@@ -1,0 +1,273 @@
+# expected jinja variables, set by calling python script
+# {{gateway}} - typically 'faraday.inria.fr'
+# {{leader}} - typically 'sopnode-l1.inria.fr'
+# {{namespace}} - typically 'oai5g'
+# {{nodes}} - typically {'k8s_fit': 'fit01', 'spgwu': 'sopnode-w3.inria.fr', 'gnb' : 'sopnode-w2.inria.fr'}
+# {{quectel_nodes}} - typically {'9': 'fit09', '18': 'fit18'}
+# {{gnb_charts}} - typically {'configmap':'','deployment':'', 'multus':'', 'values':''}
+# {{rru}} - typically 'n300' or 'n320' or 'jaguar' or 'panther'
+# {{n3xx}} - typically 'True' or 'False'
+# {{regcred}} - typically {'name': 'jdoe', 'password': 'XX', 'email': 'jdoe@yahoo.fr'}
+# {{image}} - typically 'kubernetes'
+# {{quectel_image}} - typically 'quectel-wwan0'
+# {{verbose}} - typically 'True' or 'False'
+
+nodes:
+  - id: faraday
+    hostname: {{gateway}}
+    formatter: TimeHostFormatter
+    verbose: {{verbose}}
+  - id: leader
+    hostname: {{leader}}
+    gateway: faraday
+    username: r2lab
+    formatter: TimeHostFormatter
+    verbose: {{verbose}}
+  {% for function, hostname in nodes.items() %}
+  - id: {{function}}
+    hostname: {{hostname}}
+    gateway: faraday
+    username: root
+    formatter: TimeHostFormatter
+    verbose: {{verbose}}
+  {% endfor %}
+  {% for n, hostname in quectel_dict.items() %}
+  - id: quectel_node_{{n}}
+    hostname: {{hostname}}
+    gateway: faraday
+    username: root
+    formatter: TimeHostFormatter
+    verbose: {{verbose}}
+  {% endfor %}
+
+jobs:
+  - id: load-images
+    node: faraday
+    critical: True
+    verbose: {{verbose}}
+    label: load image {{image}} on FIT worker node
+    commands:
+      - type: Run
+        command: >
+          rhubarbe load -i {{image}} {{nodes['k8s_fit']}}
+      - type: Run
+        command: >
+          rhubarbe wait {{nodes['k8s_fit']}}
+      - type: Run
+        command: >
+          rhubarbe script on-{{rru}}
+
+  {% if quectel_dict %}
+  - id: prepare-quectels
+    node: faraday
+    critical: True
+    verbose: {{verbose}}
+    label: load quectel image {{quectel_image}} on quectel UE nodes
+    commands:
+      - type: Run
+        command: >
+          rhubarbe usrpoff {%for n in quectel_dict.keys()%}{{n}} {% endfor %}
+      - type: Run
+        command: >
+          rhubarbe load -i {{quectel_image}} {%for n in quectel_dict.keys()%}{{n}} {% endfor %}
+      - type: Run
+        command: >
+          rhubarbe wait {%for n in quectel_dict.keys()%}{{n}} {% endfor %}
+      - type: Run
+        command: >
+          rhubarbe usrpon {%for n in quectel_dict.keys()%}{{n}} {% endfor %}
+      - type: Run
+        command: sleep 30
+  {% endif %}
+
+  {% for n in quectel_dict.keys() %}
+  - id: init-quectel-node-{{n}}
+    required: prepare-quectels
+    node: quectel_node_{{n}}
+    critical: True
+    verbose: {{verbose}}
+    label: init Quectel UE on fit node {{n}}
+    commands:
+      - type: RunScript
+        command: >
+          {{nodes_sh}} check-quectel-on
+        includes: {{INCLUDES}}
+      - type: Run
+        command: {{quectel_service_start}}
+      - type: Run
+        command: sleep 20
+      - type: RunScript
+        command: >
+          {{nodes_sh}} quectel-detach
+        includes: {{INCLUDES}}
+  {% endfor %}
+
+  # for now, useless to switch off other nodes as we use RfSimulator
+  # - id: turn-off-others
+  #   node: faraday
+  #   critical: False
+  #   verbose: {{verbose}}
+  #   label: turn off unused nodes
+  #   commands:
+  #   - type: Run
+  #     command: >
+  #       rhubarbe bye -- {% for h in nodes.values() %}~{{h}} {% endfor %}
+  #   - type: Run
+  #     command: sleep 1
+  #
+
+  - id: leave-join-k8s-fit-node
+    required:
+    - load-images
+    node: k8s_fit
+    critical: False
+    verbose: {{verbose}}
+    label: >
+      Prepare node {{nodes['k8s_fit']}} for k8s & networking
+    commands:
+      - type: Run
+        command: nmcli con down data; nmcli dev status; leave-tunnel
+      - type: Run
+        command: kube-install.sh leave-cluster
+      - type: Run
+        command: sleep 60
+      - type: Run
+        command: nmcli con up data; nmcli dev status; join-tunnel
+      - type: Run
+        command: kube-install.sh join-cluster r2lab@{{leader}}
+
+  - id: init-demo
+    required:
+      - leave-join-k8s-fit-node
+    node: k8s_fit
+    critical: True
+    verbose: {{verbose}}
+    label: >
+      Clone oai5g-rfsim, configure demo-oai.sh script on {{nodes.k8s_fit}},
+      clone oai-cn5g-fed, apply patches for SophiaNode R2lab environment,
+      and run the k8s demo-oai script from {{nodes.k8s_fit}}
+    commands:
+      - type: Run
+        command: >
+          rm -rf oai5g-rfsim;
+          git clone -b test-quectels https://github.com/sopnode/oai5g-rfsim.git;
+          cp oai5g-rfsim/demo-oai.sh /root/;
+          chmod a+x /root/demo-oai.sh;
+          cp oai5g-rfsim/configure-demo-oai.sh /root/;
+          chmod a+x /root/configure-demo-oai.sh;
+          /root/configure-demo-oai.sh update {{namespace}} {{nodes['spgwu']}} {{nodes['gnb']}} {%for x in regcred.values()%}{{x}} {%endfor %};
+          rm -rf oai-cn5g-fed;
+          git clone -b master https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed;
+          mkdir /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/conf;
+          cp {{gnb_charts['configmap']}} /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates/configmap.yaml;
+          cp {{gnb_charts['deployment']}} /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates/deployment.yaml;
+          cp {{gnb_charts['multus']}} /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates/multus.yaml;
+          cp {{gnb_charts['values']}} /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/values.yaml;
+          cp /root/oai5g-rfsim/gnb-config/mounted.conf /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/conf/;
+      - type: Run
+        command: /root/demo-oai.sh init {{namespace}} {{rru}}
+      - type: Run
+        command: /root/demo-oai.sh configure-all {{nodes['spgwu']}} {{nodes['gnb']}}
+
+  - id: start-demo
+    required: init-demo
+    node: k8s_fit
+    critical: True
+    verbose: {{verbose}}
+    label: >
+      Launch OAI5G pods by calling demo-oai.sh start from {{k8s_fit}}
+    commands:
+      - type: Run
+        command: /root/demo-oai.sh start {{namespace}} {{nodes['spgwu']}} {{nodes['gnb']}}
+
+  {% for n in quectel_dict.keys() %}
+  - id: attach-quectel-node-{{n}}
+    required:
+      - start-demo
+      - init-quectel-node-{{n}}
+    node: quectel_node_{{n}}
+    critical: False
+    verbose: {{verbose}}
+    label: >
+      sleep 10s, attach quectel UE on fit node {{n}}; sleep 30s and test cx
+    commands:
+      - type: Run
+        command: sleep 10
+      - type: RunScript
+        command: >
+          {{nodes_sh}} quectel-attach
+        includes: {{INCLUDES}}
+      - type: Run
+        command: sleep 30
+      - type: RunScript
+        command: >
+          {{nodes_sh}} check-quectel-cx
+        includes: {{INCLUDES}}
+  {% endfor %}
+
+  - id: stop-demo
+    required: start-demo
+    node: k8s_fit
+    critical: True
+    verbose: {{verbose}}
+    label: >
+      Delete OAI5G pods by calling demo-oai.sh stop from {{nodes.k8s_fit}}
+    commands:
+      - type: Run
+        command: /root/demo-oai.sh stop {{namespace}}
+
+  {% for n in quectel_dict.keys() %}
+  - id: detach-quectel-node-{{n}}
+    required:
+      - stop-demo
+      - attach-quectel-node-{{n}}
+    node: quectel_node_{{n}}
+    critical: False
+    verbose: {{verbose}}
+    label: >
+      detach quectel UE on fit node {{n}}
+    commands:
+      - type: RunScript
+        command: >
+          {{nodes_sh}} quectel-detach
+        includes: {{INCLUDES}}
+  {% endfor %}
+
+  - id: cleanup1
+    required: stop-demo
+    node: leader
+    critical: False
+    verbose: {{verbose}}
+    label: Drain and delete FIT nodes from the k8s {{leader}} cluster
+    commands:
+      - type: Run
+        command: fit-drain-nodes; fit-delete-nodes
+
+  - id: cleanup2
+    required: stop-demo
+    node: faraday
+    critical: False
+    verbose: {{verbose}}
+    commands:
+      - type: Run
+        command: >
+          rhubarbe script off-{{rru}}
+      - type: Run
+        command: rhubarbe off {{nodes['k8s_fit']}}
+
+  {% if quectel_dict %}
+  - id: cleanup-quectels
+    required:
+    {% for n in quectel_dict.keys() %}
+    - detach-quectel-node-{{n}}
+    {% endfor %}
+    node: faraday
+    critical: False
+    verbose: {{verbose}}
+    label: Turn off quectel nodes {{quectel_dict.keys()}}
+    commands:
+      - type: Run
+        command: rhubarbe usrpoff {%for n in quectel_dict.keys()%}{{n}} {% endfor %}
+      - type: Run
+        command: rhubarbe off {%for n in quectel_dict.keys()%}{{n}} {% endfor %}
+  {% endif %}
