@@ -3,14 +3,14 @@
 # Default k8s namespace and gNB node running oai5g pod
 DEF_NS="oai5g"
 DEF_NODE_SPGWU="sopnode-w3.inria.fr"
-DEF_NODE_GNB="sopnode-w2.inria.fr"
-DEF_RRU="n300"
+DEF_NODE_GNB="sopnode-w3.inria.fr"
+DEF_RRU="n300" # Choose between "n300", "n320", "jaguar" and "panther"
 
 # IP addresses of RRU devices
 ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.151"
 ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130,mgmt_addr=192.168.3.152"
 LOC_IF_NAME_AW2S="team0"
-LOC_ADDR_AW2S="TBD"
+LOC_ADDR_AW2S="192.168.100.166" # should match aw2sIPadd in gNB values.yaml chart
 ADDR_JAGUAR="192.168.100.48" # for eth1
 ADDR_PANTHER="192.168.100.50" # .50 for eth1 and .51 for eth2
 

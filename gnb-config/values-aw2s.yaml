@@ -68,12 +68,9 @@ multus:    # needed when gnB service will run on another interface rather than t
   hostInterface: "team0" # Interface of the node (sopnode-w2) on which this pod will be scheduled for N2 and N3
   n3IPadd: "192.168.100.164"
   n3Netmask: "24"
-  sfp1IPadd: "192.168.10.132" # .10.129 for our USRP N300 and .10.130 for our N320
-  sfp1Netmask: "26"
-  sfp1hostInterface: "eth2"
-  sfp2IPadd: "192.168.20.132" #	.20.129 for our USRP N300 and .20.130 for our N320
-  sfp2Netmask: "26"
-  sfp2hostInterface: "eth3"
+  aw2sIPadd: "192.168.100.166" # .100.48 for our Jaguar and .100.50 for our Panther
+  aw2sNetmask: "24"
+  aw2shostInterface: "team0"
 
 config:
   timeZone: "Europe/Paris"

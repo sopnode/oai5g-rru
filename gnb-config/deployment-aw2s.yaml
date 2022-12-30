@@ -26,10 +26,7 @@ spec:
                  "name": "{{ .Chart.Name }}-net2"
           },
           {
-                 "name": "{{ .Chart.Name }}-usrp1"
-          },
-          {
-                 "name": "{{ .Chart.Name }}-usrp2"
+                 "name": "{{ .Chart.Name }}-aw2s"
           }]
     {{- end }}
     spec:
