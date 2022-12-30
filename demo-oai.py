@@ -2,7 +2,7 @@
 
 """
 This script prepares one fit R2lab node to join the SophiaNode k8s cluster as a worker node for the oai5g demo.
-Then, it clones the oai5g-rfsim git directory on one of the 4 fit nodes and applies
+Then, it clones the oai5g-rru git directory on one of the 4 fit nodes and applies
 different patches on the various OAI5G charts to make them run on the k8s cluster.
 Finally, it deploys the different OAI5G pods through the same fit node.
 
@@ -88,15 +88,15 @@ def run(*, mode, gateway, slicename,
     )
 
     if rru == "n300" or rru == "n320":
-        configmap = '/root/oai5g-rfsim/gnb-config/configmap-n3xx.yaml'
-        deployment = '/root/oai5g-rfsim/gnb-config/deployment-n3xx.yaml'
-        multus = '/root/oai5g-rfsim/gnb-config/multus-n3xx.yaml'
-        values= '/root/oai5g-rfsim/gnb-config/values-n3xx.yaml'
+        configmap = '/root/oai5g-rru/gnb-config/configmap-n3xx.yaml'
+        deployment = '/root/oai5g-rru/gnb-config/deployment-n3xx.yaml'
+        multus = '/root/oai5g-rru/gnb-config/multus-n3xx.yaml'
+        values= '/root/oai5g-rru/gnb-config/values-n3xx.yaml'
     else:
-        configmap = '/root/oai5g-rfsim/gnb-config/configmap-aw2s.yaml'
-        deployment = '/root/oai5g-rfsim/gnb-config/deployment-aw2s.yaml'
-        multus = '/root/oai5g-rfsim/gnb-config/multus-aw2s.yaml'
-        values = '/root/oai5g-rfsim/gnb-config/values-aw2s.yaml'
+        configmap = '/root/oai5g-rru/gnb-config/configmap-aw2s.yaml'
+        deployment = '/root/oai5g-rru/gnb-config/deployment-aw2s.yaml'
+        multus = '/root/oai5g-rru/gnb-config/multus-aw2s.yaml'
+        values = '/root/oai5g-rru/gnb-config/values-aw2s.yaml'
 
     gnb_charts = {
         'configmap': configmap,
@@ -396,7 +396,7 @@ def main():
         print(f"the following nodes will be used:")
         print(f"\t{r2lab_hostname(args.k8s_fit)} as k8s worker node")
         print(f"\t{args.spgwu} for oai-spgwu-tiny")
-        print(f"\t{args.gnb} for oai-gnb attached to {args.rru} as RRU hardware device")
+        print(f"\t{args.gnb} for oai-gnb attached to {args.rru[0]} as RRU hardware device")
         print(f"FIT image loading:",
               f"YES with {args.image}" if args.load_images
               else "NO (use --load-images if needed)")
@@ -409,7 +409,7 @@ def main():
         leader=args.leader, namespace=args.namespace,
         auto_start=args.auto_start, load_images=args.load_images,
         k8s_fit=args.k8s_fit, spgwu=args.spgwu, gnb=args.gnb,
-        quectel_nodes=args.quectel_nodes, rru=args.rru,
+        quectel_nodes=args.quectel_nodes, rru=args.rru[0],
         regcred_name=args.regcred_name,
         regcred_password=args.regcred_password,
         regcred_email=args.regcred_email,

@@ -6,7 +6,6 @@
 # {{quectel_nodes}} - typically {'9': 'fit09', '18': 'fit18'}
 # {{gnb_charts}} - typically {'configmap':'','deployment':'', 'multus':'', 'values':''}
 # {{rru}} - typically 'n300' or 'n320' or 'jaguar' or 'panther'
-# {{n3xx}} - typically 'True' or 'False'
 # {{regcred}} - typically {'name': 'jdoe', 'password': 'XX', 'email': 'jdoe@yahoo.fr'}
 # {{image}} - typically 'kubernetes'
 # {{quectel_image}} - typically 'quectel-wwan0'
@@ -143,17 +142,17 @@ jobs:
     critical: True
     verbose: {{verbose}}
     label: >
-      Clone oai5g-rfsim, configure demo-oai.sh script on {{nodes.k8s_fit}},
+      Clone oai5g-rru, configure demo-oai.sh script on {{nodes.k8s_fit}},
       clone oai-cn5g-fed, apply patches for SophiaNode R2lab environment,
       and run the k8s demo-oai script from {{nodes.k8s_fit}}
     commands:
       - type: Run
         command: >
-          rm -rf oai5g-rfsim;
-          git clone -b test-quectels https://github.com/sopnode/oai5g-rfsim.git;
-          cp oai5g-rfsim/demo-oai.sh /root/;
+          rm -rf oai5g-rru;
+          git clone -b master https://github.com/sopnode/oai5g-rru.git;
+          cp oai5g-rru/demo-oai.sh /root/;
           chmod a+x /root/demo-oai.sh;
-          cp oai5g-rfsim/configure-demo-oai.sh /root/;
+          cp oai5g-rru/configure-demo-oai.sh /root/;
           chmod a+x /root/configure-demo-oai.sh;
           /root/configure-demo-oai.sh update {{namespace}} {{nodes['spgwu']}} {{nodes['gnb']}} {%for x in regcred.values()%}{{x}} {%endfor %};
           rm -rf oai-cn5g-fed;
@@ -163,7 +162,6 @@ jobs:
           cp {{gnb_charts['deployment']}} /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates/deployment.yaml;
           cp {{gnb_charts['multus']}} /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates/multus.yaml;
           cp {{gnb_charts['values']}} /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/values.yaml;
-          cp /root/oai5g-rfsim/gnb-config/mounted.conf /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/conf/;
       - type: Run
         command: /root/demo-oai.sh init {{namespace}} {{rru}}
       - type: Run

@@ -11,8 +11,8 @@ ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.1
 ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130,mgmt_addr=192.168.3.152"
 LOC_IF_NAME_AW2S="team0"
 LOC_ADDR_AW2S="TBD"
-ADDR_JAGUAR="TBD"
-ADDR_PANTHER="TBD"
+ADDR_JAGUAR="192.168.100.48" # for eth1
+ADDR_PANTHER="192.168.100.50" # .50 for eth1 and .51 for eth2
 
 # gNB conf file for RRU devices
 CONF_AW2S="gnb.sa-rru-50MHz-2x2.conf"
@@ -240,7 +240,7 @@ function init() {
 
     # Configure gnb conf file
     echo "Configuring gNB conf for $rru"
-    DIR_ORIG="/root/oai5g-rfsim/gnb-config/originals/"
+    DIR_ORIG="/root/oai5g-rru/gnb-config/originals/"
     DIR_DEST="/root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/conf/"
     if [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
 	CONF_ORIG="$DIR_ORIG/$CONF_N3XX"
