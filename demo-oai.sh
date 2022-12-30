@@ -250,7 +250,7 @@ function init() {
 	if [ "$rru" == "n300" ] ; then
 	   SDR_ADDRS="$ADDRS_N300"
 	elif [ "$rru" == "n320" ] ; then
-	   SDR_ADDRS="$ADDRS_N300"
+	   SDR_ADDRS="$ADDRS_N320"
 	fi
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	CONF_ORIG="$DIR_ORIG/$CONF_AW2S"
