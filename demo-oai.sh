@@ -3,7 +3,7 @@
 # Default k8s namespace and gNB node running oai5g pod
 DEF_NS="oai5g"
 DEF_NODE_SPGWU="sopnode-w3.inria.fr"
-DEF_NODE_GNB="sopnode-w3.inria.fr"
+DEF_NODE_GNB="sopnode-w2.inria.fr"
 DEF_RRU="n300" # Choose between "n300", "n320", "jaguar" and "panther"
 
 # IP addresses of RRU devices
