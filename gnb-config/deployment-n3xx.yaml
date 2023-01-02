@@ -90,7 +90,12 @@ spec:
             valueFrom:
               configMapKeyRef:
                 name: {{ .Chart.Name }}-configmap
-                key: useSATddMono
+                key: useSaTddMono
+          - name: USE_SA_FDD_MONO
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Chart.Name }}-configmap
+                key: useSaFddMono
           - name: GNB_NAME
             valueFrom:
               configMapKeyRef:
@@ -121,16 +126,11 @@ spec:
               configMapKeyRef:
                 name: {{ .Chart.Name }}-configmap
                 key: nssaiSst
-          - name: NSSAI_SD0
+          - name: NSSAI_SD
             valueFrom:
               configMapKeyRef:
                 name: {{ .Chart.Name }}-configmap
-                key: nssaiSd0
-          - name: NSSAI_SD1
-            valueFrom:
-              configMapKeyRef:
-                name: {{ .Chart.Name }}-configmap
-                key: nssaiSd1
+                key: nssaiSd
           - name: AMF_IP_ADDRESS
             valueFrom:
               configMapKeyRef:

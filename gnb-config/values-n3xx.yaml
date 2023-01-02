@@ -78,15 +78,15 @@ multus:    # needed when gnB service will run on another interface rather than t
 config:
   timeZone: "Europe/Paris"
   rfSimulator: "server" 
-  useSATddMono: "yes"
-  gnbName: "gnb-rfsim"
+  useSaTddMono: "yes"
+  useSaFddMono: "no"
+  gnbName: "gnb-r2lab"
   mcc: "208"   # check the information with AMF, SMF, UPF/SPGWU
   mnc: "95"    # check the information with AMF, SMF, UPF/SPGWU
   mncLength: "2" # check the information with AMF, SMF, UPF/SPGWU
   tac: "1"     # check the information with AMF
   nssaiSst: "1"  #currently only 4 standard values are allowed 1,2,3,4 
-  nssaiSd0: "1"    #values in hexa-decimal format
-  nssaiSd1: "10203"
+  nssaiSd: "1"    #values in hexa-decimal format
   useFqdn: "false"
   amfFqdn: "oai-amf-svc"
   amfIpAddress: "192.168.100.161"  # amf ip-address or service-name
