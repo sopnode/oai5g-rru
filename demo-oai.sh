@@ -7,8 +7,8 @@ DEF_NODE_GNB="sopnode-w2.inria.fr"
 DEF_RRU="n300" # Choose between "n300", "n320", "jaguar" and "panther"
 
 # IP addresses of RRU devices
-ADDRS_N300="addr=192.168.200.129,second_addr=192.168.200.229,mgmt_addr=192.168.3.151"
-ADDRS_N320="addr=192.168.200.130,second_addr=192.168.200.230,mgmt_addr=192.168.3.152"
+ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.151"
+ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130,mgmt_addr=192.168.3.152"
 LOC_IF_NAME_AW2S="eth1" # before "team0"
 LOC_ADDR_AW2S="192.168.100.166" # should match aw2sIPadd in gNB values.yaml chart
 ADDR_JAGUAR="192.168.100.48" # for eth1
