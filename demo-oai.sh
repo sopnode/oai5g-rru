@@ -9,10 +9,14 @@ DEF_RRU="n300" # Choose between "n300", "n320", "jaguar" and "panther"
 # IP addresses of RRU devices
 ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.151"
 ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130,mgmt_addr=192.168.3.152"
-LOC_IF_NAME_AW2S="team0"
+LOC_IF_NAME_AW2S="eth1" # before "team0"
 LOC_ADDR_AW2S="192.168.100.166" # should match aw2sIPadd in gNB values.yaml chart
 ADDR_JAGUAR="192.168.100.48" # for eth1
 ADDR_PANTHER="192.168.100.50" # .50 for eth1 and .51 for eth2
+
+# N2/N3 Interfaces definition
+IF_NAME_N2="eth1" # before "team0" for AMF
+IF_NAME_N3="eth1" # before "team0" for SPGWU
 
 # gNB conf file for RRU devices
 CONF_AW2S="gnb.sa-rru-50MHz-2x2.conf"
@@ -47,7 +51,7 @@ function configure-oai-5g-basic() {
 s|create: false|create: true|
 s|n1IPadd:.*|n1IPadd: "192.168.100.161"|
 s|n1Netmask:.*|n1Netmask: "24"|
-s|hostInterface:.*|hostInterface: "team0" # interface of the node (sopnode-w3) running amf pod for N2|
+s|hostInterface:.*|hostInterface: "$IF_NAME_N2" # interface of the node (sopnode-w3) running amf pod for N2|
 s|amfInterfaceNameForNGAP: "eth0" # If multus creation is true then net1 else eth0|amfInterfaceNameForNGAP: "net1" # If multus creation is true then net1 else eth0|
 s|mnc: "99".*|mnc: "95"|
 s|servedGuamiMnc0: "99"|servedGuamiMnc0: "95"|
@@ -55,7 +59,7 @@ s|plmnSupportMnc: "99"|plmnSupportMnc: "95"|
 s|operatorKey:.*|operatorKey: "8e27b6af0e692e750f32667a3b14605d"  # should be same as in subscriber database|  
 s|n3Ip:.*|n3Ip: "192.168.100.162"|
 s|n3Netmask:.*|n3Netmask: "24"|
-s|hostInterface:.*|hostInterface: "team0" # interface of the node (sopnode-w3) running spgwu pod for N3|
+s|hostInterface:.*|hostInterface: "$IF_NAME_N3" # interface of the node (sopnode-w3) running spgwu pod for N3|
 s|sgwS1uIf: "eth0"  # n3 interface, net1 if gNB is outside the cluster network and multus creation is true else eth0|sgwS1uIf: "net1"  # n3 interface, net1 if gNB is outside the cluster network and multus creation is true else eth0|
 s|pgwSgiIf: "eth0"  # net1 if gNB is outside the cluster network and multus creation is true else eth0 (important because it sends the traffic towards internet)|pgwSgiIf: "eth0"  # net1 if gNB is outside the cluster network and multus creation is true else eth0 (important because it sends the traffic towards internet)|
 s|dnsIpv4Address: "172.21.3.100" # configure the dns for UE don't use Kubernetes DNS|dnsIpv4Address: "138.96.0.210" # configure the dns for UE don't use Kubernetes DNS|
