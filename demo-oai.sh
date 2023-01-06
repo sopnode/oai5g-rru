@@ -196,9 +196,9 @@ function configure-gnb() {
     echo "Configuring chart $ORIG_CHART for R2lab"
     if [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
 	if [[ "$rru" == "n300" ]]; then
-	    SDR_ADDRS=ADDRS_N300
+	    SDR_ADDRS="$ADDRS_N300"
 	elif [["$rru" == "n320" ]]; then
-	    SDR_ADDRS=ADDRS_N320
+	    SDR_ADDRS="$ADDRS_N320"
 	fi
 	cat > "$SED_FILE" <<EOF
 s|n2hostInterface:.*|n2hostInterface: "$GNB_IF_NAME_N2"|
