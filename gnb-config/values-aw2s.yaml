@@ -77,14 +77,13 @@ config:
   timeZone: "Europe/Paris"
   rfSimulator: "server" 
   useSATddMono: "yes"
-  gnbName: "gnb-rfsim"
+  gnbName: "gnb-r2lab"
   mcc: "208"   # check the information with AMF, SMF, UPF/SPGWU
   mnc: "95"    # check the information with AMF, SMF, UPF/SPGWU
   mncLength: "2" # check the information with AMF, SMF, UPF/SPGWU
   tac: "1"     # check the information with AMF
   nssaiSst: "1"  #currently only 4 standard values are allowed 1,2,3,4 
-  nssaiSd0: "1"    #values in hexa-decimal format
-  nssaiSd1: "10203"
+  nssaiSd: "1"    #values in hexa-decimal format
   useFqdn: "false"
   amfFqdn: "oai-amf-svc"
   amfIpAddress: "192.168.100.161"  # amf ip-address or service-name
@@ -92,8 +91,11 @@ config:
   gnbNgaIpAddress: "192.168.100.163" # n2IPadd in case multus create is true
   gnbNguIfName: "net2"   #net2 in case multus create is true gtu interface for upf/spgwu
   gnbNguIpAddress: "192.168.100.164" # n3IPadd in case multus create is true
-  useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15"
-#  useAdditionalOptions: '--usrp-args "type=n3xx,mgmt_addr=192.168.3.151,addr=192.168.10.129,second_addr=192.168.20.129"'
+  localIfName: "team0"
+  remoteAddr: "192.168.100.48"
+  localAddr: "192.168.100.166"
+  useAdditionalOptions: ""
+
 
 persistence:
   sharedvolume: false

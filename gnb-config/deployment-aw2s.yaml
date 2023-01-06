@@ -67,7 +67,7 @@ spec:
           - infinity
         {{- end}}
         volumeMounts:
-        - mountPath: "/opt/oai-gnb/etc/mounted.conf"
+        - mountPath: "/opt/oai-gnb-aw2s/etc/mounted.conf"
           name: script
           subPath: "mounted.conf"
         env:
@@ -118,16 +118,11 @@ spec:
               configMapKeyRef:
                 name: {{ .Chart.Name }}-configmap
                 key: nssaiSst
-          - name: NSSAI_SD0
+          - name: NSSAI_SD
             valueFrom:
               configMapKeyRef:
                 name: {{ .Chart.Name }}-configmap
-                key: nssaiSd0
-          - name: NSSAI_SD1
-            valueFrom:
-              configMapKeyRef:
-                name: {{ .Chart.Name }}-configmap
-                key: nssaiSd1
+                key: nssaiSd
           - name: AMF_IP_ADDRESS
             valueFrom:
               configMapKeyRef:
@@ -175,6 +170,21 @@ spec:
                 name: {{ .Chart.Name }}-configmap
                 key: gnbNguIpAddress
             {{- end}}
+          - name: LOCAL_IF_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Chart.Name }}-configmap
+                key: localIfName
+          - name: REMOTE_ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Chart.Name }}-configmap
+                key: remoteAddr
+          - name: LOCAL_ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Chart.Name }}-configmap
+                key: localAddr
           - name: USE_ADDITIONAL_OPTIONS
             valueFrom:
               configMapKeyRef:

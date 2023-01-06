@@ -7,7 +7,7 @@ DEF_NODE_GNB="sopnode-w2.inria.fr"
 DEF_RRU="n300" # Choose between "n300", "n320", "jaguar" and "panther"
 
 # IP addresses of RRU devices
-ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.151"
+ADDRS_N300='addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.151,clock_source=internal,time_source=internal'"addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.151"
 ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130,mgmt_addr=192.168.3.152"
 LOC_IF_NAME_AW2S="eth1" # before "team0"
 LOC_ADDR_AW2S="192.168.100.166" # should match aw2sIPadd in gNB values.yaml chart
@@ -193,11 +193,37 @@ function configure-gnb() {
 
     # Tune values.yaml chart
     echo "Configuring chart $ORIG_CHART for R2lab"
-    cat > "$SED_FILE" <<EOF
-s|n2hostInterface:.*|n2hostInterface: $GNB_IF_NAME_N2|
-s|n3hostInterface:.*|n3hostInterface: $GNB_IF_NAME_N3|
+    if [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
+	if [[ "$rru" == "n300" ]]; then
+	    SDR_ADDRS=ADDRS_N300
+	elif [["$rru" == "n320" ]]; then
+	    SDR_ADDRS=ADDRS_N320
+	fi
+	cat > "$SED_FILE" <<EOF
+s|n2hostInterface:.*|n2hostInterface: "$GNB_IF_NAME_N2"|
+s|n3hostInterface:.*|n3hostInterface: "$GNB_IF_NAME_N3"|
+s|sdrAddrs:.*|sdrAddrs: "$SDR_ADDRS,clock_source=internal,time_source=internal"|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
+    elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
+	if [ "$rru" == "jaguar" ] ; then
+	    ADDR_AW2S="$ADDR_JAGUAR"
+	elif [ "$rru" == "panther" ] ; then
+	    ADDR_AW2S="$ADDR_PANTHER"
+	fi
+	cat > "$SED_FILE" <<EOF
+s|n2hostInterface:.*|n2hostInterface: "$GNB_IF_NAME_N2"|
+s|n3hostInterface:.*|n3hostInterface: "$GNB_IF_NAME_N3"|
+s|aw2shostInterface:.*|aw2shostInterface: "$LOC_IF_NAME_AW2S"|
+s|localIfName:.*|localIfName: "$LOC_IF_NAME_AW2S"|
+s|remoteAddr.*|remoteAddr: "$LOC_ADDR_AW2S"|
+s|localAddr.*|localAddr: "$ADDR_AW2S"|
+s|nodeName:.*|nodeName: $node_gnb|
+EOF
+    else
+        echo "Unknown rru selected: $rru"
+        usage
+    fi
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
     sed -f "$SED_FILE" < /tmp/"$FUNCTION"_values.yaml-orig > "$ORIG_CHART"
