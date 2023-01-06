@@ -151,7 +151,7 @@ function configure-mysql() {
    `3gppChargingCharacteristics` varchar(50) DEFAULT NULL
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 +INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES 
-+('208950100001121', '20895', '{\"sst\": 1, \"sd\": \"10203\"}','{\"oai\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 6,\"arp\":{\"priorityLevel\": 1,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"NOT_PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"100Mbps\", \"downlink\":\"100Mbps\"}}}');
++('208950100001121', '20895', '{\"sst\": 1, \"sd\": \"1\"}','{\"oai\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 6,\"arp\":{\"priorityLevel\": 1,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"NOT_PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"100Mbps\", \"downlink\":\"100Mbps\"}}}');
 +
  
  -- --------------------------------------------------------
@@ -306,7 +306,7 @@ function init() {
     # add NSSAI sd info for PLMN and sdr_addrs for RUs 
     SED_FILE="/tmp/gnb_conf.sed"
     cat > "$SED_FILE" <<EOF
-s|sst =.*|sst = 1; sd = 0x1; }) });|
+s|sst = 1|sst = 1; sd = 0x1 |
 s|mnc = 99;|mnc = 95;|
 s|ipv4       =.*|ipv4       = "192.168.100.161";|
 s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
@@ -318,7 +318,7 @@ EOF
     cp "$DIR_DEST"/mounted.conf /tmp/mounted.conf
     sed -f "$SED_FILE" < /tmp/mounted.conf > "$DIR_DEST"/mounted.conf
 
-    # add SDR IP ADDRESSES
+    # set SDR IP ADDRESSES
     if [[ "$rru" == "n300" || "$rru" == "n320" ]] ; then
         perl -i -p0e "s/#clock_src = \"internal\";/#clock_src = \"internal\";\n  sdr_addrs = \"$SDR_ADDRS,clock_source=internal,time_source=internal\";/s" "$DIR_DEST"/mounted.conf
     else
