@@ -165,7 +165,7 @@ jobs:
       - type: Run
         command: /root/demo-oai.sh init {{namespace}} {{rru}}
       - type: Run
-        command: /root/demo-oai.sh configure-all {{nodes['spgwu']}} {{nodes['gnb']}}
+        command: /root/demo-oai.sh configure-all {{nodes['spgwu']}} {{nodes['gnb']}} {{rru}}
 
   - id: start-demo
     required: init-demo
