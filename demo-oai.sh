@@ -7,7 +7,7 @@ DEF_NODE_GNB="sopnode-w2.inria.fr"
 DEF_RRU="n300" # Choose between "n300", "n320", "jaguar" and "panther"
 
 # IP addresses of RRU devices
-ADDRS_N300='addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.151,clock_source=internal,time_source=internal'"addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.151"
+ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.151"
 ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130,mgmt_addr=192.168.3.152"
 LOC_IF_NAME_AW2S="eth1" # before "team0"
 LOC_ADDR_AW2S="192.168.100.166" # should match aw2sIPadd in gNB values.yaml chart
@@ -320,8 +320,7 @@ EOF
 
     # add SDR IP ADDRESSES
     if [[ "$rru" == "n300" || "$rru" == "n320" ]] ; then
-	#	perl -i -p0e "s/#clock_src = \"internal\";/#clock_src = \"internal\";\n  sdr_addrs = \"$SDR_ADDRS,clock_source=internal,time_source=internal\";/s" "$DIR_DEST"/mounted.conf
-	echo sdr_addrs will be set using oai-gnb entrypoint.sh
+        perl -i -p0e "s/#clock_src = \"internal\";/#clock_src = \"internal\";\n  sdr_addrs = \"$SDR_ADDRS,clock_source=internal,time_source=internal\";/s" "$DIR_DEST"/mounted.conf
     else
 	SED_FILE="/tmp/aw2s_conf.sed"
 	cat > "$SED_FILE" <<EOF
