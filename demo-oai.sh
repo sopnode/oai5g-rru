@@ -35,7 +35,7 @@ function usage() {
     echo "demo-oai.sh init [namespace rru] |"
     echo "            start [namespace node_spgwu node_gnb] |"
     echo "            stop [namespace] |"
-    echo "            configure-all [node_spgwu node_gnb] |"
+    echo "            configure-all [node_spgwu node_gnb rru] |"
     echo "            reconfigure [node_spgwu node_gnb] |"
     echo "            start-cn [namespace node_spgwu] |"
     echo "            start-gnb [namespace node_gnb] |"
@@ -185,6 +185,7 @@ function configure-spgwu-tiny() {
 
 function configure-gnb() {
     node_gnb=$1; shift
+    rru=$1; shift
     
     FUNCTION="oai-gnb"
     DIR="$OAI5G_RAN/$FUNCTION"
@@ -236,6 +237,8 @@ function configure-all() {
     shift
     node_gnb=$1
     shift
+    rru=$1
+    shift
 
     echo "Applying SopNode patches to OAI5G located on "$HOME"/oai-cn5g-fed"
     echo -e "\t with oai-spgwu-tiny running on $node_spgwu"
@@ -245,7 +248,7 @@ function configure-all() {
     configure-mysql
     configure-amf
     configure-spgwu-tiny
-    configure-gnb $node_gnb
+    configure-gnb $node_gnb $rru
 }
 
 
@@ -488,11 +491,11 @@ else
             usage
         fi
     elif [ "$1" == "configure-all" ]; then
-        if test $# -eq 3; then
-            configure-all $2 $3
+        if test $# -eq 4; then
+            configure-all $2 $3 $4
 	    exit 0
         elif test $# -eq 1; then
-	    configure-all $DEF_NODE_SPGWU $DEF_NODE_GNB
+	    configure-all $DEF_NODE_SPGWU $DEF_NODE_GNB $DEF_RRU
 	else
             usage
         fi
