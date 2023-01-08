@@ -91,7 +91,7 @@ config:
   gnbNgaIpAddress: "192.168.100.163" # n2IPadd in case multus create is true
   gnbNguIfName: "net2"   #net2 in case multus create is true gtu interface for upf/spgwu
   gnbNguIpAddress: "192.168.100.164" # n3IPadd in case multus create is true
-  localIfName: "team0"
+  localIfName: "net3"
   remoteAddr: "192.168.100.48"
   localAddr: "192.168.100.166"
   useAdditionalOptions: ""
