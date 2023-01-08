@@ -216,7 +216,7 @@ EOF
 s|n2hostInterface:.*|n2hostInterface: "$GNB_IF_NAME_N2"|
 s|n3hostInterface:.*|n3hostInterface: "$GNB_IF_NAME_N3"|
 s|aw2shostInterface:.*|aw2shostInterface: "$LOC_IF_NAME_AW2S"|
-s|localIfName:.*|localIfName: "$net3"|
+s|localIfName:.*|localIfName: "net3"|
 s|remoteAddr.*|remoteAddr: "$LOC_ADDR_AW2S"|
 s|localAddr.*|localAddr: "$ADDR_AW2S"|
 s|nodeName:.*|nodeName: $node_gnb|
