@@ -325,8 +325,8 @@ EOF
 	SED_FILE="/tmp/aw2s_conf.sed"
 	cat > "$SED_FILE" <<EOF
 s|local_if_name.*|local_if_name  = "net3"|
-s|remote_address.*|remote_address = "$LOC_ADDR_AW2S"|
-s|local_address.*|local_address = "$ADDR_AW2S"|
+s|remote_address.*|remote_address = "$ADDR_AW2S"|
+s|local_address.*|local_address = "$LOC_ADDR_AW2S"|
 EOF
 	cp "$DIR_DEST"/mounted.conf /tmp/mounted.conf
 	sed -f "$SED_FILE" < /tmp/mounted.conf > "$DIR_DEST"/mounted.conf
