@@ -12,6 +12,7 @@ IP_AMF_N1="$P100.241"
 IP_UPF_N3="$P100.242"
 IP_GNB_N2="$P100.243"
 IP_GNB_N3="$P100.244"
+IP_GNB_AW2S="$P100.245" 
 
 # Interface name of VLAN 100 on sopnode servers
 IF_NAME_VLAN100="team0"
@@ -225,8 +226,11 @@ EOF
 	    ADDR_AW2S="$ADDR_PANTHER"
 	fi
 	cat > "$SED_FILE" <<EOF
+s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
 s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
+s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
 s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
+s|aw2sIPadd:.*|aw2sIPadd: "$IP_GNB_AW2S"|
 s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
 s|localIfName:.*|localIfName: "net3"|
 s|remoteAddr.*|remoteAddr: "$ADDR_AW2S"| 
