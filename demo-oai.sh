@@ -7,18 +7,19 @@ DEF_NODE_GNB="sopnode-w2.inria.fr"
 DEF_RRU="n300" # Choose between "n300", "n320", "jaguar" and "panther"
 
 # IP addresses of RRU devices
+IF_VLAN100="eth4"
 ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.151"
 ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130,mgmt_addr=192.168.3.152"
-LOC_IF_NAME_AW2S="eth1" # before "team0"
+LOC_IF_NAME_AW2S="$IF_VLAN100" # before "team0" for AW2S device
 LOC_ADDR_AW2S="192.168.100.166" # should match aw2sIPadd in gNB values.yaml chart
 ADDR_JAGUAR="192.168.100.48" # for eth1
 ADDR_PANTHER="192.168.100.50" # .50 for eth1 and .51 for eth2
 
 # N2/N3 Interfaces definition
-AMF_IF_NAME_N2="eth1" # before "team0" for AMF
-SPGWU_IF_NAME_N3="eth1" # before "team0" for SPGWU
-GNB_IF_NAME_N2="eth1" # before "team0" for GNB
-GNB_IF_NAME_N3="eth1" # before "team0" for GNB
+AMF_IF_NAME_N2="$IF_VLAN100" # before "team0" for AMF
+SPGWU_IF_NAME_N3="$IF_VLAN100" # before "team0" for SPGWU
+GNB_IF_NAME_N2="$IF_VLAN100" # before "team0" for GNB
+GNB_IF_NAME_N3="$IF_VLAN100" # before "team0" for GNB
 
 # gNB conf file for RRU devices
 CONF_AW2S="gnb.sa-rru-50MHz-2x2.conf"
