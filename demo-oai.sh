@@ -23,7 +23,7 @@ ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.1
 ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130,mgmt_addr=192.168.3.152"
 ## AW2S devices
 ADDR_JAGUAR="$P100.48" # for eth1
-ADDR_PANTHER="$P100.50" # .50 for eth1 and .51 for eth2
+ADDR_PANTHER="$P100.51" # .50 for eth1 and .51 for eth2
 
 # N2/N3 Interfaces definition
 IF_NAME_AMF_N2="$IF_NAME_VLAN100"
