@@ -26,10 +26,10 @@ spec:
                  "name": "{{ .Chart.Name }}-net2"
           },
           {
-                 "name": "{{ .Chart.Name }}-usrp1"
+                 "name": "{{ .Chart.Name }}-net3"
           },
           {
-                 "name": "{{ .Chart.Name }}-usrp2"
+                 "name": "{{ .Chart.Name }}-net4"
           }]
     {{- end }}
     spec:

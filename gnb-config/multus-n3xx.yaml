@@ -43,7 +43,7 @@ spec:
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition 
 metadata:
-  name: {{ .Chart.Name }}-usrp1
+  name: {{ .Chart.Name }}-net3
 spec:
   config: '{ 
       "cniVersion": "0.3.0",
@@ -63,7 +63,7 @@ spec:
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition 
 metadata:
-  name: {{ .Chart.Name }}-usrp2
+  name: {{ .Chart.Name }}-net4
 spec:
   config: '{ 
       "cniVersion": "0.3.0",
