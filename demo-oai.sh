@@ -2,24 +2,35 @@
 
 # Default k8s namespace and gNB node running oai5g pod
 DEF_NS="oai5g"
-DEF_NODE_SPGWU="sopnode-w3.inria.fr"
+DEF_NODE_SPGWU="sopnode-w3.inria.fr" # AMF pod will run on the same host than the one for SPGWU pod
 DEF_NODE_GNB="sopnode-w2.inria.fr"
 DEF_RRU="n300" # Choose between "n300", "n320", "jaguar" and "panther"
 
+# IP Pod addresses
+P100="192.168.100"
+IP_AMF_N1="$P100.241"
+IP_UPF_N3="$P100.242"
+IP_GNB_N2="$P100.243"
+IP_GNB_N3="$P100.244"
+
+# Interface name of VLAN 100 on sopnode servers
+IF_NAME_VLAN100="team0"
+
 # IP addresses of RRU devices
-IF_VLAN100="eth4"
+## USRP N3XX devices
 ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.151"
 ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130,mgmt_addr=192.168.3.152"
-LOC_IF_NAME_AW2S="$IF_VLAN100" # before "team0" for AW2S device
-LOC_ADDR_AW2S="192.168.100.166" # should match aw2sIPadd in gNB values.yaml chart
-ADDR_JAGUAR="192.168.100.48" # for eth1
-ADDR_PANTHER="192.168.100.50" # .50 for eth1 and .51 for eth2
+## AW2S devices
+IF_NAME_LOCAL_AW2S="$IF_NAME_VLAN100"
+ADDR_LOCAL_AW2S="$P100.166" # should match aw2sIPadd in gNB values.yaml chart
+ADDR_JAGUAR="$P100.48" # for eth1
+ADDR_PANTHER="$P100.50" # .50 for eth1 and .51 for eth2
 
 # N2/N3 Interfaces definition
-AMF_IF_NAME_N2="$IF_VLAN100" # before "team0" for AMF
-SPGWU_IF_NAME_N3="$IF_VLAN100" # before "team0" for SPGWU
-GNB_IF_NAME_N2="$IF_VLAN100" # before "team0" for GNB
-GNB_IF_NAME_N3="$IF_VLAN100" # before "team0" for GNB
+IF_NAME_AMF_N2="$IF_NAME_VLAN100"
+IF_NAME_SPGWU_N3="$IF_NAME_VLAN100"
+IF_NAME_GNB_N2="$IF_NAME_VLAN100"
+IF_NAME_GNB_N3="$IF_NAME_VLAN100"
 
 # gNB conf file for RRU devices
 CONF_AW2S="gnb.sa-rru-50MHz-2x2.conf"
@@ -52,17 +63,17 @@ function configure-oai-5g-basic() {
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
     cat > /tmp/basic-r2lab.sed <<EOF
 s|create: false|create: true|
-s|n1IPadd:.*|n1IPadd: "192.168.100.161"|
+s|n1IPadd:.*|n1IPadd: "$IP_AMF_N1"|
 s|n1Netmask:.*|n1Netmask: "24"|
-s|hostInterface:.*|hostInterface: "$AMF_IF_NAME_N2" # interface of the node (sopnode-w3) running amf pod for N2|
+s|hostInterface:.*|hostInterface: "$IF_NAME_AMF_N2" # interface of the node (sopnode-w3) running amf pod for N2|
 s|amfInterfaceNameForNGAP: "eth0" # If multus creation is true then net1 else eth0|amfInterfaceNameForNGAP: "net1" # If multus creation is true then net1 else eth0|
 s|mnc: "99".*|mnc: "95"|
 s|servedGuamiMnc0: "99"|servedGuamiMnc0: "95"|
 s|plmnSupportMnc: "99"|plmnSupportMnc: "95"|
 s|operatorKey:.*|operatorKey: "8e27b6af0e692e750f32667a3b14605d"  # should be same as in subscriber database|  
-s|n3Ip:.*|n3Ip: "192.168.100.162"|
+s|n3Ip:.*|n3Ip: "$IP_UPF_N3"|
 s|n3Netmask:.*|n3Netmask: "24"|
-s|hostInterface:.*|hostInterface: "$SPGWU_IF_NAME_N3" # interface of the node (sopnode-w3) running spgwu pod for N3|
+s|hostInterface:.*|hostInterface: "$IF_NAME_SPGWU_N3" # interface of the node (sopnode-w3) running spgwu pod for N3|
 s|sgwS1uIf: "eth0"  # n3 interface, net1 if gNB is outside the cluster network and multus creation is true else eth0|sgwS1uIf: "net1"  # n3 interface, net1 if gNB is outside the cluster network and multus creation is true else eth0|
 s|pgwSgiIf: "eth0"  # net1 if gNB is outside the cluster network and multus creation is true else eth0 (important because it sends the traffic towards internet)|pgwSgiIf: "eth0"  # net1 if gNB is outside the cluster network and multus creation is true else eth0 (important because it sends the traffic towards internet)|
 s|dnsIpv4Address: "172.21.3.100" # configure the dns for UE don't use Kubernetes DNS|dnsIpv4Address: "138.96.0.210" # configure the dns for UE don't use Kubernetes DNS|
@@ -202,8 +213,8 @@ function configure-gnb() {
 	    SDR_ADDRS="$ADDRS_N320"
 	fi
 	cat > "$SED_FILE" <<EOF
-s|n2hostInterface:.*|n2hostInterface: "$GNB_IF_NAME_N2"|
-s|n3hostInterface:.*|n3hostInterface: "$GNB_IF_NAME_N3"|
+s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
+s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
 s|sdrAddrs:.*|sdrAddrs: "$SDR_ADDRS,clock_source=internal,time_source=internal"|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
@@ -214,12 +225,12 @@ EOF
 	    ADDR_AW2S="$ADDR_PANTHER"
 	fi
 	cat > "$SED_FILE" <<EOF
-s|n2hostInterface:.*|n2hostInterface: "$GNB_IF_NAME_N2"|
-s|n3hostInterface:.*|n3hostInterface: "$GNB_IF_NAME_N3"|
-s|aw2shostInterface:.*|aw2shostInterface: "$LOC_IF_NAME_AW2S"|
+s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
+s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
+s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
 s|localIfName:.*|localIfName: "net3"|
 s|remoteAddr.*|remoteAddr: "$ADDR_AW2S"| 
-s|localAddr.*|localAddr: "$LOC_ADDR_AW2S"|
+s|localAddr.*|localAddr: "$ADDR_LOCAL_AW2S"|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
     else
@@ -309,11 +320,11 @@ function init() {
     cat > "$SED_FILE" <<EOF
 s|sst = 1|sst = 1; sd = 0x1 |
 s|mnc = 99;|mnc = 95;|
-s|ipv4       =.*|ipv4       = "192.168.100.161";|
+s|ipv4       =.*|ipv4       = "$IP_AMF_N1";|
 s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
-s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "192.168.100.163/24";|
+s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2/24";|
 s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net2";|
-s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "192.168.100.164/24";|
+s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N3/24";|
 s|sdr_addrs =.*||
 EOF
     cp "$DIR_DEST"/mounted.conf /tmp/mounted.conf
@@ -327,7 +338,7 @@ EOF
 	cat > "$SED_FILE" <<EOF
 s|local_if_name.*|local_if_name  = "net3"|
 s|remote_address.*|remote_address = "$ADDR_AW2S"|
-s|local_address.*|local_address = "$LOC_ADDR_AW2S"|
+s|local_address.*|local_address = "$ADDR_LOCAL_AW2S"|
 EOF
 	cp "$DIR_DEST"/mounted.conf /tmp/mounted.conf
 	sed -f "$SED_FILE" < /tmp/mounted.conf > "$DIR_DEST"/mounted.conf
