@@ -31,7 +31,6 @@ IF_NAME_SPGWU_N3="$IF_NAME_VLAN100"
 IF_NAME_GNB_N2="eth4"
 IF_NAME_GNB_N3="eth4"
 IF_NAME_LOCAL_AW2S="eth4"
-ADDR_LOCAL_AW2S="$P100.166" # should match aw2sIPadd in gNB values.yaml chart
 
 # gNB conf file for RRU devices
 CONF_AW2S="gnb.sa-rru-50MHz-2x2.conf"
@@ -234,7 +233,7 @@ s|aw2sIPadd:.*|aw2sIPadd: "$IP_GNB_AW2S"|
 s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
 s|localIfName:.*|localIfName: "net3"|
 s|remoteAddr.*|remoteAddr: "$ADDR_AW2S"| 
-s|localAddr.*|localAddr: "$ADDR_LOCAL_AW2S"|
+s|localAddr.*|localAddr: "$IP_GNB_AW2S"|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
     else
@@ -342,7 +341,7 @@ EOF
 	cat > "$SED_FILE" <<EOF
 s|local_if_name.*|local_if_name  = "net3"|
 s|remote_address.*|remote_address = "$ADDR_AW2S"|
-s|local_address.*|local_address = "$ADDR_LOCAL_AW2S"|
+s|local_address.*|local_address = "$IP_GNB_AW2S"|
 EOF
 	cp "$DIR_DEST"/mounted.conf /tmp/mounted.conf
 	sed -f "$SED_FILE" < /tmp/mounted.conf > "$DIR_DEST"/mounted.conf
