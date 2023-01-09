@@ -22,16 +22,16 @@ IF_NAME_VLAN100="team0"
 ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.151"
 ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130,mgmt_addr=192.168.3.152"
 ## AW2S devices
-IF_NAME_LOCAL_AW2S="$IF_NAME_VLAN100"
-ADDR_LOCAL_AW2S="$P100.166" # should match aw2sIPadd in gNB values.yaml chart
 ADDR_JAGUAR="$P100.48" # for eth1
 ADDR_PANTHER="$P100.50" # .50 for eth1 and .51 for eth2
 
 # N2/N3 Interfaces definition
 IF_NAME_AMF_N2="$IF_NAME_VLAN100"
 IF_NAME_SPGWU_N3="$IF_NAME_VLAN100"
-IF_NAME_GNB_N2="$IF_NAME_VLAN100"
-IF_NAME_GNB_N3="$IF_NAME_VLAN100"
+IF_NAME_GNB_N2="eth4"
+IF_NAME_GNB_N3="eth4"
+IF_NAME_LOCAL_AW2S="eth4"
+ADDR_LOCAL_AW2S="$P100.166" # should match aw2sIPadd in gNB values.yaml chart
 
 # gNB conf file for RRU devices
 CONF_AW2S="gnb.sa-rru-50MHz-2x2.conf"
