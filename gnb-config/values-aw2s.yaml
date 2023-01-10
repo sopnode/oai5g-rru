@@ -51,7 +51,7 @@ service:
   x2cPort: 36422 
 
 start:
-  gnb: false
+  gnb: true
   tcpdump: false
 
 # gNB needs two seperate interface one for ngap (N2) and other one for gtpu (N3) 
