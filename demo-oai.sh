@@ -2,8 +2,8 @@
 
 # Default k8s namespace and gNB node running oai5g pod
 DEF_NS="oai5g"
-#DEF_NODE_SPGWU="sopnode-w1.inria.fr" # AMF pod will run on the same host than the one for SPGWU pod
-DEF_NODE_SPGWU="sopnode-w3.inria.fr" # AMF pod will run on the same host than the one for SPGWU pod
+#DEF_NODE_AMF_SPGWU="sopnode-w1.inria.fr" 
+DEF_NODE_AMF_SPGWU="sopnode-w3.inria.fr" # AMF pod will run on the same host than the one for SPGWU pod
 #DEF_NODE_GNB="sopnode-l1.inria.fr"
 DEF_NODE_GNB="sopnode-w2.inria.fr"
 DEF_RRU="n300" # Choose between "n300", "n320", "jaguar" and "panther"
@@ -47,11 +47,11 @@ OAI5G_RAN="$OAI5G_CHARTS"/oai-5g-ran
 function usage() {
     echo "USAGE:"
     echo "demo-oai.sh init [namespace rru] |"
-    echo "            start [namespace node_spgwu node_gnb] |"
+    echo "            start [namespace node_amf_spgwu node_gnb] |"
     echo "            stop [namespace] |"
-    echo "            configure-all [node_spgwu node_gnb rru] |"
-    echo "            reconfigure [node_spgwu node_gnb] |"
-    echo "            start-cn [namespace node_spgwu] |"
+    echo "            configure-all [node_amf_spgwu node_gnb rru] |"
+    echo "            reconfigure [node_amf_spgwu node_gnb] |"
+    echo "            start-cn [namespace node_amf_spgwu] |"
     echo "            start-gnb [namespace node_gnb] |"
     echo "            stop-cn [namespace] |"
     echo "            stop-gnb [namespace] |"
@@ -60,7 +60,7 @@ function usage() {
 
 
 function configure-oai-5g-basic() {
-    node_spgwu=$1; shift
+    node_amf_spgwu=$1; shift
     
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
     cat > /tmp/basic-r2lab.sed <<EOF
@@ -97,7 +97,8 @@ EOF
     cp "$OAI5G_BASIC"/values.yaml /tmp/basic_values.yaml-orig
     echo "(Over)writing $OAI5G_BASIC/values.yaml"
     sed -f /tmp/basic-r2lab.sed < /tmp/basic_values.yaml-orig > "$OAI5G_BASIC"/values.yaml
-    perl -i -p0e "s/nodeSelector: \{\}\noai-smf:/nodeName: \"$node_spgwu\"\n  nodeSelector: \{\}\noai-smf:/s" "$OAI5G_BASIC"/values.yaml
+    perl -i -p0e "s/nodeSelector: \{\}\noai-smf:/nodeName: \"$node_amf_spgwu\"\n  nodeSelector: \{\}\noai-smf:/s" "$OAI5G_BASIC"/values.yaml
+    perl -i -p0e "s/nodeSelector: \{\}\noai-spgwu-tiny:/nodeName: \"$node_amf_spgwu\"\n  nodeSelector: \{\}\noai-spgwu-tiny:/s" "$OAI5G_BASIC"/values.yaml
 
     diff /tmp/basic_values.yaml-orig "$OAI5G_BASIC"/values.yaml
     cd "$OAI5G_BASIC"
@@ -250,7 +251,7 @@ EOF
 
 
 function configure-all() {
-    node_spgwu=$1
+    node_amf_spgwu=$1
     shift
     node_gnb=$1
     shift
@@ -258,10 +259,10 @@ function configure-all() {
     shift
 
     echo "Applying SopNode patches to OAI5G located on "$HOME"/oai-cn5g-fed"
-    echo -e "\t with oai-spgwu-tiny running on $node_spgwu"
+    echo -e "\t with oai-spgwu-tiny running on $node_amf_spgwu"
     echo -e "\t with oai-gnb running on $node_gnb"
 
-    configure-oai-5g-basic $node_spgwu
+    configure-oai-5g-basic $node_amf_spgwu
     configure-mysql
     configure-amf
     configure-spgwu-tiny
@@ -355,7 +356,7 @@ EOF
 }
 
 function reconfigure() {
-    node_spgwu=$1
+    node_amf_spgwu=$1
     shift
     node_gnb=$1
     shift
@@ -364,17 +365,17 @@ function reconfigure() {
     cd "$HOME"
     rm -rf oai-cn5g-fed
     git clone -b master https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed
-    configure $node_spgwu $node_gnb 
+    configure $node_amf_spgwu $node_gnb 
 }
 
 
 function start-cn() {
     ns=$1
     shift
-    node_spgwu=$1
+    node_amf_spgwu=$1
     shift
 
-    echo "Running start-cn() with namespace: $ns, node_spgwu:$node_spgwu"
+    echo "Running start-cn() with namespace: $ns, node_amf_spgwu:$node_amf_spgwu"
 
     echo "cd $OAI5G_BASIC"
     cd "$OAI5G_BASIC"
@@ -412,7 +413,7 @@ function start-gnb() {
 function start() {
     ns=$1
     shift
-    node_spgwu=$1
+    node_amf_spgwu=$1
     shift
     node_gnb=$1
     shift
@@ -428,7 +429,7 @@ function start() {
         sleep 5
     done
 
-    start-cn $ns $node_spgwu
+    start-cn $ns $node_amf_spgwu
     start-gnb $ns $node_gnb
 
     echo "****************************************************************************"
@@ -495,7 +496,7 @@ else
         if test $# -eq 4; then
             start $2 $3 $4
         elif test $# -eq 1; then
-	    start $DEF_NS $DEF_NODE_SPGWU $DEF_NODE_GNB
+	    start $DEF_NS $DEF_NODE_AMF_SPGWU $DEF_NODE_GNB
 	else
             usage
         fi
@@ -512,7 +513,7 @@ else
             configure-all $2 $3 $4
 	    exit 0
         elif test $# -eq 1; then
-	    configure-all $DEF_NODE_SPGWU $DEF_NODE_GNB $DEF_RRU
+	    configure-all $DEF_NODE_AMF_SPGWU $DEF_NODE_GNB $DEF_RRU
 	else
             usage
         fi
@@ -520,7 +521,7 @@ else
         if test $# -eq 3; then
             reconfigure $2 $3
         elif test $# -eq 1; then
-	    reconfigure $DEF_NODE_SPGWU $DEF_NODE_GNB
+	    reconfigure $DEF_NODE_AMF_SPGWU $DEF_NODE_GNB
 	else
             usage
         fi
@@ -528,7 +529,7 @@ else
         if test $# -eq 3; then
             start-cn $2 $3
         elif test $# -eq 1; then
-	    start-cn $DEF_NS $DEF_NODE_SPGWU
+	    start-cn $DEF_NS $DEF_NODE_AMF_SPGWU
 	else
             usage
         fi

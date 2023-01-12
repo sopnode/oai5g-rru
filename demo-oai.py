@@ -42,7 +42,7 @@ default_image = 'kubernetes'
 default_quectel_image = 'quectel-wwan0'
 
 default_k8s_fit = 1
-default_spgwu = 'sopnode-w3.inria.fr'
+default_amf_spgwu = 'sopnode-w3.inria.fr'
 default_gnb = 'sopnode-w2.inria.fr'
 default_quectel_nodes = []
 default_rru = 'n300'
@@ -58,7 +58,7 @@ default_regcred_email = 'r2labuser@turletti.com'
 
 def run(*, mode, gateway, slicename,
         leader, namespace, auto_start, load_images,
-        k8s_reset, k8s_fit, spgwu, gnb, quectel_nodes, rru,
+        k8s_reset, k8s_fit, amf_spgwu, gnb, quectel_nodes, rru,
         regcred_name, regcred_password, regcred_email,
         image, quectel_image, verbose, dry_run):
     """
@@ -68,7 +68,7 @@ def run(*, mode, gateway, slicename,
         slicename: the Unix login name (slice name) to enter the gateway
         leader: k8s leader host
         k8s_fit: FIT node number attached to the k8s cluster as worker node
-        spgwu: node name in which spgwu-tiny will be deployed
+        amf_spgwu: node name in which amf and spgwu-tiny will be deployed
         gnb: node name in which oai-gnb will be deployed
         quectel_nodes: list of indices of quectel UE nodes to use
         rru: hardware device attached to gNB
@@ -111,7 +111,7 @@ def run(*, mode, gateway, slicename,
         namespace=namespace,
         nodes=dict(
             k8s_fit=r2lab_hostname(k8s_fit),
-            spgwu=spgwu,
+            amf_spgwu=amf_spgwu,
             gnb=gnb,
         ),
         quectel_dict=quectel_dict,
@@ -322,8 +322,8 @@ def main():
     parser.add_argument("--k8s_fit", default=default_k8s_fit,
                         help="id of the FIT node that attachs to the k8s cluster")
 
-    parser.add_argument("--spgwu", default=default_spgwu,
-                        help="node name that runs oai-spgwu")
+    parser.add_argument("--amf_spgwu", default=default_amf_spgwu,
+                        help="node name that runs oai-amf and oai-spgwu")
 
     parser.add_argument("--gnb", default=default_gnb,
                         help="node name that runs oai-gnb")
@@ -395,7 +395,7 @@ def main():
         print(f"OAI5G pods will run on the {args.namespace} k8s namespace")
         print(f"the following nodes will be used:")
         print(f"\t{r2lab_hostname(args.k8s_fit)} as k8s worker node")
-        print(f"\t{args.spgwu} for oai-spgwu-tiny")
+        print(f"\t{args.amf_spgwu} for oai-amf and oai-spgwu-tiny")
         print(f"\t{args.gnb} for oai-gnb attached to {args.rru[0]} as RRU hardware device")
         print(f"FIT image loading:",
               f"YES with {args.image}" if args.load_images
@@ -408,7 +408,7 @@ def main():
     run(mode=mode, gateway=default_gateway, slicename=args.slicename,
         leader=args.leader, namespace=args.namespace,
         auto_start=args.auto_start, load_images=args.load_images,
-        k8s_fit=args.k8s_fit, spgwu=args.spgwu, gnb=args.gnb,
+        k8s_fit=args.k8s_fit, amf_spgwu=args.amf_spgwu, gnb=args.gnb,
         quectel_nodes=args.quectel_nodes, rru=args.rru[0],
         regcred_name=args.regcred_name,
         regcred_password=args.regcred_password,

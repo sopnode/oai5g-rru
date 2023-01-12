@@ -2,7 +2,7 @@
 
 function update() {
     ns=$1; shift
-    node_spgwu=$1; shift
+    node_amf_spgwu=$1; shift
     node_gnb=$1; shift
     regcred_name=$1; shift
     regcred_password=$1; shift
@@ -12,7 +12,7 @@ function update() {
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
     cat > /tmp/demo-oai.sed <<EOF
 s|DEF_NS=.*|DEF_NS="${ns}"|
-s|DEF_NODE_SPGWU=.*|DEF_NODE_SPGWU="${node_spgwu}"|
+s|DEF_NODE_AMF_SPGWU=.*|DEF_NODE_AMF_SPGWU="${node_amf_spgwu}"|
 s|DEF_NODE_GNB=.*|DEF_NODE_GNB="${node_gnb}"|
 s|username=r2labuser|username=${regcred_name}|
 s|password=r2labuser-pwd|password=${regcred_password}|
@@ -27,7 +27,7 @@ EOF
 
 if test $# -ne 7; then
     echo "val = $#, command= $@"
-    echo "USAGE: configure-demo-oai.sh namespace node_spgwu node_gnb regcred_name regcred_password regcred_email "
+    echo "USAGE: configure-demo-oai.sh namespace node_amf_spgwu node_gnb regcred_name regcred_password regcred_email "
     exit 1
 else
     shift
