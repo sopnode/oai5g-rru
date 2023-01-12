@@ -17,8 +17,7 @@ IP_GNB_N3="$P100.244"
 IP_GNB_AW2S="$P100.245" 
 
 # Interface name of VLAN 100 on sopnode servers
-#IF_NAME_VLAN100="eth5"
-IF_NAME_VLAN100="team0"
+IF_NAME_VLAN100="eth4"
 
 # IP addresses of RRU devices
 ## USRP N3XX devices
