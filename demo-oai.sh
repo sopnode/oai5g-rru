@@ -2,8 +2,10 @@
 
 # Default k8s namespace and gNB node running oai5g pod
 DEF_NS="oai5g"
-DEF_NODE_SPGWU="sopnode-w3.inria.fr" # AMF pod will run on the same host than the one for SPGWU pod
-DEF_NODE_GNB="sopnode-w2.inria.fr"
+DEF_NODE_SPGWU="sopnode-w1.inria.fr" # AMF pod will run on the same host than the one for SPGWU pod
+#DEF_NODE_SPGWU="sopnode-w3.inria.fr" # AMF pod will run on the same host than the one for SPGWU pod
+DEF_NODE_GNB="sopnode-l1.inria.fr"
+#DEF_NODE_GNB="sopnode-w2.inria.fr"
 DEF_RRU="n300" # Choose between "n300", "n320", "jaguar" and "panther"
 
 # IP Pod addresses
@@ -15,7 +17,8 @@ IP_GNB_N3="$P100.244"
 IP_GNB_AW2S="$P100.245" 
 
 # Interface name of VLAN 100 on sopnode servers
-IF_NAME_VLAN100="team0"
+IF_NAME_VLAN100="eth5"
+#IF_NAME_VLAN100="team0"
 
 # IP addresses of RRU devices
 ## USRP N3XX devices
