@@ -16,8 +16,10 @@ IP_GNB_N2="$P100.243"
 IP_GNB_N3="$P100.244"
 IP_GNB_AW2S="$P100.245" 
 
-# Interface name of VLAN 100 on sopnode servers
-IF_NAME_VLAN100="eth4"
+# Interfaces names of VLANs in sopnode servers
+IF_NAME_VLAN100="p4-net"
+IF_NAME_VLAN10="p4-net-10"
+IF_NAME_VLAN20="p4-net-20"
 
 # IP addresses of RRU devices
 ## USRP N3XX devices
@@ -25,14 +27,16 @@ ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.1
 ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130,mgmt_addr=192.168.3.152"
 ## AW2S devices
 ADDR_JAGUAR="$P100.48" # for eth1
-ADDR_PANTHER="$P100.51" # .50 for eth1 and .51 for eth2
+ADDR_PANTHER="$P100.51" # .51 for eth2
 
 # N2/N3 Interfaces definition
 IF_NAME_AMF_N2="$IF_NAME_VLAN100"
 IF_NAME_SPGWU_N3="$IF_NAME_VLAN100"
-IF_NAME_GNB_N2="eth4"
-IF_NAME_GNB_N3="eth4"
-IF_NAME_LOCAL_AW2S="eth4"
+IF_NAME_GNB_N2="$IF_NAME_VLAN100"
+IF_NAME_GNB_N3="$IF_NAME_VLAN100"
+IF_NAME_LOCAL_AW2S="$IF_NAME_VLAN100"
+IF_NAME_LOCAL_N3XX_1="$IF_NAME_VLAN10"
+IF_NAME_LOCAL_N3XX_2="$IF_NAME_VLAN20"
 
 # gNB conf file for RRU devices
 CONF_AW2S="gnb.sa-rru-50MHz-2x2.conf"
@@ -218,6 +222,8 @@ function configure-gnb() {
 	cat > "$SED_FILE" <<EOF
 s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
 s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
+s|sfp1hostInterface:.*|sfp1hostInterface: "$IF_NAME_LOCAL_N3XX_1"|
+s|sfp2hostInterface:.*|sfp2hostInterface: "$IF_NAME_LOCAL_N3XX_2"|
 s|sdrAddrs:.*|sdrAddrs: "$SDR_ADDRS,clock_source=internal,time_source=internal"|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
