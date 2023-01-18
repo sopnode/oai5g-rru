@@ -119,15 +119,15 @@ EOF
     cp "$OAI5G_AMF"/values.yaml /tmp/amf_values.yaml-orig
     echo "(Over)writing $OAI5G_AMF/values.yaml"
     sed -f /tmp/pcap.sed < /tmp/amf_values.yaml-orig > "$OAI5G_AMF"/values.yaml
-    diff /tmp/amf_values.yaml-orig "$AMF_BASIC"/values.yaml
+    diff /tmp/amf_values.yaml-orig "$OAI5G_AMF"/values.yaml
     cp "$OAI5G_AUSF"/values.yaml /tmp/ausf_values.yaml-orig
     echo "(Over)writing $OAI5G_AUSF/values.yaml"
     sed -f /tmp/pcap.sed < /tmp/ausf_values.yaml-orig > "$OAI5G_AUSF"/values.yaml
-    diff /tmp/ausf_values.yaml-orig "$AUSF_BASIC"/values.yaml
+    diff /tmp/ausf_values.yaml-orig "$OAI5G_AUSF"/values.yaml
     cp "$OAI5G_SMF"/values.yaml /tmp/smf_values.yaml-orig
     echo "(Over)writing $OAI5G_SMF/values.yaml"
     sed -f /tmp/pcap.sed < /tmp/smf_values.yaml-orig > "$OAI5G_SMF"/values.yaml
-    diff /tmp/smf_values.yaml-orig "$SMF_BASIC"/values.yaml
+    diff /tmp/smf_values.yaml-orig "$OAI5G_SMF"/values.yaml
     cp "$OAI5G_SPGWU"/values.yaml /tmp/spgwu-tiny_values.yaml-orig
     echo "(Over)writing $OAI5G_SPGWU/values.yaml"
     sed -f /tmp/pcap.sed < /tmp/spgwu-tiny_values.yaml-orig > "$OAI5G_SPGWU"/values.yaml
