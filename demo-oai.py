@@ -413,12 +413,12 @@ def main():
             print("Automatically start the demo after setup")
         else:
             print("Do not start the demo after setup")
-        if args.pcap:
-            print("pcap trace files will be generated")
-            pcap_str='True'
-        else:
-            pcap_str='False'
         mode = "run"
+    if args.pcap:
+        print(f"pcap trace files: {args.pcap}")
+        pcap_str='True'
+    else:
+        pcap_str='False'
     run(mode=mode, gateway=default_gateway, slicename=args.slicename,
         leader=args.leader, namespace=args.namespace, pcap=pcap_str,
         auto_start=args.auto_start, load_images=args.load_images,

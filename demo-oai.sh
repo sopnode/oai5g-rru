@@ -111,7 +111,7 @@ EOF
 
     diff /tmp/basic_values.yaml-orig "$OAI5G_BASIC"/values.yaml
     
-    if [[ pcap == "True" ]]; then
+    if [[ $pcap == "True" ]]; then
 	echo "Modify CN charts to generate pcap files"
     cat > /tmp/pcap.sed <<EOF
 s|tcpdump:.*|tcpdump: true|
@@ -243,7 +243,7 @@ function configure-gnb() {
 
     # Tune values.yaml chart
     echo "Configuring chart $ORIG_CHART for R2lab"
-    if [[ pcap == "True" ]]; then
+    if [[ $pcap == "True" ]]; then
 	GENER_PCAP="true"
     else
 	GENER_PCAP="false"
