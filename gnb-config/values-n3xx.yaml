@@ -52,7 +52,7 @@ service:
 
 start:
   gnb: true
-  tcpdump: false
+  tcpdump: true
 
 # gNB needs two seperate interface one for ngap (N2) and other one for gtpu (N3) 
 # But for experimentation only one interface can be used. 
