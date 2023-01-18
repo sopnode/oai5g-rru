@@ -2,6 +2,7 @@
 # {{gateway}} - typically 'faraday.inria.fr'
 # {{leader}} - typically 'sopnode-l1.inria.fr'
 # {{namespace}} - typically 'oai5g'
+# {{pcap}} - typically 'True' or 'False'
 # {{nodes}} - typically {'k8s_fit': 'fit01', 'amf_spgwu': 'sopnode-w3.inria.fr', 'gnb' : 'sopnode-w2.inria.fr'}
 # {{quectel_nodes}} - typically {'9': 'fit09', '18': 'fit18'}
 # {{gnb_charts}} - typically {'configmap':'','deployment':'', 'multus':'', 'values':''}
@@ -154,7 +155,7 @@ jobs:
           chmod a+x /root/demo-oai.sh;
           cp oai5g-rru/configure-demo-oai.sh /root/;
           chmod a+x /root/configure-demo-oai.sh;
-          /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {%for x in regcred.values()%}{{x}} {%endfor %};
+          /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{pcap}} {%for x in regcred.values()%}{{x}} {%endfor %};
           rm -rf oai-cn5g-fed;
           git clone -b master https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed;
           mkdir /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/conf;
@@ -165,7 +166,7 @@ jobs:
       - type: Run
         command: /root/demo-oai.sh init {{namespace}} {{rru}}
       - type: Run
-        command: /root/demo-oai.sh configure-all {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}}
+        command: /root/demo-oai.sh configure-all {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{pcap}}
 
   - id: start-demo
     required: init-demo

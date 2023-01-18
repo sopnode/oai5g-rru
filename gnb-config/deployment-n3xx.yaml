@@ -190,6 +190,8 @@ spec:
                 key: sdrAddrs
       - name: tcpdump
         image: "{{ .Values.tcpdumpimage.repository }}:{{ .Values.tcpdumpimage.version }}"
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
         {{- if .Values.start.tcpdump}}
         command:
           - /bin/sh

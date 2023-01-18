@@ -57,7 +57,7 @@ default_regcred_email = 'r2labuser@turletti.com'
 
 
 def run(*, mode, gateway, slicename,
-        leader, namespace, auto_start, load_images,
+        leader, namespace, pcap, auto_start, load_images,
         k8s_reset, k8s_fit, amf_spgwu, gnb, quectel_nodes, rru,
         regcred_name, regcred_password, regcred_email,
         image, quectel_image, verbose, dry_run):
@@ -67,6 +67,10 @@ def run(*, mode, gateway, slicename,
     Arguments:
         slicename: the Unix login name (slice name) to enter the gateway
         leader: k8s leader host
+        pcap: pcap trace files will be generated
+        auto_start: pods will be launched
+        load_images: FIT images will be deployed
+        k8s_reset: with k8s deployment
         k8s_fit: FIT node number attached to the k8s cluster as worker node
         amf_spgwu: node name in which amf and spgwu-tiny will be deployed
         gnb: node name in which oai-gnb will be deployed
@@ -109,6 +113,7 @@ def run(*, mode, gateway, slicename,
         gateway=gateway,
         leader=leader,
         namespace=namespace,
+        pcap=pcap,
         nodes=dict(
             k8s_fit=r2lab_hostname(k8s_fit),
             amf_spgwu=amf_spgwu,
@@ -362,6 +367,10 @@ def main():
 	action=ListOfChoices,
 	help="specify the hardware RRU to use for gNB.")
 
+    parser.add_argument("-p", "--pcap", default=False,
+                        action='store_true', dest='pcap',
+                        help="run tcpdump on OAI5G pods to store pcap files")
+
     parser.add_argument("-v", "--verbose", default=False,
                         action='store_true', dest='verbose',
                         help="run script in verbose mode")
@@ -404,9 +413,14 @@ def main():
             print("Automatically start the demo after setup")
         else:
             print("Do not start the demo after setup")
+        if args.pcap:
+            print("pcap trace files will be generated")
+            pcap_str='True'
+        else:
+            pcap_str='False'
         mode = "run"
     run(mode=mode, gateway=default_gateway, slicename=args.slicename,
-        leader=args.leader, namespace=args.namespace,
+        leader=args.leader, namespace=args.namespace, pcap=pcap_str,
         auto_start=args.auto_start, load_images=args.load_images,
         k8s_fit=args.k8s_fit, amf_spgwu=args.amf_spgwu, gnb=args.gnb,
         quectel_nodes=args.quectel_nodes, rru=args.rru[0],

@@ -7,6 +7,7 @@ DEF_NODE_AMF_SPGWU="sopnode-w3.inria.fr" # AMF pod will run on the same host tha
 #DEF_NODE_GNB="sopnode-l1.inria.fr"
 DEF_NODE_GNB="sopnode-w2.inria.fr"
 DEF_RRU="n300" # Choose between "n300", "n320", "jaguar" and "panther"
+DEF_PCAP="False"
 
 # IP Pod addresses
 P100="192.168.100"
@@ -46,14 +47,17 @@ OAI5G_CHARTS="$HOME"/oai-cn5g-fed/charts
 OAI5G_CORE="$OAI5G_CHARTS"/oai-5g-core
 OAI5G_BASIC="$OAI5G_CORE"/oai-5g-basic
 OAI5G_RAN="$OAI5G_CHARTS"/oai-5g-ran
-
+OAI5G_AMF="$OAI5G_CORE"/oai-amf
+OAI5G_AUSF="$OAI5G_CORE"/oai-ausf
+OAI5G_SMF="$OAI5G_CORE"/oai-smf
+OAI5G_SPGWU="$OAI5G_CORE"/oai-spgwu-tiny
 
 function usage() {
     echo "USAGE:"
     echo "demo-oai.sh init [namespace rru] |"
     echo "            start [namespace node_amf_spgwu node_gnb] |"
     echo "            stop [namespace] |"
-    echo "            configure-all [node_amf_spgwu node_gnb rru] |"
+    echo "            configure-all [node_amf_spgwu node_gnb rru pcap] |"
     echo "            reconfigure [node_amf_spgwu node_gnb] |"
     echo "            start-cn [namespace node_amf_spgwu] |"
     echo "            start-gnb [namespace node_gnb] |"
@@ -65,6 +69,7 @@ function usage() {
 
 function configure-oai-5g-basic() {
     node_amf_spgwu=$1; shift
+    pcap=$1; shift
     
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
     cat > /tmp/basic-r2lab.sed <<EOF
@@ -105,6 +110,30 @@ EOF
     perl -i -p0e "s/nodeSelector: \{\}\noai-spgwu-tiny:/nodeName: \"$node_amf_spgwu\"\n  nodeSelector: \{\}\noai-spgwu-tiny:/s" "$OAI5G_BASIC"/values.yaml
 
     diff /tmp/basic_values.yaml-orig "$OAI5G_BASIC"/values.yaml
+    
+    if [[ pcap == "True" ]]; then
+	echo "Modify CN charts to generate pcap files"
+    cat > /tmp/pcap.sed <<EOF
+s|tcpdump:.*|tcpdump: true|
+EOF
+    cp "$OAI5G_AMF"/values.yaml /tmp/amf_values.yaml-orig
+    echo "(Over)writing $OAI5G_AMF/values.yaml"
+    sed -f /tmp/pcap.sed < /tmp/amf_values.yaml-orig > "$OAI5G_AMF"/values.yaml
+    diff /tmp/amf_values.yaml-orig "$AMF_BASIC"/values.yaml
+    cp "$OAI5G_AUSF"/values.yaml /tmp/ausf_values.yaml-orig
+    echo "(Over)writing $OAI5G_AUSF/values.yaml"
+    sed -f /tmp/pcap.sed < /tmp/ausf_values.yaml-orig > "$OAI5G_AUSF"/values.yaml
+    diff /tmp/ausf_values.yaml-orig "$AUSF_BASIC"/values.yaml
+    cp "$OAI5G_SMF"/values.yaml /tmp/smf_values.yaml-orig
+    echo "(Over)writing $OAI5G_SMF/values.yaml"
+    sed -f /tmp/pcap.sed < /tmp/smf_values.yaml-orig > "$OAI5G_SMF"/values.yaml
+    diff /tmp/smf_values.yaml-orig "$SMF_BASIC"/values.yaml
+    cp "$OAI5G_SPGWU"/values.yaml /tmp/spgwu-tiny_values.yaml-orig
+    echo "(Over)writing $OAI5G_SPGWU/values.yaml"
+    sed -f /tmp/pcap.sed < /tmp/spgwu-tiny_values.yaml-orig > "$OAI5G_SPGWU"/values.yaml
+    diff /tmp/spgwu-tiny_values.yaml-orig "$OAI5G_SPGWU"/values.yaml
+    fi
+
     cd "$OAI5G_BASIC"
     echo "helm dependency update"
     helm dependency update
@@ -205,6 +234,7 @@ function configure-spgwu-tiny() {
 function configure-gnb() {
     node_gnb=$1; shift
     rru=$1; shift
+    pcap=$1; shift
     
     FUNCTION="oai-gnb"
     DIR="$OAI5G_RAN/$FUNCTION"
@@ -213,6 +243,11 @@ function configure-gnb() {
 
     # Tune values.yaml chart
     echo "Configuring chart $ORIG_CHART for R2lab"
+    if [[ pcap == "True" ]]; then
+	GENER_PCAP="true"
+    else
+	GENER_PCAP="false"
+    fi
     if [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
 	if [[ "$rru" == "n300" ]]; then
 	    SDR_ADDRS="$ADDRS_N300"
@@ -220,6 +255,7 @@ function configure-gnb() {
 	    SDR_ADDRS="$ADDRS_N320"
 	fi
 	cat > "$SED_FILE" <<EOF
+s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
 s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
 s|sfp1hostInterface:.*|sfp1hostInterface: "$IF_NAME_LOCAL_N3XX_1"|
@@ -234,6 +270,7 @@ EOF
 	    ADDR_AW2S="$ADDR_PANTHER"
 	fi
 	cat > "$SED_FILE" <<EOF
+s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
 s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
 s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
@@ -257,22 +294,21 @@ EOF
 
 
 function configure-all() {
-    node_amf_spgwu=$1
-    shift
-    node_gnb=$1
-    shift
-    rru=$1
-    shift
+    node_amf_spgwu=$1; shift
+    node_gnb=$1; shift
+    rru=$1; shift
+    pcap=$1; shift
 
     echo "Applying SopNode patches to OAI5G located on "$HOME"/oai-cn5g-fed"
     echo -e "\t with oai-spgwu-tiny running on $node_amf_spgwu"
     echo -e "\t with oai-gnb running on $node_gnb"
+    echo -e "\t with generate-pcap: $pcap"
 
-    configure-oai-5g-basic $node_amf_spgwu
+    configure-oai-5g-basic $node_amf_spgwu $pcap
     configure-mysql
     configure-amf
     configure-spgwu-tiny
-    configure-gnb $node_gnb $rru
+    configure-gnb $node_gnb $rru $pcap
 }
 
 
@@ -515,11 +551,11 @@ else
             usage
         fi
     elif [ "$1" == "configure-all" ]; then
-        if test $# -eq 4; then
-            configure-all $2 $3 $4
+        if test $# -eq 5; then
+            configure-all $2 $3 $4 $5
 	    exit 0
         elif test $# -eq 1; then
-	    configure-all $DEF_NODE_AMF_SPGWU $DEF_NODE_GNB $DEF_RRU
+	    configure-all $DEF_NODE_AMF_SPGWU $DEF_NODE_GNB $DEF_RRU $DEF_PCAP
 	else
             usage
         fi
