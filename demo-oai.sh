@@ -546,9 +546,9 @@ function stop() {
 	./delete-pvc.sh $ns
     fi
 
-    echo "Delete namespace $ns"
-    echo "kubectl delete ns $ns"
-    kubectl delete ns $ns || true
+#    echo "Delete namespace $ns"
+#    echo "kubectl delete ns $ns"
+#    kubectl delete ns $ns || true
 }
 
 
