@@ -115,6 +115,7 @@ EOF
 	echo "Modify CN charts to generate pcap files"
     cat > /tmp/pcap.sed <<EOF
 s|tcpdump:.*|tcpdump: true|
+s|sharedvolume:.*|sharedvolume: true|
 EOF
     cp "$OAI5G_AMF"/values.yaml /tmp/amf_values.yaml-orig
     echo "(Over)writing $OAI5G_AMF/values.yaml"
@@ -262,6 +263,7 @@ s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
 s|sfp1hostInterface:.*|sfp1hostInterface: "$IF_NAME_LOCAL_N3XX_1"|
 s|sfp2hostInterface:.*|sfp2hostInterface: "$IF_NAME_LOCAL_N3XX_2"|
 s|sdrAddrs:.*|sdrAddrs: "$SDR_ADDRS,clock_source=internal,time_source=internal"|
+s|sharedvolume:.*|sharedvolume: true|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
@@ -281,6 +283,7 @@ s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
 s|localIfName:.*|localIfName: "net3"|
 s|remoteAddr.*|remoteAddr: "$ADDR_AW2S"| 
 s|localAddr.*|localAddr: "$IP_GNB_AW2S"|
+s|sharedvolume:.*|sharedvolume: true|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
     else
@@ -336,14 +339,14 @@ function init() {
     echo "kube-install.sh enable-multus"
     kube-install.sh enable-multus || true
 
-    # Configure gnb conf file
-    echo "Configuring gNB conf for $rru"
-    DIR_ORIG="/root/oai5g-rru/gnb-config/originals/"
-    DIR_DEST="/root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/conf/"
+    # Configure gnb conf and chart files
+    echo "Configuring gNB conf, values/multus/configmap/deployment charts for $rru"
+    DIR_ORIG="/root/oai5g-rru/gnb-config/originals"
+    DIR_GNB="/root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
+    DIR_DEST="$DIR_GNB/conf/"
     if [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
+	RRU_TYPE="n3xx"
 	CONF_ORIG="$DIR_ORIG/$CONF_N3XX"
-	REPO_GNB="$REPO_GNB_N3XX"
-	V_REPO_GNB="$V_REPO_GNB_N3XX"
 	cp "$CONF_ORIG" "$DIR_DEST"/mounted.conf
 	if [ "$rru" == "n300" ] ; then
 	   SDR_ADDRS="$ADDRS_N300"
@@ -351,9 +354,8 @@ function init() {
 	   SDR_ADDRS="$ADDRS_N320"
 	fi
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
+	RRU_TYPE="aw2s"
 	CONF_ORIG="$DIR_ORIG/$CONF_AW2S"
-	REPO_GNB="$REPO_GNB_AW2S"
-	V_REPO_GNB="$V_REPO_GNB_AW2S"
 	cp "$CONF_ORIG" "$DIR_DEST"/mounted.conf
 	if [ "$rru" == "jaguar" ] ; then
 	    ADDR_AW2S="$ADDR_JAGUAR"
@@ -395,7 +397,19 @@ EOF
     # show changes applied to default conf
     echo "Following changes applied to $CONF_ORIG"
     diff "$DIR_DEST"/mounted.conf "$CONF_ORIG"
-    exit 0 # don't know why it returns 1 otherwise...
+    # Copy the right gNB chart files
+    DIR_TEMPLATES="$DIR_GNB"/templates/
+    echo cp "$DIR_TEMPLATES/configmap"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/configmap.yaml
+    cp "$DIR_TEMPLATES/configmap"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/configmap.yaml
+    echo cp "$DIR_TEMPLATES/deployment"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
+    cp "$DIR_TEMPLATES/deployment"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
+    echo cp "$DIR_TEMPLATES/configmap"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/configmap.yaml
+    cp "$DIR_TEMPLATES/configmap"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/configmap.yaml
+    echo cp "$DIR_TEMPLATES/multus"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+    cp "$DIR_TEMPLATES/multus"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+    echo cp "$DIR_GNB"/values-"$RRU_TYPE".yaml  "$DIR_GNB"/values.yaml
+    cp "$DIR_GNB"/values-"$RRU_TYPE".yaml  "$DIR_GNB"/values.yaml
+#    exit 0 # don't know why it returns 1 otherwise...
 }
 
 function reconfigure() {
