@@ -472,12 +472,10 @@ function start-gnb() {
 }
 
 function start() {
-    ns=$1
-    shift
-    node_amf_spgwu=$1
-    shift
-    node_gnb=$1
-    shift
+    ns=$1; shift
+    node_amf_spgwu=$1; shift
+    node_gnb=$1; shift
+    pcap=$1; shift
 
     echo "start: run all oai5g pods on namespace: $ns"
 
