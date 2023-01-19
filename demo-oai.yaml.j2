@@ -164,7 +164,7 @@ jobs:
 #          cp {{gnb_charts['multus']}} /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates/multus.yaml;
 #          cp {{gnb_charts['values']}} /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/values.yaml;
       - type: Run
-        command: /root/demo-oai.sh init {{namespace}} {{rru}}
+        command: /root/demo-oai.sh init {{namespace}} {{rru}} {{pcap}}
       - type: Run
         command: /root/demo-oai.sh configure-all {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{pcap}}
 
@@ -177,7 +177,7 @@ jobs:
       Launch OAI5G pods by calling demo-oai.sh start from {{k8s_fit}}
     commands:
       - type: Run
-        command: /root/demo-oai.sh start {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}}
+        command: /root/demo-oai.sh start {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{pcap}}
 
   {% for n in quectel_dict.keys() %}
   - id: attach-quectel-node-{{n}}
@@ -213,7 +213,7 @@ jobs:
       Delete OAI5G pods by calling demo-oai.sh stop from {{nodes.k8s_fit}}
     commands:
       - type: Run
-        command: /root/demo-oai.sh stop {{namespace}}
+        command: /root/demo-oai.sh stop {{namespace}} {{pcap}}
 
   {% for n in quectel_dict.keys() %}
   - id: detach-quectel-node-{{n}}

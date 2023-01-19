@@ -54,9 +54,9 @@ OAI5G_SPGWU="$OAI5G_CORE"/oai-spgwu-tiny
 
 function usage() {
     echo "USAGE:"
-    echo "demo-oai.sh init [namespace rru] |"
-    echo "            start [namespace node_amf_spgwu node_gnb] |"
-    echo "            stop [namespace] |"
+    echo "demo-oai.sh init [namespace rru pcap] |"
+    echo "            start [namespace node_amf_spgwu node_gnb pcap] |"
+    echo "            stop [namespace pcap] |"
     echo "            configure-all [node_amf_spgwu node_gnb rru pcap] |"
     echo "            reconfigure [node_amf_spgwu node_gnb] |"
     echo "            start-cn [namespace node_amf_spgwu] |"
@@ -121,11 +121,10 @@ EOF
     echo "(Over)writing $OAI5G_AMF/values.yaml"
     sed -f /tmp/pcap.sed < /tmp/amf_values.yaml-orig > "$OAI5G_AMF"/values.yaml
     diff /tmp/amf_values.yaml-orig "$OAI5G_AMF"/values.yaml
-# for oai-ausf, deployment.yaml should be fixed for tcpdump security context
-#    cp "$OAI5G_AUSF"/values.yaml /tmp/ausf_values.yaml-orig
-#    echo "(Over)writing $OAI5G_AUSF/values.yaml"
-#    sed -f /tmp/pcap.sed < /tmp/ausf_values.yaml-orig > "$OAI5G_AUSF"/values.yaml
-#    diff /tmp/ausf_values.yaml-orig "$OAI5G_AUSF"/values.yaml
+    cp "$OAI5G_AUSF"/values.yaml /tmp/ausf_values.yaml-orig
+    echo "(Over)writing $OAI5G_AUSF/values.yaml"
+    sed -f /tmp/pcap.sed < /tmp/ausf_values.yaml-orig > "$OAI5G_AUSF"/values.yaml
+    diff /tmp/ausf_values.yaml-orig "$OAI5G_AUSF"/values.yaml
     cp "$OAI5G_SMF"/values.yaml /tmp/smf_values.yaml-orig
     echo "(Over)writing $OAI5G_SMF/values.yaml"
     sed -f /tmp/pcap.sed < /tmp/smf_values.yaml-orig > "$OAI5G_SMF"/values.yaml
@@ -303,7 +302,7 @@ function configure-all() {
     rru=$1; shift
     pcap=$1; shift
 
-    echo "Applying SopNode patches to OAI5G located on "$HOME"/oai-cn5g-fed"
+    echo "Applying SophiaNode patches to OAI5G located on "$HOME"/oai-cn5g-fed"
     echo -e "\t with oai-spgwu-tiny running on $node_amf_spgwu"
     echo -e "\t with oai-gnb running on $node_gnb"
     echo -e "\t with generate-pcap: $pcap"
@@ -317,10 +316,9 @@ function configure-all() {
 
 
 function init() {
-    ns=$1
-    shift
-    rru=$1
-    shift
+    ns=$1; shift
+    rru=$1; shift
+    pcap=$1; shift
 
     # init function should be run once per demo.
     echo "init: ensure spray is installed and possibly create secret docker-registry"
@@ -338,6 +336,12 @@ function init() {
     # Just in case the k8s cluster has been restarted without multus enabled..
     echo "kube-install.sh enable-multus"
     kube-install.sh enable-multus || true
+
+    if [[ $pcap == "True" ]]; then
+	echo "Create k8s persistence volumes for pcap files"
+	cd /root/oai5g-rru/k8s
+	./create-pv.sh $ns
+    fi
 
     # Configure gnb conf and chart files
     echo "Configuring gNB conf, values/multus/configmap/deployment charts for $rru"
@@ -486,6 +490,12 @@ function start() {
         sleep 5
     done
 
+    if [[ $pcap == "True" ]]; then
+	echo "Create k8s persistence volume claims for pcap files"
+	cd /root/oai5g-rru/k8s
+	./create-pvc.sh $ns
+    fi
+
     start-cn $ns $node_amf_spgwu
     start-gnb $ns $node_gnb
 
@@ -518,10 +528,10 @@ function stop-gnb(){
 
 
 function stop() {
-    ns=$1
-    shift
+    ns=$1; shift
+    pcap=$1; shift
 
-    echo "Running stop() on namespace:$ns"
+    echo "Running stop() on namespace:$ns; pcap is $pcap"
 
     res=$(helm -n $ns ls | wc -l)
     if test $res -gt 1; then
@@ -531,6 +541,13 @@ function stop() {
     else
         echo "OAI5G demo is not running, there is no pod on namespace $ns !"
     fi
+
+    if [[ $pcap == "True" ]]; then
+	echo "Delete k8s persistence volume claims for pcap files"
+	cd /root/oai5g-rru/k8s
+	./delete-pvc.sh $ns
+    fi
+
     echo "Delete namespace $ns"
     echo "kubectl delete ns $ns"
     kubectl delete ns $ns || true
@@ -542,26 +559,26 @@ if test $# -lt 1; then
     usage
 else
     if [ "$1" == "init" ]; then
-        if test $# -eq 3; then
-            init $2 $3
+        if test $# -eq 4; then
+            init $2 $3 $4
         elif test $# -eq 1; then
-	    init $DEF_NS $DEF_RRU
+	    init $DEF_NS $DEF_RRU $DEF_PCAP
         else
             usage
         fi
     elif [ "$1" == "start" ]; then
-        if test $# -eq 4; then
-            start $2 $3 $4
+        if test $# -eq 5; then
+            start $2 $3 $4 $5
         elif test $# -eq 1; then
-	    start $DEF_NS $DEF_NODE_AMF_SPGWU $DEF_NODE_GNB
+	    start $DEF_NS $DEF_NODE_AMF_SPGWU $DEF_NODE_GNB $DEF_PCAP
 	else
             usage
         fi
     elif [ "$1" == "stop" ]; then
-        if test $# -eq 2; then
-            stop $2
+        if test $# -eq 3; then
+            stop $2 $3
         elif test $# -eq 1; then
-	    stop $DEF_NS
+	    stop $DEF_NS $DEF_PCAP
 	else
             usage
         fi
