@@ -339,7 +339,7 @@ function init() {
 
     if [[ $pcap == "True" ]]; then
 	echo "Create k8s persistence volumes for pcap files"
-	cd /root/oai5g-rru/k8s
+	cd /root/oai5g-rru/k8s-pv
 	./create-pv.sh $ns
     fi
 
@@ -492,7 +492,7 @@ function start() {
 
     if [[ $pcap == "True" ]]; then
 	echo "Create k8s persistence volume claims for pcap files"
-	cd /root/oai5g-rru/k8s
+	cd /root/oai5g-rru/k8s-pv
 	./create-pvc.sh $ns
     fi
 
@@ -544,7 +544,7 @@ function stop() {
 
     if [[ $pcap == "True" ]]; then
 	echo "Delete k8s persistence volume claims for pcap files"
-	cd /root/oai5g-rru/k8s
+	cd /root/oai5g-rru/k8s-pv
 	./delete-pvc.sh $ns
     fi
 
