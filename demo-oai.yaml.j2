@@ -209,6 +209,11 @@ jobs:
     commands:
       - type: Run
         command: /root/demo-oai.sh stop {{namespace}} {{pcap}}
+      {% if pcap %}
+      - type: Pull
+        remotepaths: "/tmp/oai5g-stats.tgz"
+        localpath: "./"
+      {% endif %}
 
   {% for n in quectel_dict.keys() %}
   - id: detach-quectel-node-{{n}}

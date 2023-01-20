@@ -9,6 +9,8 @@ DEF_NODE_GNB="sopnode-w2.inria.fr"
 DEF_RRU="n300" # Choose between "n300", "n320", "jaguar" and "panther"
 DEF_PCAP="False"
 
+PREFIX_STATS="/tmp/oai5g-stats"
+
 # IP Pod addresses
 P100="192.168.100"
 IP_AMF_N1="$P100.241"
@@ -68,6 +70,95 @@ function usage() {
     echo "            get-all-pcap [namespace]"
     exit 1
 }
+
+
+function get-all-logs() {
+    ns=$1; shift
+    prefix=$1; shift
+
+DATE=`date +"%Y-%m-%dT%H:%M:%S"`
+
+AMF_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-amf" -o jsonpath="{.items[0].metadata.name}")
+AMF_eth0_IP=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-amf" -o jsonpath="{.items[*].status.podIP}")
+echo -e "\t - Retrieving logs for oai-amf $AMF_POD_NAME running with IP $AMF_eth0_IP"
+kubectl --namespace $ns -c amf logs $AMF_POD_NAME > "$prefix"/amf-"$DATE".logs
+
+AUSF_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-ausf" -o jsonpath="{.items[0].metadata.name}")
+AUSF_eth0_IP=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-ausf" -o jsonpath="{.items[*].status.podIP}")
+echo -e "\t - Retrieving logs for oai-ausf $AUSF_POD_NAME running with IP $AUSF_eth0_IP"
+kubectl --namespace $ns -c ausf logs $AUSF_POD_NAME > "$prefix"/ausf-"$DATE".logs
+
+GNB_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-gnb,app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[0].metadata.name}")
+GNB_eth0_IP=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-gnb,app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[*].status.podIP}")
+echo -e "\t - Retrieving logs for oai-gnb $GNB_POD_NAME running with IP $GNB_eth0_IP"
+kubectl --namespace $ns -c gnb logs $GNB_POD_NAME > "$prefix"/gnb-"$DATE".logs
+
+NRF_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-nrf" -o jsonpath="{.items[0].metadata.name}")
+NRF_eth0_IP=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-nrf" -o jsonpath="{.items[*].status.podIP}")
+echo -e "\t - Retrieving logs for oai-nrf $NRF_POD_NAME running with IP $NRF_eth0_IP"
+kubectl --namespace $ns -c nrf logs $NRF_POD_NAME > "$prefix"/nrf-"$DATE".logs
+
+SMF_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-smf" -o jsonpath="{.items[0].metadata.name}")
+SMF_eth0_IP=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-smf" -o jsonpath="{.items[*].status.podIP}")
+echo -e "\t - Retrieving logs for oai-smf $SMF_POD_NAME running with IP $SMF_eth0_IP"
+kubectl --namespace $ns -c smf logs $SMF_POD_NAME > "$prefix"/smf-"$DATE".logs
+
+SPGWU_TINY_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-spgwu-tiny,app.kubernetes.io/instance=oai-spgwu-tiny" -o jsonpath="{.items[0].metadata.name}")
+SPGWU_TINY_eth0_IP=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-spgwu-tiny,app.kubernetes.io/instance=oai-spgwu-tiny" -o jsonpath="{.items[*].status.podIP}")
+echo -e "\t - Retrieving logs for oai-spgwu-tiny $SPGWU_TINY_POD_NAME running with IP $SPGWU_TINY_eth0_IP"
+kubectl --namespace $ns -c spgwu logs $SPGWU_TINY_POD_NAME > "$prefix"/spgwu-tiny-"$DATE".logs
+
+UDM_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-udm" -o jsonpath="{.items[0].metadata.name}")
+UDM_eth0_IP=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-udm" -o jsonpath="{.items[*].status.podIP}")
+echo -e "\t - Retrieving logs for oai-udm $UDM_POD_NAME running with IP $UDM_eth0_IP"
+kubectl --namespace $ns -c udm logs $UDM_POD_NAME > "$prefix"/udm-"$DATE".logs
+
+UDR_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-udr" -o jsonpath="{.items[0].metadata.name}")
+UDR_eth0_IP=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-udr" -o jsonpath="{.items[*].status.podIP}")
+echo -e "\t - Retrieving logs for oai-udr $UDR_POD_NAME running with IP $UDR_eth0_IP"
+kubectl --namespace $ns -c udr logs $UDR_POD_NAME > "$prefix"/udr-"$DATE".logs
+    
+}
+
+
+function get-cn-pcap(){
+    ns=$1; shift
+    prefix=$1; shift
+
+    AMF_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-amf" -o jsonpath="{.items[0].metadata.name}")
+    echo "Retrieve OAI5G cn pcap files from oai-amf pod, ns $ns"
+    echo "kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz pcap"
+    kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz pcap
+    echo "kubectl -c tcpdump cp $ns/$AMF_PODNAME:cn-pcap.tgz $prefix/cn-pcap.tgz"
+    kubectl -c tcpdump cp $ns/$AMF_POD_NAME:cn-pcap.tgz $prefix/cn-pcap.tgz
+}
+
+
+function get-ran-pcap(){
+    ns=$1; shift
+    prefix=$1; shift
+
+    GNB_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-gnb,app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[0].metadata.name}")
+    echo "Retrieve OAI5G ran pcap files from oai-gnb pod, ns $ns"
+    echo "kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-net1-pcap.tgz pcap"
+    kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-net1-pcap.tgz pcap
+    echo "kubectl -c tcpdump cp $ns/$GNB_PODNAME:ran-net1-pcap.tgz $prefix/ran-net1-pcap.tgz"
+    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-net1-pcap.tgz $prefix/ran-net1-pcap.tgz
+    echo "kubectl -c tcpdump2 -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-net2-pcap.tgz pcap"
+    kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-net2-pcap.tgz pcap
+    echo "kubectl -c tcpdump cp $ns/$GNB_PODNAME:ran-net2-pcap.tgz $prefix/ran-net2-pcap.tgz"
+    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-net2-pcap.tgz $prefix/ran-net2-pcap.tgz
+}
+
+
+function get-all-pcap(){
+    ns=$1
+    shift
+
+    get-cn-pcap $ns
+    get-ran-pcap $ns
+}
+
 
 
 function configure-oai-5g-basic() {
@@ -534,8 +625,12 @@ function stop() {
     echo "Running stop() on namespace:$ns; pcap is $pcap"
 
     if [[ $pcap == "True" ]]; then
-	echo "First retrieve all pcap files in /tmp"
-	get-all-pcap $ns
+	echo "First retrieve all pcap and log files in $prefix and compressed it"
+	prefix=${PREFIX_STATS-"/tmp/oai5g-stats"}
+	mkdir -p $prefix
+	get-all-pcap $ns $prefix
+	get-all-logs $ns $prefix
+	tar cfz $prefix.tgz $prefix
     fi
 
     res=$(helm -n $ns ls | wc -l)
@@ -562,41 +657,6 @@ function stop() {
 #    kubectl delete ns $ns || true
 }
 
-function get-cn-pcap(){
-    ns=$1
-    shift
-
-    AMF_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-amf" -o jsonpath="{.items[0].metadata.name}")
-    echo "Retrieve OAI5G cn pcap files from oai-amf pod, ns $ns"
-    echo "kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz pcap"
-    kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz pcap
-    echo "kubectl -c tcpdump cp $ns/$AMF_PODNAME:cn-pcap.tgz /tmp/cn-pcap.tgz"
-    kubectl -c tcpdump cp $ns/$AMF_POD_NAME:cn-pcap.tgz /tmp/cn-pcap.tgz
-}
-
-function get-ran-pcap(){
-    ns=$1
-    shift
-
-    GNB_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-gnb,app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[0].metadata.name}")
-    echo "Retrieve OAI5G ran pcap files from oai-gnb pod, ns $ns"
-    echo "kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-net1-pcap.tgz pcap"
-    kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-net1-pcap.tgz pcap
-    echo "kubectl -c tcpdump cp $ns/$GNB_PODNAME:ran-net1-pcap.tgz /tmp/ran-net1-pcap.tgz"
-    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-net1-pcap.tgz /tmp/ran-net1-pcap.tgz
-    echo "kubectl -c tcpdump2 -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-net2-pcap.tgz pcap"
-    kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-net2-pcap.tgz pcap
-    echo "kubectl -c tcpdump cp $ns/$GNB_PODNAME:ran-net2-pcap.tgz /tmp/ran-net2-pcap.tgz"
-    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-net2-pcap.tgz /tmp/ran-net2-pcap.tgz
-}
-
-function get-all-pcap(){
-    ns=$1
-    shift
-
-    get-cn-pcap $ns
-    get-ran-pcap $ns
-}
 
 
 #Handle the different function calls with or without input parameters
