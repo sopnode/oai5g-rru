@@ -507,13 +507,14 @@ function stop-cn(){
     shift
 
     echo "helm -n$ns uninstall oai-spgwu-tiny oai-nrf oai-udr oai-udm oai-ausf oai-smf oai-amf mysql"
-    helm -n$ns uninstall mysql
+    helm -n$ns uninstall oai-smf
+    helm -n$ns uninstall oai-spgwu-tiny
+    helm -n$ns uninstall oai-amf
     helm -n$ns uninstall oai-ausf
     helm -n$ns uninstall oai-udm
     helm -n$ns uninstall oai-udr
-    helm -n$ns uninstall oai-amf
-    helm -n$ns uninstall oai-smf
     helm -n$ns uninstall oai-nrf
+    helm -n$ns uninstall mysql
 }
 
 
