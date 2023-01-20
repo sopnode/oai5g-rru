@@ -630,8 +630,9 @@ function stop() {
 	mkdir -p $prefix
 	get-all-pcap $ns $prefix
 	get-all-logs $ns $prefix
-	echo tar cfz "$prefix".tgz $prefix
-	tar cfz "$prefix".tgz $prefix
+	cd /tmp; dirname=$(basename $prefix)
+	echo cd /tmp; tar cfz "$dirname".tgz $dirname
+	tar cfz "$dirname".tgz $dirname
     fi
 
     res=$(helm -n $ns ls | wc -l)
