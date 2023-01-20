@@ -63,6 +63,9 @@ function usage() {
     echo "            start-gnb [namespace node_gnb] |"
     echo "            stop-cn [namespace] |"
     echo "            stop-gnb [namespace] |"
+    echo "            get-cn-pcap [namespace] |"
+    echo "            get-ran-pcap [namespace] |"
+    echo "            get-all-pcap [namespace]"
     exit 1
 }
 
@@ -529,6 +532,11 @@ function stop() {
 
     echo "Running stop() on namespace:$ns; pcap is $pcap"
 
+    if [[ $pcap == "True" ]]; then
+	echo "First retrieve all pcap files in /tmp"
+	get-all-pcap $ns
+    fi
+
     res=$(helm -n $ns ls | wc -l)
     if test $res -gt 1; then
         echo "Remove all 5G OAI pods"
@@ -538,18 +546,47 @@ function stop() {
         echo "OAI5G demo is not running, there is no pod on namespace $ns !"
     fi
 
+    echo "Wait until all $ns pods disppear"
+    kubectl delete pods -n $ns --all --wait --cascade=foreground
+
     if [[ $pcap == "True" ]]; then
 	echo "Delete k8s persistence volume claims for pcap files"
 	cd /root/oai5g-rru/k8s-pv
 	./delete-pvc.sh $ns
     fi
 
-    echo "Wait until all $ns pods disppear"
-    kubectl delete pods -n $ns --all --wait --cascade=foreground
 
 #    echo "Delete namespace $ns"
 #    echo "kubectl delete ns $ns"
 #    kubectl delete ns $ns || true
+}
+
+function get-cn-pcap(){
+    ns=$1
+    shift
+
+    AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-amf" -o jsonpath="{.items[0].metadata.name}")
+    echo "Retrieve OAI5G cn pcap files from oai-amf pod, ns $ns"
+    k -c tcpdump -n $ns exec -it $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz pcap
+    kubectl -c tcpdump cp $ns/$AMF_PODNAME:cn-pcap.tgz /tmp/cn-pcap.tgz
+}
+
+function get-ran-pcap(){
+    ns=$1
+    shift
+
+    GNB_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-gnb,app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[0].metadata.name}")
+    echo "Retrieve OAI5G ran pcap file from oai-gnb pod, ns $ns"
+    k -c tcpdump -n $ns exec -it $GNB_POD_NAME -- /bin/tar cfz ran-pcap.tgz pcap
+    kubectl -c tcpdump cp $ns/$GNB_PODNAME:ran-pcap.tgz /tmp/ran-pcap.tgz
+}
+
+function get-all-pcap(){
+    ns=$1
+    shift
+
+    get-cn-pcap $ns
+    get-ran-pcap $ns
 }
 
 
@@ -627,6 +664,30 @@ else
             stop-gnb $2
         elif test $# -eq 1; then
 	    stop-gnb $DEF_NS
+	else
+            usage
+        fi
+    elif [ "$1" == "get-cn-pcap" ]; then
+        if test $# -eq 2; then
+            get-cn-pcap $2
+        elif test $# -eq 1; then
+	    get-cn-pcap $DEF_NS
+	else
+            usage
+        fi
+    elif [ "$1" == "get-ran-pcap" ]; then
+        if test $# -eq 2; then
+            get-ran-pcap $2
+        elif test $# -eq 1; then
+	    get-ran-pcap $DEF_NS
+	else
+            usage
+        fi
+    elif [ "$1" == "get-all-pcap" ]; then
+        if test $# -eq 2; then
+            get-all-pcap $2
+        elif test $# -eq 1; then
+	    get-all-pcap $DEF_NS
 	else
             usage
         fi
