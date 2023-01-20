@@ -152,11 +152,11 @@ function get-ran-pcap(){
 
 
 function get-all-pcap(){
-    ns=$1
-    shift
+    ns=$1; shift
+    prefix=$1; shift
 
-    get-cn-pcap $ns
-    get-ran-pcap $ns
+    get-cn-pcap $ns $prefix
+    get-ran-pcap $ns $prefix
 }
 
 
@@ -651,8 +651,6 @@ function stop() {
 	cd /root/oai5g-rru/k8s-pv
 	./delete-pvc.sh $ns
     fi
-
-
 #    echo "Delete namespace $ns"
 #    echo "kubectl delete ns $ns"
 #    kubectl delete ns $ns || true
