@@ -625,12 +625,13 @@ function stop() {
     echo "Running stop() on namespace:$ns; pcap is $pcap"
 
     if [[ $pcap == "True" ]]; then
-	echo "First retrieve all pcap and log files in $prefix and compressed it"
 	prefix=${PREFIX_STATS-"/tmp/oai5g-stats"}
+	echo "First retrieve all pcap and log files in $prefix and compressed it"
 	mkdir -p $prefix
 	get-all-pcap $ns $prefix
 	get-all-logs $ns $prefix
-	tar cfz $prefix.tgz $prefix
+	echo tar cfz "$prefix".tgz $prefix
+	tar cfz "$prefix".tgz $prefix
     fi
 
     res=$(helm -n $ns ls | wc -l)
