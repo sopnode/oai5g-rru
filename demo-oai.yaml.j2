@@ -158,11 +158,6 @@ jobs:
           /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{pcap}} {%for x in regcred.values()%}{{x}} {%endfor %};
           rm -rf oai-cn5g-fed;
           git clone -b master https://gitlab.eurecom.fr/turletti/oai-cn5g-fed.git;
-          mkdir /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/conf;
-#          cp {{gnb_charts['configmap']}} /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates/configmap.yaml;
-#          cp {{gnb_charts['deployment']}} /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates/deployment.yaml;
-#          cp {{gnb_charts['multus']}} /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates/multus.yaml;
-#          cp {{gnb_charts['values']}} /root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/values.yaml;
       - type: Run
         command: /root/demo-oai.sh init {{namespace}} {{rru}} {{pcap}}
       - type: Run

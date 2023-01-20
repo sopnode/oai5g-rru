@@ -401,19 +401,17 @@ EOF
     # show changes applied to default conf
     echo "Following changes applied to $CONF_ORIG"
     diff "$DIR_DEST"/mounted.conf "$CONF_ORIG"
-    # Copy the right gNB chart files
-    DIR_TEMPLATES="$DIR_GNB"/templates/
-    echo cp "$DIR_TEMPLATES/configmap"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/configmap.yaml
-    cp "$DIR_TEMPLATES/configmap"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/configmap.yaml
-    echo cp "$DIR_TEMPLATES/deployment"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
-    cp "$DIR_TEMPLATES/deployment"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
-    echo cp "$DIR_TEMPLATES/configmap"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/configmap.yaml
-    cp "$DIR_TEMPLATES/configmap"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/configmap.yaml
-    echo cp "$DIR_TEMPLATES/multus"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
-    cp "$DIR_TEMPLATES/multus"-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
-    echo cp "$DIR_GNB"/values-"$RRU_TYPE".yaml  "$DIR_GNB"/values.yaml
-    cp "$DIR_GNB"/values-"$RRU_TYPE".yaml  "$DIR_GNB"/values.yaml
-#    exit 0 # don't know why it returns 1 otherwise...
+    echo "Copying the right chart files corresponding to $RRU_TYPE RRU"
+    DIR_CHARTS="$DIR_GNB"/conf
+    DIR_TEMPLATES="$DIR_GNB"/templates
+    echo cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB"/values.yaml
+    cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB"/values.yaml
+    echo cp "$DIR_CHARTS"/configmap-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/configmap.yaml
+    cp "$DIR_CHARTS"/configmap-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/configmap.yaml
+    echo cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
+    cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
+    echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+    cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
 }
 
 function reconfigure() {
@@ -545,6 +543,9 @@ function stop() {
 	cd /root/oai5g-rru/k8s-pv
 	./delete-pvc.sh $ns
     fi
+
+    echo "Wait until all $ns pods disppear"
+    kubectl delete pods -n $ns --all --wait --cascade=foreground
 
 #    echo "Delete namespace $ns"
 #    echo "kubectl delete ns $ns"
