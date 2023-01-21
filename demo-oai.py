@@ -2,12 +2,12 @@
 
 """
 This script prepares one fit R2lab node to join the SophiaNode k8s cluster as a worker node for the oai5g demo.
-Then, it clones the oai5g-rru git directory on one of the 4 fit nodes and applies
-different patches on the various OAI5G charts to make them run on the k8s cluster.
+Then, it clones the oai5g-rru and oai-cn5g-fed git directories on one a fit node and applies
+different patches on the various OAI5G charts to make them run on the SophiaNode k8s cluster.
 Finally, it deploys the different OAI5G pods through the same fit node.
 
-In this demo, the oai-gnb pod uses one USRP N300/N320 device located in R2lab.
-A variable number of UEs (currently 0 to 4) could be used using -Q option.
+In this demo, the oai-gnb pod can be a USRP N300/N320 device or a jaguar/panther AW2S device located in R2lab.
+A variable number of UEs (currently 0 to 6) could be used using -Q option.
 Each UE will run on a fit node attached to a Quectel RM 500Q-GL device in R2lab.
 
 This version requires asynciojobs-0.16.3 or higher; if needed, upgrade with
@@ -91,24 +91,6 @@ def run(*, mode, gateway, slicename,
         verbose=verbose,
     )
 
-    if rru == "n300" or rru == "n320":
-        configmap = '/root/oai5g-rru/gnb-config/configmap-n3xx.yaml'
-        deployment = '/root/oai5g-rru/gnb-config/deployment-n3xx.yaml'
-        multus = '/root/oai5g-rru/gnb-config/multus-n3xx.yaml'
-        values= '/root/oai5g-rru/gnb-config/values-n3xx.yaml'
-    else:
-        configmap = '/root/oai5g-rru/gnb-config/configmap-aw2s.yaml'
-        deployment = '/root/oai5g-rru/gnb-config/deployment-aw2s.yaml'
-        multus = '/root/oai5g-rru/gnb-config/multus-aw2s.yaml'
-        values = '/root/oai5g-rru/gnb-config/values-aw2s.yaml'
-
-    gnb_charts = {
-        'configmap': configmap,
-        'deployment': deployment,
-        'multus': multus,
-        'values': values,
-    }
-
     jinja_variables = dict(
         gateway=gateway,
         leader=leader,
@@ -120,7 +102,6 @@ def run(*, mode, gateway, slicename,
             gnb=gnb,
         ),
         quectel_dict=quectel_dict,
-        gnb_charts=gnb_charts,
         rru=rru,
         regcred=dict(
             name=regcred_name,
