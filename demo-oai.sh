@@ -344,8 +344,10 @@ function configure-gnb() {
     echo "Configuring chart $ORIG_CHART for R2lab"
     if [[ $pcap == "True" ]]; then
 	GENER_PCAP="true"
+	SHARED_VOL="true"
     else
 	GENER_PCAP="false"
+	SHARED_VOL="false"
     fi
     if [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
 	if [[ "$rru" == "n300" ]]; then
@@ -360,7 +362,7 @@ s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
 s|sfp1hostInterface:.*|sfp1hostInterface: "$IF_NAME_LOCAL_N3XX_1"|
 s|sfp2hostInterface:.*|sfp2hostInterface: "$IF_NAME_LOCAL_N3XX_2"|
 s|sdrAddrs:.*|sdrAddrs: "$SDR_ADDRS,clock_source=internal,time_source=internal"|
-s|sharedvolume:.*|sharedvolume: true|
+s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
@@ -380,7 +382,7 @@ s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
 s|localIfName:.*|localIfName: "net3"|
 s|remoteAddr.*|remoteAddr: "$ADDR_AW2S"| 
 s|localAddr.*|localAddr: "$IP_GNB_AW2S"|
-s|sharedvolume:.*|sharedvolume: true|
+s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
     else
