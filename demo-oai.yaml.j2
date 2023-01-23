@@ -142,9 +142,9 @@ jobs:
     critical: True
     verbose: {{verbose}}
     label: >
-      Clone oai5g-rru, configure demo-oai.sh script on {{nodes.k8s_fit}},
+      Clone oai5g-rru, configure demo-oai.sh script on {{nodes['k8s_fit']}},
       clone oai-cn5g-fed, apply patches for SophiaNode R2lab environment,
-      and run the k8s demo-oai script from {{nodes.k8s_fit}}
+      and run the k8s demo-oai script from {{nodes['k8s_fit']}}
     commands:
       - type: Run
         command: >
@@ -168,7 +168,7 @@ jobs:
     critical: True
     verbose: {{verbose}}
     label: >
-      Launch OAI5G pods by calling demo-oai.sh start from {{k8s_fit}}
+      Launch OAI5G pods by calling demo-oai.sh start from {{nodes['k8s_fit']}}
     commands:
       - type: Run
         command: /root/demo-oai.sh start {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{pcap}}
@@ -208,7 +208,7 @@ jobs:
     commands:
       - type: Run
         command: /root/demo-oai.sh stop {{namespace}} {{pcap}}
-      {% if pcap %}
+      {% if pcap == 'True' %}
       - type: Pull
         remotepaths: "/tmp/oai5g-stats.tgz"
         localpath: "./"
