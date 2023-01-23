@@ -634,10 +634,12 @@ function stop() {
 	prefix=${PREFIX_STATS-"/tmp/oai5g-stats"}
 	echo "First retrieve all pcap and log files in $prefix and compressed it"
 	mkdir -p $prefix
+	echo "cleanup $prefix before including new logs/pcap files"
+	cd $prefix; rm *.pcap *.tgz *.logs
 	get-all-pcap $ns $prefix
 	get-all-logs $ns $prefix
 	cd /tmp; dirname=$(basename $prefix)
-	echo cd /tmp; tar cfz "$dirname".tgz $dirname
+	echo tar cfz "$dirname".tgz $dirname
 	tar cfz "$dirname".tgz $dirname
     fi
 
