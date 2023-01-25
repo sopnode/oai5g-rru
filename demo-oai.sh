@@ -515,7 +515,7 @@ EOF
 	elif [["$rru" == "n320" ]]; then
 	    SDR_ADDRS="$ADDRS_N320"
 	fi
-        perl -i -p0e "s/#clock_src = \"internal\";/#clock_src = \"internal\";\n  sdr_addrs = \"$SDR_ADDRS,clock_source=internal,time_source=internal\";/s" "$DIR_TEMPLATES"/configmap.yaml
+        perl -i -p0e "s/#clock_src = \"internal\";/#clock_src = \"internal\";\n        sdr_addrs = \"$SDR_ADDRS,clock_source=internal,time_source=internal\";/s" "$DIR_TEMPLATES"/configmap.yaml
     else
 	if [ "$rru" == "jaguar" ] ; then
 	    ADDR_AW2S="$ADDR_JAGUAR"
