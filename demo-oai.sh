@@ -441,26 +441,26 @@ function init() {
     # Prepare mounted.conf and gnb chart files
     echo "Preparing gNB mounted.conf and values/multus/configmap/deployment charts for $rru"
 
-    DIR_ORIG="/root/oai5g-rru/gnb-config/originals"
-    DIR_GNB="/root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
-    DIR_DEST="$DIR_GNB/conf"
-    DIR_CHARTS="$DIR_GNB"/conf
-    DIR_TEMPLATES="$DIR_GNB"/templates
+    DIR_GNB="/root/oai5g-rru/gnb-config"
+    DIR_CONF="$DIR_GNB/conf"
+    DIR_CHARTS="$DIR_GNB/charts"
+    DIR_GNB_DEST="/root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
+    DIR_TEMPLATES="$DIR_GNB_DEST/templates"
 
     if [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
 	RRU_TYPE="n3xx"
-	CONF_ORIG="$DIR_ORIG/$CONF_N3XX"
+	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	RRU_TYPE="aw2s"
-	CONF_ORIG="$DIR_ORIG/$CONF_AW2S"
+	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
     else
 	echo "Unknown rru selected: $rru"
 	usage
     fi
     
     echo "Copying the right chart files corresponding to $RRU_TYPE RRU"
-    echo cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB"/values.yaml
-    cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB"/values.yaml
+    echo cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
+    cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
     echo cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
     cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
     echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
