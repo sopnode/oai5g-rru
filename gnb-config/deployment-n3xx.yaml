@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "oai-gnb.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       {{- include "oai-gnb.selectorLabels" . | nindent 6 }}
@@ -15,7 +15,7 @@ spec:
     metadata:
       labels:
         {{- include "oai-gnb.selectorLabels" . | nindent 8 }}
-        app: 5grf-sim
+        app: 5gnb
     {{- if .Values.multus.create }}
       annotations:
         k8s.v1.cni.cncf.io/networks: >-
@@ -42,6 +42,12 @@ spec:
       containers:
       - name: gnb
         image: "{{ .Values.nfimage.repository }}:{{ .Values.nfimage.version }}"
+        {{- if .Values.config.mountConfig}}
+        volumeMounts:
+          - mountPath: /opt/oai-gnb/etc/mounted.conf
+            name: configuration
+            subPath: mounted.conf
+        {{- end}}
         {{- if .Values.resources.define}}
         resources:
           requests:
@@ -54,48 +60,35 @@ spec:
         securityContext:
           {{- toYaml .Values.securityContext | nindent 12 }}
         ports:
-        - containerPort: {{ .Values.service.s1uPort }}
-          name: s1u
+        - containerPort: 2152
+          name: n3
           protocol: UDP
-        - containerPort: {{ .Values.service.s1cPort }}
-          name: s1c
-          protocol: UDP
-        - containerPort: {{ .Values.service.x2cPort }}
-          name: x2c
-          protocol: UDP
+        - containerPort: 36412
+          name: n2
+          protocol: SCTP
         {{- if .Values.start.gnb}}
         {{- else}}
         command:
           - /bin/sleep
           - infinity
         {{- end}}
-        volumeMounts:
-        - mountPath: "/opt/oai-gnb/etc/mounted.conf"
-          name: script
-          subPath: "mounted.conf"
         env:
+          - name: TZ
+            value: {{ .Values.config.timeZone }}
+          - name: RFSIMULATOR
+            value: {{ .Values.config.rfSimulator }}
+          - name: USE_ADDITIONAL_OPTIONS
+            value: {{ .Values.config.useAdditionalOptions }}
+        {{- if .Values.config.mountConfig}}
           - name: USE_VOLUMED_CONF
             value: "yes"
-          - name: TZ
-            valueFrom:
-              configMapKeyRef:
-                name: {{ .Chart.Name }}-configmap
-                key: timeZone
-          - name: RFSIMULATOR
-            valueFrom:
-              configMapKeyRef:
-                name: {{ .Chart.Name }}-configmap
-                key: rfSimulator
+        {{- end}}
+        {{- if not .Values.config.mountConfig}}
           - name: USE_SA_TDD_MONO
             valueFrom:
               configMapKeyRef:
                 name: {{ .Chart.Name }}-configmap
-                key: useSaTddMono
-          - name: USE_SA_FDD_MONO
-            valueFrom:
-              configMapKeyRef:
-                name: {{ .Chart.Name }}-configmap
-                key: useSaFddMono
+                key: useSATddMono
           - name: GNB_NAME
             valueFrom:
               configMapKeyRef:
@@ -126,26 +119,16 @@ spec:
               configMapKeyRef:
                 name: {{ .Chart.Name }}-configmap
                 key: nssaiSst
-          - name: NSSAI_SD
+          - name: NSSAI_SD0
             valueFrom:
               configMapKeyRef:
                 name: {{ .Chart.Name }}-configmap
-                key: nssaiSd
+                key: nssaiSd0
           - name: AMF_IP_ADDRESS
             valueFrom:
               configMapKeyRef:
                 name: {{ .Chart.Name }}-configmap
                 key: amfIpAddress
-          - name: USE_FQDN
-            valueFrom:
-              configMapKeyRef:
-                name: {{ .Chart.Name }}-configmap
-                key: useFqdn
-          - name: AMF_FQDN
-            valueFrom:
-              configMapKeyRef:
-                name: {{ .Chart.Name }}-configmap
-                key: amfFqdn
           - name: GNB_NGA_IF_NAME
             valueFrom:
               configMapKeyRef:
@@ -178,16 +161,17 @@ spec:
                 name: {{ .Chart.Name }}-configmap
                 key: gnbNguIpAddress
             {{- end}}
-          - name: USE_ADDITIONAL_OPTIONS
+          - name: THREAD_PARALLEL_CONFIG
             valueFrom:
               configMapKeyRef:
                 name: {{ .Chart.Name }}-configmap
-                key: useAdditionalOptions
+                key: threadParallelConfig
           - name: SDR_ADDRS
             valueFrom:
               configMapKeyRef:
                 name: {{ .Chart.Name }}-configmap
                 key: sdrAddrs
+          {{- end}}
       - name: tcpdump
         image: "{{ .Values.tcpdumpimage.repository }}:{{ .Values.tcpdumpimage.version }}"
         securityContext:
@@ -196,26 +180,42 @@ spec:
         command:
           - /bin/sh
           - -c
-          - /usr/sbin/tcpdump -i any -w /tmp/oai-gnb_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap
+          - /usr/sbin/tcpdump -ni net1 src {{ .Values.multus.n2IPadd }} or dst {{ .Values.multus.n2IPadd }} -w /pcap/oai-gnb-n2_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap
         {{- else}}
         command:
           - /bin/sleep
           - infinity
         {{- end}}
-        volumeMounts:
         {{- if .Values.persistence.sharedvolume}}
+        volumeMounts:
         - mountPath: "/pcap"
           name: cn5g-pv
         {{- end}}
+      - name: tcpdump2
+        image: "{{ .Values.tcpdumpimage.repository }}:{{ .Values.tcpdumpimage.version }}"
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        {{- if .Values.start.tcpdump}}
+        command:
+          - /bin/sh
+          - -c
+          - /usr/sbin/tcpdump -ni net2 src {{ .Values.multus.n3IPadd }} or dst {{ .Values.multus.n3IPadd }} -w /pcap/oai-gnb-n3_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap
+        {{- else}}
+        command:
+          - /bin/sleep
+          - infinity
+        {{- end}}
+        {{- if .Values.persistence.sharedvolume}}
+        volumeMounts:
+        - mountPath: "/pcap"
+          name: cn5g-pv
+        {{- end}}
+      {{- if .Values.config.mountConfig}}
       volumes:
-      - name: script 
-        configMap: 
-          name: {{ .Chart.Name }}-script
-      {{- if .Values.persistence.sharedvolume}}
-      - name: cn5g-pv
-        persistenceVolumeClaim:
-          claimName: cn5g-pvc
-      {{- end }}
+      - configMap:
+          name: {{ .Chart.Name }}-configmap
+        name: configuration
+      {{- end}}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler

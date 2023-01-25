@@ -1,26 +1,20 @@
-# Default values for oai-gnb.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
-replicaCount: 1
+kubernetesType: Vanilla  #Vanilla for community kubernetes distribution
 
 nfimage:   # image name either locally present or in a public/private repository
-  registry: local
   repository: docker.io/r2labuser/oai-gnb-aw2s
-  version: latest # image tag
+  version: latest ##develop # image tag
   # pullPolicy: IfNotPresent or Never or Always
   pullPolicy: IfNotPresent
 
 tcpdumpimage:
-  registry: local
   repository: docker.io/corfr/tcpdump
   version: latest
   #pullPolicy: IfNotPresent or Never or Always
   pullPolicy: IfNotPresent
 
-## good to use when pulling images from docker-hub mention 
+# good to use when pulling images from docker-hub mention 
 imagePullSecrets: 
-  - name: "regcred"
+ - name: "regcred"
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -44,11 +38,7 @@ securityContext:
   # runAsNonRoot: true
   # runAsUser: 1000
 
-service:
-  type: ClusterIP
-  s1uPort: 2152
-  s1cPort: 36412
-  x2cPort: 36422 
+#service type is fixed to clusterIP, it is only support for non multus interface (eth0)
 
 start:
   gnb: true
@@ -60,46 +50,44 @@ start:
 # 1. you want seperate interface for N2 and N3 
 # 2. You want static ip-address for N2 and N3 interface
 # 3. Different interfaces for different packets
- 
+
 multus:    # needed when gnB service will run on another interface rather than traditional eth0
-  create: true
-  n2IPadd: "192.168.100.163"
-  n2Netmask: "24"
-  n2hostInterface: "team0" # Interface of the node (sopnode-w2) on which this pod will be scheduled for N2
-  n3IPadd: "192.168.100.164"
-  n3Netmask: "24"
-  n3hostInterface: "team0" # Interface of the node (sopnode-w2) on which this pod will be scheduled for N3
+  create: false
+  n2n3IPadd: "172.21.6.203"
+  n2n3Netmask: "22"
+  defaultGateway: "172.21.7.254"
+  hostInterface: "bond0"      # Interface of the host machine on which this pod will be scheduled
   aw2sIPadd: "192.168.100.166" # .100.48 for our Jaguar and .100.50 for our Panther
   aw2sNetmask: "24"
   aw2shostInterface: "team0"
 
+
+
 config:
+  mountConfig: true #If config file is mounted then please edit mount.conf in configmap.yaml properly 
+  useSATddMono: true
   timeZone: "Europe/Paris"
-  rfSimulator: "server" 
+  rfSimulator: "server"
   useSATddMono: "yes"
-  gnbName: "gnb-r2lab"
-  mcc: "208"   # check the information with AMF, SMF, UPF/SPGWU
-  mnc: "95"    # check the information with AMF, SMF, UPF/SPGWU
+  gnbName: "gnb-aw2s"
+  mcc: "001"   # check the information with AMF, SMF, UPF/SPGWU
+  mnc: "01"    # check the information with AMF, SMF, UPF/SPGWU
   mncLength: "2" # check the information with AMF, SMF, UPF/SPGWU
   tac: "1"     # check the information with AMF
   nssaiSst: "1"  #currently only 4 standard values are allowed 1,2,3,4 
-  nssaiSd: "1"    #values in hexa-decimal format
-  useFqdn: "false"
-  amfFqdn: "oai-amf-svc"
-  amfIpAddress: "192.168.100.161"  # amf ip-address or service-name
-  gnbNgaIfName: "net1"  # net1 in case multus create is true that means another interface is created for ngap interface, n2 to communicate with amf
-  gnbNgaIpAddress: "192.168.100.163" # n2IPadd in case multus create is true
-  gnbNguIfName: "net2"   #net2 in case multus create is true gtu interface for upf/spgwu
-  gnbNguIpAddress: "192.168.100.164" # n3IPadd in case multus create is true
-  localIfName: "net3"
-  remoteAddr: "192.168.100.48"
-  localAddr: "192.168.100.166"
-  useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11,13,15"
-
+  nssaiSd0: "ffffff"    #values in hexa-decimal format
+  amfIpAddress: "oai-amf-svc"  # amf ip-address or service-name oai-amf-svc
+  gnbNgaIfName: "eth0"            # net1 in case multus create is true that means another interface is created for ngap interface, n2 to communicate with amf
+  gnbNgaIpAddress: "status.podIP" # n2n3IPadd in case multus create is true
+  gnbNguIfName: "eth0"   #net1 in case multus create is true gtu interface for upf/spgwu
+  gnbNguIpAddress: "status.podIP" # n2n3IPadd in case multus create is true
+  useAdditionalOptions: "--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
+  threadParallelConfig: "PARALLEL_SINGLE_THREAD"
+  sdrAddrs: "serial=XXXXXXX"
 
 persistence:
   sharedvolume: false
-  volumeName: managed-nfs-storage
+  volumeName: cn5g-volume
   size: 1Gi
 
 resources:
@@ -116,8 +104,8 @@ tolerations: []
 
 affinity: {}
 
-terminationGracePeriodSeconds: 30
+terminationGracePeriodSeconds: 5
 
 nodeSelector: {}
 
-nodeName: sopnode-w2.inria.fr
+nodeName: 

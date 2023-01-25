@@ -438,33 +438,41 @@ function init() {
 	./create-pv.sh $ns
     fi
 
-    # Configure gnb conf and chart files
-    echo "Configuring gNB conf, values/multus/configmap/deployment charts for $rru"
+    # Prepare mounted.conf and gnb chart files
+    echo "Preparing gNB mounted.conf and values/multus/configmap/deployment charts for $rru"
+
     DIR_ORIG="/root/oai5g-rru/gnb-config/originals"
     DIR_GNB="/root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
-    DIR_DEST="$DIR_GNB/conf/"
+    DIR_DEST="$DIR_GNB/conf"
+    DIR_CHARTS="$DIR_GNB"/conf
+    DIR_TEMPLATES="$DIR_GNB"/templates
+
     if [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
 	RRU_TYPE="n3xx"
 	CONF_ORIG="$DIR_ORIG/$CONF_N3XX"
-	cp "$CONF_ORIG" "$DIR_DEST"/mounted.conf
-	if [ "$rru" == "n300" ] ; then
-	   SDR_ADDRS="$ADDRS_N300"
-	elif [ "$rru" == "n320" ] ; then
-	   SDR_ADDRS="$ADDRS_N320"
-	fi
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	RRU_TYPE="aw2s"
 	CONF_ORIG="$DIR_ORIG/$CONF_AW2S"
-	cp "$CONF_ORIG" "$DIR_DEST"/mounted.conf
-	if [ "$rru" == "jaguar" ] ; then
-	    ADDR_AW2S="$ADDR_JAGUAR"
-	elif [ "$rru" == "panther" ] ; then
-	    ADDR_AW2S="$ADDR_PANTHER"
-	fi
     else
 	echo "Unknown rru selected: $rru"
 	usage
     fi
+    
+    echo "Copying the right chart files corresponding to $RRU_TYPE RRU"
+    echo cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB"/values.yaml
+    cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB"/values.yaml
+    echo cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
+    cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
+    echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+    cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+
+    echo "Preparing configmap.yaml chart that includes the right gNB configuration"
+    head -17  "$DIR_TEMPLATES"/configmap.yaml "$DIR_TEMPLATES"/configmap /tmp/configmap.yaml
+    cat "$CONF_ORIG" >> /tmp/configmap.yaml
+    echo "{{- end }}" >> /tmp/configmap.yaml
+    diff /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+    mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+
     # add NSSAI sd info for PLMN and sdr_addrs for RUs 
     SED_FILE="/tmp/gnb_conf.sed"
     cat > "$SED_FILE" <<EOF
@@ -477,12 +485,12 @@ s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net2"
 s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N3/24";|
 s|sdr_addrs =.*||
 EOF
-    cp "$DIR_DEST"/mounted.conf /tmp/mounted.conf
-    sed -f "$SED_FILE" < /tmp/mounted.conf > "$DIR_DEST"/mounted.conf
+    cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
+    sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
 
     # set SDR IP ADDRESSES
     if [[ "$rru" == "n300" || "$rru" == "n320" ]] ; then
-        perl -i -p0e "s/#clock_src = \"internal\";/#clock_src = \"internal\";\n  sdr_addrs = \"$SDR_ADDRS,clock_source=internal,time_source=internal\";/s" "$DIR_DEST"/mounted.conf
+        perl -i -p0e "s/#clock_src = \"internal\";/#clock_src = \"internal\";\n  sdr_addrs = \"$SDR_ADDRS,clock_source=internal,time_source=internal\";/s" "$DIR_TEMPLATES"/configmap.yaml
     else
 	SED_FILE="/tmp/aw2s_conf.sed"
 	cat > "$SED_FILE" <<EOF
@@ -490,23 +498,12 @@ s|local_if_name.*|local_if_name  = "net3"|
 s|remote_address.*|remote_address = "$ADDR_AW2S"|
 s|local_address.*|local_address = "$IP_GNB_AW2S"|
 EOF
-	cp "$DIR_DEST"/mounted.conf /tmp/mounted.conf
-	sed -f "$SED_FILE" < /tmp/mounted.conf > "$DIR_DEST"/mounted.conf
+	cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
+	sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
     fi
     # show changes applied to default conf
-    echo "Following changes applied to $CONF_ORIG"
-    diff "$DIR_DEST"/mounted.conf "$CONF_ORIG"
-    echo "Copying the right chart files corresponding to $RRU_TYPE RRU"
-    DIR_CHARTS="$DIR_GNB"/conf
-    DIR_TEMPLATES="$DIR_GNB"/templates
-    echo cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB"/values.yaml
-    cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB"/values.yaml
-    echo cp "$DIR_CHARTS"/configmap-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/configmap.yaml
-    cp "$DIR_CHARTS"/configmap-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/configmap.yaml
-    echo cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
-    cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
-    echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
-    cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+    echo "Display new $DIR_TEMPLATES/configmap.yaml"
+    cat "$DIR_TEMPLATES"/configmap.yaml
 }
 
 function reconfigure() {
