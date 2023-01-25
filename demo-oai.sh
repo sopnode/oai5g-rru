@@ -332,9 +332,9 @@ function configure-gnb() {
     cat > "$SED_FILE" <<EOF
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
-s|n2Netmask: "24"|
+s|n2Netmask:.*|n2Netmask: "24"|
 s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
-s|n3Netmask: "24"|
+s|n3Netmash:.*|n3Netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_GNB_N2_N3"|
 s|gnbName:.*|gnbName: "$rru"|
 s|mcc:.*|mcc: "$MCC"|
