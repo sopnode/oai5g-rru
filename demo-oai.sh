@@ -336,7 +336,7 @@ s|n2Netmask: "24"|
 s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
 s|n3Netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_GNB_N2_N3"|
-s|gnbName:.*|gnbName: "$rru"
+s|gnbName:.*|gnbName: "$rru"|
 s|mcc:.*|mcc: "$MCC"|
 s|mnc:.*|mnc: "$MNC"|
 s|amfIpAddress:.*|amfIpAddress: "$IP_AMF_N1"|
