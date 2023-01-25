@@ -33,10 +33,8 @@ ADDR_JAGUAR="$P100.48" # for eth1
 ADDR_PANTHER="$P100.51" # .51 for eth2
 
 # N2/N3 Interfaces definition
-IF_NAME_AMF_N2="$IF_NAME_VLAN100"
-IF_NAME_SPGWU_N3="$IF_NAME_VLAN100"
-IF_NAME_GNB_N2="$IF_NAME_VLAN100"
-IF_NAME_GNB_N3="$IF_NAME_VLAN100"
+IF_NAME_AMF_N2_SPGWU_N3="$IF_NAME_VLAN100"
+IF_NAME_GNB_N2_N3="$IF_NAME_VLAN100"
 IF_NAME_LOCAL_AW2S="$IF_NAME_VLAN100"
 IF_NAME_LOCAL_N3XX_1="$IF_NAME_VLAN10"
 IF_NAME_LOCAL_N3XX_2="$IF_NAME_VLAN20"
@@ -53,6 +51,10 @@ OAI5G_AMF="$OAI5G_CORE"/oai-amf
 OAI5G_AUSF="$OAI5G_CORE"/oai-ausf
 OAI5G_SMF="$OAI5G_CORE"/oai-smf
 OAI5G_SPGWU="$OAI5G_CORE"/oai-spgwu-tiny
+
+# Other CN parameters configuration
+MCC="208"
+MNC="95"
 
 function usage() {
     echo "USAGE:"
@@ -174,31 +176,16 @@ function configure-oai-5g-basic() {
 s|create: false|create: true|
 s|n1IPadd:.*|n1IPadd: "$IP_AMF_N1"|
 s|n1Netmask:.*|n1Netmask: "24"|
-s|hostInterface:.*|hostInterface: "$IF_NAME_AMF_N2" # interface of the node (sopnode-w3) running amf pod for N2|
-s|amfInterfaceNameForNGAP: "eth0" # If multus creation is true then net1 else eth0|amfInterfaceNameForNGAP: "net1" # If multus creation is true then net1 else eth0|
-s|mnc: "99".*|mnc: "95"|
-s|servedGuamiMnc0: "99"|servedGuamiMnc0: "95"|
-s|plmnSupportMnc: "99"|plmnSupportMnc: "95"|
-s|operatorKey:.*|operatorKey: "8e27b6af0e692e750f32667a3b14605d"  # should be same as in subscriber database|  
+s|hostInterface:.*|hostInterface: "$IF_NAME_AMF_N2_SPGWU_N3" # interface of the nodes for amf/N2 and spgwu/N3|
+s|amfInterfaceNameForNGAP:.*|amfInterfaceNameForNGAP: "net1" # If multus creation is true then net1 else eth0|
+s|mcc:.*|mcc: "$MCC"|
+s|mnc:.*|mnc: "$MNC"|
 s|n3Ip:.*|n3Ip: "$IP_UPF_N3"|
 s|n3Netmask:.*|n3Netmask: "24"|
-s|hostInterface:.*|hostInterface: "$IF_NAME_SPGWU_N3" # interface of the node (sopnode-w3) running spgwu pod for N3|
-s|sgwS1uIf: "eth0"  # n3 interface, net1 if gNB is outside the cluster network and multus creation is true else eth0|sgwS1uIf: "net1"  # n3 interface, net1 if gNB is outside the cluster network and multus creation is true else eth0|
-s|pgwSgiIf: "eth0"  # net1 if gNB is outside the cluster network and multus creation is true else eth0 (important because it sends the traffic towards internet)|pgwSgiIf: "eth0"  # net1 if gNB is outside the cluster network and multus creation is true else eth0 (important because it sends the traffic towards internet)|
-s|dnsIpv4Address: "172.21.3.100" # configure the dns for UE don't use Kubernetes DNS|dnsIpv4Address: "138.96.0.210" # configure the dns for UE don't use Kubernetes DNS|
-s|dnsSecIpv4Address: "172.21.3.100" # configure the dns for UE don't use Kubernetes DNS|dnsSecIpv4Address: "193.51.196.138" # configure the dns for UE don't use Kubernetes DNS|
-s|sst0:.*|sst0: "1"|
-s|sd0:.*|sd0: "1"|
-s|sst1:.*|sst1: "1"|
-s|sd1:.*|sd1: "10203"|
-s|sst2:.*|sst2: "4"|
-s|sd2:.*|sd2: "4"|
-s|nssaiSst0:.*|nssaiSst0: 1|
-s|nssaiSd0:.*|nssaiSd0: 1|
-s|nssaiSst1:.*|nssaiSst1: 1|
-s|nssaiSd1:.*|nssaiSd1: 10203|
-s|nssaiSst2:.*|nssaiSst2: 4|
-s|nssaiSd2:.*|nssaiSd2: 4|
+s|n3If:.*|n3If: "net1"  # net1 if gNB is outside the cluster network and multus creation is true else eth0|
+s|n6If:.*|n6If: "net1"  # net1 if gNB is outside the cluster network and multus creation is true else eth0  (important because it sends the traffic towards internet)|
+s|dnsIpv4Address:.*|dnsIpv4Address: "138.96.0.210" # configure the dns for UE don't use Kubernetes DNS|
+s|dnsSecIpv4Address:.*|dnsSecIpv4Address: "193.51.196.138" # configure the dns for UE don't use Kubernetes DNS|
 EOF
 
     cp "$OAI5G_BASIC"/values.yaml /tmp/basic_values.yaml-orig
@@ -314,7 +301,7 @@ function configure-amf() {
     echo "Configuring chart $ORIG_CHART for R2lab"
 
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
-    perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-n1-net1"/s' "$ORIG_CHART"
+    perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-n2-net1"/s' "$ORIG_CHART"
     diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 }
 
@@ -342,6 +329,25 @@ function configure-gnb() {
 
     # Tune values.yaml chart
     echo "Configuring chart $ORIG_CHART for R2lab"
+    cat > "$SED_FILE" <<EOF
+s|tcpdump:.*|tcpdump: $GENER_PCAP|
+s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
+s|n2Netmask: "24"|
+s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
+s|n3Netmask: "24"|
+s|hostInterface:.*|hostInterface: "$IF_NAME_GNB_N2_N3"|
+s|gnbName:.*|gnbName: "$rru"
+s|mcc:.*|mcc: "$MCC"|
+s|mnc:.*|mnc: "$MNC"|
+s|amfIpAddress:.*|amfIpAddress: "$IP_AMF_N1"|
+s|gnbNgaIfName:.*|gnbNgaIfName: "net1"|
+s|gnbNgaIpAddress:.*|gnbNgaIpAddress: "$IP_GNB_N2"|
+s|gnbNguIfName:.*|gnbNguIfName: "net2"|
+s|gnbNguIpAddress:.*|gnbNguIpAddress: "$IP_GNB_N3"|
+s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
+s|nodeName:.*|nodeName: $node_gnb|
+EOF
+
     if [[ $pcap == "True" ]]; then
 	GENER_PCAP="true"
 	SHARED_VOL="true"
@@ -355,15 +361,11 @@ function configure-gnb() {
 	elif [["$rru" == "n320" ]]; then
 	    SDR_ADDRS="$ADDRS_N320"
 	fi
-	cat > "$SED_FILE" <<EOF
-s|tcpdump:.*|tcpdump: $GENER_PCAP|
-s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
-s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
+	cat >> "$SED_FILE" <<EOF
 s|sfp1hostInterface:.*|sfp1hostInterface: "$IF_NAME_LOCAL_N3XX_1"|
 s|sfp2hostInterface:.*|sfp2hostInterface: "$IF_NAME_LOCAL_N3XX_2"|
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15"|
 s|sdrAddrs:.*|sdrAddrs: "$SDR_ADDRS,clock_source=internal,time_source=internal"|
-s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
-s|nodeName:.*|nodeName: $node_gnb|
 EOF
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	if [ "$rru" == "jaguar" ] ; then
@@ -371,19 +373,12 @@ EOF
 	elif [ "$rru" == "panther" ] ; then
 	    ADDR_AW2S="$ADDR_PANTHER"
 	fi
-	cat > "$SED_FILE" <<EOF
-s|tcpdump:.*|tcpdump: $GENER_PCAP|
-s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
-s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
-s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
-s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
+	cat >> "$SED_FILE" <<EOF
 s|aw2sIPadd:.*|aw2sIPadd: "$IP_GNB_AW2S"|
 s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
-s|localIfName:.*|localIfName: "net3"|
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15"|
 s|remoteAddr.*|remoteAddr: "$ADDR_AW2S"| 
 s|localAddr.*|localAddr: "$IP_GNB_AW2S"|
-s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
-s|nodeName:.*|nodeName: $node_gnb|
 EOF
     else
         echo "Unknown rru selected: $rru"
