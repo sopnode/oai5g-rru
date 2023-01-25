@@ -469,8 +469,7 @@ function init() {
     echo "Preparing configmap.yaml chart that includes the right gNB configuration"
     head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
     cat "$CONF_ORIG" >> /tmp/configmap.yaml
-    echo -e "\n{{- end }}" >> /tmp/configmap.yaml
-    diff /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+    echo -e "\n{{- end }}\n" >> /tmp/configmap.yaml
     mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
     # add NSSAI sd info for PLMN and sdr_addrs for RUs 
