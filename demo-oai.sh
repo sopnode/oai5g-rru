@@ -334,16 +334,16 @@ s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
 s|n2Netmask:.*|n2Netmask: "24"|
 s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
-s|n3Netmash:.*|n3Netmask: "24"|
+s|n3Netmask:.*|n3Netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_GNB_N2_N3"|
-s|gnbName:.*|gnbName: "$rru"|
-s|mcc:.*|mcc: "$MCC"|
-s|mnc:.*|mnc: "$MNC"|
-s|amfIpAddress:.*|amfIpAddress: "$IP_AMF_N1"|
-s|gnbNgaIfName:.*|gnbNgaIfName: "net1"|
-s|gnbNgaIpAddress:.*|gnbNgaIpAddress: "$IP_GNB_N2"|
-s|gnbNguIfName:.*|gnbNguIfName: "net2"|
-s|gnbNguIpAddress:.*|gnbNguIpAddress: "$IP_GNB_N3"|
+s|XgnbName:.*|gnbName: "$rru"|
+s|Xmcc:.*|mcc: "$MCC"|
+s|Xmnc:.*|mnc: "$MNC"|
+s|XamfIpAddress:.*|amfIpAddress: "$IP_AMF_N1"|
+s|XgnbNgaIfName:.*|gnbNgaIfName: "net1"|
+s|XgnbNgaIpAddress:.*|gnbNgaIpAddress: "$IP_GNB_N2"|
+s|XgnbNguIfName:.*|gnbNguIfName: "net2"|
+s|XgnbNguIpAddress:.*|gnbNguIpAddress: "$IP_GNB_N3"|
 s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
@@ -364,8 +364,8 @@ EOF
 	cat >> "$SED_FILE" <<EOF
 s|sfp1hostInterface:.*|sfp1hostInterface: "$IF_NAME_LOCAL_N3XX_1"|
 s|sfp2hostInterface:.*|sfp2hostInterface: "$IF_NAME_LOCAL_N3XX_2"|
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15"|
-s|sdrAddrs:.*|sdrAddrs: "$SDR_ADDRS,clock_source=internal,time_source=internal"|
+s|XuseAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15"|
+s|XsdrAddrs:.*|sdrAddrs: "$SDR_ADDRS,clock_source=internal,time_source=internal"|
 EOF
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	if [ "$rru" == "jaguar" ] ; then
@@ -376,9 +376,9 @@ EOF
 	cat >> "$SED_FILE" <<EOF
 s|aw2sIPadd:.*|aw2sIPadd: "$IP_GNB_AW2S"|
 s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15"|
-s|remoteAddr.*|remoteAddr: "$ADDR_AW2S"| 
-s|localAddr.*|localAddr: "$IP_GNB_AW2S"|
+s|XuseAdditionalOptions:.*|useAdditionalOptions: "--sa --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15"|
+s|XremoteAddr.*|remoteAddr: "$ADDR_AW2S"| 
+s|XlocalAddr.*|localAddr: "$IP_GNB_AW2S"|
 EOF
     else
         echo "Unknown rru selected: $rru"
@@ -453,6 +453,7 @@ function init() {
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	RRU_TYPE="aw2s"
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
+	
     else
 	echo "Unknown rru selected: $rru"
 	usage
@@ -476,7 +477,8 @@ function init() {
     SED_FILE="/tmp/gnb_conf.sed"
     cat > "$SED_FILE" <<EOF
 s|sst = 1|sst = 1; sd = 0x1 |
-s|mnc = 99;|mnc = 95;|
+s|mcc = 208;|mcc = "$MCC";|
+s|mnc = 99;|mnc = "$MNC";|
 s|ipv4       =.*|ipv4       = "$IP_AMF_N1";|
 s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
 s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2/24";|
@@ -491,6 +493,11 @@ EOF
     if [[ "$rru" == "n300" || "$rru" == "n320" ]] ; then
         perl -i -p0e "s/#clock_src = \"internal\";/#clock_src = \"internal\";\n  sdr_addrs = \"$SDR_ADDRS,clock_source=internal,time_source=internal\";/s" "$DIR_TEMPLATES"/configmap.yaml
     else
+	if [ "$rru" == "jaguar" ] ; then
+	    ADDR_AW2S="$ADDR_JAGUAR"
+	elif [ "$rru" == "panther" ] ; then
+	    ADDR_AW2S="$ADDR_PANTHER"
+	fi
 	SED_FILE="/tmp/aw2s_conf.sed"
 	cat > "$SED_FILE" <<EOF
 s|local_if_name.*|local_if_name  = "net3"|
