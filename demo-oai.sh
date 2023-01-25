@@ -336,14 +336,6 @@ s|n2Netmask:.*|n2Netmask: "24"|
 s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
 s|n3Netmask:.*|n3Netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_GNB_N2_N3"|
-s|XgnbName:.*|gnbName: "$rru"|
-s|Xmcc:.*|mcc: "$MCC"|
-s|Xmnc:.*|mnc: "$MNC"|
-s|XamfIpAddress:.*|amfIpAddress: "$IP_AMF_N1"|
-s|XgnbNgaIfName:.*|gnbNgaIfName: "net1"|
-s|XgnbNgaIpAddress:.*|gnbNgaIpAddress: "$IP_GNB_N2"|
-s|XgnbNguIfName:.*|gnbNguIfName: "net2"|
-s|XgnbNguIpAddress:.*|gnbNguIpAddress: "$IP_GNB_N3"|
 s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
@@ -364,8 +356,6 @@ EOF
 	cat >> "$SED_FILE" <<EOF
 s|sfp1hostInterface:.*|sfp1hostInterface: "$IF_NAME_LOCAL_N3XX_1"|
 s|sfp2hostInterface:.*|sfp2hostInterface: "$IF_NAME_LOCAL_N3XX_2"|
-s|XuseAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15"|
-s|XsdrAddrs:.*|sdrAddrs: "$SDR_ADDRS,clock_source=internal,time_source=internal"|
 EOF
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	if [ "$rru" == "jaguar" ] ; then
@@ -376,9 +366,6 @@ EOF
 	cat >> "$SED_FILE" <<EOF
 s|aw2sIPadd:.*|aw2sIPadd: "$IP_GNB_AW2S"|
 s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
-s|XuseAdditionalOptions:.*|useAdditionalOptions: "--sa --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15"|
-s|XremoteAddr.*|remoteAddr: "$ADDR_AW2S"| 
-s|XlocalAddr.*|localAddr: "$IP_GNB_AW2S"|
 EOF
     else
         echo "Unknown rru selected: $rru"
@@ -491,6 +478,11 @@ EOF
 
     # set SDR IP ADDRESSES
     if [[ "$rru" == "n300" || "$rru" == "n320" ]] ; then
+	if [[ "$rru" == "n300" ]]; then
+	    SDR_ADDRS="$ADDRS_N300"
+	elif [["$rru" == "n320" ]]; then
+	    SDR_ADDRS="$ADDRS_N320"
+	fi
         perl -i -p0e "s/#clock_src = \"internal\";/#clock_src = \"internal\";\n  sdr_addrs = \"$SDR_ADDRS,clock_source=internal,time_source=internal\";/s" "$DIR_TEMPLATES"/configmap.yaml
     else
 	if [ "$rru" == "jaguar" ] ; then
