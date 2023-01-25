@@ -467,9 +467,9 @@ function init() {
     cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
 
     echo "Preparing configmap.yaml chart that includes the right gNB configuration"
-    head -17  "$DIR_TEMPLATES"/configmap.yaml "$DIR_TEMPLATES"/configmap /tmp/configmap.yaml
+    head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
     cat "$CONF_ORIG" >> /tmp/configmap.yaml
-    echo "{{- end }}" >> /tmp/configmap.yaml
+    echo -e "\n{{- end }}" >> /tmp/configmap.yaml
     diff /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
     mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
