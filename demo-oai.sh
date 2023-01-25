@@ -486,7 +486,7 @@ function init() {
     # Keep the 17 first lines of configmap.yaml
     head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
     # Add a 6-characters margin to gnb.conf
-    awk '$0="      "$0' "$CONF_ORIG" >> /tmp/gnb.conf
+    awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
     # Append the modified gnb.conf to /tmp/configmap.yaml
     cat /tmp/gnb.conf >> /tmp/configmap.yaml
     echo -e "\n{{- end }}\n" >> /tmp/configmap.yaml
