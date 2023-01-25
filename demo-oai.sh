@@ -355,8 +355,15 @@ function configure-gnb() {
     ORIG_CHART="$DIR"/values.yaml
     SED_FILE="/tmp/$FUNCTION-r2lab.sed"
 
-    # Tune values.yaml chart
+    # Configure values.yaml chart
     echo "Configuring chart $ORIG_CHART for R2lab"
+    if [[ $pcap == "True" ]]; then
+	GENER_PCAP="true"
+	SHARED_VOL="true"
+    else
+	GENER_PCAP="false"
+	SHARED_VOL="false"
+    fi
     cat > "$SED_FILE" <<EOF
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
@@ -368,13 +375,6 @@ s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
 
-    if [[ $pcap == "True" ]]; then
-	GENER_PCAP="true"
-	SHARED_VOL="true"
-    else
-	GENER_PCAP="false"
-	SHARED_VOL="false"
-    fi
     if [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
 	if [[ "$rru" == "n300" ]]; then
 	    SDR_ADDRS="$ADDRS_N300"
