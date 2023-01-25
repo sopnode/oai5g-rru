@@ -483,8 +483,12 @@ function init() {
     cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
 
     echo "Preparing configmap.yaml chart that includes the right gNB configuration"
+    # Keep the 17 first lines of configmap.yaml
     head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
-    cat "$CONF_ORIG" >> /tmp/configmap.yaml
+    # Add a 6-characters margin to gnb.conf
+    awk '$0="      "$0' "$CONF_ORIG" >> /tmp/gnb.conf
+    # Append the modified gnb.conf to /tmp/configmap.yaml
+    cat /tmp/gnb.conf >> /tmp/configmap.yaml
     echo -e "\n{{- end }}\n" >> /tmp/configmap.yaml
     mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
