@@ -53,8 +53,8 @@ OAI5G_SMF="$OAI5G_CORE"/oai-smf
 OAI5G_SPGWU="$OAI5G_CORE"/oai-spgwu-tiny
 
 # Other CN parameters configuration
-MCC="208"
-MNC="95"
+MCC=208
+MNC=95
 
 function usage() {
     echo "USAGE:"
