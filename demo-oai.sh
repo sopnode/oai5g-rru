@@ -56,13 +56,13 @@ OAI5G_SPGWU="$OAI5G_CORE"/oai-spgwu-tiny
 MCC="208"
 MNC="95"
 
+
 function usage() {
     echo "USAGE:"
-    echo "demo-oai.sh init [namespace rru pcap] |"
+    echo "demo-oai.sh init [namespace] |"
     echo "            start [namespace node_amf_spgwu node_gnb pcap] |"
     echo "            stop [namespace pcap] |"
     echo "            configure-all [node_amf_spgwu node_gnb rru pcap] |"
-    echo "            reconfigure [node_amf_spgwu node_gnb] |"
     echo "            start-cn [namespace node_amf_spgwu] |"
     echo "            start-gnb [namespace node_gnb] |"
     echo "            stop-cn [namespace] |"
@@ -225,6 +225,7 @@ EOF
     helm dependency update
 }
 
+
 function configure-mysql() {
 
     FUNCTION="mysql"
@@ -321,6 +322,7 @@ EOF
     patch "$ORIG_CHART" < /tmp/oai_db-basic-patch
 }
 
+
 function configure-amf() {
 
     FUNCTION="oai-amf"
@@ -332,6 +334,7 @@ function configure-amf() {
     perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-n2-net1"/s' "$ORIG_CHART"
     diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 }
+
 
 function configure-spgwu-tiny() {
 
@@ -345,18 +348,103 @@ function configure-spgwu-tiny() {
     diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 }
 
+
 function configure-gnb() {
     node_gnb=$1; shift
     rru=$1; shift
     pcap=$1; shift
     
+
+    # Prepare mounted.conf and gnb chart files
+    echo "configure-gnb to run on node $node_gnb with RRU $rru and pcap is $pcap"
+    echo "First prepare gNB mounted.conf and values/multus/configmap/deployment charts for $rru"
+
+    DIR_GNB="/root/oai5g-rru/gnb-config"
+    DIR_CONF="$DIR_GNB/conf"
+    DIR_CHARTS="$DIR_GNB/charts"
+    DIR_GNB_DEST="/root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
+    DIR_TEMPLATES="$DIR_GNB_DEST/templates"
+
+    if [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
+	RRU_TYPE="n3xx"
+	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
+    elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
+	RRU_TYPE="aw2s"
+	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
+	
+    else
+	echo "Unknown rru selected: $rru"
+	usage
+    fi
+    
+    echo "Copy the relevant chart files corresponding to $RRU_TYPE RRU"
+    echo cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
+    cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
+    echo cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
+    cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
+    echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+    cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+
+    echo "Set up configmap.yaml chart with the right gNB configuration from $CONF_ORIG"
+    # Keep the 17 first lines of configmap.yaml
+    head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
+    # Add a 6-characters margin to gnb.conf
+    awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
+    # Append the modified gnb.conf to /tmp/configmap.yaml
+    cat /tmp/gnb.conf >> /tmp/configmap.yaml
+    echo -e "\n{{- end }}\n" >> /tmp/configmap.yaml
+    mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+
+    # add NSSAI sd info for PLMN and sdr_addrs for RUs 
+    SED_FILE="/tmp/gnb_conf.sed"
+    cat > "$SED_FILE" <<EOF
+s|sst = 1|sst = 1; sd = 0x1 |
+s|mcc = 208;|mcc = $MCC;|
+s|mnc = 99;|mnc = $MNC;|
+s|ipv4       =.*|ipv4       = "$IP_AMF_N1";|
+s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
+s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2/24";|
+s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net2";|
+s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N3/24";|
+s|sdr_addrs =.*||
+EOF
+    cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
+    sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
+
+    # set SDR IP ADDRESSES
+    if [[ "$rru" == "n300" || "$rru" == "n320" ]] ; then
+	if [[ "$rru" == "n300" ]]; then
+	    SDR_ADDRS="$ADDRS_N300"
+	elif [["$rru" == "n320" ]]; then
+	    SDR_ADDRS="$ADDRS_N320"
+	fi
+        perl -i -p0e "s/#clock_src = \"internal\";/#clock_src = \"internal\";\n        sdr_addrs = \"$SDR_ADDRS,clock_source=internal,time_source=internal\";/s" "$DIR_TEMPLATES"/configmap.yaml
+    else
+	if [ "$rru" == "jaguar" ] ; then
+	    ADDR_AW2S="$ADDR_JAGUAR"
+	elif [ "$rru" == "panther" ] ; then
+	    ADDR_AW2S="$ADDR_PANTHER"
+	fi
+	SED_FILE="/tmp/aw2s_conf.sed"
+	cat > "$SED_FILE" <<EOF
+s|local_if_name.*|local_if_name  = "net3"|
+s|remote_address.*|remote_address = "$ADDR_AW2S"|
+s|local_address.*|local_address = "$IP_GNB_AW2S"|
+EOF
+	cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
+	sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
+    fi
+    # show changes applied to default conf
+    echo "Display new $DIR_TEMPLATES/configmap.yaml"
+    cat "$DIR_TEMPLATES"/configmap.yaml
+
     FUNCTION="oai-gnb"
     DIR="$OAI5G_RAN/$FUNCTION"
     ORIG_CHART="$DIR"/values.yaml
     SED_FILE="/tmp/$FUNCTION-r2lab.sed"
 
     # Configure values.yaml chart
-    echo "Configuring chart $ORIG_CHART for R2lab"
+    echo "Then configure chart $ORIG_CHART for R2lab"
     if [[ $pcap == "True" ]]; then
 	GENER_PCAP="true"
 	SHARED_VOL="true"
@@ -415,7 +503,23 @@ function configure-all() {
     rru=$1; shift
     pcap=$1; shift
 
-    echo "Applying SophiaNode patches to OAI5G located on "$HOME"/oai-cn5g-fed"
+    echo "configure-all: Create a k8s persistence volume for possible generation of pcap files"
+    cat << \EOF >> /tmp/cn5g-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cn5g-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteMany
+  hostPath:
+    path: /var/cn5g-volume
+EOF
+    kubectl apply -f /tmp/cn5g-pv.yaml
+
+    echo "configure-all: Applying SophiaNode patches to OAI5G charts located on "$HOME"/oai-cn5g-fed"
     echo -e "\t with oai-spgwu-tiny running on $node_amf_spgwu"
     echo -e "\t with oai-gnb running on $node_gnb"
     echo -e "\t with generate-pcap: $pcap"
@@ -430,17 +534,17 @@ function configure-all() {
 
 function init() {
     ns=$1; shift
-    rru=$1; shift
-    pcap=$1; shift
 
     # init function should be run once per demo.
-    echo "init: ensure spray is installed and possibly create secret docker-registry"
+
     # Remove pulling limitations from docker-hub with anonymous account
+    echo "init: create regcred secret"	     
     kubectl create namespace $ns || true
     kubectl -n$ns delete secret regcred || true
     kubectl -n$ns create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=r2labuser --docker-password=r2labuser-pwd --docker-email=r2labuser@turletti.com || true
 
     # Ensure that helm spray plugin is installed
+    echo "init: ensure spray is installed and possibly create secret docker-registry"
     helm plugin install https://github.com/ThalesGroup/helm-spray || true
 
     # Install patch command...
@@ -449,107 +553,6 @@ function init() {
     # Just in case the k8s cluster has been restarted without multus enabled..
     echo "kube-install.sh enable-multus"
     kube-install.sh enable-multus || true
-
-    if [[ $pcap == "True" ]]; then
-	echo "Create k8s persistence volumes for pcap files"
-	cd /root/oai5g-rru/k8s-pv
-	./create-pv.sh $ns
-    fi
-
-    # Prepare mounted.conf and gnb chart files
-    echo "Preparing gNB mounted.conf and values/multus/configmap/deployment charts for $rru"
-
-    DIR_GNB="/root/oai5g-rru/gnb-config"
-    DIR_CONF="$DIR_GNB/conf"
-    DIR_CHARTS="$DIR_GNB/charts"
-    DIR_GNB_DEST="/root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
-    DIR_TEMPLATES="$DIR_GNB_DEST/templates"
-
-    if [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
-	RRU_TYPE="n3xx"
-	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
-    elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
-	RRU_TYPE="aw2s"
-	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
-	
-    else
-	echo "Unknown rru selected: $rru"
-	usage
-    fi
-    
-    echo "Copying the right chart files corresponding to $RRU_TYPE RRU"
-    echo cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
-    cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
-    echo cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
-    cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
-    echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
-    cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
-
-    echo "Preparing configmap.yaml chart that includes the right gNB configuration"
-    # Keep the 17 first lines of configmap.yaml
-    head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
-    # Add a 6-characters margin to gnb.conf
-    awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
-    # Append the modified gnb.conf to /tmp/configmap.yaml
-    cat /tmp/gnb.conf >> /tmp/configmap.yaml
-    echo -e "\n{{- end }}\n" >> /tmp/configmap.yaml
-    mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
-
-    # add NSSAI sd info for PLMN and sdr_addrs for RUs 
-    SED_FILE="/tmp/gnb_conf.sed"
-    cat > "$SED_FILE" <<EOF
-s|sst = 1|sst = 1; sd = 0x1 |
-s|mcc = 208;|mcc = $MCC;|
-s|mnc = 99;|mnc = $MNC;|
-s|ipv4       =.*|ipv4       = "$IP_AMF_N1";|
-s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
-s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2/24";|
-s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net2";|
-s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N3/24";|
-s|sdr_addrs =.*||
-EOF
-    cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
-    sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
-
-    # set SDR IP ADDRESSES
-    if [[ "$rru" == "n300" || "$rru" == "n320" ]] ; then
-	if [[ "$rru" == "n300" ]]; then
-	    SDR_ADDRS="$ADDRS_N300"
-	elif [["$rru" == "n320" ]]; then
-	    SDR_ADDRS="$ADDRS_N320"
-	fi
-        perl -i -p0e "s/#clock_src = \"internal\";/#clock_src = \"internal\";\n        sdr_addrs = \"$SDR_ADDRS,clock_source=internal,time_source=internal\";/s" "$DIR_TEMPLATES"/configmap.yaml
-    else
-	if [ "$rru" == "jaguar" ] ; then
-	    ADDR_AW2S="$ADDR_JAGUAR"
-	elif [ "$rru" == "panther" ] ; then
-	    ADDR_AW2S="$ADDR_PANTHER"
-	fi
-	SED_FILE="/tmp/aw2s_conf.sed"
-	cat > "$SED_FILE" <<EOF
-s|local_if_name.*|local_if_name  = "net3"|
-s|remote_address.*|remote_address = "$ADDR_AW2S"|
-s|local_address.*|local_address = "$IP_GNB_AW2S"|
-EOF
-	cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
-	sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
-    fi
-    # show changes applied to default conf
-    echo "Display new $DIR_TEMPLATES/configmap.yaml"
-    cat "$DIR_TEMPLATES"/configmap.yaml
-}
-
-function reconfigure() {
-    node_amf_spgwu=$1
-    shift
-    node_gnb=$1
-    shift
-
-    echo "setup: Reconfigure oai5g charts from original ones"
-    cd "$HOME"
-    rm -rf oai-cn5g-fed
-    git clone -b master https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed
-    configure $node_amf_spgwu $node_gnb 
 }
 
 
@@ -594,6 +597,7 @@ function start-gnb() {
     kubectl -n$ns wait pod --for=condition=Ready --all
 }
 
+
 function start() {
     ns=$1; shift
     node_amf_spgwu=$1; shift
@@ -606,15 +610,29 @@ function start() {
     while :; do
         kubectl wait no --for=condition=Ready $node_gnb && break
         clear
-        echo "Wait until gNB FIT node is in READY state"
+        echo "start: Wait until gNB FIT node is in READY state"
         kubectl get no
         sleep 5
     done
 
     if [[ $pcap == "True" ]]; then
-	echo "Create k8s persistence volume claims for pcap files"
-	cd /root/oai5g-rru/k8s-pv
-	./create-pvc.sh $ns
+	echo "start: Create a k8s persistence volume claim for pcap files"
+    cat << \EOF >> /tmp/cn5g-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cn5g-pvc
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+  - ReadWriteMany
+  storageClassName: ""
+  volumeName: cn5g-pv
+EOF
+    echo "kubectl -n $ns apply -f /tmp/cn5g-pvc.yaml"
+    kubectl -n $ns apply -f /tmp/cn5g-pvc.yaml
     fi
 
     start-cn $ns $node_amf_spgwu
@@ -623,6 +641,7 @@ function start() {
     echo "****************************************************************************"
     echo "When you finish, to clean-up the k8s cluster, please run demo-oai.py --clean"
 }
+
 
 function stop-cn(){
     ns=$1
@@ -685,22 +704,20 @@ function stop() {
 	cd /root/oai5g-rru/k8s-pv
 	./delete-pvc.sh $ns
     fi
-#    echo "Delete namespace $ns"
-#    echo "kubectl delete ns $ns"
-#    kubectl delete ns $ns || true
 }
 
 
-
+# ****************************************************************************** #
 #Handle the different function calls with or without input parameters
+
 if test $# -lt 1; then
     usage
 else
     if [ "$1" == "init" ]; then
-        if test $# -eq 4; then
-            init $2 $3 $4
+        if test $# -eq 2; then
+            init $2
         elif test $# -eq 1; then
-	    init $DEF_NS $DEF_RRU $DEF_PCAP
+	    init $DEF_NS
         else
             usage
         fi
@@ -726,14 +743,6 @@ else
 	    exit 0
         elif test $# -eq 1; then
 	    configure-all $DEF_NODE_AMF_SPGWU $DEF_NODE_GNB $DEF_RRU $DEF_PCAP
-	else
-            usage
-        fi
-    elif [ "$1" == "reconfigure" ]; then
-        if test $# -eq 3; then
-            reconfigure $2 $3
-        elif test $# -eq 1; then
-	    reconfigure $DEF_NODE_AMF_SPGWU $DEF_NODE_GNB
 	else
             usage
         fi

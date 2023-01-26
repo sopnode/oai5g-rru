@@ -134,6 +134,8 @@ jobs:
         command: nmcli con up data; nmcli dev status; join-tunnel
       - type: Run
         command: kube-install.sh join-cluster r2lab@{{leader}}
+      - type: Run
+        command: /root/demo-oai.sh init {{namespace}}
 
   - id: init-demo
     required:
@@ -157,8 +159,6 @@ jobs:
           /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{pcap}} {%for x in regcred.values()%}{{x}} {%endfor %};
           rm -rf oai-cn5g-fed;
           git clone -b master https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git;
-      - type: Run
-        command: /root/demo-oai.sh init {{namespace}} {{rru}} {{pcap}}
       - type: Run
         command: /root/demo-oai.sh configure-all {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{pcap}}
 
