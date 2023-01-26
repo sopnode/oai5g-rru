@@ -13,7 +13,7 @@ PREFIX_STATS="/tmp/oai5g-stats"
 
 # IP Pod addresses
 P100="192.168.100"
-IP_AMF_N1="$P100.241"
+IP_AMF_N2="$P100.241"
 IP_UPF_N3="$P100.242"
 IP_GNB_N2="$P100.243"
 IP_GNB_N3="$P100.244"
@@ -174,10 +174,8 @@ function configure-oai-5g-basic() {
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
     cat > /tmp/basic-r2lab.sed <<EOF
 s|create: false|create: true|
-s|n1IPadd:.*|n1IPadd: "$IP_AMF_N1"|
-s|n2Netmask:.*|n1Netmask: "24"|
-s|n2IPadd:.*|n1IPadd: "$IP_AMF_N1"|
-s|n1Netmask:.*|n1Netmask: "24"|
+s|n2IPadd:.*|n2IPadd: "$IP_AMF_N2"|
+s|n2Netmask:.*|n2Netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_AMF_N2_SPGWU_N3" # interface of the nodes for amf/N2 and spgwu/N3|
 s|amfInterfaceNameForNGAP:.*|amfInterfaceNameForNGAP: "net1" # If multus creation is true then net1 else eth0|
 s|mcc:.*|mcc: "$MCC"|
@@ -403,7 +401,7 @@ function configure-gnb() {
 s|sst = 1|sst = 1; sd = 0x1 |
 s|mcc = 208;|mcc = $MCC;|
 s|mnc = 99;|mnc = $MNC;|
-s|ipv4       =.*|ipv4       = "$IP_AMF_N1";|
+s|ipv4       =.*|ipv4       = "$IP_AMF_N2";|
 s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
 s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2/24";|
 s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net2";|

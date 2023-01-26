@@ -164,7 +164,7 @@ jobs:
           chmod a+x /root/configure-demo-oai.sh;
           /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{pcap}} {%for x in regcred.values()%}{{x}} {%endfor %};
           rm -rf oai-cn5g-fed;
-          git clone -b master https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git;
+          git clone -b r2lab-rrus https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git;
       - type: Run
         command: /root/demo-oai.sh configure-all {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{pcap}}
 
