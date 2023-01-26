@@ -175,11 +175,13 @@ function configure-oai-5g-basic() {
     cat > /tmp/basic-r2lab.sed <<EOF
 s|create: false|create: true|
 s|n1IPadd:.*|n1IPadd: "$IP_AMF_N1"|
+s|n2Netmask:.*|n1Netmask: "24"|
+s|n2IPadd:.*|n1IPadd: "$IP_AMF_N1"|
 s|n1Netmask:.*|n1Netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_AMF_N2_SPGWU_N3" # interface of the nodes for amf/N2 and spgwu/N3|
 s|amfInterfaceNameForNGAP:.*|amfInterfaceNameForNGAP: "net1" # If multus creation is true then net1 else eth0|
-s|mcc:.*|mcc: $MCC|
-s|mnc:.*|mnc: $MNC|
+s|mcc:.*|mcc: "$MCC"|
+s|mnc:.*|mnc: "$MNC"|
 s|n3Ip:.*|n3Ip: "$IP_UPF_N3"|
 s|n3Netmask:.*|n3Netmask: "24"|
 s|n3If:.*|n3If: "net1"  # net1 if gNB is outside the cluster network and multus creation is true else eth0|
