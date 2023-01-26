@@ -55,7 +55,7 @@ multus:    # needed when gnB service will run on another interface rather than t
   create: false
   n2IPadd: "172.21.6.203"
   n2Netmask: "22"
-  n3IPadd: "172.21.6.203"
+  n3IPadd: "172.21.6.204"
   n3Netmask: "22"
   defaultGateway: "172.21.7.254"
   hostInterface: "bond0"      # Interface of the host machine on which this pod will be scheduled
