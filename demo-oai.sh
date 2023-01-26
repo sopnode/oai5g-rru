@@ -365,6 +365,7 @@ function configure-gnb() {
 	SHARED_VOL="false"
     fi
     cat > "$SED_FILE" <<EOF
+s|create: false|create: true|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
 s|n2Netmask:.*|n2Netmask: "24"|
