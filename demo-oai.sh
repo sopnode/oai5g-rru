@@ -34,7 +34,8 @@ ADDR_PANTHER="$P100.51" # .51 for eth2
 
 # N2/N3 Interfaces definition
 IF_NAME_AMF_N2_SPGWU_N3="$IF_NAME_VLAN100"
-IF_NAME_GNB_N2_N3="$IF_NAME_VLAN100"
+IF_NAME_GNB_N2="$IF_NAME_VLAN100"
+IF_NAME_GNB_N3="$IF_NAME_VLAN100"
 IF_NAME_LOCAL_AW2S="$IF_NAME_VLAN100"
 IF_NAME_LOCAL_N3XX_1="$IF_NAME_VLAN10"
 IF_NAME_LOCAL_N3XX_2="$IF_NAME_VLAN20"
@@ -457,9 +458,10 @@ s|create: false|create: true|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
 s|n2Netmask:.*|n2Netmask: "24"|
+s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
 s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
 s|n3Netmask:.*|n3Netmask: "24"|
-s|hostInterface:.*|hostInterface: "$IF_NAME_GNB_N2_N3"|
+s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
 s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF

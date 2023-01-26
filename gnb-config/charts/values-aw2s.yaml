@@ -55,9 +55,10 @@ multus:    # needed when gnB service will run on another interface rather than t
   create: false
   n2IPadd: "172.21.6.203"
   n2Netmask: "22"
+  n2hostInterface: "bond0"
   n3IPadd: "172.21.6.204"
   n3Netmask: "22"
-  hostInterface: "bond0"      # Interface of the host machine on which this pod will be scheduled
+  n3hostInterface: "bond1"
   aw2sIPadd: "192.168.100.166" # .100.48 for our Jaguar and .100.50 for our Panther
   aw2sNetmask: "24"
   aw2shostInterface: "team0"
