@@ -53,8 +53,8 @@ OAI5G_SMF="$OAI5G_CORE"/oai-smf
 OAI5G_SPGWU="$OAI5G_CORE"/oai-spgwu-tiny
 
 # Other CN parameters configuration
-MCC=208
-MNC=95
+MCC="208"
+MNC="95"
 
 function usage() {
     echo "USAGE:"
@@ -178,8 +178,8 @@ s|n1IPadd:.*|n1IPadd: "$IP_AMF_N1"|
 s|n1Netmask:.*|n1Netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_AMF_N2_SPGWU_N3" # interface of the nodes for amf/N2 and spgwu/N3|
 s|amfInterfaceNameForNGAP:.*|amfInterfaceNameForNGAP: "net1" # If multus creation is true then net1 else eth0|
-s|mcc:.*|mcc: "$MCC"|
-s|mnc:.*|mnc: "$MNC"|
+s|mcc:.*|mcc: $MCC|
+s|mnc:.*|mnc: $MNC|
 s|n3Ip:.*|n3Ip: "$IP_UPF_N3"|
 s|n3Netmask:.*|n3Netmask: "24"|
 s|n3If:.*|n3If: "net1"  # net1 if gNB is outside the cluster network and multus creation is true else eth0|
@@ -499,8 +499,8 @@ function init() {
     SED_FILE="/tmp/gnb_conf.sed"
     cat > "$SED_FILE" <<EOF
 s|sst = 1|sst = 1; sd = 0x1 |
-s|mcc = 208;|mcc = "$MCC";|
-s|mnc = 99;|mnc = "$MNC";|
+s|mcc = 208;|mcc = $MCC;|
+s|mnc = 99;|mnc = $MNC;|
 s|ipv4       =.*|ipv4       = "$IP_AMF_N1";|
 s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
 s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2/24";|
