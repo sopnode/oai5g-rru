@@ -416,7 +416,7 @@ EOF
     if [[ "$rru" == "n300" || "$rru" == "n320" ]] ; then
 	if [[ "$rru" == "n300" ]]; then
 	    SDR_ADDRS="$ADDRS_N300"
-	elif [["$rru" == "n320" ]]; then
+	elif [[ "$rru" == "n320" ]]; then
 	    SDR_ADDRS="$ADDRS_N320"
 	fi
         perl -i -p0e "s/#clock_src = \"internal\";/#clock_src = \"internal\";\n        sdr_addrs = \"$SDR_ADDRS,clock_source=internal,time_source=internal\";/s" "$DIR_TEMPLATES"/configmap.yaml
