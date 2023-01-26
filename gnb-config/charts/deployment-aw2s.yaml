@@ -41,7 +41,7 @@ spec:
         image: "{{ .Values.nfimage.repository }}:{{ .Values.nfimage.version }}"
         {{- if .Values.config.mountConfig}}
         volumeMounts:
-          - mountPath: /opt/oai-gnb/etc/mounted.conf
+          - mountPath: /opt/oai-gnb-aw2s/etc/mounted.conf
             name: configuration
             subPath: mounted.conf
         {{- end}}

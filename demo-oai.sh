@@ -384,6 +384,7 @@ EOF
 	cat >> "$SED_FILE" <<EOF
 s|sfp1hostInterface:.*|sfp1hostInterface: "$IF_NAME_LOCAL_N3XX_1"|
 s|sfp2hostInterface:.*|sfp2hostInterface: "$IF_NAME_LOCAL_N3XX_2"|
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time|
 EOF
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	if [ "$rru" == "jaguar" ] ; then
@@ -394,6 +395,7 @@ EOF
 	cat >> "$SED_FILE" <<EOF
 s|aw2sIPadd:.*|aw2sIPadd: "$IP_GNB_AW2S"|
 s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
 EOF
     else
         echo "Unknown rru selected: $rru"
