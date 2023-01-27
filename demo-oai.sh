@@ -146,7 +146,7 @@ function get-ran-pcap(){
     DATE=`date +"%Y-%m-%dT%H.%M.%S"`
 
     GNB_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-gnb,app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[0].metadata.name}")
-    echo "Retrieve the two OAI5G ran pcap files from the oai-gnb pod on ns $ns"
+    echo "Retrieve OAI5G ran pcap file from the oai-gnb pod on ns $ns"
     echo "kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-pcap.tgz pcap"
     kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-pcap.tgz pcap || true
     echo "kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-pcap.tgz $prefix/ran-pcap-"$DATE".tgz"

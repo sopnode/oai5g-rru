@@ -188,25 +188,6 @@ spec:
         - mountPath: "/pcap"
           name: cn5g-pv
         {{- end}}
-      - name: tcpdump2
-        image: "{{ .Values.tcpdumpimage.repository }}:{{ .Values.tcpdumpimage.version }}"
-        securityContext:
-          {{- toYaml .Values.securityContext | nindent 12 }}
-        {{- if .Values.start.tcpdump}}
-        command:
-          - /bin/sh
-          - -c
-          - /usr/sbin/tcpdump -ni net2 src {{ .Values.multus.n3IPadd }} or dst {{ .Values.multus.n3IPadd }} -w /pcap/oai-gnb-n3_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap
-        {{- else}}
-        command:
-          - /bin/sleep
-          - infinity
-        {{- end}}
-        {{- if .Values.persistent.sharedvolume}}
-        volumeMounts:
-        - mountPath: "/pcap"
-          name: cn5g-pv
-        {{- end}}
       {{- if .Values.config.mountConfig}}
       volumes:
       {{- if .Values.persistent.sharedvolume}}
