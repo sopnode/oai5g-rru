@@ -706,9 +706,8 @@ function stop() {
     kubectl delete pods -n $ns --all --wait --cascade=foreground
 
     if [[ $pcap == "True" ]]; then
-	echo "Delete k8s persistence volume claims for pcap files"
-	cd /root/oai5g-rru/k8s-pv
-	./delete-pvc.sh $ns
+	echo "Delete k8s persistence volume claim for pcap files"
+	kubectl -n $ns delete pvc cn5g-pvc
     fi
 }
 
