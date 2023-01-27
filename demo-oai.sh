@@ -200,7 +200,7 @@ EOF
     if [[ $pcap == "True" ]]; then
 	echo "Modify CN charts to generate pcap files"
     cat > /tmp/pcap.sed <<EOF
-s|tcpdump:.*|tcpdump: true|
+s|tcpdump: false.*|tcpdump: true|
 s|sharedvolume:.*|sharedvolume: true|
 EOF
     cp "$OAI5G_AMF"/values.yaml /tmp/amf_values.yaml-orig
