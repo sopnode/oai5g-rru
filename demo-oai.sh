@@ -131,7 +131,7 @@ function get-cn-pcap(){
     DATE=`date +"%Y-%m-%dT%H.%M.%S"`
 
     AMF_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-amf" -o jsonpath="{.items[0].metadata.name}")
-    echo "Retrieve OAI5G cn pcap files from oai-amf pod, ns $ns"
+    echo "Retrieve OAI5G CN pcap files from the AMF pod on ns $ns"
     echo "kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz pcap"
     kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz pcap
     echo "kubectl -c tcpdump cp $ns/$AMF_POD_NAME:cn-pcap.tgz $prefix/cn-pcap.tgz"
@@ -146,15 +146,11 @@ function get-ran-pcap(){
     DATE=`date +"%Y-%m-%dT%H.%M.%S"`
 
     GNB_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-gnb,app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[0].metadata.name}")
-    echo "Retrieve OAI5G ran pcap files from oai-gnb pod, ns $ns"
-    echo "kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-net1-pcap.tgz pcap"
-    kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-net1-pcap.tgz pcap
-    echo "kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-net1-pcap.tgz $prefix/ran-net1-pcap-"$DATE".tgz"
-    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-net1-pcap.tgz $prefix/ran-net1-pcap-"$DATE".tgz
-    echo "kubectl -c tcpdump2 -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-net2-pcap.tgz pcap"
-    kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-net2-pcap.tgz pcap
-    echo "kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-net2-pcap.tgz $prefix/ran-net2-pcap-"$DATE".tgz"
-    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-net2-pcap.tgz $prefix/ran-net2-pcap-"$DATE".tgz
+    echo "Retrieve the two OAI5G ran pcap files from the oai-gnb pod on ns $ns"
+    echo "kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-pcap.tgz pcap"
+    kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-pcap.tgz pcap
+    echo "kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-pcap.tgz $prefix/ran-pcap-"$DATE".tgz"
+    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-pcap.tgz $prefix/ran-pcap-"$DATE".tgz
 }
 
 
