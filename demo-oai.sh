@@ -133,9 +133,9 @@ function get-cn-pcap(){
     AMF_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-amf" -o jsonpath="{.items[0].metadata.name}")
     echo "Retrieve OAI5G CN pcap files from the AMF pod on ns $ns"
     echo "kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz pcap"
-    kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz pcap
+    kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz pcap || true
     echo "kubectl -c tcpdump cp $ns/$AMF_POD_NAME:cn-pcap.tgz $prefix/cn-pcap.tgz"
-    kubectl -c tcpdump cp $ns/$AMF_POD_NAME:cn-pcap.tgz $prefix/cn-pcap-"$DATE".tgz
+    kubectl -c tcpdump cp $ns/$AMF_POD_NAME:cn-pcap.tgz $prefix/cn-pcap-"$DATE".tgz || true
 }
 
 
@@ -148,9 +148,9 @@ function get-ran-pcap(){
     GNB_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-gnb,app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[0].metadata.name}")
     echo "Retrieve the two OAI5G ran pcap files from the oai-gnb pod on ns $ns"
     echo "kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-pcap.tgz pcap"
-    kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-pcap.tgz pcap
+    kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-pcap.tgz pcap || true
     echo "kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-pcap.tgz $prefix/ran-pcap-"$DATE".tgz"
-    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-pcap.tgz $prefix/ran-pcap-"$DATE".tgz
+    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-pcap.tgz $prefix/ran-pcap-"$DATE".tgz || true
 }
 
 
@@ -505,22 +505,6 @@ function configure-all() {
     rru=$1; shift
     pcap=$1; shift
 
-    echo "configure-all: Create a k8s persistence volume for possible generation of pcap files"
-    cat << \EOF >> /tmp/cn5g-pv.yaml
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: cn5g-pv
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-  - ReadWriteMany
-  hostPath:
-    path: /var/cn5g-volume
-EOF
-    kubectl apply -f /tmp/cn5g-pv.yaml
-
     echo "configure-all: Applying SophiaNode patches to OAI5G charts located on "$HOME"/oai-cn5g-fed"
     echo -e "\t with oai-spgwu-tiny running on $node_amf_spgwu"
     echo -e "\t with oai-gnb running on $node_gnb"
@@ -618,6 +602,23 @@ function start() {
     done
 
     if [[ $pcap == "True" ]]; then
+	echo "start: Create a k8s persistence volume for generation of pcap files"
+	cat << \EOF >> /tmp/cn5g-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cn5g-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteMany
+  hostPath:
+    path: /var/cn5g-volume
+EOF
+	kubectl apply -f /tmp/cn5g-pv.yaml
+
+	
 	echo "start: Create a k8s persistent volume claim for pcap files"
     cat << \EOF >> /tmp/cn5g-pvc.yaml
 apiVersion: v1
@@ -702,8 +703,9 @@ function stop() {
     kubectl delete pods -n $ns --all --wait --cascade=foreground
 
     if [[ $pcap == "True" ]]; then
-	echo "Delete k8s persistence volume claim for pcap files"
-	kubectl -n $ns delete pvc cn5g-pvc
+	echo "Delete k8s persistence volume / claim for pcap files"
+	kubectl -n $ns delete pvc cn5g-pvc || true
+	kubectl delete pv cn5g-pv || true
     fi
 }
 
