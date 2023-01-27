@@ -209,6 +209,11 @@ spec:
         {{- end}}
       {{- if .Values.config.mountConfig}}
       volumes:
+      {{- if .Values.persistent.sharedvolume}}
+      - name: cn5g-pv
+        persistentVolumeClaim:
+          claimName: cn5g-pvc
+      {{- end }}
       - configMap:
           name: {{ .Chart.Name }}-configmap
         name: configuration

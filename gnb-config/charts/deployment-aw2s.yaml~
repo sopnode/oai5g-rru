@@ -207,12 +207,7 @@ spec:
         {{- end}}
         {{- if .Values.persistence.sharedvolume}}
         volumeMounts:
-      {{- if .Values.persistent.sharedvolume}}
-      - name: cn5g-pv
-        persistentVolumeClaim:
-          claimName: cn5g-pvc
-      {{- end }}
-      - mountPath: "/pcap"
+        - mountPath: "/pcap"
           name: cn5g-pv
         {{- end}}
       {{- if .Values.config.mountConfig}}
