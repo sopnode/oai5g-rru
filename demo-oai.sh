@@ -200,6 +200,7 @@ EOF
     if [[ $pcap == "True" ]]; then
 	echo "Modify CN charts to generate pcap files"
     cat > /tmp/pcap.sed <<EOF
+s|privileged:.*|privileged: true|
 s|tcpdump: false.*|tcpdump: true|
 s|sharedvolume:.*|sharedvolume: true|
 EOF
@@ -618,7 +619,7 @@ function start() {
     done
 
     if [[ $pcap == "True" ]]; then
-	echo "start: Create a k8s persistence volume claim for pcap files"
+	echo "start: Create a k8s persistent volume claim for pcap files"
     cat << \EOF >> /tmp/cn5g-pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
