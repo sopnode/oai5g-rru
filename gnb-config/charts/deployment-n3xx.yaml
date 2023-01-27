@@ -186,7 +186,7 @@ spec:
           - /bin/sleep
           - infinity
         {{- end}}
-        {{- if .Values.persistence.sharedvolume}}
+        {{- if .Values.persistent.sharedvolume}}
         volumeMounts:
         - mountPath: "/pcap"
           name: cn5g-pv
@@ -205,7 +205,7 @@ spec:
           - /bin/sleep
           - infinity
         {{- end}}
-        {{- if .Values.persistence.sharedvolume}}
+        {{- if .Values.persistent.sharedvolume}}
         volumeMounts:
       {{- if .Values.persistent.sharedvolume}}
       - name: cn5g-pv

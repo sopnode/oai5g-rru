@@ -87,7 +87,7 @@ config:
   threadParallelConfig: "PARALLEL_SINGLE_THREAD"
   sdrAddrs: "serial=XXXXXXX"
 
-persistence:
+persistent:
   sharedvolume: false
   volumeName: cn5g-volume
   size: 1Gi
