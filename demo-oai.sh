@@ -172,8 +172,36 @@ function configure-oai-5g-basic() {
     node_amf_spgwu=$1; shift
     pcap=$1; shift
     
+    if [[ $pcap == "True" ]]; then
+	echo "Modify CN charts to generate pcap files"
+	PRIVILEGED="true"
+	cat > /tmp/pcap.sed <<EOF
+s|tcpdump: false.*|tcpdump: true|
+s|sharedvolume:.*|sharedvolume: true|
+EOF
+	cp "$OAI5G_AMF"/values.yaml /tmp/amf_values.yaml-orig
+	echo "(Over)writing $OAI5G_AMF/values.yaml"
+	sed -f /tmp/pcap.sed < /tmp/amf_values.yaml-orig > "$OAI5G_AMF"/values.yaml
+	diff /tmp/amf_values.yaml-orig "$OAI5G_AMF"/values.yaml
+	cp "$OAI5G_AUSF"/values.yaml /tmp/ausf_values.yaml-orig
+	echo "(Over)writing $OAI5G_AUSF/values.yaml"
+	sed -f /tmp/pcap.sed < /tmp/ausf_values.yaml-orig > "$OAI5G_AUSF"/values.yaml
+	diff /tmp/ausf_values.yaml-orig "$OAI5G_AUSF"/values.yaml
+	cp "$OAI5G_SMF"/values.yaml /tmp/smf_values.yaml-orig
+	echo "(Over)writing $OAI5G_SMF/values.yaml"
+	sed -f /tmp/pcap.sed < /tmp/smf_values.yaml-orig > "$OAI5G_SMF"/values.yaml
+	diff /tmp/smf_values.yaml-orig "$OAI5G_SMF"/values.yaml
+	cp "$OAI5G_SPGWU"/values.yaml /tmp/spgwu-tiny_values.yaml-orig
+	echo "(Over)writing $OAI5G_SPGWU/values.yaml"
+	sed -f /tmp/pcap.sed < /tmp/spgwu-tiny_values.yaml-orig > "$OAI5G_SPGWU"/values.yaml
+	diff /tmp/spgwu-tiny_values.yaml-orig "$OAI5G_SPGWU"/values.yaml
+    else
+		PRIVILEGED="false"
+    fi
+
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
     cat > /tmp/basic-r2lab.sed <<EOF
+s|privileged:.*|privileged: $PRIVILEGED|
 s|create: false|create: true|
 s|n2IPadd:.*|n2IPadd: "$IP_AMF_N2"|
 s|n2Netmask:.*|n2Netmask: "24"|
@@ -196,32 +224,7 @@ EOF
     perl -i -p0e "s/nodeSelector: \{\}\noai-spgwu-tiny:/nodeName: \"$node_amf_spgwu\"\n  nodeSelector: \{\}\noai-spgwu-tiny:/s" "$OAI5G_BASIC"/values.yaml
 
     diff /tmp/basic_values.yaml-orig "$OAI5G_BASIC"/values.yaml
-    
-    if [[ $pcap == "True" ]]; then
-	echo "Modify CN charts to generate pcap files"
-    cat > /tmp/pcap.sed <<EOF
-s|privileged:.*|privileged: true|
-s|tcpdump: false.*|tcpdump: true|
-s|sharedvolume:.*|sharedvolume: true|
-EOF
-    cp "$OAI5G_AMF"/values.yaml /tmp/amf_values.yaml-orig
-    echo "(Over)writing $OAI5G_AMF/values.yaml"
-    sed -f /tmp/pcap.sed < /tmp/amf_values.yaml-orig > "$OAI5G_AMF"/values.yaml
-    diff /tmp/amf_values.yaml-orig "$OAI5G_AMF"/values.yaml
-    cp "$OAI5G_AUSF"/values.yaml /tmp/ausf_values.yaml-orig
-    echo "(Over)writing $OAI5G_AUSF/values.yaml"
-    sed -f /tmp/pcap.sed < /tmp/ausf_values.yaml-orig > "$OAI5G_AUSF"/values.yaml
-    diff /tmp/ausf_values.yaml-orig "$OAI5G_AUSF"/values.yaml
-    cp "$OAI5G_SMF"/values.yaml /tmp/smf_values.yaml-orig
-    echo "(Over)writing $OAI5G_SMF/values.yaml"
-    sed -f /tmp/pcap.sed < /tmp/smf_values.yaml-orig > "$OAI5G_SMF"/values.yaml
-    diff /tmp/smf_values.yaml-orig "$OAI5G_SMF"/values.yaml
-    cp "$OAI5G_SPGWU"/values.yaml /tmp/spgwu-tiny_values.yaml-orig
-    echo "(Over)writing $OAI5G_SPGWU/values.yaml"
-    sed -f /tmp/pcap.sed < /tmp/spgwu-tiny_values.yaml-orig > "$OAI5G_SPGWU"/values.yaml
-    diff /tmp/spgwu-tiny_values.yaml-orig "$OAI5G_SPGWU"/values.yaml
-    fi
-
+        
     cd "$OAI5G_BASIC"
     echo "helm dependency update"
     helm dependency update
