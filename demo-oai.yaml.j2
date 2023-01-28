@@ -54,7 +54,7 @@ jobs:
           rhubarbe wait {{nodes['k8s_fit']}}
       - type: Run
         command: >
-          rhubarbe script on-{{rru}}
+          rhubarbe-pdu on {{rru}}
 
   {% if quectel_dict %}
   - id: prepare-quectels
@@ -249,7 +249,7 @@ jobs:
     commands:
       - type: Run
         command: >
-          rhubarbe script off-{{rru}}
+          rhubarbe-pdu off {{rru}}
       - type: Run
         command: rhubarbe off {{nodes['k8s_fit']}}
 
