@@ -409,19 +409,20 @@ s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "ne
 s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2/24";|
 s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net2";|
 s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N3/24";|
-s|sdr_addrs =.*||
 EOF
     cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
     sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
 
-    # set SDR IP ADDRESSES
+    # set RRU parameters in gnb conf file
     if [[ "$rru" == "n300" || "$rru" == "n320" ]] ; then
 	if [[ "$rru" == "n300" ]]; then
 	    SDR_ADDRS="$ADDRS_N300"
 	elif [[ "$rru" == "n320" ]]; then
 	    SDR_ADDRS="$ADDRS_N320"
 	fi
-        perl -i -p0e "s/#clock_src = \"internal\";/#clock_src = \"internal\";\n        sdr_addrs = \"$SDR_ADDRS,clock_source=internal,time_source=internal\";/s" "$DIR_TEMPLATES"/configmap.yaml
+	cat > "$SED_FILE" <<EOF
+s|sdr_addrs =.*|sdr_addrs = "$SDR_ADDRS,clock_source=internal,time_source=internal"|
+EOF
     else
 	if [ "$rru" == "jaguar" ] ; then
 	    ADDR_AW2S="$ADDR_JAGUAR"
@@ -433,10 +434,11 @@ EOF
 s|local_if_name.*|local_if_name  = "net3"|
 s|remote_address.*|remote_address = "$ADDR_AW2S"|
 s|local_address.*|local_address = "$IP_GNB_AW2S"|
+s|sdr_addrs =.*||
 EOF
-	cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
-	sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
     fi
+    cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
+    sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
     # show changes applied to default conf
     echo "Display new $DIR_TEMPLATES/configmap.yaml"
     cat "$DIR_TEMPLATES"/configmap.yaml
@@ -446,7 +448,7 @@ EOF
     ORIG_CHART="$DIR"/values.yaml
     SED_FILE="/tmp/$FUNCTION-r2lab.sed"
 
-    # Configure values.yaml chart
+    # Configure gnb values.yaml chart
     echo "Then configure chart $ORIG_CHART for R2lab"
     if [[ $pcap == "True" ]]; then
 	GENER_PCAP="true"
