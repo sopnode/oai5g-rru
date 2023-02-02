@@ -43,7 +43,7 @@ IF_NAME_LOCAL_N3XX_2="$IF_NAME_VLAN20"
 # gNB conf file for RRU devices
 CONF_AW2S="gnb.sa-rru-50MHz-2x2.conf"
 #CONF_N3XX="gnb.sa.band66.fr1.106PRB.usrpn300.conf"
-CONF_N3XX="CONF_N3XX="gnb.sa.band66.fr1.106PRB.usrpn300.conf"
+CONF_N3XX="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
 
 
 OAI5G_CHARTS="$HOME"/oai-cn5g-fed/charts
