@@ -42,7 +42,9 @@ IF_NAME_LOCAL_N3XX_2="$IF_NAME_VLAN20"
 
 # gNB conf file for RRU devices
 CONF_AW2S="gnb.sa-rru-50MHz-2x2.conf"
-CONF_N3XX="gnb.sa.band66.fr1.106PRB.usrpn300.conf"
+#CONF_N3XX="gnb.sa.band66.fr1.106PRB.usrpn300.conf"
+CONF_N3XX="CONF_N3XX="gnb.sa.band66.fr1.106PRB.usrpn300.conf"
+
 
 OAI5G_CHARTS="$HOME"/oai-cn5g-fed/charts
 OAI5G_CORE="$OAI5G_CHARTS"/oai-5g-core
@@ -399,7 +401,7 @@ function configure-gnb() {
     # add NSSAI sd info for PLMN and sdr_addrs for RUs 
     SED_FILE="/tmp/gnb_conf.sed"
     cat > "$SED_FILE" <<EOF
-s|sst = 1|sst = 1; sd = 0x1 |
+s|sd = 0x010203|sd = 0x000001 |
 s|mcc = 208;|mcc = $MCC;|
 s|mnc = 99;|mnc = $MNC;|
 s|ipv4       =.*|ipv4       = "$IP_AMF_N2";|
