@@ -403,7 +403,7 @@ function configure-gnb() {
     cat > "$SED_FILE" <<EOF
 s|sd = 0x010203|sd = 0x000001 |
 s|mcc = 208;|mcc = $MCC;|
-s|mnc = 99;|mnc = $MNC;|
+s|mnc = [0-9][0-9];|mnc = $MNC;|
 s|ipv4       =.*|ipv4       = "$IP_AMF_N2";|
 s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
 s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2/24";|
