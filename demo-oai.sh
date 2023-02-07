@@ -243,7 +243,7 @@ function configure-mysql() {
     rm -f /tmp/oai_db-basic-patch
     cat << \EOF >> /tmp/oai_db-basic-patch
 --- oai_db-basic-orig.sql	2023-02-06 15:25:19.000000000 +0100
-+++ oai_db-basic-new.sql	2023-02-07 15:55:40.000000000 +0100
++++ oai_db-basic-new.sql	2023-02-07 21:52:41.000000000 +0100
 @@ -150,31 +150,17 @@
  -- Dumping data for table `AuthenticationSubscription`
  --
@@ -323,6 +323,7 @@ function configure-mysql() {
  
  --
  -- AUTO_INCREMENT for table `SdmSubscriptions`
+
 EOF
     patch "$ORIG_CHART" < /tmp/oai_db-basic-patch
 }
