@@ -41,8 +41,8 @@ IF_NAME_LOCAL_N3XX_1="$IF_NAME_VLAN10"
 IF_NAME_LOCAL_N3XX_2="$IF_NAME_VLAN20"
 
 # gNB conf file for RRU devices
-CONF_AW2S="jaguar_panther2x2_50MHz.conf"
-#CONF_AW2S="panther4x4_20MHz.conf"
+#CONF_AW2S="jaguar_panther2x2_50MHz.conf"
+CONF_AW2S="panther4x4_20MHz.conf"
 #CONF_N3XX="gnb.sa.band66.fr1.106PRB.usrpn300.conf"
 CONF_N3XX="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
 
