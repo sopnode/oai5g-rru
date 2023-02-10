@@ -403,11 +403,11 @@ function configure-gnb() {
 
     # remove NSSAI sd info for PLMN and add other parameters for RUs 
     SED_FILE="/tmp/gnb_conf.sed"
-    #s|sd = 0x010203;||
-    #s|, sd = 0x010203||
-    #s|sd = 0x010203||
+    #s|sd = 0x010203|sd = 0x000001|
     cat > "$SED_FILE" <<EOF
-s|sd = 0x010203|sd = 0x000001|
+s|sd = 0x010203;||
+s|, sd = 0x010203||
+s|sd = 0x010203||
 s|mcc = 208;|mcc = $MCC;|
 s|mnc = [0-9][0-9];|mnc = $MNC;|
 s|ipv4       =.*|ipv4       = "$IP_AMF_N2";|
