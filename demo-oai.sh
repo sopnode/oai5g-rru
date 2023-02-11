@@ -808,7 +808,7 @@ function stop() {
         echo "Remove all 5G OAI pods"
 	stop-cn $ns
 	stop-gnb $ns
-	if [[ "$rru"== "rfsim" ]]; then
+	if [[ "$rru" == "rfsim" ]]; then
 	    stop-ue $ns
 	fi
     else
