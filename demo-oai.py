@@ -32,19 +32,31 @@ from apssh import YamlLoader, SshJob, Run, Service # Push
 from r2lab import r2lab_hostname, ListOfChoices, find_local_embedded_script # ListOfChoicesNullReset
 
 
-# where to join; as of this writing:
-# sopnode-l1.inria.fr runs a production cluster, and
-# sopnode-w2.inria.fr runs an experimental/devel cluster
+# Currently, TWO k8s clusters are available on the SophiaNode:
+# - A Production k8s cluster with 2 PowerEdge servers :
+K8S_MASTER_PROD = 'sopnode-l1.inria.fr'
+K8S_WORKER_PROD = 'sopnode-w1.inria.fr'
+# - An Experimental/Devel cluster with 2 servers :
+K8S_MASTER_DEVEL = 'sopnode-w2.inria.fr'
+K8S_WORKER_DEVEL = 'sopnode-w3.inria.fr'
 
-default_leader = 'sopnode-l1.inria.fr'
-devel_leader = 'sopnode-w2.inria.fr'
+# By default, the script uses the Production k8s cluster
+default_master = K8S_MASTER_PROD
+
+# Default R2lab FIT node images
 default_image = 'kubernetes'
 default_quectel_image = 'quectel-wwan0'
 
+# This script uses one R2lab FIT node as a k8s worker attached to the cluster
+# in order to launch the scenario 
 default_k8s_fit = 1
-default_amf_spgwu = 'sopnode-w3.inria.fr'
-default_gnb = 'sopnode-w2.inria.fr'
+
+# Default FIT nodes used as UE Quectel
 default_quectel_nodes = []
+
+# Default RRU used for the scenario.
+# Currently, following possible options:
+# ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim'] 
 default_rru = 'n300'
 
 default_gateway  = 'faraday.inria.fr'
@@ -57,7 +69,7 @@ default_regcred_email = 'r2labuser@turletti.com'
 
 
 def run(*, mode, gateway, slicename,
-        leader, namespace, pcap, auto_start, load_images,
+        master, namespace, pcap, auto_start, load_images,
         k8s_reset, k8s_fit, amf_spgwu, gnb, quectel_nodes, rru,
         regcred_name, regcred_password, regcred_email,
         image, quectel_image, verbose, dry_run):
@@ -66,7 +78,7 @@ def run(*, mode, gateway, slicename,
 
     Arguments:
         slicename: the Unix login name (slice name) to enter the gateway
-        leader: k8s leader host
+        master: k8s master host
         pcap: pcap trace files will be generated
         auto_start: pods will be launched
         load_images: FIT images will be deployed
@@ -93,7 +105,7 @@ def run(*, mode, gateway, slicename,
 
     jinja_variables = dict(
         gateway=gateway,
-        leader=leader,
+        master=master,
         namespace=namespace,
         pcap=pcap,
         nodes=dict(
@@ -152,17 +164,17 @@ def run(*, mode, gateway, slicename,
     if mode == "cleanup":
         scheduler.keep_only(j_cleanups)
         ko_message = f"Could not cleanup demo"
-        ok_message = f"Thank you, the k8s {leader} cluster is now clean and FIT nodes have been switched off"
+        ok_message = f"Thank you, the k8s {master} cluster is now clean and FIT nodes have been switched off"
     elif mode == "stop":
         scheduler.keep_only_between(starts=[j_stop_demo], ends=j_cleanups, keep_ends=False)
         ko_message = f"Could not delete OAI5G pods"
-        ok_message = f"""No more OAI5G pods on the {leader} cluster
-Nota: If you are done with the demo, do not forget to clean up the k8s {leader} cluster by running:
-\t ./demo-oai.py [--leader {leader}] --cleanup
+        ok_message = f"""No more OAI5G pods on the {master} cluster
+Nota: If you are done with the demo, do not forget to clean up the k8s {master} cluster by running:
+\t ./demo-oai.py [--master {master}] --cleanup
 """
     elif mode == "start":
         scheduler.keep_only([j_start_demo] + j_init_quectels + j_attach_quectels)
-        ok_message = f"OAI5G demo started, you can check kubectl logs on the {leader} cluster"
+        ok_message = f"OAI5G demo started, you can check kubectl logs on the {master} cluster"
         ko_message = f"Could not launch OAI5G pods"
     else:
         scheduler.keep_only_between(ends=[j_start_demo] + j_attach_quectels, keep_ends=True)
@@ -183,9 +195,9 @@ Nota: If you are done with the demo, do not forget to clean up the k8s {leader} 
         if not auto_start:
             scheduler.bypass_and_remove(j_start_demo)
             purpose += f" (NO auto start)"
-            ok_message = f"RUN SetUp OK. You can now start the demo by running ./demo-oai.py --leader {leader} --start"
+            ok_message = f"RUN SetUp OK. You can now start the demo by running ./demo-oai.py --master {master} --start"
         else:
-            ok_message = f"RUN SetUp and demo started OK. You can now check the kubectl logs on the k8s {leader} cluster."
+            ok_message = f"RUN SetUp and demo started OK. You can now check the kubectl logs on the k8s {master} cluster."
         if not k8s_reset:
             for job in j_leave_joins:
                 scheduler.bypass_and_remove(job)
@@ -227,7 +239,7 @@ Nota: If you are done with the demo, do not forget to clean up the k8s {leader} 
 
 HELP = """
 all the forms of the script assume there is a kubernetes cluster
-up and running on the chosen leader node,
+up and running on the chosen master node,
 and that the provided slicename holds the current lease on FIT/R2lab
 
 In its simplest form (no option given), the script will
@@ -298,20 +310,21 @@ def main():
                         default=default_quectel_image)
 
     parser.add_argument(
-        "--leader", default=default_leader,
-        help="kubernetes leader node")
+        "--master", default=default_master,
+        help="kubernetes master node")
+
     parser.add_argument(
         "--devel", action='store_true', default=False,
-        help=f"equivalent to --leader {devel_leader}"
-    )
+        help=f"equivalent to --master {K8S_MASTER_DEVEL}")
+
 
     parser.add_argument("--k8s_fit", default=default_k8s_fit,
                         help="id of the FIT node that attachs to the k8s cluster")
 
-    parser.add_argument("--amf_spgwu", default=default_amf_spgwu,
+    parser.add_argument("--amf_spgwu", default=K8S_WORKER_PROD,
                         help="node name that runs oai-amf and oai-spgwu")
 
-    parser.add_argument("--gnb", default=default_gnb,
+    parser.add_argument("--gnb", default=K8S_MASTER_PROD,
                         help="node name that runs oai-gnb")
 
     parser.add_argument(
@@ -344,9 +357,8 @@ def main():
     parser.add_argument(
         "-R", "--rru", dest='rru',
         default=default_rru,
-        choices=["n300", "n320", "jaguar", "panther"],
-	action=ListOfChoices,
-	help="specify the hardware RRU to use for gNB.")
+        choices=("b210", "n300", "n320", "jaguar", "panther", "rfsim"),
+	help="specify the hardware RRU to use for gNB or rfsim if simulation")
 
     parser.add_argument("-p", "--pcap", default=False,
                         action='store_true', dest='pcap',
@@ -363,8 +375,13 @@ def main():
 
     args = parser.parse_args()
     if args.devel:
-        args.leader = devel_leader
-
+        args.master = K8S_MASTER_DEVEL
+        # in case of Devel Cluster, modify the default servers to run amf/spgwu/gnb pods
+        if args.amf_spgwu == K8S_WORKER_PROD:
+            args.amf_spgwu = K8S_WORKER_DEVEL
+        if args.gnb == K8S_MASTER_PROD:
+            args.gnb = K8S_MASTER_DEVEL
+        
     if args.quectel_nodes:
         for quectel in args.quectel_nodes:
             print(f"Using Quectel UE on node {r2lab_hostname(quectel)}")
@@ -372,21 +389,24 @@ def main():
         print("No Quectel UE involved")
 
     if args.start:
-        print(f"**** Launch all pods of the oai5g demo on the k8s {args.leader} cluster")
+        print(f"**** Launch all pods of the oai5g demo on the k8s {args.master} cluster")
         mode = "start"
     elif args.stop:
         print(f"delete all pods in the {args.namespace} namespace")
         mode = "stop"
     elif args.cleanup:
-        print(f"**** Drain and remove FIT nodes from the {args.leader} cluster, then swith off FIT nodes")
+        print(f"**** Drain and remove FIT nodes from the {args.master} cluster, then swith off FIT nodes")
         mode = "cleanup"
     else:
-        print(f"**** Prepare oai5g demo setup on the k8s {args.leader} cluster with {args.slicename} slicename")
+        print(f"**** Prepare oai5g demo setup on the k8s {args.master} cluster with {args.slicename} slicename")
         print(f"OAI5G pods will run on the {args.namespace} k8s namespace")
         print(f"the following nodes will be used:")
         print(f"\t{r2lab_hostname(args.k8s_fit)} as k8s worker node")
         print(f"\t{args.amf_spgwu} for oai-amf and oai-spgwu-tiny")
-        print(f"\t{args.gnb} for oai-gnb attached to {args.rru[0]} as RRU hardware device")
+        if args.rru == "rfsim":
+            print(f"\toai-gnb running in simulation mode")
+        else:
+            print(f"\t{args.gnb} for oai-gnb with {args.rru} as RRU hardware device")
         print(f"FIT image loading:",
               f"YES with {args.image}" if args.load_images
               else "NO (use --load-images if needed)")
@@ -401,10 +421,10 @@ def main():
     else:
         pcap_str='False'
     run(mode=mode, gateway=default_gateway, slicename=args.slicename,
-        leader=args.leader, namespace=args.namespace, pcap=pcap_str,
+        master=args.master, namespace=args.namespace, pcap=pcap_str,
         auto_start=args.auto_start, load_images=args.load_images,
         k8s_fit=args.k8s_fit, amf_spgwu=args.amf_spgwu, gnb=args.gnb,
-        quectel_nodes=args.quectel_nodes, rru=args.rru[0],
+        quectel_nodes=args.quectel_nodes, rru=args.rru,
         regcred_name=args.regcred_name,
         regcred_password=args.regcred_password,
         regcred_email=args.regcred_email,

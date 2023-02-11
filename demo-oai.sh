@@ -1,13 +1,15 @@
 #!/bin/bash
 
-# Default k8s namespace and gNB node running oai5g pod
-DEF_NS="oai5g"
-#DEF_NODE_AMF_SPGWU="sopnode-w1.inria.fr" 
-DEF_NODE_AMF_SPGWU="sopnode-w3.inria.fr" # AMF pod will run on the same host than the one for SPGWU pod
-#DEF_NODE_GNB="sopnode-l1.inria.fr"
-DEF_NODE_GNB="sopnode-w2.inria.fr"
-DEF_RRU="n300" # Choose between "n300", "n320", "jaguar" and "panther"
-DEF_PCAP="False"
+
+##########################################################################
+# Following parameters automatically set by configure-demo-oai.sh script
+# do not change them here !
+DEF_NS= # k8s namespace
+DEF_NODE_AMF_SPGWU= # node in wich run amf and spgwu pods
+DEF_NODE_GNB= # node in which gnb pod runs
+DEF_RRU= # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
+DEF_PCAP= # boolean if pcap are generated on pods
+##########################################################################
 
 PREFIX_STATS="/tmp/oai5g-stats"
 
@@ -18,6 +20,7 @@ IP_UPF_N3="$P100.242"
 IP_GNB_N2="$P100.243"
 IP_GNB_N3="$P100.244"
 IP_GNB_AW2S="$P100.245" 
+IP_NRUE="$P100.246" 
 
 # Interfaces names of VLANs in sopnode servers
 IF_NAME_VLAN100="p4-net"
@@ -39,13 +42,14 @@ IF_NAME_GNB_N3="$IF_NAME_VLAN100"
 IF_NAME_LOCAL_AW2S="$IF_NAME_VLAN100"
 IF_NAME_LOCAL_N3XX_1="$IF_NAME_VLAN10"
 IF_NAME_LOCAL_N3XX_2="$IF_NAME_VLAN20"
+IF_NAME_NRUE="$IF_NAME_VLAN100"
 
 # gNB conf file for RRU devices
-#CONF_AW2S="jaguar_panther2x2_50MHz.conf"
-CONF_AW2S="panther4x4_20MHz.conf"
-#CONF_N3XX="gnb.sa.band66.fr1.106PRB.usrpn300.conf"
+CONF_JAGUAR="jaguar_panther2x2_50MHz.conf"
+CONF_PANTHER="panther4x4_20MHz.conf"
+CONF_B210="gnb.sa.band78.fr1.24PRB.usrpb210.conf"
 CONF_N3XX="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
-
+CONF_RFSIM="gnb.sa.band78.106prb.rfsim.2x2.conf"
 
 OAI5G_CHARTS="$HOME"/oai-cn5g-fed/charts
 OAI5G_CORE="$OAI5G_CHARTS"/oai-5g-core
@@ -55,22 +59,28 @@ OAI5G_AMF="$OAI5G_CORE"/oai-amf
 OAI5G_AUSF="$OAI5G_CORE"/oai-ausf
 OAI5G_SMF="$OAI5G_CORE"/oai-smf
 OAI5G_SPGWU="$OAI5G_CORE"/oai-spgwu-tiny
+OAI5G_NRUE="$OAI5G_CORE"/oai-nr-ue
 
-# Other CN parameters configuration
+# Other configurable CN parameters 
 MCC="208"
 MNC="95"
-
+DNN="oai.ipv4"
+FULL_KEY="8baf473f2f8fd09487cccbd7097c6862"
+OPC="8E27B6AF0E692E750F32667A3B14605D"
+RFSIM_IMSI="208950000001121"
 
 function usage() {
     echo "USAGE:"
     echo "demo-oai.sh init [namespace] |"
-    echo "            start [namespace node_amf_spgwu node_gnb pcap] |"
-    echo "            stop [namespace pcap] |"
+    echo "            start [namespace node_amf_spgwu node_gnb rru pcap] |"
+    echo "            stop [namespace rru pcap] |"
     echo "            configure-all [node_amf_spgwu node_gnb rru pcap] |"
     echo "            start-cn [namespace node_amf_spgwu] |"
     echo "            start-gnb [namespace node_gnb] |"
+    echo "            start-ue [namespace node_gnb] |"
     echo "            stop-cn [namespace] |"
     echo "            stop-gnb [namespace] |"
+    echo "            stop-ue [namespace] |"
     echo "            get-cn-pcap [namespace] |"
     echo "            get-ran-pcap [namespace] |"
     echo "            get-all-pcap [namespace]"
@@ -214,8 +224,8 @@ s|n3If:.*|n3If: "net1"  # net1 if gNB is outside the cluster network and multus 
 s|n6If:.*|n6If: "net1"  # net1 if gNB is outside the cluster network and multus creation is true else eth0  (important because it sends the traffic towards internet)|
 s|dnsIpv4Address:.*|dnsIpv4Address: "138.96.0.210" # configure the dns for UE don't use Kubernetes DNS|
 s|dnsSecIpv4Address:.*|dnsSecIpv4Address: "193.51.196.138" # configure the dns for UE don't use Kubernetes DNS|
-s|dnn0:.*|dnn0: "oai.ipv4"|
-s|dnnNi0:.*|dnnNi0: "oai.ipv4"|
+s|dnn0:.*|dnn0: "$DNN"|
+s|dnnNi0:.*|dnnNi0: "$DNN"|
 EOF
 
     cp "$OAI5G_BASIC"/values.yaml /tmp/basic_values.yaml-orig
@@ -243,29 +253,30 @@ function configure-mysql() {
     echo "Applying patch to add R2lab SIM info in AuthenticationSubscription table"
     rm -f /tmp/oai_db-basic-patch
     cat << \EOF >> /tmp/oai_db-basic-patch
---- oai_db-basic-orig.sql	2023-02-06 15:25:19.000000000 +0100
-+++ oai_db-basic-new.sql	2023-02-08 10:47:32.000000000 +0100
-@@ -150,31 +150,17 @@
+--- oai_db-basic-orig.sql	2023-02-09 20:00:46.000000000 +0100
++++ oai_db-basic-new.sql	2023-02-11 15:33:19.000000000 +0100
+@@ -150,31 +150,19 @@
  -- Dumping data for table `AuthenticationSubscription`
  --
  INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
 -('001010000000100', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000100');
-+('208950000000010', '5G_AKA', '8baf473f2f8fd09487cccbd7097c6862', '8baf473f2f8fd09487cccbd7097c6862', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '8E27B6AF0E692E750F32667A3B14605D', NULL, NULL, NULL, NULL, '208950000000010');
++('208950000000010', '5G_AKA', '$FULL_KEY', '$FULL_KEY', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '$OPC', NULL, NULL, NULL, NULL, '208950000000010');
  INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
 -('001010000000101', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000101');
-+('208950000000011', '5G_AKA', '8baf473f2f8fd09487cccbd7097c6862', '8baf473f2f8fd09487cccbd7097c6862', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '8E27B6AF0E692E750F32667A3B14605D', NULL, NULL, NULL, NULL, '208950000000011');
++('208950000000011', '5G_AKA', '$FULL_KEY', '$FULL_KEY', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '$OPC', NULL, NULL, NULL, NULL, '208950000000011');
  INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
 -('001010000000102', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000102');
-+('208950000000012', '5G_AKA', '8baf473f2f8fd09487cccbd7097c6862', '8baf473f2f8fd09487cccbd7097c6862', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '8E27B6AF0E692E750F32667A3B14605D', NULL, NULL, NULL, NULL, '208950000000012');
++('208950000000012', '5G_AKA', '$FULL_KEY', '$FULL_KEY', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '$OPC', NULL, NULL, NULL, NULL, '208950000000012');
  INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
 -('001010000000103', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000103');
-+('208950000000013', '5G_AKA', '8baf473f2f8fd09487cccbd7097c6862', '8baf473f2f8fd09487cccbd7097c6862', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '8E27B6AF0E692E750F32667A3B14605D', NULL, NULL, NULL, NULL, '208950000000013');
++('208950000000013', '5G_AKA', '$FULL_KEY', '$FULL_KEY', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '$OPC', NULL, NULL, NULL, NULL, '208950000000013');
  INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
 -('001010000000104', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000104');
-+('208950000000014', '5G_AKA', '8baf473f2f8fd09487cccbd7097c6862', '8baf473f2f8fd09487cccbd7097c6862', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '8E27B6AF0E692E750F32667A3B14605D', NULL, NULL, NULL, NULL, '208950000000014');
++('208950000000014', '5G_AKA', '$FULL_KEY', '$FULL_KEY', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '$OPC', NULL, NULL, NULL, NULL, '208950000000014');
  INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
 -('001010000000105', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000105');
--INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
++('208950000000015', '5G_AKA', '$FULL_KEY', '$FULL_KEY', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '$OPC', NULL, NULL, NULL, NULL, '208950000000015');
+ INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
 -('001010000000106', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000106');
 -INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
 -('001010000000107', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000107');
@@ -279,31 +290,33 @@ function configure-mysql() {
 -('001010000000111', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000111');
 -INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
 -('001010000000112', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000112');
-+('208950000000015', '5G_AKA', '8baf473f2f8fd09487cccbd7097c6862', '8baf473f2f8fd09487cccbd7097c6862', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '8E27B6AF0E692E750F32667A3B14605D', NULL, NULL, NULL, NULL, '208950000000015');
++('$RFSIM_IMSI', '5G_AKA', '$FULL_KEY', '$FULL_KEY', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '$OPC', NULL, NULL, NULL, NULL, '$RFSIM_IMSI');
  
  
  -- --------------------------------------------------------
-@@ -320,34 +306,22 @@
+@@ -320,34 +308,24 @@
  -- AUTO_INCREMENT for dumped tables
  --
  INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES
 -('001010000000100', '00101', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"oai\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.100\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
-+('208950000000010', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"oai.ipv4\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.100\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
++('208950000000010', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"$DNN\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.100\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
++INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES
++('208950000000011', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"$DNN\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.101\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
  INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES
 -('001010000000101', '00101', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"oai\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.101\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
-+('208950000000011', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"oai.ipv4\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.101\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
++('208950000000012', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"$DNN\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.102\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
  INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES
 -('001010000000102', '00101', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"oai\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.102\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
-+('208950000000012', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"oai.ipv4\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.102\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
++('208950000000013', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"$DNN\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.103\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
  INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES
 -('001010000000103', '00101', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"oai\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.103\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
-+('208950000000013', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"oai.ipv4\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.103\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
++('208950000000014', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"$DNN\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.104\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
  INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES
 -('001010000000104', '00101', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"oai\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.104\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
-+('208950000000014', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"oai.ipv4\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.104\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
++('208950000000015', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"$DNN\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.105\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
  INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES
 -('001010000000105', '00101', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"oai\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.105\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
-+('208950000000015', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"oai.ipv4\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.105\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
++('$RFSIM_IMSI', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"$DNN\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.105\"}]},\"ims\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4V6\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 2,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
  
  -- Dynamic IPADDRESS Allocation
  
@@ -324,6 +337,7 @@ function configure-mysql() {
  
  --
  -- AUTO_INCREMENT for table `SdmSubscriptions`
+
 EOF
     patch "$ORIG_CHART" < /tmp/oai_db-basic-patch
 }
@@ -371,13 +385,23 @@ function configure-gnb() {
     DIR_GNB_DEST="/root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
     DIR_TEMPLATES="$DIR_GNB_DEST/templates"
 
-    if [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
+    if [[  "$rru" == "b210" ]]; then
+	RRU_TYPE="b210"
+	CONF_ORIG="$DIR_CONF/$CONF_B210"
+    elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
 	RRU_TYPE="n3xx"
 	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	RRU_TYPE="aw2s"
+	if [[  "$rru" == "jaguar" ]]; then
+	    CONF_AW2S="$CONF_JAGUAR"
+	else
+	    CONF_AW2S="$CONF_PANTHER"
+	fi
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
-	
+    elif [[ "$rru" == "rfsim" ]]; then
+	RRU_TYPE="rfsim"
+	CONF_ORIG="$DIR_CONF/$CONF_RFSIM"
     else
 	echo "Unknown rru selected: $rru"
 	usage
@@ -488,9 +512,9 @@ s|sfp2hostInterface:.*|sfp2hostInterface: "$IF_NAME_LOCAL_N3XX_2"|
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
 EOF
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
-	if [ "$rru" == "jaguar" ] ; then
+	if [[ "$rru" == "jaguar" ]] ; then
 	    ADDR_AW2S="$ADDR_JAGUAR"
-	elif [ "$rru" == "panther" ] ; then
+	elif [[ "$rru" == "panther" ]] ; then
 	    ADDR_AW2S="$ADDR_PANTHER"
 	fi
 	cat >> "$SED_FILE" <<EOF
@@ -498,6 +522,8 @@ s|aw2sIPadd:.*|aw2sIPadd: "$IP_GNB_AW2S"|
 s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
 EOF
+    elif [[ "$rru" == "b210" || "$rru" == "rfsim" ]]; then
+	echo "nothing more to change in gnb conf with for $rru"
     else
         echo "Unknown rru selected: $rru"
         usage
@@ -526,6 +552,43 @@ function configure-all() {
     configure-spgwu-tiny
     configure-gnb $node_gnb $rru $pcap
 }
+
+
+function configure-oai-nr-ue() {
+    fit_ue=$1; shift
+    
+    FUNCTION="oai-nr-ue"
+    DIR="$OAI5G_RAN/$FUNCTION"
+    ORIG_CHART="$DIR"/values.yaml
+    SED_FILE="/tmp/$FUNCTION-r2lab.sed"
+    echo "Configuring chart $ORIG_CHART for R2lab"
+    cat > "$SED_FILE" <<EOF
+s|create: false|create: true|
+s|ipadd:.*|ipadd: "$IP_NRUE"|
+s|netmask:.*|netmask: "24"|
+s|hostInterface:.*|hostInterface: "$IF_NAME_NRUE"|
+s|nodeName:.*|nodeName:|
+s|fullImsi:.*|fullImsi: "$RFSIM_IMSI"|
+s|fullKey:.*|fullKey: "$FULL_KEY"|
+s|opc:.*|opc: "$OPC"|
+s|dnn:.*|dnn: "$DNN"|
+s|nssaiSst:.*|nssaiSst: "1"|
+s|nssaiSd:.*|nssaiSd: "16777215"|
+EOF
+
+    cp "$ORIG_CHART" /tmp/"$FUNCTION"_values.yaml-orig
+    echo "(Over)writing $DIR/values.yaml"
+    sed -f "$SED_FILE" < /tmp/"$FUNCTION"_values.yaml-orig > "$ORIG_CHART"
+    diff /tmp/"$FUNCTION"_values.yaml-orig "$ORIG_CHART"
+
+    ORIG_CHART="$DIR"/templates/deployment.yaml
+    echo "Configuring chart $ORIG_CHART for R2lab"
+
+    cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
+    perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-net1"/s' "$ORIG_CHART"
+    diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
+}
+
 
 
 function init() {
@@ -594,22 +657,48 @@ function start-gnb() {
 }
 
 
+function start-ue() {
+    ns=$1
+    shift
+    node_gnb=$1
+    shift
+
+    echo "Running start-ue() on namespace: $ns, node_gnb:$node_gnb"
+
+    echo "cd $OAI5G_RAN"
+    cd "$OAI5G_RAN"
+
+    # Retrieve the IP address of the gnb pod and set it
+    GNB_POD_NAME=$(kubectl -n$ns get pods -l app.kubernetes.io/name=oai-gnb -o jsonpath="{.items[0].metadata.name}")
+    GNB_POD_IP=$(kubectl -n$ns get pod $GNB_POD_NAME --template '{{.status.podIP}}')
+    echo "gNB pod IP is $GNB_POD_IP"
+    conf_ue_dir="$OAI5G_RAN/oai-nr-ue"
+    cat >/tmp/gnb-values.sed <<EOF
+s|  rfSimulator:.*|  rfSimulator: "${GNB_POD_IP}"|
+EOF
+
+    echo "(Over)writing oai-nr-ue chart $conf_ue_dir/values.yaml"
+    cp $conf_ue_dir/values.yaml /tmp/values-orig.yaml
+    sed -f /tmp/gnb-values.sed </tmp/values-orig.yaml >/tmp/values.yaml
+    cp /tmp/values.yaml $conf_ue_dir/
+
+    echo "helm -n$ns install oai-nr-ue oai-nr-ue/"
+    helm -n$ns install oai-nr-ue oai-nr-ue/
+
+    echo "Wait until oai-nr-ue pod is READY"
+    kubectl wait pod -n$ns --for=condition=Ready --all
+}
+
+
+
 function start() {
     ns=$1; shift
     node_amf_spgwu=$1; shift
     node_gnb=$1; shift
+    rru=$1; shift
     pcap=$1; shift
 
     echo "start: run all oai5g pods on namespace: $ns"
-
-    # Check if all FIT nodes are ready
-    while :; do
-        kubectl wait no --for=condition=Ready $node_gnb && break
-        clear
-        echo "start: Wait until gNB FIT node is in READY state"
-        kubectl get no
-        sleep 5
-    done
 
     if [[ $pcap == "True" ]]; then
 	echo "start: Create a k8s persistence volume for generation of pcap files"
@@ -651,6 +740,10 @@ EOF
     start-cn $ns $node_amf_spgwu
     start-gnb $ns $node_gnb
 
+    if [[ "$rru" == "rfsim" ]]; then
+	start-nr-ue $ns $node_gnb
+    fi
+
     echo "****************************************************************************"
     echo "When you finish, to clean-up the k8s cluster, please run demo-oai.py --clean"
 }
@@ -681,8 +774,18 @@ function stop-gnb(){
 }
 
 
+function stop-ue(){
+    ns=$1
+    shift
+
+    echo "helm -n$ns uninstall oai-nr-ue"
+    helm -n$ns uninstall oai-nr-ue
+}
+
+
 function stop() {
     ns=$1; shift
+    rru=$1; shift
     pcap=$1; shift
 
     echo "Running stop() on namespace:$ns; pcap is $pcap"
@@ -705,6 +808,9 @@ function stop() {
         echo "Remove all 5G OAI pods"
 	stop-cn $ns
 	stop-gnb $ns
+	if [[ "$rru"== "rfsim" ]]; then
+	    stop-ue $ns
+	fi
     else
         echo "OAI5G demo is not running, there is no pod on namespace $ns !"
     fi
@@ -735,18 +841,18 @@ else
             usage
         fi
     elif [ "$1" == "start" ]; then
-        if test $# -eq 5; then
-            start $2 $3 $4 $5
+        if test $# -eq 6; then
+            start $2 $3 $4 $5 $6
         elif test $# -eq 1; then
-	    start $DEF_NS $DEF_NODE_AMF_SPGWU $DEF_NODE_GNB $DEF_PCAP
+	    start $DEF_NS $DEF_NODE_AMF_SPGWU $DEF_NODE_GNB $DEF_RRU $DEF_PCAP
 	else
             usage
         fi
     elif [ "$1" == "stop" ]; then
-        if test $# -eq 3; then
-            stop $2 $3
+        if test $# -eq 4; then
+            stop $2 $3 $4
         elif test $# -eq 1; then
-	    stop $DEF_NS $DEF_PCAP
+	    stop $DEF_NS $DEF_RRU $DEF_PCAP
 	else
             usage
         fi
@@ -775,6 +881,14 @@ else
 	else
             usage
         fi
+    elif [ "$1" == "start-ue" ]; then
+        if test $# -eq 3; then
+            start-ue $2 $3
+        elif test $# -eq 1; then
+	    start-ue $DEF_NS $DEF_NODE_GNB
+	else
+            usage
+        fi
     elif [ "$1" == "stop-cn" ]; then
         if test $# -eq 2; then
             stop-cn $2
@@ -788,6 +902,14 @@ else
             stop-gnb $2
         elif test $# -eq 1; then
 	    stop-gnb $DEF_NS
+	else
+            usage
+        fi
+    elif [ "$1" == "stop-ue" ]; then
+        if test $# -eq 2; then
+            stop-ue $2
+        elif test $# -eq 1; then
+	    stop-ue $DEF_NS
 	else
             usage
         fi

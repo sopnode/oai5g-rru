@@ -1,6 +1,6 @@
 # expected jinja variables, set by calling python script
 # {{gateway}} - typically 'faraday.inria.fr'
-# {{leader}} - typically 'sopnode-l1.inria.fr'
+# {{master}} - typically 'sopnode-l1.inria.fr'
 # {{namespace}} - typically 'oai5g'
 # {{pcap}} - typically 'True' or 'False'
 # {{nodes}} - typically {'k8s_fit': 'fit01', 'amf_spgwu': 'sopnode-w3.inria.fr', 'gnb' : 'sopnode-w2.inria.fr'}
@@ -16,8 +16,8 @@ nodes:
     hostname: {{gateway}}
     formatter: TimeHostFormatter
     verbose: {{verbose}}
-  - id: leader
-    hostname: {{leader}}
+  - id: master
+    hostname: {{master}}
     gateway: faraday
     username: r2lab
     formatter: TimeHostFormatter
@@ -133,7 +133,7 @@ jobs:
       - type: Run
         command: nmcli con up data; nmcli dev status; join-tunnel
       - type: Run
-        command: kube-install.sh join-cluster r2lab@{{leader}}
+        command: kube-install.sh join-cluster r2lab@{{master}}
       - type: Run
         command: >
           kubectl create namespace {{namespace}} || true;
@@ -162,7 +162,7 @@ jobs:
           chmod a+x /root/demo-oai.sh;
           cp oai5g-rru/configure-demo-oai.sh /root/;
           chmod a+x /root/configure-demo-oai.sh;
-          /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{pcap}} {%for x in regcred.values()%}{{x}} {%endfor %};
+          /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{pcap}} {%for x in regcred.values()%}{{x}} {%endfor %};
           rm -rf oai-cn5g-fed;
           git clone -b r2lab-rrus https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git;
       - type: Run
@@ -177,7 +177,7 @@ jobs:
       Launch OAI5G pods by calling demo-oai.sh start from {{nodes['k8s_fit']}}
     commands:
       - type: Run
-        command: /root/demo-oai.sh start {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{pcap}}
+        command: /root/demo-oai.sh start {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{pcap}}
 
   {% for n in quectel_dict.keys() %}
   - id: attach-quectel-node-{{n}}
@@ -213,7 +213,7 @@ jobs:
       Delete OAI5G pods by calling demo-oai.sh stop from {{nodes.k8s_fit}}
     commands:
       - type: Run
-        command: /root/demo-oai.sh stop {{namespace}} {{pcap}}
+        command: /root/demo-oai.sh stop {{namespace}} {{rru}} {{pcap}}
       {% if pcap == 'True' %}
       - type: Pull
         remotepaths: "/tmp/oai5g-stats.tgz"
@@ -239,10 +239,10 @@ jobs:
 
   - id: cleanup1
     required: stop-demo
-    node: leader
+    node: master
     critical: False
     verbose: {{verbose}}
-    label: Drain and delete FIT nodes from the k8s {{leader}} cluster
+    label: Drain and delete FIT nodes from the k8s {{master}} cluster
     commands:
       - type: Run
         command: fit-drain-nodes; fit-delete-nodes
