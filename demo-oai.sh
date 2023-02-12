@@ -512,6 +512,13 @@ s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
 s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
 s|n3Netmask:.*|n3Netmask: "24"|
 s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
+s|mountConfig:.*|mountConfig: true|
+s|mcc:.*|mcc: "$MCC"|
+s|mnc:.*|mcc: "$MNC"|
+s|gnbNgaIfName:.*|gnbNgaIfName: "net1"|
+s|gnbNgaIpAddress:.*|gnbNgaIpAddress: "$IP_GNB_N2"|
+s|gnbNguIfName:.*|gnbNguIfName: "net2"|
+s|gnbNguIpAddress:.*|gnbNguIpAddress: "$IP_GNB_N3"|
 s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
