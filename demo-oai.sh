@@ -501,13 +501,6 @@ s|n2n3IPadd:.*|n2n3IPadd: "$IP_GNB_N2N3"|
 s|n2n3Netmask:.*|n2n3Netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_GNB_N2"|
 s|mountConfig:.*|mountConfig: true|
-s|mnc:.*|mnc: "$MNC"|
-s|mcc:.*|mcc: "$MCC"|
-s|gnbNgaIfName:.*|gnbNgaIfName: "net1"|
-s|gnbNgaIpAddress:.*|gnbNgaIpAddress: "$IP_GNB_N2N3"|
-s|gnbNguIfName:.*|gnbNguIfName: "net1"|
-s|gnbNguIpAddress:.*|gnbNguIpAddress: "$IP_GNB_N2N3"|
-s|sdrAddrs:.*||
 EOF
     else
 	cat >> "$SED_VALUES_FILE" <<EOF
