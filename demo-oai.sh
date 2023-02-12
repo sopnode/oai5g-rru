@@ -81,7 +81,7 @@ function usage() {
     echo "            start-ue [namespace node_gnb] |"
     echo "            stop-cn [namespace] |"
     echo "            stop-gnb [namespace] |"
-    echo "            stop-ue [namespace] |"
+    echo "            stop-nr-ue [namespace] |"
     echo "            get-cn-pcap [namespace] |"
     echo "            get-ran-pcap [namespace] |"
     echo "            get-all-pcap [namespace]"
@@ -380,6 +380,7 @@ function configure-gnb() {
     echo "configure-gnb to run on node $node_gnb with RRU $rru and pcap is $pcap"
     echo "First prepare gNB mounted.conf and values/multus/configmap/deployment charts for $rru"
 
+    FUNCTION="oai-gnb"
     DIR_GNB="/root/oai5g-rru/gnb-config"
     DIR_CONF="$DIR_GNB/conf"
     DIR_CHARTS="$DIR_GNB/charts"
@@ -477,7 +478,6 @@ EOF
     cat "$DIR_TEMPLATES"/configmap.yaml
 
     # Configure gnb values.yaml chart
-    FUNCTION="oai-gnb"
     DIR="$OAI5G_RAN/$FUNCTION"
     ORIG_CHART="$DIR"/values.yaml
 
@@ -523,11 +523,17 @@ EOF
     echo "(Over)writing $DIR/values.yaml"
     sed -f "$SED_VALUES_FILE" < /tmp/"$FUNCTION"_values.yaml-orig > "$ORIG_CHART"
     diff /tmp/"$FUNCTION"_values.yaml-orig "$ORIG_CHART"
+
+    ORIG_CHART="$DIR"/templates/deployment.yaml
+    echo "Finally, configure $ORIG_CHART of oai-gnb"
+    cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
+    perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-net1"/s' "$ORIG_CHART"
+    diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
+
 }
 
 
-function configure-oai-nr-ue() {
-    fit_ue=$1; shift
+function configure-nr-ue() {
     
     FUNCTION="oai-nr-ue"
     DIR="$OAI5G_RAN/$FUNCTION"
@@ -578,6 +584,9 @@ function configure-all() {
     configure-amf
     configure-spgwu-tiny
     configure-gnb $node_gnb $rru $pcap
+    if [[ "$rru" == "rfsim" ]]; then
+	configure-nr-ue
+    fi
 }
 
 
@@ -648,7 +657,7 @@ function start-gnb() {
 }
 
 
-function start-ue() {
+function start-nr-ue() {
     ns=$1
     shift
     node_gnb=$1
@@ -765,7 +774,7 @@ function stop-gnb(){
 }
 
 
-function stop-ue(){
+function stop-nr-ue(){
     ns=$1
     shift
 
@@ -800,7 +809,7 @@ function stop() {
 	stop-cn $ns
 	stop-gnb $ns
 	if [[ "$rru" == "rfsim" ]]; then
-	    stop-ue $ns
+	    stop-nr-ue $ns
 	fi
     else
         echo "OAI5G demo is not running, there is no pod on namespace $ns !"
@@ -896,11 +905,11 @@ else
 	else
             usage
         fi
-    elif [ "$1" == "stop-ue" ]; then
+    elif [ "$1" == "stop-nr-ue" ]; then
         if test $# -eq 2; then
-            stop-ue $2
+            stop-nr-ue $2
         elif test $# -eq 1; then
-	    stop-ue $DEF_NS
+	    stop-nr-ue $DEF_NS
 	else
             usage
         fi
