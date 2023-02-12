@@ -51,6 +51,9 @@ default_quectel_image = 'quectel-wwan0'
 # in order to launch the scenario 
 default_k8s_fit = 1
 
+# Default FIT node used to run oai-gnb with USRP B210
+default_b210_node = 11
+
 # Default FIT nodes used as UE Quectel
 default_quectel_nodes = []
 
@@ -68,9 +71,9 @@ default_regcred_password = 'r2labuser-pwd'
 default_regcred_email = 'r2labuser@turletti.com'
 
 
-def run(*, mode, gateway, slicename,
-        master, namespace, pcap, auto_start, load_images,
-        k8s_reset, k8s_fit, amf_spgwu, gnb, quectel_nodes, rru,
+def run(*, mode, gateway, slicename, master,
+        namespace, pcap, auto_start, load_images, k8s_reset,
+        k8s_fit, amf_spgwu, gnb, quectel_nodes, rru, b210,
         regcred_name, regcred_password, regcred_email,
         image, quectel_image, verbose, dry_run):
     """
@@ -88,6 +91,7 @@ def run(*, mode, gateway, slicename,
         gnb: node name in which oai-gnb will be deployed
         quectel_nodes: list of indices of quectel UE nodes to use
         rru: hardware device attached to gNB
+        b210: if usrp b210 used, fit number used to run it, else 0
         image: R2lab k8s image name
     """
 
@@ -115,6 +119,7 @@ def run(*, mode, gateway, slicename,
         ),
         quectel_dict=quectel_dict,
         rru=rru,
+        b210=b210,
         regcred=dict(
             name=regcred_name,
             password=regcred_password,
@@ -270,7 +275,8 @@ def main():
     """
     CLI frontend
     """
-
+    b210 = 0 # by default no USRP B210 used for gnb
+    
     parser = ArgumentParser(usage=HELP, formatter_class=ArgumentDefaultsHelpFormatter)
 
     parser.add_argument(
@@ -381,6 +387,10 @@ def main():
             args.amf_spgwu = K8S_WORKER_DEVEL
         if args.gnb == K8S_MASTER_PROD:
             args.gnb = K8S_MASTER_DEVEL
+
+    if args.rru == "b210":
+        b210 = default_b210_node
+        args.gnb = r2lab_hostname(default_b210_node)
         
     if args.quectel_nodes:
         for quectel in args.quectel_nodes:
@@ -424,7 +434,7 @@ def main():
         master=args.master, namespace=args.namespace, pcap=pcap_str,
         auto_start=args.auto_start, load_images=args.load_images,
         k8s_fit=args.k8s_fit, amf_spgwu=args.amf_spgwu, gnb=args.gnb,
-        quectel_nodes=args.quectel_nodes, rru=args.rru,
+        quectel_nodes=args.quectel_nodes, rru=args.rru, b210=b210,
         regcred_name=args.regcred_name,
         regcred_password=args.regcred_password,
         regcred_email=args.regcred_email,

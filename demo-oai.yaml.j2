@@ -6,8 +6,10 @@
 # {{nodes}} - typically {'k8s_fit': 'fit01', 'amf_spgwu': 'sopnode-w3.inria.fr', 'gnb' : 'sopnode-w2.inria.fr'}
 # {{quectel_nodes}} - typically {'9': 'fit09', '18': 'fit18'}
 # {{rru}} - typically 'n300' or 'n320' or 'jaguar' or 'panther'
+# {{b210}} - typically '0' or the fit node number used to run oai-gnb with USRP b210 device
 # {{regcred}} - typically {'name': 'jdoe', 'password': 'XX', 'email': 'jdoe@yahoo.fr'}
 # {{image}} - typically 'kubernetes'
+# {{quectel_dict}} 
 # {{quectel_image}} - typically 'quectel-wwan0'
 # {{verbose}} - typically 'True' or 'False'
 
@@ -45,6 +47,18 @@ jobs:
     critical: True
     verbose: {{verbose}}
     label: load image {{image}} on FIT worker node
+  {% if b210 %}    
+    commands:
+      - type: Run
+        command: >
+          rhubarbe load -i {{image}} {{nodes['k8s_fit']}} {{nodes['gnb']}}
+      - type: Run
+        command: >
+          rhubarbe wait {{nodes['k8s_fit']}} {{nodes['gnb']}}
+      - type: Run
+        command: >
+          rhubarbe usrpon {{nodes['gnb']}}
+  {% else %}
     commands:
       - type: Run
         command: >
@@ -52,9 +66,13 @@ jobs:
       - type: Run
         command: >
           rhubarbe wait {{nodes['k8s_fit']}}
+  {% if rru != "rfsim" %}
       - type: Run
         command: >
           rhubarbe-pdu on {{rru}}
+  {% endif %}
+  {% endif %}
+
 
   {% if quectel_dict %}
   - id: prepare-quectels
@@ -255,9 +273,16 @@ jobs:
     commands:
       - type: Run
         command: >
-          rhubarbe-pdu off {{rru}}
-      - type: Run
-        command: rhubarbe off {{nodes['k8s_fit']}}
+  {% if b210 %}    
+          rhubarbe usrpoff {{nodes['gnb']}};
+          rhubarbe off {{nodes['k8s_fit']}} {{nodes['gnb']}}
+  {% else %}
+  {% if rru != "rfsim" %}
+          rhubarbe-pdu off {{rru}};
+  {% endif %}
+          rhubarbe off {{nodes['k8s_fit']}}
+  {% endif %}
+
 
   {% if quectel_dict %}
   - id: cleanup-quectels

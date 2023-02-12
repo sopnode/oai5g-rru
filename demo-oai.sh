@@ -385,50 +385,80 @@ function configure-gnb() {
     DIR_GNB_DEST="/root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
     DIR_TEMPLATES="$DIR_GNB_DEST/templates"
 
+    SED_CONF_FILE="/tmp/gnb_conf.sed"
+    SED_VALUES_FILE="/tmp/$FUNCTION-r2lab.sed"
+    
     if [[  "$rru" == "b210" ]]; then
 	RRU_TYPE="b210"
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
     elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
+	if [[ "$rru" == "n300" ]]; then
+	    SDR_ADDRS="$ADDRS_N300"
+	elif [[ "$rru" == "n320" ]]; then
+	    SDR_ADDRS="$ADDRS_N320"
+	fi
+	cat > "$SED_CONF_FILE" <<EOF
+s|sdr_addrs =.*|sdr_addrs = "$SDR_ADDRS,clock_source=internal,time_source=internal"|
+EOF
+	cat > "$SED_VALUES_FILE" <<EOF
+s|sfp1hostInterface:.*|sfp1hostInterface: "$IF_NAME_LOCAL_N3XX_1"|
+s|sfp2hostInterface:.*|sfp2hostInterface: "$IF_NAME_LOCAL_N3XX_2"|
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
+EOF
 	RRU_TYPE="n3xx"
 	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	RRU_TYPE="aw2s"
 	if [[  "$rru" == "jaguar" ]]; then
 	    CONF_AW2S="$CONF_JAGUAR"
+	    ADDR_AW2S="$ADDR_JAGUAR"
 	else
 	    CONF_AW2S="$CONF_PANTHER"
+	    ADDR_AW2S="$ADDR_PANTHER"
 	fi
+	cat > "$SED_CONF_FILE" <<EOF
+s|local_if_name.*|local_if_name  = "net3"|
+s|remote_address.*|remote_address = "$ADDR_AW2S"|
+s|local_address.*|local_address = "$IP_GNB_AW2S"|
+s|sdr_addrs =.*||
+EOF
+	cat >> "$SED_VALUES_FILE" <<EOF
+s|aw2sIPadd:.*|aw2sIPadd: "$IP_GNB_AW2S"|
+s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
+EOF
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
     elif [[ "$rru" == "rfsim" ]]; then
-	RRU_TYPE="rfsim"
-	CONF_ORIG="$DIR_CONF/$CONF_RFSIM"
+	echo "configure-gnb: rfsim mode used, use the default charts"
     else
 	echo "Unknown rru selected: $rru"
 	usage
     fi
-    
-    echo "Copy the relevant chart files corresponding to $RRU_TYPE RRU"
-    echo cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
-    cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
-    echo cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
-    cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
-    echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
-    cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
 
-    echo "Set up configmap.yaml chart with the right gNB configuration from $CONF_ORIG"
-    # Keep the 17 first lines of configmap.yaml
-    head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
-    # Add a 6-characters margin to gnb.conf
-    awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
-    # Append the modified gnb.conf to /tmp/configmap.yaml
-    cat /tmp/gnb.conf >> /tmp/configmap.yaml
-    echo -e "\n{{- end }}\n" >> /tmp/configmap.yaml
-    mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+    if [[ "$rru" != "rfsim" ]]; then
+	echo "Copy the relevant chart files corresponding to $RRU_TYPE RRU"
+	echo cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
+	cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
+	echo cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
+	cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
+	echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+	cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
 
+	echo "Set up configmap.yaml chart with the right gNB configuration from $CONF_ORIG"
+	# Keep the 17 first lines of configmap.yaml
+	head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
+	# Add a 6-characters margin to gnb.conf
+	awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
+	# Append the modified gnb.conf to /tmp/configmap.yaml
+	cat /tmp/gnb.conf >> /tmp/configmap.yaml
+	echo -e "\n{{- end }}\n" >> /tmp/configmap.yaml
+	mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+    fi
+
+    echo "First configure gnb.conf within configmap.yaml"
     # remove NSSAI sd info for PLMN and add other parameters for RUs 
-    SED_FILE="/tmp/gnb_conf.sed"
     #s|sd = 0x010203|sd = 0x000001|
-    cat > "$SED_FILE" <<EOF
+    cat >> "$SED_CONF_FILE" <<EOF
 s|sd = 0x010203;||
 s|, sd = 0x010203||
 s|sd = 0x010203||
@@ -441,45 +471,16 @@ s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net2"
 s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N3/24";|
 EOF
     cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
-    sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
-
-    # set RRU parameters in gnb conf file
-    if [[ "$rru" == "n300" || "$rru" == "n320" ]] ; then
-	if [[ "$rru" == "n300" ]]; then
-	    SDR_ADDRS="$ADDRS_N300"
-	elif [[ "$rru" == "n320" ]]; then
-	    SDR_ADDRS="$ADDRS_N320"
-	fi
-	cat > "$SED_FILE" <<EOF
-s|sdr_addrs =.*|sdr_addrs = "$SDR_ADDRS,clock_source=internal,time_source=internal"|
-EOF
-    else
-	if [ "$rru" == "jaguar" ] ; then
-	    ADDR_AW2S="$ADDR_JAGUAR"
-	elif [ "$rru" == "panther" ] ; then
-	    ADDR_AW2S="$ADDR_PANTHER"
-	fi
-	SED_FILE="/tmp/aw2s_conf.sed"
-	cat > "$SED_FILE" <<EOF
-s|local_if_name.*|local_if_name  = "net3"|
-s|remote_address.*|remote_address = "$ADDR_AW2S"|
-s|local_address.*|local_address = "$IP_GNB_AW2S"|
-s|sdr_addrs =.*||
-EOF
-    fi
-    cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
-    sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
-    # show changes applied to default conf
+    sed -f "$SED_CONF_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
     echo "Display new $DIR_TEMPLATES/configmap.yaml"
     cat "$DIR_TEMPLATES"/configmap.yaml
 
+    # Configure gnb values.yaml chart
     FUNCTION="oai-gnb"
     DIR="$OAI5G_RAN/$FUNCTION"
     ORIG_CHART="$DIR"/values.yaml
-    SED_FILE="/tmp/$FUNCTION-r2lab.sed"
 
-    # Configure gnb values.yaml chart
-    echo "Then configure chart $ORIG_CHART for R2lab"
+    echo "Then configure $ORIG_CHART of oai-gnb"
     if [[ $pcap == "True" ]]; then
 	GENER_PCAP="true"
 	SHARED_VOL="true"
@@ -487,7 +488,7 @@ EOF
 	GENER_PCAP="false"
 	SHARED_VOL="false"
     fi
-    cat > "$SED_FILE" <<EOF
+    cat >> "$SED_VALUES_FILE" <<EOF
 s|create: false|create: true|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
@@ -499,39 +500,46 @@ s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
 s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
+    cp "$ORIG_CHART" /tmp/"$FUNCTION"_values.yaml-orig
+    echo "(Over)writing $DIR/values.yaml"
+    sed -f "$SED_VALUES_FILE" < /tmp/"$FUNCTION"_values.yaml-orig > "$ORIG_CHART"
+    diff /tmp/"$FUNCTION"_values.yaml-orig "$ORIG_CHART"
+}
 
-    if [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
-	if [[ "$rru" == "n300" ]]; then
-	    SDR_ADDRS="$ADDRS_N300"
-	elif [["$rru" == "n320" ]]; then
-	    SDR_ADDRS="$ADDRS_N320"
-	fi
-	cat >> "$SED_FILE" <<EOF
-s|sfp1hostInterface:.*|sfp1hostInterface: "$IF_NAME_LOCAL_N3XX_1"|
-s|sfp2hostInterface:.*|sfp2hostInterface: "$IF_NAME_LOCAL_N3XX_2"|
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
+
+function configure-oai-nr-ue() {
+    fit_ue=$1; shift
+    
+    FUNCTION="oai-nr-ue"
+    DIR="$OAI5G_RAN/$FUNCTION"
+    ORIG_CHART="$DIR"/values.yaml
+    SED_FILE="/tmp/$FUNCTION-r2lab.sed"
+    echo "Configuring chart $ORIG_CHART for R2lab"
+    cat > "$SED_FILE" <<EOF
+s|create: false|create: true|
+s|ipadd:.*|ipadd: "$IP_NRUE"|
+s|netmask:.*|netmask: "24"|
+s|hostInterface:.*|hostInterface: "$IF_NAME_NRUE"|
+s|fullImsi:.*|fullImsi: "$RFSIM_IMSI"|
+s|fullKey:.*|fullKey: "$FULL_KEY"|
+s|opc:.*|opc: "$OPC"|
+s|dnn:.*|dnn: "$DNN"|
+s|nssaiSst:.*|nssaiSst: "1"|
+s|nssaiSd:.*|nssaiSd: "16777215"|
+s|nodeName:.*|nodeName:|
 EOF
-    elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
-	if [[ "$rru" == "jaguar" ]] ; then
-	    ADDR_AW2S="$ADDR_JAGUAR"
-	elif [[ "$rru" == "panther" ]] ; then
-	    ADDR_AW2S="$ADDR_PANTHER"
-	fi
-	cat >> "$SED_FILE" <<EOF
-s|aw2sIPadd:.*|aw2sIPadd: "$IP_GNB_AW2S"|
-s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
-EOF
-    elif [[ "$rru" == "b210" || "$rru" == "rfsim" ]]; then
-	echo "nothing more to change in gnb conf with for $rru"
-    else
-        echo "Unknown rru selected: $rru"
-        usage
-    fi
+
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
     sed -f "$SED_FILE" < /tmp/"$FUNCTION"_values.yaml-orig > "$ORIG_CHART"
     diff /tmp/"$FUNCTION"_values.yaml-orig "$ORIG_CHART"
+
+    ORIG_CHART="$DIR"/templates/deployment.yaml
+    echo "Configuring chart $ORIG_CHART for R2lab"
+
+    cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
+    perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-net1"/s' "$ORIG_CHART"
+    diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 }
 
 
@@ -551,42 +559,6 @@ function configure-all() {
     configure-amf
     configure-spgwu-tiny
     configure-gnb $node_gnb $rru $pcap
-}
-
-
-function configure-oai-nr-ue() {
-    fit_ue=$1; shift
-    
-    FUNCTION="oai-nr-ue"
-    DIR="$OAI5G_RAN/$FUNCTION"
-    ORIG_CHART="$DIR"/values.yaml
-    SED_FILE="/tmp/$FUNCTION-r2lab.sed"
-    echo "Configuring chart $ORIG_CHART for R2lab"
-    cat > "$SED_FILE" <<EOF
-s|create: false|create: true|
-s|ipadd:.*|ipadd: "$IP_NRUE"|
-s|netmask:.*|netmask: "24"|
-s|hostInterface:.*|hostInterface: "$IF_NAME_NRUE"|
-s|nodeName:.*|nodeName:|
-s|fullImsi:.*|fullImsi: "$RFSIM_IMSI"|
-s|fullKey:.*|fullKey: "$FULL_KEY"|
-s|opc:.*|opc: "$OPC"|
-s|dnn:.*|dnn: "$DNN"|
-s|nssaiSst:.*|nssaiSst: "1"|
-s|nssaiSd:.*|nssaiSd: "16777215"|
-EOF
-
-    cp "$ORIG_CHART" /tmp/"$FUNCTION"_values.yaml-orig
-    echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_FILE" < /tmp/"$FUNCTION"_values.yaml-orig > "$ORIG_CHART"
-    diff /tmp/"$FUNCTION"_values.yaml-orig "$ORIG_CHART"
-
-    ORIG_CHART="$DIR"/templates/deployment.yaml
-    echo "Configuring chart $ORIG_CHART for R2lab"
-
-    cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
-    perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-net1"/s' "$ORIG_CHART"
-    diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 }
 
 
