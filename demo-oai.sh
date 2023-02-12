@@ -501,6 +501,7 @@ s|mnc:.*|mnc: "$MNC"|
 s|mcc:.*|mcc: "$MCC"|
 s|gnbNgaIfName:.*|gnbNgaIfName: "net1"|
 s|gnbNgaIpAddress:.*|gnbNgaIpAddress: "$IP_GNB_N2N3"|
+s|gnbNguIfName:.*|gnbNguIfName: "net1"|
 s|gnbNguIpAddress:.*|gnbNguIpAddress: "$IP_GNB_N2N3"|
 s|sdrAddrs:.*||
 EOF
