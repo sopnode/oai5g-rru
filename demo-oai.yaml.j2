@@ -161,9 +161,34 @@ jobs:
           dnf -y install patch;
           kube-install.sh enable-multus || true;
 
+  {% if b210 %}
+  - id: leave-join-gnb
+    required:
+    - load-images
+    node: gnb
+    critical: False
+    verbose: {{verbose}}
+    label: >
+      Prepare node {{nodes['gnb']}} for k8s & networking
+    commands:
+      - type: Run
+        command: nmcli con down data; nmcli dev status; leave-tunnel
+      - type: Run
+        command: kube-install.sh leave-cluster
+      - type: Run
+        command: sleep 60
+      - type: Run
+        command: nmcli con up data; nmcli dev status; join-tunnel
+      - type: Run
+        command: kube-install.sh join-cluster r2lab@{{master}}
+  {% endif %}
+
   - id: init-demo
     required:
       - leave-join-k8s-fit-node
+  {% if b210 %}    
+      - leave-join-gnb
+  {% endif %}
     node: k8s_fit
     critical: True
     verbose: {{verbose}}
