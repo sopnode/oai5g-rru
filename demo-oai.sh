@@ -479,9 +479,8 @@ EOF
 
     # Configure gnb values.yaml chart
     DIR="$OAI5G_RAN/$FUNCTION"
-    ORIG_CHART="$DIR"/values.yaml
 
-    echo "Then configure $ORIG_CHART of oai-gnb"
+    echo "Then configure charts of oai-gnb"
     if [[ $pcap == "True" ]]; then
 	GENER_PCAP="true"
 	SHARED_VOL="true"
@@ -490,6 +489,11 @@ EOF
 	SHARED_VOL="false"
     fi
     if [[ "$rru" == "rfsim" ]]; then
+	ORIG_CHART="$DIR"/templates/deployment.yaml
+	echo "Configure $ORIG_CHART of oai-gnb in the case of rfsim"
+	cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
+	perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-net1"/s' "$ORIG_CHART"
+	diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 	cat >> "$SED_VALUES_FILE" <<EOF
 s|create: false|create: true|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
@@ -519,17 +523,11 @@ s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
     fi
+    ORIG_CHART="$DIR"/values.yaml
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
     sed -f "$SED_VALUES_FILE" < /tmp/"$FUNCTION"_values.yaml-orig > "$ORIG_CHART"
-    diff /tmp/"$FUNCTION"_values.yaml-orig "$ORIG_CHART"
-
-    ORIG_CHART="$DIR"/templates/deployment.yaml
-    echo "Finally, configure $ORIG_CHART of oai-gnb"
-    cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
-    perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-net1"/s' "$ORIG_CHART"
-    diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
-
+    diff /tmp/"$FUNCTION"_values.yaml-orig "$ORIG_CHART" 
 }
 
 
@@ -559,6 +557,7 @@ EOF
     sed -f "$SED_FILE" < /tmp/"$FUNCTION"_values.yaml-orig > "$ORIG_CHART"
     diff /tmp/"$FUNCTION"_values.yaml-orig "$ORIG_CHART"
 
+    
     ORIG_CHART="$DIR"/templates/deployment.yaml
     echo "Configuring chart $ORIG_CHART for R2lab"
 
