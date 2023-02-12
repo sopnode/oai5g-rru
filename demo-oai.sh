@@ -19,6 +19,7 @@ IP_AMF_N2="$P100.241"
 IP_UPF_N3="$P100.242"
 IP_GNB_N2="$P100.243"
 IP_GNB_N3="$P100.244"
+IP_GNB_N2N3="$P100.243"
 IP_GNB_AW2S="$P100.245" 
 IP_NRUE="$P100.246" 
 
@@ -488,7 +489,23 @@ EOF
 	GENER_PCAP="false"
 	SHARED_VOL="false"
     fi
-    cat >> "$SED_VALUES_FILE" <<EOF
+    if [[ "$rru" == "rfsim" ]]; then
+	cat >> "$SED_VALUES_FILE" <<EOF
+s|create: false|create: true|
+s|tcpdump:.*|tcpdump: $GENER_PCAP|
+s|n2n3IPadd:.*|n2n3IPadd: "$IP_GNB_N2N3"|
+s|n2n3Netmask:.*|n2n3Netmask: "24"|
+s|hostInterface:.*|hostInterface: "$IF_NAME_GNB_N2"|
+s|mountConfig:.*|mountConfig: true|
+s|mnc:.*|mnc: "$MNC"|
+s|mcc:.*|mcc: "$MCC"|
+s|gnbNgaIfName:.*|gnbNgaIfName: "net1"|
+s|gnbNgaIpAddress:.*|gnbNgaIpAddress: "$IP_GNB_N2N3"|
+s|gnbNguIpAddress:.*|gnbNguIpAddress: "$IP_GNB_N2N3"|
+s|sdrAddrs:.*||
+EOF
+    else
+	cat >> "$SED_VALUES_FILE" <<EOF
 s|create: false|create: true|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
@@ -500,6 +517,7 @@ s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
 s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
+    fi
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
     sed -f "$SED_VALUES_FILE" < /tmp/"$FUNCTION"_values.yaml-orig > "$ORIG_CHART"
