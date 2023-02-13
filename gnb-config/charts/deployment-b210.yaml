@@ -76,6 +76,8 @@ spec:
         {{- if .Values.config.mountConfig}}
           - name: USE_VOLUMED_CONF
             value: "yes"
+          - name: USE_B2XX
+            value: "True"
         {{- end}}
         {{- if not .Values.config.mountConfig}}
           - name: USE_SA_TDD_MONO
