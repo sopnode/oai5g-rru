@@ -516,6 +516,8 @@ s|n2n3IPadd:.*|n2n3IPadd: "$IP_GNB_N2N3"|
 s|n2n3Netmask:.*|n2n3Netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_GNB_N2N3"|
 s|mountConfig:.*|mountConfig: true|
+s|mcc:.*|mcc: "$MCC"|
+s|mnc:.*|mcc: "$MNC"|
 EOF
     else
 	cat >> "$SED_VALUES_FILE" <<EOF
