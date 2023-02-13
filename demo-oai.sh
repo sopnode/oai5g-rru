@@ -182,6 +182,7 @@ function get-all-pcap(){
 function configure-oai-5g-basic() {
     node_amf_spgwu=$1; shift
     pcap=$1; shift
+    multus=$1; shift
     
     if [[ $pcap == "True" ]]; then
 	echo "Modify CN charts to generate pcap files"
@@ -213,7 +214,7 @@ EOF
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
     cat > /tmp/basic-r2lab.sed <<EOF
 s|privileged:.*|privileged: $PRIVILEGED|
-s|create: false|create: true|
+s|create: false|create: $multus|
 s|n2IPadd:.*|n2IPadd: "$IP_AMF_N2"|
 s|n2Netmask:.*|n2Netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_AMF_N2_SPGWU_N3" # interface of the nodes for amf/N2 and spgwu/N3|
@@ -394,8 +395,9 @@ function configure-gnb() {
     if [[  "$rru" == "b210" ]]; then
 	RRU_TYPE="b210"
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
-	N2_HOST_IF="enp0s25" # corresponding to FIT node
-	N3_HOST_IF="enp0s25" # corresponding to FIT node
+#	N2_HOST_IF="enp0s25" # corresponding to FIT node
+#	N3_HOST_IF="enp0s25" # corresponding to FIT node # no more needed if it works without multus
+	MULTUS="false" 
     elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
 	if [[ "$rru" == "n300" ]]; then
 	    SDR_ADDRS="$ADDRS_N300"
@@ -414,6 +416,7 @@ EOF
 	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
 	N2_HOST_IF="$IF_NAME_GNB_N2"
 	N3_HOST_IF="$IF_NAME_GNB_N3"
+	MULTUS="true" 
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	RRU_TYPE="aw2s"
 	if [[  "$rru" == "jaguar" ]]; then
@@ -437,6 +440,7 @@ EOF
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
 	N2_HOST_IF="$IF_NAME_GNB_N2"
 	N3_HOST_IF="$IF_NAME_GNB_N3"
+	MULTUS="true" 
     elif [[ "$rru" == "rfsim" ]]; then
 	echo "configure-gnb: rfsim mode used, use the default charts"
     else
@@ -511,7 +515,7 @@ s|mountConfig:.*|mountConfig: true|
 EOF
     else
 	cat >> "$SED_VALUES_FILE" <<EOF
-s|create: false|create: true|
+s|create: false|create: $MULTUS|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
 s|n2Netmask:.*|n2Netmask: "24"|
@@ -585,7 +589,11 @@ function configure-all() {
     echo -e "\t with oai-gnb running on $node_gnb"
     echo -e "\t with generate-pcap: $pcap"
 
-    configure-oai-5g-basic $node_amf_spgwu $pcap
+    if [[ "$rru" == "b210" ]]; then
+	configure-oai-5g-basic $node_amf_spgwu $pcap false
+    else
+	configure-oai-5g-basic $node_amf_spgwu $pcap true
+    fi	
     configure-mysql
     configure-amf
     configure-spgwu-tiny
