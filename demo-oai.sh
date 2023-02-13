@@ -445,7 +445,7 @@ EOF
 	MULTUS="true" 
     elif [[ "$rru" == "rfsim" ]]; then
 	cat > "$SED_VALUES_FILE" <<EOF
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --rfsim --log_config.global_log_options level,nocolor,time"|
 EOF
     else
 	echo "Unknown rru selected: $rru"
