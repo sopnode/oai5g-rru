@@ -40,6 +40,7 @@ ADDR_PANTHER="$P100.51" # .51 for eth2
 IF_NAME_AMF_N2_SPGWU_N3="$IF_NAME_VLAN100"
 IF_NAME_GNB_N2="$IF_NAME_VLAN100"
 IF_NAME_GNB_N3="$IF_NAME_VLAN100"
+IF_NAME_GNB_N2N3="$IF_NAME_VLAN100"
 IF_NAME_LOCAL_AW2S="$IF_NAME_VLAN100"
 IF_NAME_LOCAL_N3XX_1="$IF_NAME_VLAN10"
 IF_NAME_LOCAL_N3XX_2="$IF_NAME_VLAN20"
@@ -393,6 +394,8 @@ function configure-gnb() {
     if [[  "$rru" == "b210" ]]; then
 	RRU_TYPE="b210"
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
+	N2_HOST_IF="enp0s25" # corresponding to FIT node
+	N3_HOST_IF="enp0s25" # corresponding to FIT node
     elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
 	if [[ "$rru" == "n300" ]]; then
 	    SDR_ADDRS="$ADDRS_N300"
@@ -409,6 +412,8 @@ s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 
 EOF
 	RRU_TYPE="n3xx"
 	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
+	N2_HOST_IF="$IF_NAME_GNB_N2"
+	N3_HOST_IF="$IF_NAME_GNB_N3"
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	RRU_TYPE="aw2s"
 	if [[  "$rru" == "jaguar" ]]; then
@@ -430,6 +435,8 @@ s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
+	N2_HOST_IF="$IF_NAME_GNB_N2"
+	N3_HOST_IF="$IF_NAME_GNB_N3"
     elif [[ "$rru" == "rfsim" ]]; then
 	echo "configure-gnb: rfsim mode used, use the default charts"
     else
@@ -499,7 +506,7 @@ s|create: false|create: true|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2n3IPadd:.*|n2n3IPadd: "$IP_GNB_N2N3"|
 s|n2n3Netmask:.*|n2n3Netmask: "24"|
-s|hostInterface:.*|hostInterface: "$IF_NAME_GNB_N2"|
+s|hostInterface:.*|hostInterface: "$IF_NAME_GNB_N2N3"|
 s|mountConfig:.*|mountConfig: true|
 EOF
     else
@@ -508,10 +515,10 @@ s|create: false|create: true|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
 s|n2Netmask:.*|n2Netmask: "24"|
-s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
+s|n2hostInterface:.*|n2hostInterface: "$N2_HOST_IF"|
 s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
 s|n3Netmask:.*|n3Netmask: "24"|
-s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
+s|n3hostInterface:.*|n3hostInterface: "$N3_HOST_IF"|
 s|mountConfig:.*|mountConfig: true|
 s|mcc:.*|mcc: "$MCC"|
 s|mnc:.*|mcc: "$MNC"|
