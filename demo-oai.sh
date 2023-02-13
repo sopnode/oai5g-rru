@@ -403,8 +403,6 @@ function configure-gnb() {
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --log_config.global_log_options level,nocolor,time"|
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
-#	N2_HOST_IF="enp0s25" # corresponding to FIT node
-#	N3_HOST_IF="enp0s25" # corresponding to FIT node # no more needed if it works without multus
 	MULTUS="false" 
     elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
 	if [[ "$rru" == "n300" ]]; then
@@ -422,8 +420,6 @@ s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 
 EOF
 	RRU_TYPE="n3xx"
 	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
-	N2_HOST_IF="$IF_NAME_GNB_N2"
-	N3_HOST_IF="$IF_NAME_GNB_N3"
 	MULTUS="true" 
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	RRU_TYPE="aw2s"
@@ -446,11 +442,11 @@ s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
-	N2_HOST_IF="$IF_NAME_GNB_N2"
-	N3_HOST_IF="$IF_NAME_GNB_N3"
 	MULTUS="true" 
     elif [[ "$rru" == "rfsim" ]]; then
-	echo "configure-gnb: rfsim mode used, use the default charts"
+	cat > "$SED_VALUES_FILE" <<EOF
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
+EOF
     else
 	echo "Unknown rru selected: $rru"
 	usage
@@ -527,10 +523,10 @@ s|create: false|create: $MULTUS|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
 s|n2Netmask:.*|n2Netmask: "24"|
-s|n2hostInterface:.*|n2hostInterface: "$N2_HOST_IF"|
+s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
 s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
 s|n3Netmask:.*|n3Netmask: "24"|
-s|n3hostInterface:.*|n3hostInterface: "$N3_HOST_IF"|
+s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
 s|mountConfig:.*|mountConfig: true|
 s|mcc:.*|mcc: "$MCC"|
 s|mnc:.*|mcc: "$MNC"|
