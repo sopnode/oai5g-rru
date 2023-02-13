@@ -399,6 +399,9 @@ function configure-gnb() {
     
     if [[  "$rru" == "b210" ]]; then
 	RRU_TYPE="b210"
+	cat > "$SED_VALUES_FILE" <<EOF
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --log_config.global_log_options level,nocolor,time"|
+EOF
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
 #	N2_HOST_IF="enp0s25" # corresponding to FIT node
 #	N3_HOST_IF="enp0s25" # corresponding to FIT node # no more needed if it works without multus
