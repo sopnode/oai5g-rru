@@ -479,7 +479,7 @@ EOF
 s|sd = 0x010203;||
 s|, sd = 0x010203||
 s|sd = 0x010203||
-s|mcc = 208;|mcc = $MCC;|
+s|mcc = [0-9][0-9][0-9];|mcc = $MCC;|
 s|mnc = [0-9][0-9];|mnc = $MNC;|
 s|ipv4       =.*|ipv4       = "$IP_AMF_N2";|
 s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
