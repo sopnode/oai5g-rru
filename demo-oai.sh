@@ -211,6 +211,11 @@ EOF
 		PRIVILEGED="false"
     fi
 
+    if [[ $multus == "true" ]]; then
+	NET_IF="net1"
+    else
+	NET_IF="eth0"
+    fi
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
     cat > /tmp/basic-r2lab.sed <<EOF
 s|privileged:.*|privileged: $PRIVILEGED|
@@ -218,13 +223,13 @@ s|create: false|create: $multus|
 s|n2IPadd:.*|n2IPadd: "$IP_AMF_N2"|
 s|n2Netmask:.*|n2Netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_AMF_N2_SPGWU_N3" # interface of the nodes for amf/N2 and spgwu/N3|
-s|amfInterfaceNameForNGAP:.*|amfInterfaceNameForNGAP: "net1" # If multus creation is true then net1 else eth0|
+s|amfInterfaceNameForNGAP:.*|amfInterfaceNameForNGAP: "$NET_IF" # If multus creation is true then net1 else eth0|
 s|mcc:.*|mcc: "$MCC"|
 s|mnc:.*|mnc: "$MNC"|
 s|n3Ip:.*|n3Ip: "$IP_UPF_N3"|
 s|n3Netmask:.*|n3Netmask: "24"|
-s|n3If:.*|n3If: "net1"  # net1 if gNB is outside the cluster network and multus creation is true else eth0|
-s|n6If:.*|n6If: "net1"  # net1 if gNB is outside the cluster network and multus creation is true else eth0  (important because it sends the traffic towards internet)|
+s|n3If:.*|n3If: "$NET_IF"  # net1 if gNB is outside the cluster network and multus creation is true else eth0|
+s|n6If:.*|n6If: "$NET_IF"  # net1 if gNB is outside the cluster network and multus creation is true else eth0  (important because it sends the traffic towards internet)|
 s|dnsIpv4Address:.*|dnsIpv4Address: "138.96.0.210" # configure the dns for UE don't use Kubernetes DNS|
 s|dnsSecIpv4Address:.*|dnsSecIpv4Address: "193.51.196.138" # configure the dns for UE don't use Kubernetes DNS|
 s|dnn0:.*|dnn0: "$DNN"|
