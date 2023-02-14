@@ -405,7 +405,6 @@ function configure-gnb() {
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1  --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"|
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
-	MULTUS="false" 
     elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
 	if [[ "$rru" == "n300" ]]; then
 	    SDR_ADDRS="$ADDRS_N300"
@@ -422,7 +421,6 @@ s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 
 EOF
 	RRU_TYPE="n3xx"
 	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
-	MULTUS="true" 
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	RRU_TYPE="aw2s"
 	if [[  "$rru" == "jaguar" ]]; then
@@ -444,7 +442,6 @@ s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
-	MULTUS="true" 
     elif [[ "$rru" == "rfsim" ]]; then
 	cat > "$SED_VALUES_FILE" <<EOF
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --rfsim --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
