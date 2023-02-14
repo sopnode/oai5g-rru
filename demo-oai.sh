@@ -402,7 +402,7 @@ function configure-gnb() {
     if [[  "$rru" == "b210" ]]; then
 	RRU_TYPE="b210"
 	cat > "$SED_VALUES_FILE" <<EOF
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1  --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"|
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --usrp-tx-thread-config 1  --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"|
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
     elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
