@@ -524,6 +524,8 @@ s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|mountConfig:.*|mountConfig: false|
 s|mcc:.*|mcc: "$MCC"|
 s|mnc:.*|mnc: "$MNC"|
+s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
+s|nodeName:.*|nodeName: $node_gnb|
 EOF
     else # AW2S or N3XX RRUs
 	cat >> "$SED_VALUES_FILE" <<EOF
