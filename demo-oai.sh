@@ -521,9 +521,16 @@ s|mountConfig:.*|mountConfig: true|
 s|mcc:.*|mcc: "$MCC"|
 s|mnc:.*|mcc: "$MNC"|
 EOF
+    if [[ "$rru" == "b210" ]]; then
+	cat >> "$SED_VALUES_FILE" <<EOF
+s|tcpdump:.*|tcpdump: $GENER_PCAP|
+s|mountConfig:.*|mountConfig: false|
+s|mcc:.*|mcc: "$MCC"|
+s|mnc:.*|mnc: "$MNC"|
+EOF
     else
 	cat >> "$SED_VALUES_FILE" <<EOF
-s|create: false|create: $MULTUS|
+s|create: false|create: true|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
 s|n2Netmask:.*|n2Netmask: "24"|
@@ -531,7 +538,7 @@ s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
 s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
 s|n3Netmask:.*|n3Netmask: "24"|
 s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
-s|mountConfig:.*|mountConfig: $MULTUS|
+s|mountConfig:.*|mountConfig: true|
 s|mcc:.*|mcc: "$MCC"|
 s|mnc:.*|mnc: "$MNC"|
 s|gnbNgaIfName:.*|gnbNgaIfName: "net1"|
