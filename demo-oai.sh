@@ -415,6 +415,10 @@ EOF
 	    SDR_ADDRS="$ADDRS_N320"
 	fi
 	cat > "$SED_CONF_FILE" <<EOF
+s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
+s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2/24";|
+s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net2";|
+s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N3/24";|
 s|sdr_addrs =.*|sdr_addrs = "$SDR_ADDRS,clock_source=internal,time_source=internal"|
 EOF
 	cat > "$SED_VALUES_FILE" <<EOF
@@ -434,6 +438,10 @@ EOF
 	    ADDR_AW2S="$ADDR_PANTHER"
 	fi
 	cat > "$SED_CONF_FILE" <<EOF
+s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
+s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2/24";|
+s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net2";|
+s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N3/24";|
 s|local_if_name.*|local_if_name  = "net3"|
 s|remote_address.*|remote_address = "$ADDR_AW2S"|
 s|local_address.*|local_address = "$IP_GNB_AW2S"|
@@ -446,7 +454,13 @@ s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
     elif [[ "$rru" == "rfsim" ]]; then
-	cat > "$SED_VALUES_FILE" <<EOF
+	cat > "$SED_CONF_FILE" <<EOF
+s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
+s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2N3/24";|
+s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net1";|
+s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N2N3/24";|
+EOF
+cat > "$SED_VALUES_FILE" <<EOF
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --rfsim --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
 EOF
     else
@@ -484,10 +498,6 @@ s|sd = 0x010203||
 s|mcc = [0-9][0-9][0-9];|mcc = $MCC;|
 s|mnc = [0-9][0-9];|mnc = $MNC;|
 s|ipv4       =.*|ipv4       = "$IP_AMF_N2";|
-s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
-s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2/24";|
-s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net2";|
-s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N3/24";|
 EOF
     cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
     sed -f "$SED_CONF_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
