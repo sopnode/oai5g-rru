@@ -162,6 +162,11 @@ spec:
               configMapKeyRef:
                 name: {{ .Chart.Name }}-configmap
                 key: threadParallelConfig
+          - name: USE_B2XX
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Chart.Name }}-configmap
+                key: useB2XX
           - name: SDR_ADDRS
             valueFrom:
               configMapKeyRef:
