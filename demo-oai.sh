@@ -531,7 +531,7 @@ s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
 s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
 s|n3Netmask:.*|n3Netmask: "24"|
 s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
-s|mountConfig:.*|mountConfig: true|
+s|mountConfig:.*|mountConfig: $MULTUS|
 s|mcc:.*|mcc: "$MCC"|
 s|mnc:.*|mcc: "$MNC"|
 s|gnbNgaIfName:.*|gnbNgaIfName: "net1"|
