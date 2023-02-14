@@ -447,7 +447,7 @@ EOF
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
     elif [[ "$rru" == "rfsim" ]]; then
 	cat > "$SED_VALUES_FILE" <<EOF
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --rfsim --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --rfsim --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
 EOF
     else
 	echo "Unknown rru selected: $rru"
