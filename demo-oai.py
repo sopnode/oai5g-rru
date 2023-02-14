@@ -53,7 +53,7 @@ default_quectel_image = 'quectel-wwan0'
 default_k8s_fit = 1
 
 # Default FIT node used to run oai-gnb with USRP B210
-default_b210_node = 11
+default_b210_node = 2
 
 # Default FIT nodes used as UE Quectel
 default_quectel_nodes = []
