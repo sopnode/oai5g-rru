@@ -30,8 +30,11 @@ IF_NAME_VLAN20="p4-net-20"
 
 # IP addresses of RRU devices
 ## USRP N3XX devices
-ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.151"
-ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130,mgmt_addr=192.168.3.152"
+# do not specify mgmt_address, this makes USRP not found !
+#ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129,mgmt_addr=192.168.3.151"
+#ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130,mgmt_addr=192.168.3.152"
+ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129"
+ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130"
 ## AW2S devices
 ADDR_JAGUAR="$P100.48" # for eth1
 ADDR_PANTHER="$P100.51" # .51 for eth2
