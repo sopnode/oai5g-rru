@@ -516,16 +516,16 @@ s|n2n3Netmask:.*|n2n3Netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_GNB_N2N3"|
 s|mountConfig:.*|mountConfig: true|
 s|mcc:.*|mcc: "$MCC"|
-s|mnc:.*|mcc: "$MNC"|
+s|mnc:.*|mnc: "$MNC"|
 EOF
-    if [[ "$rru" == "b210" ]]; then
+    elif [[ "$rru" == "b210" ]]; then
 	cat >> "$SED_VALUES_FILE" <<EOF
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|mountConfig:.*|mountConfig: false|
 s|mcc:.*|mcc: "$MCC"|
 s|mnc:.*|mnc: "$MNC"|
 EOF
-    else
+    else # AW2S or N3XX RRUs
 	cat >> "$SED_VALUES_FILE" <<EOF
 s|create: false|create: true|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
