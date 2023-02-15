@@ -541,7 +541,7 @@ EOF
 	echo "Configure $ORIG_CHART of oai-gnb in the case of rfsim"
 	cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
 	cat > "$SED_DEPLOYMENT_FILE" <<EOF
-s|/usr/sbin/tcpdump.*|/usr/sbin/tcpdump -i any -w /tmp/oai-gnb_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap|
+s|/usr/sbin/tcpdump.*|/usr/sbin/tcpdump -i any -w /pcap/oai-gnb_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap|
 EOF
 	sed -f "$SED_DEPLOYMENT_FILE" < /tmp/"$FUNCTION"_deployment.yaml-orig > "$ORIG_CHART"
 	perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-net1"/s' "$ORIG_CHART"
@@ -641,7 +641,7 @@ EOF
 
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
     cat > "$SED_DEPLOYMENT_FILE" <<EOF
-s|/usr/sbin/tcpdump.*|/usr/sbin/tcpdump -i any -w /tmp/oai-nr-ue_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap|
+s|/usr/sbin/tcpdump.*|/usr/sbin/tcpdump -i any -w /pcap/oai-nr-ue_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap|
 EOF
 	sed -f "$SED_DEPLOYMENT_FILE" < /tmp/"$FUNCTION"_deployment.yaml-orig > "$ORIG_CHART"
     perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-net1"/s' "$ORIG_CHART"
