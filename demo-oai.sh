@@ -471,10 +471,10 @@ s|aw2sIPadd:.*|aw2sIPadd: "$IP_GNB_AW2S"|
 s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
 EOF
-	RRU_TYPE="rfsim"
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
     elif [[ "$rru" == "rfsim" ]]; then
 	# multus=true; 
+	RRU_TYPE="rfsim"
 	CONF_ORIG="$DIR_CONF/$CONF_RFSIM"
 	cat > "$SED_CONF_FILE" <<EOF
 s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
