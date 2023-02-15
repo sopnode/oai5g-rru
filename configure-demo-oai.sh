@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Following trick to solve issue when configuring mysql database
+RFSIM_IMSI="208950000001121"
+
 function update() {
     ns=$1; shift
     node_amf_spgwu=$1; shift
@@ -21,6 +24,7 @@ s|DEF_PCAP=.*|DEF_PCAP="${pcap}"|
 s|username=r2labuser|username=${regcred_name}|
 s|password=r2labuser-pwd|password=${regcred_password}|
 s|email=r2labuser@turletti.com|email=${regcred_email}|
+s|@RFSIM_IMSI@|${RFSIM_IMSI}|
 EOF
 
     cp demo-oai.sh /tmp/demo-oai-orig.sh
