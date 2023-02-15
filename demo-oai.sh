@@ -173,10 +173,10 @@ function get-ran-pcap(){
 
     GNB_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-gnb,app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[0].metadata.name}")
     echo "Retrieve OAI5G ran pcap file from the oai-gnb pod on ns $ns"
-    echo "kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-pcap.tgz pcap"
-    kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-pcap.tgz pcap || true
-    echo "kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-pcap.tgz $prefix/ran-pcap-"$DATE".tgz"
-    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-pcap.tgz $prefix/ran-pcap-"$DATE".tgz || true
+    echo "kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz gnb-pcap.tgz pcap"
+    kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz gnb-pcap.tgz pcap || true
+    echo "kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-pcap.tgz $prefix/gnb-pcap-"$DATE".tgz"
+    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-pcap.tgz $prefix/gnb-pcap-"$DATE".tgz || true
     if [[ "$rru" == "rfsim" ]]; then
 	NRUE_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-nr-ue,app.kubernetes.io/instance=oai-nr-ue" -o jsonpath="{.items[0].metadata.name}")
     echo "Retrieve OAI5G ran pcap file from the oai-nr-ue pod on ns $ns"
@@ -415,7 +415,8 @@ function configure-gnb() {
     DIR_TEMPLATES="$DIR_GNB_DEST/templates"
 
     SED_CONF_FILE="/tmp/gnb_conf.sed"
-    SED_VALUES_FILE="/tmp/$FUNCTION-r2lab.sed"
+    SED_VALUES_FILE="/tmp/$FUNCTION-values.sed"
+    SED_DEPLOYMENT_FILE="/tmp/$FUNCTION-deployment.sed"
     
     if [[  "$rru" == "b210" ]]; then
 	RRU_TYPE="b210"
@@ -534,6 +535,10 @@ EOF
 	ORIG_CHART="$DIR"/templates/deployment.yaml
 	echo "Configure $ORIG_CHART of oai-gnb in the case of rfsim"
 	cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
+	cat > "$SED_DEPLOYMENT_FILE" <<EOF
+s|/usr/sbin/tcpdump.*|/usr/sbin/tcpdump -i any -w /tmp/oai-gnb_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap|
+EOF
+	sed -f "$SED_DEPLOYMENT_FILE" < /tmp/"$FUNCTION"_deployment.yaml-orig > "$ORIG_CHART"
 	perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-net1"/s' "$ORIG_CHART"
 	diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 	cat >> "$SED_VALUES_FILE" <<EOF
@@ -594,7 +599,8 @@ function configure-nr-ue() {
     FUNCTION="oai-nr-ue"
     DIR="$OAI5G_RAN/$FUNCTION"
     ORIG_CHART="$DIR"/values.yaml
-    SED_FILE="/tmp/$FUNCTION-r2lab.sed"
+    SED_FILE="/tmp/$FUNCTION-values.sed"
+    SED_DEPLOYMENT_FILE="/tmp/$FUNCTION-deployment.sed"
     echo "Configuring chart $ORIG_CHART for R2lab"
     cat > "$SED_FILE" <<EOF
 s|create: false|create: true|
@@ -620,6 +626,10 @@ EOF
     echo "Configuring chart $ORIG_CHART for R2lab"
 
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
+    cat > "$SED_DEPLOYMENT_FILE" <<EOF
+s|/usr/sbin/tcpdump.*|/usr/sbin/tcpdump -i any -w /tmp/oai-nr-ue_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap|
+EOF
+	sed -f "$SED_DEPLOYMENT_FILE" < /tmp/"$FUNCTION"_deployment.yaml-orig > "$ORIG_CHART"
     perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-net1"/s' "$ORIG_CHART"
     diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 }
