@@ -24,7 +24,7 @@ s|DEF_PCAP=.*|DEF_PCAP="${pcap}"|
 s|username=r2labuser|username=${regcred_name}|
 s|password=r2labuser-pwd|password=${regcred_password}|
 s|email=r2labuser@turletti.com|email=${regcred_email}|
-s|@RFSIM_IMSI@|${RFSIM_IMSI}|
+s|@RFSIM_IMSI@|${RFSIM_IMSI}|g
 EOF
 
     cp demo-oai.sh /tmp/demo-oai-orig.sh
