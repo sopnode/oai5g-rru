@@ -612,8 +612,9 @@ function configure-nr-ue() {
 
     
     if [[ $pcap == "True" ]]; then
-	GENER_PCAP="true"
-	SHARED_VOL="true"
+	echo "nr-ue: will NOT generate PCAP file to avoid wasting all memory resources!"
+	GENER_PCAP="false"
+	SHARED_VOL="false"
     else
 	GENER_PCAP="false"
 	SHARED_VOL="false"
