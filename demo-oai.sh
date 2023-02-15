@@ -419,14 +419,14 @@ function configure-gnb() {
     SED_DEPLOYMENT_FILE="/tmp/$FUNCTION-deployment.sed"
     
     if [[  "$rru" == "b210" ]]; then
-	#multus=false; mounted=true
+	#multus=false; mountConfig=false
 	RRU_TYPE="b210"
 	cat > "$SED_VALUES_FILE" <<EOF
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"|
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
-	#multus=true; mounted=true
     elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
+	#multus=true; mountConfig=true
 	if [[ "$rru" == "n300" ]]; then
 	    SDR_ADDRS="$ADDRS_N300"
 	elif [[ "$rru" == "n320" ]]; then
@@ -447,7 +447,7 @@ EOF
 	RRU_TYPE="n3xx"
 	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
-	# multus=true; mounted=true
+	# multus=true; mountConfig=true
 	RRU_TYPE="aw2s"
 	if [[  "$rru" == "jaguar" ]]; then
 	    CONF_AW2S="$CONF_JAGUAR"
@@ -473,7 +473,7 @@ s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
     elif [[ "$rru" == "rfsim" ]]; then
-	# multus=true; mounted=true
+	# multus=true; mountConfig=true
 	cat > "$SED_CONF_FILE" <<EOF
 s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
 s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2N3/24";|
@@ -506,6 +506,7 @@ EOF
 	cat /tmp/gnb.conf >> /tmp/configmap.yaml
 	echo -e "\n{{- end }}\n" >> /tmp/configmap.yaml
 	mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+	# if "$rru" == "rfsim" we used the default configmap 
     fi
 
     echo "First configure gnb.conf within configmap.yaml"
