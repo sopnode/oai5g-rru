@@ -841,9 +841,8 @@ spec:
   storageClassName: ""
   volumeName: oai5g-pv
 EOF
-    echo "kubectl -n $ns apply -f /tmp/oai5g-pvc.yaml"
-    kubectl -n $ns apply -f /tmp/oai5g-pvc.yaml
-    
+    echo "kubectl -n $ns apply -f /tmp/cn5g-pvc.yaml"
+    kubectl -n $ns apply -f /tmp/cn5g-pvc.yaml
     fi
 
     start-cn $ns $node_amf_spgwu
