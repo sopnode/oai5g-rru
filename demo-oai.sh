@@ -586,6 +586,7 @@ s|create: false|create: true|
 s|ipadd:.*|ipadd: "$IP_NRUE"|
 s|netmask:.*|netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_NRUE"|
+s|rfSimulator:.*|rfSimulator: "$IP_GNB_N2N3"|
 s|fullImsi:.*|fullImsi: "$RFSIM_IMSI"|
 s|fullKey:.*|fullKey: "$FULL_KEY"|
 s|opc:.*|opc: "$OPC"|
