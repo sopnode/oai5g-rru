@@ -24,6 +24,12 @@ spec:
           },
           {
                  "name": "{{ .Chart.Name }}-net2"
+          },
+          {
+                 "name": "{{ .Chart.Name }}-net3"
+          },
+          {
+                 "name": "{{ .Chart.Name }}-net4"
           }]
     {{- end }}
     spec:
@@ -76,7 +82,7 @@ spec:
         {{- if .Values.config.mountConfig}}
           - name: USE_VOLUMED_CONF
             value: "yes"
-          - name: USE_B2XX
+          - name: USE_N3XX
             value: "True"
         {{- end}}
         {{- if not .Values.config.mountConfig}}
@@ -162,11 +168,6 @@ spec:
               configMapKeyRef:
                 name: {{ .Chart.Name }}-configmap
                 key: threadParallelConfig
-          - name: USE_B2XX
-            valueFrom:
-              configMapKeyRef:
-                name: {{ .Chart.Name }}-configmap
-                key: useB2XX
           - name: SDR_ADDRS
             valueFrom:
               configMapKeyRef:
@@ -190,13 +191,13 @@ spec:
         {{- if .Values.persistent.sharedvolume}}
         volumeMounts:
         - mountPath: "/pcap"
-          name: cn5g-pv
+          name: oai5g-pv
         {{- end}}
       volumes:
       {{- if .Values.persistent.sharedvolume}}
-      - name: cn5g-pv
+      - name: oai5g-pv
         persistentVolumeClaim:
-          claimName: cn5g-pvc
+          claimName: oai5g-pvc
       {{- end }}
       {{- if .Values.config.mountConfig}}
       - configMap:

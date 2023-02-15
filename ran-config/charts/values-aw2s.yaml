@@ -89,7 +89,7 @@ config:
 
 persistent:
   sharedvolume: false
-  volumeName: cn5g-volume
+  volumeName: oai5g-volume
   size: 1Gi
 
 resources:

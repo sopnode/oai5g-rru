@@ -1,0 +1,117 @@
+kubernetesType: Vanilla  #Vanilla for community kubernetes distribution
+
+nfimage:   # image name either locally present or in a public/private repository
+#  repository: docker.io/r2labuser/oai-gnb ##docker.io/oaisoftwarealliance/oai-gnb
+#  version: latest ##develop # image tag
+  repository: docker.io/oaisoftwarealliance/oai-gnb
+  version: develop # image tag
+  # pullPolicy: IfNotPresent or Never or Always
+  pullPolicy: IfNotPresent
+
+tcpdumpimage:
+  repository: docker.io/corfr/tcpdump
+  version: latest
+  #pullPolicy: IfNotPresent or Never or Always
+  pullPolicy: IfNotPresent
+
+# good to use when pulling images from docker-hub mention 
+imagePullSecrets: 
+ - name: "regcred"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: "oai-gnb-sa"
+
+podSecurityContext:
+  runAsUser: 0
+  runAsGroup: 0
+
+securityContext:
+  privileged: true
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+#service type is fixed to clusterIP, it is only support for non multus interface (eth0)
+
+start:
+  gnb: true
+  tcpdump: false
+
+# gNB needs two seperate interface one for ngap (N2) and other one for gtpu (N3) 
+# But for experimentation only one interface can be used. 
+# When you need multus:
+# 1. you want seperate interface for N2 and N3 
+# 2. You want static ip-address for N2 and N3 interface
+# 3. Different interfaces for different packets
+
+multus:    # needed when gnB service will run on another interface rather than traditional eth0
+  create: false
+  n2IPadd: "172.21.6.203"
+  n2Netmask: "22"
+  n2hostInterface: "bond0"
+  n3IPadd: "172.21.6.204"
+  n3Netmask: "22"
+  n3hostInterface: "bond1"
+  sfp1IPadd: "192.168.10.132" # .10.129 for our USRP N300 and .10.130 for our N320
+  sfp1Netmask: "24"
+  sfp1hostInterface: "eth2"
+  sfp2IPadd: "192.168.20.132" #	.20.129 for our USRP N300 and .20.130 for our N320
+  sfp2Netmask: "24"
+  sfp2hostInterface: "eth3"
+
+
+config:
+  mountConfig: true #If config file is mounted then please edit mount.conf in configmap.yaml properly 
+  useSATddMono: true
+  timeZone: "Europe/Paris"
+  rfSimulator: "server"
+  useSATddMono: "yes"
+  gnbName: "gnb-n3xx"
+  mcc: "001"   # check the information with AMF, SMF, UPF/SPGWU
+  mnc: "01"    # check the information with AMF, SMF, UPF/SPGWU
+  mncLength: "2" # check the information with AMF, SMF, UPF/SPGWU
+  tac: "1"     # check the information with AMF
+  nssaiSst: "1"  #currently only 4 standard values are allowed 1,2,3,4 
+  nssaiSd0: "ffffff"    #values in hexa-decimal format
+  amfIpAddress: "oai-amf-svc"  # amf ip-address or service-name oai-amf-svc
+  gnbNgaIfName: "eth0"            # net1 in case multus create is true that means another interface is created for ngap interface, n2 to communicate with amf
+  gnbNgaIpAddress: "status.podIP" # n2n3IPadd in case multus create is true
+  gnbNguIfName: "eth0"   #net1 in case multus create is true gtu interface for upf/spgwu
+  gnbNguIpAddress: "status.podIP" # n2n3IPadd in case multus create is true
+  useAdditionalOptions: "--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
+  threadParallelConfig: "PARALLEL_SINGLE_THREAD"
+  sdrAddrs: "serial=XXXXXXX"
+
+persistent:
+  sharedvolume: false
+  volumeName: oai5g-volume
+  size: 1Gi
+
+resources:
+  define: false
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+   cpu: 100m
+   memory: 256Mi
+
+
+tolerations: []
+
+affinity: {}
+
+terminationGracePeriodSeconds: 5
+
+nodeSelector: {}
+
+nodeName: 

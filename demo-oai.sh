@@ -408,9 +408,9 @@ function configure-gnb() {
     echo "First prepare gNB mounted.conf and values/multus/configmap/deployment charts for $rru"
 
     FUNCTION="oai-gnb"
-    DIR_GNB="/root/oai5g-rru/gnb-config"
-    DIR_CONF="$DIR_GNB/conf"
-    DIR_CHARTS="$DIR_GNB/charts"
+    DIR_RAN="/root/oai5g-rru/ran-config"
+    DIR_CONF="$DIR_RAN/conf"
+    DIR_CHARTS="$DIR_RAN/charts"
     DIR_GNB_DEST="/root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
     DIR_TEMPLATES="$DIR_GNB_DEST/templates"
 
@@ -419,14 +419,14 @@ function configure-gnb() {
     SED_DEPLOYMENT_FILE="/tmp/$FUNCTION-deployment.sed"
     
     if [[  "$rru" == "b210" ]]; then
-	#multus=false; mountConfig=false
+	#multus=false;
 	RRU_TYPE="b210"
 	cat > "$SED_VALUES_FILE" <<EOF
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"|
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
     elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
-	#multus=true; mountConfig=true
+	#multus=true; 
 	if [[ "$rru" == "n300" ]]; then
 	    SDR_ADDRS="$ADDRS_N300"
 	elif [[ "$rru" == "n320" ]]; then
@@ -447,7 +447,7 @@ EOF
 	RRU_TYPE="n3xx"
 	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
-	# multus=true; mountConfig=true
+	# multus=true; 
 	RRU_TYPE="aw2s"
 	if [[  "$rru" == "jaguar" ]]; then
 	    CONF_AW2S="$CONF_JAGUAR"
@@ -473,7 +473,7 @@ s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
     elif [[ "$rru" == "rfsim" ]]; then
-	# multus=true; mountConfig=true
+	# multus=true; 
 	CONF_ORIG="$DIR_CONF/$CONF_RFSIM"
 	cat > "$SED_CONF_FILE" <<EOF
 s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
@@ -489,16 +489,14 @@ EOF
 	usage
     fi
     
-    if [[ "$rru" != "rfsim" ]]; then
-	# if "$rru" == "rfsim" we used the default charts
-	echo "Copy the relevant chart files corresponding to $RRU_TYPE RRU"
-	echo cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
-	cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
-	echo cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
-	cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
-	echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
-	cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
-    fi
+    echo "Copy the relevant chart files corresponding to $RRU_TYPE RRU"
+    echo cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
+    cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
+    echo cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
+    cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
+    echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+    cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+
     echo "Set up configmap.yaml chart with the right gNB configuration from $CONF_ORIG"
     # Keep the 17 first lines of configmap.yaml
     head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
@@ -538,14 +536,6 @@ EOF
     fi
     if [[ "$rru" == "rfsim" ]]; then
 	ORIG_CHART="$DIR"/templates/deployment.yaml
-	echo "Configure $ORIG_CHART of oai-gnb in the case of rfsim"
-	cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
-	cat > "$SED_DEPLOYMENT_FILE" <<EOF
-s|/usr/sbin/tcpdump.*|/usr/sbin/tcpdump -i any -w /pcap/oai-gnb_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap|
-EOF
-	sed -f "$SED_DEPLOYMENT_FILE" < /tmp/"$FUNCTION"_deployment.yaml-orig > "$ORIG_CHART"
-	perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-net1"/s' "$ORIG_CHART"
-	diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 	cat >> "$SED_VALUES_FILE" <<EOF
 s|create: false|create: true|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
@@ -564,7 +554,7 @@ EOF
     elif [[ "$rru" == "b210" ]]; then
 	cat >> "$SED_VALUES_FILE" <<EOF
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
-s|mountConfig:.*|mountConfig: false|
+s|mountConfig:.*|mountConfig: true|
 s|mcc:.*|mcc: "$MCC"|
 s|mnc:.*|mnc: "$MNC"|
 s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
@@ -604,17 +594,32 @@ function configure-nr-ue() {
     
     FUNCTION="oai-nr-ue"
     DIR="$OAI5G_RAN/$FUNCTION"
-    ORIG_CHART="$DIR"/values.yaml
-    SED_FILE="/tmp/$FUNCTION-values.sed"
-    SED_DEPLOYMENT_FILE="/tmp/$FUNCTION-deployment.sed"
+    DIR_TEMPLATES="$DIR"/templates
 
+
+    DIR_RAN="/root/oai5g-rru/ran-config"
+    DIR_CHARTS="$DIR_RAN/charts"
+
+
+    echo "Copy the nr-ue chart files"
+    echo cp "$DIR_CHARTS"/nr-ue-values.yaml "$DIR"/values.yaml
+    cp "$DIR_CHARTS"/nr-ue-values.yaml "$DIR"/values.yaml
+    echo cp "$DIR_CHARTS"/nr-ue-deployment.yaml "$DIR_TEMPLATES"/deployment.yaml
+    cp "$DIR_CHARTS"/nr-ue-deployment.yaml "$DIR_TEMPLATES"/deployment.yaml
+    echo cp "$DIR_CHARTS"/nr-ue-multus.yaml "$DIR_TEMPLATES"/multus.yaml
+    cp "$DIR_CHARTS"/nr-ue-multus.yaml "$DIR_TEMPLATES"/multus.yaml
+
+    
     if [[ $pcap == "True" ]]; then
 	GENER_PCAP="true"
     else
 	GENER_PCAP="false"
     fi
     
-    echo "Configuring chart $ORIG_CHART for R2lab"
+    ORIG_CHART="$DIR"/values.yaml
+    SED_FILE="/tmp/$FUNCTION-values.sed"
+    SED_DEPLOYMENT_FILE="/tmp/$FUNCTION-deployment.sed"
+    echo "Configuring chart $ORIG_CHART"
     cat > "$SED_FILE" <<EOF
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|create: false|create: true|
@@ -643,7 +648,7 @@ EOF
     cat > "$SED_DEPLOYMENT_FILE" <<EOF
 s|/usr/sbin/tcpdump.*|/usr/sbin/tcpdump -i any -w /pcap/oai-nr-ue_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap|
 EOF
-	sed -f "$SED_DEPLOYMENT_FILE" < /tmp/"$FUNCTION"_deployment.yaml-orig > "$ORIG_CHART"
+    sed -f "$SED_DEPLOYMENT_FILE" < /tmp/"$FUNCTION"_deployment.yaml-orig > "$ORIG_CHART"
     perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-net1"/s' "$ORIG_CHART"
     diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 }
@@ -786,28 +791,28 @@ function start() {
 
     if [[ $pcap == "True" ]]; then
 	echo "start: Create a k8s persistence volume for generation of pcap files"
-	cat << \EOF >> /tmp/cn5g-pv.yaml
+	cat << \EOF >> /tmp/oai5g-pv.yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: cn5g-pv
+  name: oai5g-pv
 spec:
   capacity:
     storage: 1Gi
   accessModes:
   - ReadWriteMany
   hostPath:
-    path: /var/cn5g-volume
+    path: /var/oai5g-volume
 EOF
-	kubectl apply -f /tmp/cn5g-pv.yaml
+	kubectl apply -f /tmp/oai5g-pv.yaml
 
 	
 	echo "start: Create a k8s persistent volume claim for pcap files"
-    cat << \EOF >> /tmp/cn5g-pvc.yaml
+    cat << \EOF >> /tmp/oai5g-pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: cn5g-pvc
+  name: oai5g-pvc
 spec:
   resources:
     requests:
@@ -815,10 +820,10 @@ spec:
   accessModes:
   - ReadWriteMany
   storageClassName: ""
-  volumeName: cn5g-pv
+  volumeName: oai5g-pv
 EOF
-    echo "kubectl -n $ns apply -f /tmp/cn5g-pvc.yaml"
-    kubectl -n $ns apply -f /tmp/cn5g-pvc.yaml
+    echo "kubectl -n $ns apply -f /tmp/oai5g-pvc.yaml"
+    kubectl -n $ns apply -f /tmp/oai5g-pvc.yaml
     fi
 
     start-cn $ns $node_amf_spgwu
@@ -904,8 +909,8 @@ function stop() {
 
     if [[ $pcap == "True" ]]; then
 	echo "Delete k8s persistence volume / claim for pcap files"
-	kubectl -n $ns delete pvc cn5g-pvc || true
-	kubectl delete pv cn5g-pv || true
+	kubectl -n $ns delete pvc oai5g-pvc || true
+	kubectl delete pv oai5g-pv || true
     fi
 }
 

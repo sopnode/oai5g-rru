@@ -1,8 +1,8 @@
 kubernetesType: Vanilla  #Vanilla for community kubernetes distribution
 
 nfimage:   # image name either locally present or in a public/private repository
-  repository: docker.io/r2labuser/oai-gnb ##docker.io/oaisoftwarealliance/oai-gnb
-  version: latest ##develop # image tag
+  repository: docker.io/oaisoftwarealliance/oai-gnb
+  version: develop # image tag
   # pullPolicy: IfNotPresent or Never or Always
   pullPolicy: IfNotPresent
 
@@ -53,20 +53,18 @@ start:
 
 multus:    # needed when gnB service will run on another interface rather than traditional eth0
   create: false
-  n2IPadd: "172.21.6.203"
-  n2Netmask: "22"
-  n2hostInterface: "bond0"
-  n3IPadd: "172.21.6.204"
-  n3Netmask: "22"
-  n3hostInterface: "bond1"
+  n2n3IPadd: "172.21.6.203"
+  n2n3Netmask: "22"
+  defaultGateway: "172.21.7.254"
+  hostInterface: "bond0"      # Interface of the host machine on which this pod will be scheduled
 
 config:
-  mountConfig: true #If config file is mounted then please edit mount.conf in configmap.yaml properly 
+  mountConfig: false          #If config file is mounted then please edit mount.conf in configmap.yaml properly 
   useSATddMono: true
   timeZone: "Europe/Paris"
   rfSimulator: "server"
   useSATddMono: "yes"
-  gnbName: "gnb-n3xx"
+  gnbName: "gnb-rfsim"
   mcc: "001"   # check the information with AMF, SMF, UPF/SPGWU
   mnc: "01"    # check the information with AMF, SMF, UPF/SPGWU
   mncLength: "2" # check the information with AMF, SMF, UPF/SPGWU
@@ -80,12 +78,11 @@ config:
   gnbNguIpAddress: "status.podIP" # n2n3IPadd in case multus create is true
   useAdditionalOptions: "--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
   threadParallelConfig: "PARALLEL_SINGLE_THREAD"
-  useB2XX: "True"
-  sdrAddrs: "unused_but_required"
+  sdrAddrs: "serial=XXXXXXX"
 
 persistent:
   sharedvolume: false
-  volumeName: cn5g-volume
+  volumeName: oai5g-volume
   size: 1Gi
 
 resources:

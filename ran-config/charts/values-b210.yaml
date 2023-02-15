@@ -1,10 +1,8 @@
 kubernetesType: Vanilla  #Vanilla for community kubernetes distribution
 
 nfimage:   # image name either locally present or in a public/private repository
-#  repository: docker.io/r2labuser/oai-gnb ##docker.io/oaisoftwarealliance/oai-gnb
-#  version: latest ##develop # image tag
-  repository: docker.io/oaisoftwarealliance/oai-gnb
-  version: develop # image tag
+  repository: docker.io/r2labuser/oai-gnb ##docker.io/oaisoftwarealliance/oai-gnb
+  version: latest ##develop # image tag
   # pullPolicy: IfNotPresent or Never or Always
   pullPolicy: IfNotPresent
 
@@ -61,13 +59,6 @@ multus:    # needed when gnB service will run on another interface rather than t
   n3IPadd: "172.21.6.204"
   n3Netmask: "22"
   n3hostInterface: "bond1"
-  sfp1IPadd: "192.168.10.132" # .10.129 for our USRP N300 and .10.130 for our N320
-  sfp1Netmask: "24"
-  sfp1hostInterface: "eth2"
-  sfp2IPadd: "192.168.20.132" #	.20.129 for our USRP N300 and .20.130 for our N320
-  sfp2Netmask: "24"
-  sfp2hostInterface: "eth3"
-
 
 config:
   mountConfig: true #If config file is mounted then please edit mount.conf in configmap.yaml properly 
@@ -89,11 +80,12 @@ config:
   gnbNguIpAddress: "status.podIP" # n2n3IPadd in case multus create is true
   useAdditionalOptions: "--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
   threadParallelConfig: "PARALLEL_SINGLE_THREAD"
-  sdrAddrs: "serial=XXXXXXX"
+  useB2XX: "True"
+  sdrAddrs: "unused_but_required"
 
 persistent:
   sharedvolume: false
-  volumeName: cn5g-volume
+  volumeName: oai5g-volume
   size: 1Gi
 
 resources:

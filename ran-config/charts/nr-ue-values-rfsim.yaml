@@ -1,0 +1,85 @@
+kubernetesType: Vanilla  #Vanilla for community kubernetes distribution
+
+nfimage:
+  repository: docker.io/oaisoftwarealliance/oai-nr-ue           # dockehub oaisoftwarealliance/oai-nr-ue
+  version: develop # image tag    # develop tag experimental features 
+  # pullPolicy: IfNotPresent or Never or Always
+  pullPolicy: IfNotPresent
+
+tcpdumpimage:
+  repository: docker.io/corfr/tcpdump
+  version: latest
+  #pullPolicy: IfNotPresent or Never or Always
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: "oai-nr-ue-sa"
+
+## good to use when pulling images from docker-hub mention 
+#imagePullSecrets: 
+#  - name: "regcred"
+
+
+podSecurityContext:
+  runAsUser: 0
+  runAsGroup: 0
+
+securityContext:
+  privileged: true
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+start:
+  nrue: true
+  tcpdump: false  # if false then started in sleep mode else it will start capturing packets, nr ue will have a lot of packets per sec better avoid this or add a filter in the deployment.yaml
+
+multus:
+  create: false
+  ipadd: "172.21.6.204"  # interface needed to connect with gnb
+  netmask: "22"
+  defaultGateway: "172.21.7.254"
+  hostInterface: "bond0"
+
+config:
+  timeZone: "Europe/Paris"
+  rfSimulator: "oai-gnb"    # ip-address of gnb rf-sim or service name oai-gnb in case of du change it with oai-gnb-du if multus is true then provide ip-address of oai-gnb
+  fullImsi: "001010000000100"       # make sure all the below entries are present in the subscriber database
+  fullKey: "fec86ba6eb707ed08905757b1bb44b8f" 
+  opc: "C42449363BBAD02B66D16BC975D77CC1"
+  dnn: "oai" 
+  nssaiSst: "1"                     # configure according to gnb and amf, smf and upf 
+  nssaiSd: "16777215" 
+  useAdditionalOptions: "-E --sa --rfsim -r 106 --numerology 1 -C 3619200000 --nokrnmod" 
+
+# in case of du change the command   
+#"--sa --rfsim -r 106 --numerology 1 -C 3619200000 --nokrnmod --log_config.global_log_options level,nocolor,time" 
+
+persistent:
+  sharedvolume: false
+  volumeName: oai5g-volume
+  size: 1Gi
+
+resources:
+  define: false
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+   cpu: 100m
+   memory: 256Mi
+
+terminationGracePeriodSeconds: 5
+
+nodeSelector: {}
+
+nodeName:
