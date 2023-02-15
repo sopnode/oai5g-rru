@@ -791,7 +791,7 @@ function start() {
     echo "start: run all oai5g pods on namespace: $ns"
 
     if [[ $pcap == "True" ]]; then
-	echo "start: Create a k8s persistence volume for generation of pcap files"
+	echo "start: Create a k8s persistence volume for generation of RAN pcap files"
 	cat << \EOF >> /tmp/oai5g-pv.yaml
 apiVersion: v1
 kind: PersistentVolume
@@ -799,13 +799,29 @@ metadata:
   name: oai5g-pv
 spec:
   capacity:
-    storage: 2Gi
+    storage: 1Gi
   accessModes:
   - ReadWriteMany
   hostPath:
     path: /var/oai5g-volume
 EOF
 	kubectl apply -f /tmp/oai5g-pv.yaml
+
+	echo "start: Create a k8s persistence volume for generation of CN pcap files"
+	cat << \EOF >> /tmp/cn5g-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cn5g-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteMany
+  hostPath:
+    path: /var/cn5g-volume
+EOF
+	kubectl apply -f /tmp/cn5g-pv.yaml
 
 	
 	echo "start: Create a k8s persistent volume claim for RAN pcap files"
@@ -839,7 +855,7 @@ spec:
   accessModes:
   - ReadWriteMany
   storageClassName: ""
-  volumeName: oai5g-pv
+  volumeName: cn5g-pv
 EOF
     echo "kubectl -n $ns apply -f /tmp/cn5g-pvc.yaml"
     kubectl -n $ns apply -f /tmp/cn5g-pvc.yaml
@@ -931,6 +947,7 @@ function stop() {
 	kubectl -n $ns delete pvc oai5g-pvc || true
 	kubectl -n $ns delete pvc cn5g-pvc || true
 	kubectl delete pv oai5g-pv || true
+	kubectl delete pv cn5g-pv || true
     fi
 }
 
