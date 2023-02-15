@@ -670,7 +670,7 @@ function configure-all() {
     configure-spgwu-tiny
     configure-gnb $node_gnb $rru $pcap
     if [[ "$rru" == "rfsim" ]]; then
-	configure-nr-ue
+	configure-nr-ue $pcap
     fi
 }
 
