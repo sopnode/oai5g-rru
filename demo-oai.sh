@@ -88,9 +88,6 @@ function usage() {
     echo "            stop-cn [namespace] |"
     echo "            stop-gnb [namespace] |"
     echo "            stop-nr-ue [namespace] |"
-    echo "            get-cn-pcap [namespace] |"
-    echo "            get-ran-pcap [namespace] |"
-    echo "            get-all-pcap [namespace]"
     exit 1
 }
 
@@ -98,6 +95,7 @@ function usage() {
 function get-all-logs() {
     ns=$1; shift
     prefix=$1; shift
+    rru=$1; shift
 
 DATE=`date +"%Y-%m-%dT%H.%M.%S"`
 
@@ -140,7 +138,14 @@ UDR_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-u
 UDR_eth0_IP=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-udr" -o jsonpath="{.items[*].status.podIP}")
 echo -e "\t - Retrieving logs for oai-udr $UDR_POD_NAME running with IP $UDR_eth0_IP"
 kubectl --namespace $ns -c udr logs $UDR_POD_NAME > "$prefix"/udr-"$DATE".logs
-    
+
+if [[ "$rru" == "rfsim" ]]; then
+NRUE_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-nr-ue,app.kubernetes.io/instance=oai-nr-ue" -o jsonpath="{.items[0].metadata.name}")
+NRUE_eth0_IP=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-nr-ue,app.kubernetes.io/instance=oai-nr-ue" -o jsonpath="{.items[*].status.podIP}")
+echo -e "\t - Retrieving logs for oai-nr-ue $NRUE_POD_NAME running with IP $NRUE_eth0_IP"
+kubectl --namespace $ns -c nr-ue logs $NRUE_POD_NAME > "$prefix"/nr-ue-"$DATE".logs
+fi
+
 }
 
 
@@ -162,6 +167,7 @@ function get-cn-pcap(){
 function get-ran-pcap(){
     ns=$1; shift
     prefix=$1; shift
+    rru=$1; shift
 
     DATE=`date +"%Y-%m-%dT%H.%M.%S"`
 
@@ -171,15 +177,24 @@ function get-ran-pcap(){
     kubectl -c tcpdump -n $ns exec -i $GNB_POD_NAME -- /bin/tar cfz ran-pcap.tgz pcap || true
     echo "kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-pcap.tgz $prefix/ran-pcap-"$DATE".tgz"
     kubectl -c tcpdump cp $ns/$GNB_POD_NAME:ran-pcap.tgz $prefix/ran-pcap-"$DATE".tgz || true
+    if [[ "$rru" == "rfsim" ]]; then
+	NRUE_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-nr-ue,app.kubernetes.io/instance=oai-nr-ue" -o jsonpath="{.items[0].metadata.name}")
+    echo "Retrieve OAI5G ran pcap file from the oai-nr-ue pod on ns $ns"
+    echo "kubectl -c tcpdump -n $ns exec -i $NRUE_POD_NAME -- /bin/tar cfz nr-ue-pcap.tgz pcap"
+    kubectl -c tcpdump -n $ns exec -i $NRUE_POD_NAME -- /bin/tar cfz nr-ue-pcap.tgz pcap || true
+    echo "kubectl -c tcpdump cp $ns/$NRUE_POD_NAME:nr-ue-pcap.tgz $prefix/nr-ue-pcap-"$DATE".tgz"
+    kubectl -c tcpdump cp $ns/$NRUE_POD_NAME:nr-ue-pcap.tgz $prefix/nr-ue-pcap-"$DATE".tgz || true
+    fi
 }
 
 
 function get-all-pcap(){
     ns=$1; shift
     prefix=$1; shift
+    rru=$1; shift
 
-    get-cn-pcap $ns $prefix
-    get-ran-pcap $ns $prefix
+    get-cn-pcap $ns $prefix $rru
+    get-ran-pcap $ns $prefix $rru
 }
 
 
@@ -841,8 +856,8 @@ function stop() {
 	mkdir -p $prefix
 	echo "cleanup $prefix before including new logs/pcap files"
 	cd $prefix; rm -f *.pcap *.tgz *.logs
-	get-all-pcap $ns $prefix
-	get-all-logs $ns $prefix
+	get-all-pcap $ns $prefix $rru
+	get-all-logs $ns $prefix $rru
 	cd /tmp; dirname=$(basename $prefix)
 	echo tar cfz "$dirname".tgz $dirname
 	tar cfz "$dirname".tgz $dirname
@@ -955,30 +970,6 @@ else
             stop-nr-ue $2
         elif test $# -eq 1; then
 	    stop-nr-ue $DEF_NS
-	else
-            usage
-        fi
-    elif [ "$1" == "get-cn-pcap" ]; then
-        if test $# -eq 2; then
-            get-cn-pcap $2
-        elif test $# -eq 1; then
-	    get-cn-pcap $DEF_NS
-	else
-            usage
-        fi
-    elif [ "$1" == "get-ran-pcap" ]; then
-        if test $# -eq 2; then
-            get-ran-pcap $2
-        elif test $# -eq 1; then
-	    get-ran-pcap $DEF_NS
-	else
-            usage
-        fi
-    elif [ "$1" == "get-all-pcap" ]; then
-        if test $# -eq 2; then
-            get-all-pcap $2
-        elif test $# -eq 1; then
-	    get-all-pcap $DEF_NS
 	else
             usage
         fi
