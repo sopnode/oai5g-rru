@@ -54,8 +54,8 @@ CONF_JAGUAR="jaguar_panther2x2_50MHz.conf"
 CONF_PANTHER="panther4x4_20MHz.conf"
 CONF_B210="gnb.sa.band78.fr1.24PRB.usrpb210.conf"
 CONF_N3XX="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
-#CONF_RFSIM="gnb.sa.band78.106prb.rfsim.2x2.conf"
-CONF_RFSIM="gnb.sa.band78.fr1.24PRB.usrpb210.conf"
+CONF_RFSIM="gnb.sa.band78.106prb.rfsim.2x2.conf"
+
 
 
 OAI5G_CHARTS="$HOME"/oai-cn5g-fed/charts
@@ -419,11 +419,13 @@ function configure-gnb() {
     SED_DEPLOYMENT_FILE="/tmp/$FUNCTION-deployment.sed"
     
     if [[  "$rru" == "b210" ]]; then
+	#multus=false; mounted=true
 	RRU_TYPE="b210"
 	cat > "$SED_VALUES_FILE" <<EOF
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"|
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
+	#multus=true; mounted=true
     elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
 	if [[ "$rru" == "n300" ]]; then
 	    SDR_ADDRS="$ADDRS_N300"
@@ -445,6 +447,7 @@ EOF
 	RRU_TYPE="n3xx"
 	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
+	# multus=true; mounted=true
 	RRU_TYPE="aw2s"
 	if [[  "$rru" == "jaguar" ]]; then
 	    CONF_AW2S="$CONF_JAGUAR"
@@ -470,6 +473,7 @@ s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
     elif [[ "$rru" == "rfsim" ]]; then
+	# multus=true; mounted=true
 	cat > "$SED_CONF_FILE" <<EOF
 s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
 s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2N3/24";|
