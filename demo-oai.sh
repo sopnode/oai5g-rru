@@ -602,12 +602,12 @@ function configure-nr-ue() {
 
 
     echo "Copy the nr-ue chart files"
-    echo cp "$DIR_CHARTS"/nr-ue-values.yaml "$DIR"/values.yaml
-    cp "$DIR_CHARTS"/nr-ue-values.yaml "$DIR"/values.yaml
-    echo cp "$DIR_CHARTS"/nr-ue-deployment.yaml "$DIR_TEMPLATES"/deployment.yaml
-    cp "$DIR_CHARTS"/nr-ue-deployment.yaml "$DIR_TEMPLATES"/deployment.yaml
-    echo cp "$DIR_CHARTS"/nr-ue-multus.yaml "$DIR_TEMPLATES"/multus.yaml
-    cp "$DIR_CHARTS"/nr-ue-multus.yaml "$DIR_TEMPLATES"/multus.yaml
+    echo cp "$DIR_CHARTS"/nr-ue-values-rfsim.yaml "$DIR"/values.yaml
+    cp "$DIR_CHARTS"/nr-ue-values-rfsim.yaml "$DIR"/values.yaml
+    echo cp "$DIR_CHARTS"/nr-ue-deployment-rfsim.yaml "$DIR_TEMPLATES"/deployment.yaml
+    cp "$DIR_CHARTS"/nr-ue-deployment-rfsim.yaml "$DIR_TEMPLATES"/deployment.yaml
+    echo cp "$DIR_CHARTS"/nr-ue-multus-rfsim.yaml "$DIR_TEMPLATES"/multus.yaml
+    cp "$DIR_CHARTS"/nr-ue-multus-rfsim.yaml "$DIR_TEMPLATES"/multus.yaml
 
     
     if [[ $pcap == "True" ]]; then
