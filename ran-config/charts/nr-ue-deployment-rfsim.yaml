@@ -20,8 +20,7 @@ spec:
     {{- if .Values.multus.create }}
         k8s.v1.cni.cncf.io/networks: >-
           [{
-                 "name": "{{ .Chart.Name }}-net1",
-                 "default-route": ["{{ .Values.multus.defaultGateway }}"]
+                 "name": "{{ .Chart.Name }}-net1"
           }]
     {{- end }}
     spec:
@@ -116,7 +115,6 @@ spec:
         - mountPath: "/pcap"
           name: oai5g-pv
         {{- end}}
-      {{- if .Values.config.mountConfig}}
       volumes:
       {{- if .Values.persistent.sharedvolume}}
       - name: oai5g-pv
