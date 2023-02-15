@@ -607,7 +607,8 @@ function configure-nr-ue() {
     echo cp "$DIR_CHARTS"/nr-ue-deployment-rfsim.yaml "$DIR_TEMPLATES"/deployment.yaml
     cp "$DIR_CHARTS"/nr-ue-deployment-rfsim.yaml "$DIR_TEMPLATES"/deployment.yaml
     echo cp "$DIR_CHARTS"/nr-ue-multus-rfsim.yaml "$DIR_TEMPLATES"/multus.yaml
-    cp "$DIR_CHARTS"/nr-ue-multus-rfsim.yaml "$DIR_TEMPLATES"/multus.yaml
+    cp "$DIR_CHARTS"/nr-ue-multus-rfsimcase
+    .yaml "$DIR_TEMPLATES"/multus.yaml
 
     
     if [[ $pcap == "True" ]]; then
@@ -798,7 +799,7 @@ metadata:
   name: oai5g-pv
 spec:
   capacity:
-    storage: 1Gi
+    storage: 2Gi
   accessModes:
   - ReadWriteMany
   hostPath:
@@ -807,7 +808,7 @@ EOF
 	kubectl apply -f /tmp/oai5g-pv.yaml
 
 	
-	echo "start: Create a k8s persistent volume claim for pcap files"
+	echo "start: Create a k8s persistent volume claim for RAN pcap files"
     cat << \EOF >> /tmp/oai5g-pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -824,6 +825,25 @@ spec:
 EOF
     echo "kubectl -n $ns apply -f /tmp/oai5g-pvc.yaml"
     kubectl -n $ns apply -f /tmp/oai5g-pvc.yaml
+
+	echo "start: Create a k8s persistent volume claim for CN pcap files"
+    cat << \EOF >> /tmp/cn5g-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cn5g-pvc
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+  - ReadWriteMany
+  storageClassName: ""
+  volumeName: oai5g-pv
+EOF
+    echo "kubectl -n $ns apply -f /tmp/oai5g-pvc.yaml"
+    kubectl -n $ns apply -f /tmp/oai5g-pvc.yaml
+    
     fi
 
     start-cn $ns $node_amf_spgwu
@@ -910,6 +930,7 @@ function stop() {
     if [[ $pcap == "True" ]]; then
 	echo "Delete k8s persistence volume / claim for pcap files"
 	kubectl -n $ns delete pvc oai5g-pvc || true
+	kubectl -n $ns delete pvc cn5g-pvc || true
 	kubectl delete pv oai5g-pv || true
     fi
 }
