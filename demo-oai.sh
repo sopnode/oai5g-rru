@@ -474,6 +474,7 @@ EOF
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
     elif [[ "$rru" == "rfsim" ]]; then
 	# multus=true; mountConfig=true
+	CONF_ORIG="$DIR_CONF/$CONF_RFSIM"
 	cat > "$SED_CONF_FILE" <<EOF
 s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
 s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2N3/24";|
@@ -487,8 +488,9 @@ EOF
 	echo "Unknown rru selected: $rru"
 	usage
     fi
-
+    
     if [[ "$rru" != "rfsim" ]]; then
+	# if "$rru" == "rfsim" we used the default charts
 	echo "Copy the relevant chart files corresponding to $RRU_TYPE RRU"
 	echo cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
 	cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
@@ -496,18 +498,16 @@ EOF
 	cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
 	echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
 	cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
-
-	echo "Set up configmap.yaml chart with the right gNB configuration from $CONF_ORIG"
-	# Keep the 17 first lines of configmap.yaml
-	head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
-	# Add a 6-characters margin to gnb.conf
-	awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
-	# Append the modified gnb.conf to /tmp/configmap.yaml
-	cat /tmp/gnb.conf >> /tmp/configmap.yaml
-	echo -e "\n{{- end }}\n" >> /tmp/configmap.yaml
-	mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
-	# if "$rru" == "rfsim" we used the default configmap 
     fi
+    echo "Set up configmap.yaml chart with the right gNB configuration from $CONF_ORIG"
+    # Keep the 17 first lines of configmap.yaml
+    head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
+    # Add a 6-characters margin to gnb.conf
+    awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
+    # Append the modified gnb.conf to /tmp/configmap.yaml
+    cat /tmp/gnb.conf >> /tmp/configmap.yaml
+    echo -e "\n{{- end }}\n" >> /tmp/configmap.yaml
+    mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
     echo "First configure gnb.conf within configmap.yaml"
     # remove NSSAI sd info for PLMN and add other parameters for RUs 
