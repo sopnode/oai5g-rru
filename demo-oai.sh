@@ -613,13 +613,14 @@ function configure-nr-ue() {
     
     if [[ $pcap == "True" ]]; then
 	GENER_PCAP="true"
+	SHARED_VOL="true"
     else
 	GENER_PCAP="false"
+	SHARED_VOL="false"
     fi
     
     ORIG_CHART="$DIR"/values.yaml
     SED_FILE="/tmp/$FUNCTION-values.sed"
-    SED_DEPLOYMENT_FILE="/tmp/$FUNCTION-deployment.sed"
     echo "Configuring chart $ORIG_CHART"
     cat > "$SED_FILE" <<EOF
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
@@ -633,9 +634,9 @@ s|opc:.*|opc: "$OPC"|
 s|dnn:.*|dnn: "$DNN"|
 s|nssaiSst:.*|nssaiSst: "1"|
 s|nssaiSd:.*|nssaiSd: "16777215"|
+s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
 s|nodeName:.*|nodeName:|
 EOF
-
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
     sed -f "$SED_FILE" < /tmp/"$FUNCTION"_values.yaml-orig > "$ORIG_CHART"
@@ -644,7 +645,7 @@ EOF
     
     ORIG_CHART="$DIR"/templates/deployment.yaml
     echo "Configuring chart $ORIG_CHART for R2lab"
-
+    SED_DEPLOYMENT_FILE="/tmp/$FUNCTION-deployment.sed"
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
     cat > "$SED_DEPLOYMENT_FILE" <<EOF
 s|/usr/sbin/tcpdump.*|/usr/sbin/tcpdump -i any -w /pcap/oai-nr-ue_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap|
