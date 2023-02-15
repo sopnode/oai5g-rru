@@ -586,7 +586,6 @@ s|create: false|create: true|
 s|ipadd:.*|ipadd: "$IP_NRUE"|
 s|netmask:.*|netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_NRUE"|
-s|rfSimulator:.*|rfSimulator: "$IP_GNB_N2N3"|
 s|fullImsi:.*|fullImsi: "$RFSIM_IMSI"|
 s|fullKey:.*|fullKey: "$FULL_KEY"|
 s|opc:.*|opc: "$OPC"|
@@ -721,9 +720,8 @@ function start-nr-ue() {
     echo "gNB pod IP is $GNB_POD_IP"
     conf_ue_dir="$OAI5G_RAN/oai-nr-ue"
     cat >/tmp/gnb-values.sed <<EOF
-s|  rfSimulator:.*|  rfSimulator: "${GNB_POD_IP}"|
+s|rfSimulator:.*|rfSimulator: "${GNB_POD_IP}"|
 EOF
-
     echo "(Over)writing oai-nr-ue chart $conf_ue_dir/values.yaml"
     cp $conf_ue_dir/values.yaml /tmp/values-orig.yaml
     sed -f /tmp/gnb-values.sed </tmp/values-orig.yaml >/tmp/values.yaml
