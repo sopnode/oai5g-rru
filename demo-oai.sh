@@ -495,7 +495,7 @@ s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net1"
 s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N2N3/24";|
 EOF
 cat > "$SED_VALUES_FILE" <<EOF
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --rfsim --log_config.global_log_options level,nocolor,time"|
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --rfsim --log_config.global_log_options level,nocolor,time"|
 EOF
     else
 	echo "Unknown rru selected: $rru"
