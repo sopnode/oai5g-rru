@@ -66,7 +66,7 @@ config:
   timeZone: "Europe/Paris"
   rfSimulator: "server"
   useSATddMono: "yes"
-  gnbName: "gnb-n3xx"
+  gnbName: "gnb-b210"
   mcc: "001"   # check the information with AMF, SMF, UPF/SPGWU
   mnc: "01"    # check the information with AMF, SMF, UPF/SPGWU
   mncLength: "2" # check the information with AMF, SMF, UPF/SPGWU
