@@ -146,6 +146,13 @@ echo -e "\t - Retrieving logs for oai-nr-ue $NRUE_POD_NAME running with IP $NRUE
 kubectl --namespace $ns -c nr-ue logs $NRUE_POD_NAME > "$prefix"/nr-ue-"$DATE".logs
 fi
 
+if [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
+    echo "in case of AW2S device, also retrieve nrL1_stats.log, nrMAC_stats.log and nrRRC_stats.log from gnb pod"
+    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:nrL1_stats.log $prefix/gnb-L1_stats.log"$DATE".tgz"
+    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:nrMAC_stats.log $prefix/nrMAC_stats.log"$DATE".tgz"
+    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:nrRRC_stats.log $prefix/nrRRC_stats.log"$DATE".tgz"
+fi
+
 }
 
 
@@ -179,11 +186,11 @@ function get-ran-pcap(){
     kubectl -c tcpdump cp $ns/$GNB_POD_NAME:gnb-pcap.tgz $prefix/gnb-pcap-"$DATE".tgz || true
     if [[ "$rru" == "rfsim" ]]; then
 	NRUE_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-nr-ue,app.kubernetes.io/instance=oai-nr-ue" -o jsonpath="{.items[0].metadata.name}")
-    echo "Retrieve OAI5G pcap file from the oai-nr-ue pod on ns $ns"
-    echo "kubectl -c tcpdump -n $ns exec -i $NRUE_POD_NAME -- /bin/tar cfz nr-ue-pcap.tgz pcap"
-    kubectl -c tcpdump -n $ns exec -i $NRUE_POD_NAME -- /bin/tar cfz nr-ue-pcap.tgz pcap || true
-    echo "kubectl -c tcpdump cp $ns/$NRUE_POD_NAME:nr-ue-pcap.tgz $prefix/nr-ue-pcap-"$DATE".tgz"
-    kubectl -c tcpdump cp $ns/$NRUE_POD_NAME:nr-ue-pcap.tgz $prefix/nr-ue-pcap-"$DATE".tgz || true
+	echo "Retrieve OAI5G pcap file from the oai-nr-ue pod on ns $ns"
+	echo "kubectl -c tcpdump -n $ns exec -i $NRUE_POD_NAME -- /bin/tar cfz nr-ue-pcap.tgz pcap"
+	kubectl -c tcpdump -n $ns exec -i $NRUE_POD_NAME -- /bin/tar cfz nr-ue-pcap.tgz pcap || true
+	echo "kubectl -c tcpdump cp $ns/$NRUE_POD_NAME:nr-ue-pcap.tgz $prefix/nr-ue-pcap-"$DATE".tgz"
+	kubectl -c tcpdump cp $ns/$NRUE_POD_NAME:nr-ue-pcap.tgz $prefix/nr-ue-pcap-"$DATE".tgz || true
     fi
 }
 
