@@ -1,7 +1,15 @@
 #!/bin/bash
 
-# Following trick to solve issue when configuring mysql database
+####
+#    Following variables used to configure mysql database in demo-oai.sh script
+#
+MCC="208"
+MNC="95"
+DNN="oai.ipv4"
+FULL_KEY="8baf473f2f8fd09487cccbd7097c6862"
+OPC="8E27B6AF0E692E750F32667A3B14605D"
 RFSIM_IMSI="208950000001121"
+####
 
 function update() {
     ns=$1; shift
@@ -24,6 +32,11 @@ s|DEF_PCAP=.*|DEF_PCAP="${pcap}"|
 s|username=r2labuser|username=${regcred_name}|
 s|password=r2labuser-pwd|password=${regcred_password}|
 s|email=r2labuser@turletti.com|email=${regcred_email}|
+s|@MCC@|${MCC}|g
+s|@MNC@|${MNC}|g
+s|@DNN@|${DNN}|g
+s|@FULL_KEY@|${FULL_KEY}|g
+s|@OPC@|${OPC}|g
 s|@RFSIM_IMSI@|${RFSIM_IMSI}|g
 EOF
 
