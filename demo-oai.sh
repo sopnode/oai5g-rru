@@ -495,7 +495,7 @@ s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net1"
 s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N2N3/24";|
 EOF
 cat > "$SED_VALUES_FILE" <<EOF
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --rfsim --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --rfsim --log_config.global_log_options level,nocolor,time"|
 EOF
     else
 	echo "Unknown rru selected: $rru"
@@ -563,6 +563,7 @@ s|gnbNgaIpAddress:.*|gnbNgaIpAddress: "$IP_GNB_N2N3"|
 s|gnbNguIfName:.*|gnbNguIfName: "net1"|
 s|gnbNguIpAddress:.*|gnbNguIpAddress: "$IP_GNB_N2N3"|
 s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
+s|nodeName:.*|nodeName: $node_gnb|
 EOF
     elif [[ "$rru" == "b210" ]]; then
 	cat >> "$SED_VALUES_FILE" <<EOF
