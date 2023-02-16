@@ -50,7 +50,8 @@ IF_NAME_LOCAL_N3XX_2="$IF_NAME_VLAN20"
 IF_NAME_NRUE="$IF_NAME_VLAN100"
 
 # gNB conf file for RRU devices
-CONF_JAGUAR="jaguar_panther2x2_50MHz.conf"
+#CONF_JAGUAR="jaguar_panther2x2_50MHz.conf"
+CONF_JAGUAR="panther4x4_20MHz.conf"
 CONF_PANTHER="panther4x4_20MHz.conf"
 CONF_B210="gnb.sa.band78.fr1.24PRB.usrpb210.conf"
 CONF_N3XX="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"

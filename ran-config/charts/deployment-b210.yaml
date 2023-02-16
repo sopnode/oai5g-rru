@@ -181,7 +181,7 @@ spec:
         command:
           - /bin/sh
           - -c
-          - /usr/sbin/tcpdump -ni net1 src {{ .Values.multus.n2IPadd }} or dst {{ .Values.multus.n2IPadd }} -w /pcap/oai-gnb-n2_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap
+          - /usr/sbin/tcpdump -ni any -w /pcap/oai-gnb_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap
         {{- else}}
         command:
           - /bin/sleep
