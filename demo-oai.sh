@@ -257,7 +257,7 @@ s|hostInterface:.*|hostInterface: "$IF_NAME_AMF_N2_SPGWU_N3" # interface of the 
 s|amfInterfaceNameForNGAP:.*|amfInterfaceNameForNGAP: "$NET_IF" # If multus creation is true then net1 else eth0|
 s|mcc:.*|mcc: "$MCC"|
 s|mnc:.*|mnc: "$MNC"|
-s|nssaiSd0:.*|nssaiSd0: "" # empty so will be set by configmap chart|
+s|nssaiSd0:.*|nssaiSd0: "0xFFFFFF" # empty so will be set by configmap chart|
 s|n3Ip:.*|n3Ip: "$IP_UPF_N3"|
 s|n3Netmask:.*|n3Netmask: "24"|
 s|n3If:.*|n3If: "$NET_IF"  # net1 if gNB is outside the cluster network and multus creation is true else eth0|
