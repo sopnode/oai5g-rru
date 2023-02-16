@@ -419,14 +419,8 @@ function configure-gnb() {
     SED_DEPLOYMENT_FILE="/tmp/$FUNCTION-deployment.sed"
     
     if [[  "$rru" == "b210" ]]; then
-	#multus=false;
+	#multus=false;#mountedConfig=falase as it is more complex to set pod addresses on conf file
 	RRU_TYPE="b210"
-	cat > "$SED_CONF_FILE" <<EOF
-s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
-s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2/24";|
-s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net2";|
-s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N3/24";|
-EOF
 	cat > "$SED_VALUES_FILE" <<EOF
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"|
 EOF
@@ -561,7 +555,7 @@ EOF
     elif [[ "$rru" == "b210" ]]; then
 	cat >> "$SED_VALUES_FILE" <<EOF
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
-s|mountConfig:.*|mountConfig: true|
+s|mountConfig:.*|mountConfig: false|
 s|mcc:.*|mcc: "$MCC"|
 s|mnc:.*|mnc: "$MNC"|
 s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
