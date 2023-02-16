@@ -28,4 +28,4 @@ done
 POD_NAME=$(kubectl -n$ns get pods -l app.kubernetes.io/name=oai-"${oaiLabel}" -o jsonpath="{.items[0].metadata.name}")
 
 echo "Show logs of "oai-${oaiLabel} pod $POD_NAME
-kubectl -n "$ns" -c "${oaiLabel}" logs -f $POD_NAME"
+kubectl -n "$ns" -c "${oaiLabel}" logs -f $POD_NAME
