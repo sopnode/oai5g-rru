@@ -148,9 +148,9 @@ fi
 
 if [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
     echo "in case of AW2S device, also retrieve nrL1_stats.log, nrMAC_stats.log and nrRRC_stats.log from gnb pod"
-    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:nrL1_stats.log $prefix/gnb-L1_stats.log"$DATE".tgz"
-    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:nrMAC_stats.log $prefix/nrMAC_stats.log"$DATE".tgz"
-    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:nrRRC_stats.log $prefix/nrRRC_stats.log"$DATE".tgz"
+    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:nrL1_stats.log $prefix/gnb-L1_stats.log"$DATE".tgz
+    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:nrMAC_stats.log $prefix/nrMAC_stats.log"$DATE".tgz
+    kubectl -c tcpdump cp $ns/$GNB_POD_NAME:nrRRC_stats.log $prefix/nrRRC_stats.log"$DATE".tgz
 fi
 
 }
