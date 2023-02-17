@@ -56,7 +56,7 @@ CONF_PANTHER="panther4x4_20MHz.conf"
 CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210.conf"
 CONF_N3XX="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
 #CONF_RFSIM="gnb.sa.band78.106prb.rfsim.2x2.conf" #this one works
-CONF_RFSIM="gnb.sa.band78.fr1.51PRB.usrpb210.conf"
+CONF_RFSIM="gnb.sa.band78.fr1.51PRB.rfsim.conf"
 
 
 
