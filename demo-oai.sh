@@ -156,6 +156,9 @@ if [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
     kubectl -c gnb cp $ns/$GNB_POD_NAME:nrL1_stats.log $prefix/gnb-L1_stats.log"$DATE" || true
     kubectl -c gnb cp $ns/$GNB_POD_NAME:nrMAC_stats.log $prefix/nrMAC_stats.log"$DATE" || true
     kubectl -c gnb cp $ns/$GNB_POD_NAME:nrRRC_stats.log $prefix/nrRRC_stats.log"$DATE" || true
+    kubectl -c gnb cp $ns/$GNB_POD_NAME:/opt/oai-gnb-aw2s/etc/gnb.conf $prefix/gnb.conf || true
+else
+    kubectl -c gnb cp $ns/$GNB_POD_NAME:/opt/oai-gnb/etc/gnb.conf $prefix/gnb.conf || true
 fi
 
 }
