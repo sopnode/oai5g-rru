@@ -534,9 +534,6 @@ EOF
 s|sd = 0x010203;||
 s|, sd = 0x010203||
 s|sd = 0x010203||
-s|sd = 0xffffff;||
-s|, sd = 0xffffff||
-s|sd = 0xffffff||
 s|mcc = [0-9][0-9][0-9];|mcc = $MCC;|
 s|mnc = [0-9][0-9];|mnc = $MNC;|
 s|ipv4       =.*|ipv4       = "$IP_AMF_N2";|
