@@ -115,11 +115,6 @@ spec:
               configMapKeyRef:
                 name: {{ .Chart.Name }}-configmap
                 key: nssaiSst
-          - name: NSSAI_SD0
-            valueFrom:
-              configMapKeyRef:
-                name: {{ .Chart.Name }}-configmap
-                key: nssaiSd0
           - name: AMF_IP_ADDRESS
             valueFrom:
               configMapKeyRef:
