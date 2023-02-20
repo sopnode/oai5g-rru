@@ -717,10 +717,11 @@ function init() {
 
     # Ensure that helm spray plugin is installed
     echo "init: ensure spray is installed and possibly create secret docker-registry"
+    helm plugin uninstall helm-spray || true
     helm plugin install https://github.com/ThalesGroup/helm-spray || true
 
     # Install patch command...
-    dnf -y install patch
+    apt-get install -y patch
 
     # Just in case the k8s cluster has been restarted without multus enabled..
     echo "kube-install.sh enable-multus"
