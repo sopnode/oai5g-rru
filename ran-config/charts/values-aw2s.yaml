@@ -31,9 +31,7 @@ podSecurityContext:
 
 securityContext:
   privileged: true
-#  sysctls: "net.core.*"
-  capabilities:
-    add: ["NET_ADMIN"]
+  # capabilities:
   #   drop:
   #   - ALL
   # readOnlyRootFilesystem: true
