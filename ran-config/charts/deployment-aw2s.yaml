@@ -44,6 +44,8 @@ spec:
           - mountPath: /opt/oai-gnb-aw2s/etc/mounted.conf
             name: configuration
             subPath: mounted.conf
+          - mountPath: /proc/sys/net
+            name: host-net
         {{- end}}
         {{- if .Values.resources.define}}
         resources:
@@ -190,6 +192,9 @@ spec:
         {{- end}}
       {{- if .Values.config.mountConfig}}
       volumes:
+      - name: host-net
+        hostPath:
+          path: /proc/sys/net
       {{- if .Values.persistent.sharedvolume}}
       - name: oai5g-pv
         persistentVolumeClaim:
