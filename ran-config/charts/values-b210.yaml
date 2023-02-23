@@ -63,7 +63,7 @@ multus:    # needed when gnB service will run on another interface rather than t
   n3hostInterface: "bond1"
 
 config:
-  mountConfig: true #If config file is mounted then please edit mount.conf in configmap.yaml properly 
+  mountConfig: false #If config file is mounted then please edit mount.conf in configmap.yaml properly 
   useSATddMono: true
   timeZone: "Europe/Paris"
   rfSimulator: "server"

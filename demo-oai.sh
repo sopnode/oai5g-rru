@@ -439,14 +439,8 @@ function configure-gnb() {
     SED_DEPLOYMENT_FILE="/tmp/$FUNCTION-deployment.sed"
     
     if [[  "$rru" == "b210" ]]; then
-	#multus=false;#mountedConfig=true
+	#multus=false;#mountedConfig=false !!! # not possible to configure a mounted file with dynamic pod IP addresses
 	RRU_TYPE="b210"
-	cat > "$SED_CONF_FILE" <<EOF
-s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "eth0";|
-s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "@AMF_IP_ADDRESS@/24";|
-s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "eth0";|
-s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "@GNB_NGA_IP_ADDRESS@/24";|
-EOF
 	cat > "$SED_VALUES_FILE" <<EOF
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"|
 EOF
