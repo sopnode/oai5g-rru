@@ -153,16 +153,17 @@ echo -e "\t - Retrieving logs for oai-nr-ue $NRUE_POD_NAME running with IP $NRUE
 kubectl --namespace $ns -c nr-ue logs $NRUE_POD_NAME > "$prefix"/nr-ue-"$DATE".logs
 fi
 
+echo "Retrieve gnb config from the pod"
 if [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
-    echo "in case of AW2S device, also retrieve nrL1_stats.log, nrMAC_stats.log and nrRRC_stats.log from gnb pod"
-    kubectl -c gnb cp $ns/$GNB_POD_NAME:nrL1_stats.log $prefix/gnb-L1_stats.log"$DATE" || true
-    kubectl -c gnb cp $ns/$GNB_POD_NAME:nrMAC_stats.log $prefix/nrMAC_stats.log"$DATE" || true
-    kubectl -c gnb cp $ns/$GNB_POD_NAME:nrRRC_stats.log $prefix/nrRRC_stats.log"$DATE" || true
     kubectl -c gnb cp $ns/$GNB_POD_NAME:/opt/oai-gnb-aw2s/etc/gnb.conf $prefix/gnb.conf || true
 else
     kubectl -c gnb cp $ns/$GNB_POD_NAME:/opt/oai-gnb/etc/gnb.conf $prefix/gnb.conf || true
 fi
 
+echo "Retrieve nrL1_stats.log, nrMAC_stats.log and nrRRC_stats.log from gnb pod"
+kubectl -c gnb cp $ns/$GNB_POD_NAME:nrL1_stats.log $prefix/nrL1_stats.log"$DATE" || true
+kubectl -c gnb cp $ns/$GNB_POD_NAME:nrMAC_stats.log $prefix/nrMAC_stats.log"$DATE" || true
+kubectl -c gnb cp $ns/$GNB_POD_NAME:nrRRC_stats.log $prefix/nrRRC_stats.log"$DATE" || true
 }
 
 
@@ -720,12 +721,13 @@ function init() {
     helm plugin uninstall helm-spray || true
     helm plugin install https://github.com/ThalesGroup/helm-spray || true
 
-    # Install patch command...
-    apt-get install -y patch
-
     # Just in case the k8s cluster has been restarted without multus enabled..
     echo "kube-install.sh enable-multus"
     kube-install.sh enable-multus || true
+
+    # Install patch command...
+    [ -f /etc/fedora-release ] && dnf -y update
+    [ -f /etc/lsb-release ] && apt -y update
 }
 
 

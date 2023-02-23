@@ -153,13 +153,8 @@ jobs:
       - type: Run
         command: kube-install.sh join-cluster r2lab@{{master}}
       - type: Run
-        command: >
-          kubectl create namespace {{namespace}} || true;
-          kubectl -n {{namespace}} delete secret regcred || true;
-          kubectl -n {{namespace}} create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username={{regcred['name']}} --docker-password={{regcred['password']}} --docker-email={{regcred['email']}} || true;
-          helm plugin install https://github.com/ThalesGroup/helm-spray || true;
-          apt-get install -y patch || true;
-          kube-install.sh enable-multus || true;
+        command: init {{namespace}}
+
 
   {% if b210 %}
   - id: leave-join-gnb
