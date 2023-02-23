@@ -726,8 +726,10 @@ function init() {
     kube-install.sh enable-multus || true
 
     # Install patch command...
-    [ -f /etc/fedora-release ] && dnf -y update
-    [ -f /etc/lsb-release ] && apt -y update
+    if [ ! -x "$(command -v patch)" ]; then
+        [[ -f /etc/fedora-release ]] && dnf install -y patch
+        [[ -f /etc/lsb-release ]] && apt-get install -y patch
+    fi  
 }
 
 

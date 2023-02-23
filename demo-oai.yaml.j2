@@ -152,8 +152,8 @@ jobs:
         command: nmcli con up data; nmcli dev status; join-tunnel
       - type: Run
         command: kube-install.sh join-cluster r2lab@{{master}}
-      - type: Run
-        command: init {{namespace}}
+      - type: RunScript
+        command: demo-oai.sh init {{namespace}}
 
 
   {% if b210 %}
