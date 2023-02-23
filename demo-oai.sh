@@ -576,7 +576,7 @@ EOF
     elif [[ "$rru" == "b210" ]]; then
 	cat >> "$SED_VALUES_FILE" <<EOF
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
-s|mountConfig:.*|mountConfig: false|
+s|mountConfig:.*|mountConfig: true|
 s|mcc:.*|mcc: "$MCC"|
 s|mnc:.*|mnc: "$MNC"|
 s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
