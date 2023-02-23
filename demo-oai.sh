@@ -942,14 +942,14 @@ function stop() {
     echo "Running stop() on namespace:$ns; pcap is $pcap"
 
     if [[ $pcap == "True" ]]; then
-	prefix=${PREFIX_STATS-"/tmp/oai5g-stats"}
-	echo "First retrieve all pcap and log files in $prefix and compressed it"
-	mkdir -p $prefix
-	echo "cleanup $prefix before including new logs/pcap files"
-	cd $prefix; rm -f *.pcap *.tgz *.logs
-	get-all-pcap $ns $prefix $rru
-	get-all-logs $ns $prefix $rru
-	cd /tmp; dirname=$(basename $prefix)
+	dir_stats=${PREFIX_STATS-"/tmp/oai5g-stats"}
+	echo "First retrieve all pcap and log files in $dir_stats and compressed it"
+	mkdir -p $dir_stats
+	echo "cleanup $dir_stats before including new logs/pcap files"
+	cd $dir_stats; rm -f *.pcap *.tgz *.logs *stats* *.conf
+	get-all-pcap $ns $dir_stats $rru
+	get-all-logs $ns $dir_stats $rru
+	cd /tmp; dirname=$(basename $dir_stats)
 	echo tar cfz "$dirname".tgz $dirname
 	tar cfz "$dirname".tgz $dirname
     fi
