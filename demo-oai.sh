@@ -775,7 +775,7 @@ function start-gnb() {
 	DIR_TEMPLATES="$OAI5G_RAN/oai-gnb/templates"
 	SED_FILE="/tmp/gnb-configmap.sed"
 	cat > "$SED_FILE" <<EOF
-s|ipv4       =.*|ipv4       = "$AMF_POD_IP";
+s|ipv4       =.*|ipv4       = "$AMF_POD_IP";|
 EOF
 	cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
 	sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
