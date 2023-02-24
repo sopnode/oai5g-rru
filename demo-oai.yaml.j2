@@ -10,7 +10,7 @@
 # {{regcred}} - typically {'name': 'jdoe', 'password': 'XX', 'email': 'jdoe@yahoo.fr'}
 # {{image}} - typically 'kubernetes'
 # {{quectel_dict}} 
-# {{quectel_image}} - typically 'quectel-wwan0'
+# {{quectel_image}} - typically 'quectel-mbim'
 # {{verbose}} - typically 'True' or 'False'
 
 nodes:
@@ -109,13 +109,9 @@ jobs:
         command: >
           {{nodes_sh}} check-quectel-on
         includes: {{INCLUDES}}
-      - type: Run
-        command: {{quectel_service_start}}
-      - type: Run
-        command: sleep 20
       - type: RunScript
         command: >
-          {{nodes_sh}} quectel-detach
+          {{nodes_sh}} stop-quectel
         includes: {{INCLUDES}}
   {% endfor %}
 
@@ -232,7 +228,7 @@ jobs:
         command: sleep 10
       - type: RunScript
         command: >
-          {{nodes_sh}} quectel-attach
+          {{nodes_sh}} start-quectel
         includes: {{INCLUDES}}
       - type: Run
         command: sleep 30
@@ -271,7 +267,7 @@ jobs:
     commands:
       - type: RunScript
         command: >
-          {{nodes_sh}} quectel-detach
+          {{nodes_sh}} stop-quectel
         includes: {{INCLUDES}}
   {% endfor %}
 
