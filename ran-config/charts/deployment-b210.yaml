@@ -78,6 +78,29 @@ spec:
             value: "yes"
           - name: USE_B2XX
             value: "True"
+          - name: AMF_IP_ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Chart.Name }}-configmap
+                key: amfIpAddress
+          - name: GNB_NGA_IF_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Chart.Name }}-configmap
+                key: gnbNgaIfName
+          - name: GNB_NGA_IP_ADDRESS
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: GNB_NGU_IF_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Chart.Name }}-configmap
+                key: gnbNguIfName
+          - name: GNB_NGU_IP_ADDRESS
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
         {{- end}}
         {{- if not .Values.config.mountConfig}}
           - name: USE_SA_TDD_MONO
