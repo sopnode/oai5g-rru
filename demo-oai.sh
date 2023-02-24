@@ -90,7 +90,7 @@ function usage() {
     echo "            stop [namespace rru pcap] |"
     echo "            configure-all [node_amf_spgwu node_gnb rru pcap] |"
     echo "            start-cn [namespace node_amf_spgwu] |"
-    echo "            start-gnb [namespace node_gnb] |"
+    echo "            start-gnb [namespace node_gnb rru] |"
     echo "            start-ue [namespace node_gnb] |"
     echo "            stop-cn [namespace] |"
     echo "            stop-gnb [namespace] |"
@@ -762,9 +762,26 @@ function start-gnb() {
     shift
     node_gnb=$1
     shift
+    rru=$1
+    shift
 
-    echo "Running start-gnb() with namespace: $ns, node_gnb:$node_gnb"
+    echo "Running start-gnb() with namespace: $ns, node_gnb:$node_gnb with rru $rru"
 
+    if [[ "$rru" == "b210" ]]; then
+	echo "Set AMF IP address in gnb conf"
+	AMF_POD_NAME=$(kubectl -n$ns get pods -l app.kubernetes.io/name=oai-amf -o jsonpath="{.items[0].metadata.name}")
+	AMF_POD_IP=$(kubectl -n$ns get pod $AMF_POD_NAME --template '{{.status.podIP}}')
+	DIR="$OAI5G_RAN/$FUNCTION"
+	DIR_TEMPLATES="$OAI5G_RAN/oai-gnb/templates"
+	SED_FILE="/tmp/gnb-configmap.sed"
+	cat > "$SED_FILE" <<EOF
+s|ipv4       =.*|ipv4       = "$AMF_POD_IP";
+EOF
+	cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
+	sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
+	diff  /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+    fi
+    
     echo "cd $OAI5G_RAN"
     cd "$OAI5G_RAN"
 
@@ -891,7 +908,7 @@ EOF
     fi
 
     start-cn $ns $node_amf_spgwu
-    start-gnb $ns $node_gnb
+    start-gnb $ns $node_gnb $rru
 
     if [[ "$rru" == "rfsim" ]]; then
 	start-nr-ue $ns $node_gnb
@@ -1029,10 +1046,10 @@ else
             usage
         fi
     elif [ "$1" == "start-gnb" ]; then
-        if test $# -eq 3; then
-            start-gnb $2 $3
+        if test $# -eq 4; then
+            start-gnb $2 $3 $4
         elif test $# -eq 1; then
-	    start-gnb $DEF_NS $DEF_NODE_GNB
+	    start-gnb $DEF_NS $DEF_NODE_GNB $DEF_RRU
 	else
             usage
         fi
