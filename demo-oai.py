@@ -46,7 +46,7 @@ default_master = K8S_MASTER_PROD
 # Default R2lab FIT node images
 #default_image = 'kubernetes'
 default_image = 'u18-lowlat-kube-uhd'
-default_quectel_image = 'quectel-mbim'
+default_quectel_image = 'quectel-mbim-oai'
 
 # This script uses one R2lab FIT node as a k8s worker attached to the cluster
 # in order to launch the scenario 
