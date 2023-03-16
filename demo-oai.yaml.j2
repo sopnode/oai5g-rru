@@ -222,16 +222,16 @@ jobs:
     critical: False
     verbose: {{verbose}}
     label: >
-      sleep 10s, attach quectel UE on fit node {{n}}; sleep 30s and test cx
+      sleep 40s, attach quectel UE on fit node {{n}}; sleep 40s and test cx
     commands:
       - type: Run
-        command: sleep 10
+        command: sleep 40
       - type: RunScript
         command: >
           {{nodes_sh}} start-quectel
         includes: {{INCLUDES}}
       - type: Run
-        command: sleep 30
+        command: sleep 40
       - type: RunScript
         command: >
           {{nodes_sh}} check-quectel-cx
