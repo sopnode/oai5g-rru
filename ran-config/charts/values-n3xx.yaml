@@ -2,7 +2,8 @@ kubernetesType: Vanilla  #Vanilla for community kubernetes distribution
 
 nfimage:   # image name either locally present or in a public/private repository
   repository: docker.io/oaisoftwarealliance/oai-gnb
-  version: develop # image tag
+  version: 2023.w10b # image tag
+#  version: develop # image tag
 #  repository: docker.io/r2labuser/oai-gnb
 #  version: bugfix-phy-mac-interface # image tag
 #  version: u20.04-bugfix-record # image tag
