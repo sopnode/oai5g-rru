@@ -5,7 +5,7 @@ nfimage:   # image name either locally present or in a public/private repository
   version: develop # image tag
 #  repository: docker.io/r2labuser/oai-gnb
 #  version: bugfix-phy-mac-interface # image tag
-  version: u20.04-bugfix-record # image tag
+#  version: u20.04-bugfix-record # image tag
   # pullPolicy: IfNotPresent or Never or Always
   pullPolicy: IfNotPresent
 
