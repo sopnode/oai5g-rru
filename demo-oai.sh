@@ -83,6 +83,29 @@ OPC="@OPC@"
 RFSIM_IMSI="@RFSIM_IMSI@"
 #
 
+####
+#    Following variables used to select repo and tag for OAI5G docker images
+#
+CN_REPO="docker.io/oaisoftwarealliance"
+CN_TAG="develop"
+
+NRF_REPO="${CN_REPO}/oai-nrf"
+NRF_TAG="${CN_TAG}"
+UDR_REPO="${CN_REPO}/oai-udr"
+UDR_TAG="${CN_TAG}"
+UDM_REPO="${CN_REPO}/oai-udm"
+UDM_TAG="${CN_TAG}"
+AUSF_REPO="${CN_REPO}/oai-ausf"
+AUSF_TAG="${CN_TAG}"
+AMF_REPO="${CN_REPO}/oai-amf"
+AMF_TAG="${CN_TAG}"
+SPGWU_REPO="${CN_REPO}/oai-spgwu-tiny"
+SPGWU_TAG="${CN_TAG}"
+SMF_REPO="${CN_REPO}/oai-smf"
+SMF_TAG="${CN_TAG}"
+####
+
+
 
 function usage() {
     echo "USAGE:"
@@ -247,7 +270,7 @@ EOF
 	sed -f /tmp/pcap.sed < /tmp/spgwu-tiny_values.yaml-orig > "$OAI5G_SPGWU"/values.yaml
 	diff /tmp/spgwu-tiny_values.yaml-orig "$OAI5G_SPGWU"/values.yaml
     else
-		PRIVILEGED="false"
+	PRIVILEGED="false"
     fi
 
     if [[ $multus == "true" ]]; then
@@ -274,6 +297,20 @@ s|dnsIpv4Address:.*|dnsIpv4Address: "138.96.0.210" # configure the dns for UE do
 s|dnsSecIpv4Address:.*|dnsSecIpv4Address: "193.51.196.138" # configure the dns for UE don't use Kubernetes DNS|
 s|dnn0:.*|dnn0: "$DNN"|
 s|dnnNi0:.*|dnnNi0: "$DNN"|
+s|@NRF_REPO@|${NRF_REPO}|
+s|@NRF_TAG@|${NRF_TAG}|
+s|@UDR_REPO@|${UDR_REPO}|
+s|@UDR_TAG@|${UDR_TAG}|
+s|@UDM_REPO@|${UDM_REPO}|
+s|@UDM_TAG@|${UDM_TAG}|
+s|@AUSF_REPO@|${AUSF_REPO}|
+s|@AUSF_TAG@|${AUSF_TAG}|
+s|@AMF_REPO@|${AMF_REPO}|
+s|@AMF_TAG@|${AMF_TAG}|
+s|@SPGWU_REPO@|${SPGWU_REPO}|
+s|@SPGWU_TAG@|${SPGWU_TAG}|
+s|@SMF_REPO@|${SMF_REPO}|
+s|@SMF_TAG@|${SMF_TAG}|
 EOF
 
     cp "$OAI5G_BASIC"/values.yaml /tmp/basic_values.yaml-orig
