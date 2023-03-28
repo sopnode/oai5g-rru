@@ -225,13 +225,13 @@ jobs:
       sleep 40s, attach quectel UE on fit node {{n}}; sleep 40s and test cx
     commands:
       - type: Run
-        command: sleep 40
+        command: sleep 60
       - type: RunScript
         command: >
           {{nodes_sh}} start-quectel
         includes: {{INCLUDES}}
       - type: Run
-        command: sleep 40
+        command: sleep 30
       - type: RunScript
         command: >
           {{nodes_sh}} check-quectel-cx
