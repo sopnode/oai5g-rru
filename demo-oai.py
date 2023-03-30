@@ -358,7 +358,7 @@ def main():
     parser.add_argument(
         "-Q", "--quectel-id", dest='quectel_nodes',
         default=default_quectel_nodes,
-        choices=["7", "9", "18", "32", "35"],
+        choices=["7", "9", "18", "31", "32", "34"],
 	action=ListOfChoices,
 	help="specify as many node ids with Quectel UEs as you want.")
 
