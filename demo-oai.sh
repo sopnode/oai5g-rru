@@ -85,25 +85,41 @@ RFSIM_IMSI="@RFSIM_IMSI@"
 ####
 #    Following variables used to select repo and tag for OAI5G docker images
 #
-CN_REPO="docker.io/oaisoftwarealliance"
+OAISA_REPO="docker.io/oaisoftwarealliance"
+
+# OAI5G CN docker images
 CN_TAG="develop"
 
-NRF_REPO="${CN_REPO}/oai-nrf"
+NRF_REPO="${OAISA_REPO}/oai-nrf"
 NRF_TAG="${CN_TAG}"
-UDR_REPO="${CN_REPO}/oai-udr"
+UDR_REPO="${OAISA_REPO}/oai-udr"
 UDR_TAG="${CN_TAG}"
-UDM_REPO="${CN_REPO}/oai-udm"
+UDM_REPO="${OAISA_REPO}/oai-udm"
 UDM_TAG="${CN_TAG}"
-AUSF_REPO="${CN_REPO}/oai-ausf"
+AUSF_REPO="${OAISA_REPO}/oai-ausf"
 AUSF_TAG="${CN_TAG}"
-#AMF_REPO="${CN_REPO}/oai-amf"
+#AMF_REPO="${OAISA_REPO}/oai-amf"
 #AMF_TAG="${CN_TAG}"
 AMF_REPO="docker.io/rohankharade/oai-amf"
 AMF_TAG="service_accept"
-SPGWU_REPO="${CN_REPO}/oai-spgwu-tiny"
+SPGWU_REPO="${OAISA_REPO}/oai-spgwu-tiny"
 SPGWU_TAG="${CN_TAG}"
-SMF_REPO="${CN_REPO}/oai-smf"
+SMF_REPO="${OAISA_REPO}/oai-smf"
 SMF_TAG="${CN_TAG}"
+
+# OAI5G RAN docker images
+RAN_TAG="develop"
+
+GNB_AW2S_REPO="docker.io/r2labuser/oai-gnb-aw2s"
+GNB_AW2S_TAG="new"
+GNB_B210_REPO="${OAISA_REPO}/oai-gnb"
+GNB_B210_TAG="2023.w11b"
+GNB_N3XX_REPO="docker.io/r2labuser/oai-gnb"
+GNB_N3XX_TAG="bugfix-phy-mac-interface"
+GNB_RFSIM_REPO="${OAISA_REPO}/oai-gnb"
+GNB_RFSIM_TAG="develop"
+
+
 ####
 
 
@@ -500,6 +516,8 @@ s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB
 s|sdr_addrs =.*|sdr_addrs = "$SDR_ADDRS,clock_source=internal,time_source=internal"|
 EOF
 	cat > "$SED_VALUES_FILE" <<EOF
+s|@GNB_N3XX_REPO@|$GNB_N3XX_REPO|
+s|@GNB_N3XX_TAG@|$GNB_N3XX_TAG|
 s|sfp1hostInterface:.*|sfp1hostInterface: "$IF_NAME_LOCAL_N3XX_1"|
 s|sfp2hostInterface:.*|sfp2hostInterface: "$IF_NAME_LOCAL_N3XX_2"|
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
@@ -528,6 +546,8 @@ s|local_address.*|local_address = "$IP_GNB_AW2S"|
 s|sdr_addrs =.*||
 EOF
 	cat >> "$SED_VALUES_FILE" <<EOF
+s|@GNB_AW2S_REPO@|$GNB_AW2S_REPO|
+s|@GNB_AW2S_TAG@|$GNB_AW2S_TAG|
 s|aw2sIPadd:.*|aw2sIPadd: "$IP_GNB_AW2S"|
 s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
@@ -599,6 +619,8 @@ EOF
     if [[ "$rru" == "rfsim" ]]; then
 	ORIG_CHART="$DIR"/templates/deployment.yaml
 	cat >> "$SED_VALUES_FILE" <<EOF
+s|@GNB_RFSIM_REPO@|$GNB_RFSIM_REPO|
+s|@GNB_RFSIM_TAG@|$GNB_RFSIM_TAG|
 s|create: false|create: true|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|n2n3IPadd:.*|n2n3IPadd: "$IP_GNB_N2N3"|
@@ -616,6 +638,8 @@ s|nodeName:.*|nodeName: $node_gnb|
 EOF
     elif [[ "$rru" == "b210" ]]; then
 	cat >> "$SED_VALUES_FILE" <<EOF
+s|@GNB_B210_REPO@|$GNB_B210_REPO|
+s|@GNB_B210_TAG@|$GNB_B210_TAG|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|mountConfig:.*|mountConfig: true|
 s|mcc:.*|mcc: "$MCC"|

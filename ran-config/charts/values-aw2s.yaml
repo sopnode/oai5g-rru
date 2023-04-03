@@ -1,8 +1,8 @@
 kubernetesType: Vanilla  #Vanilla for community kubernetes distribution
 
 nfimage:   # image name either locally present or in a public/private repository
-  repository: docker.io/r2labuser/oai-gnb-aw2s
-  version: new ##develop # image tag
+  repository: @GNB_AW2S_REPO@ 
+  version: @GNB_AW2S_TAG@ # image tag
   # pullPolicy: IfNotPresent or Never or Always
   pullPolicy: IfNotPresent
 

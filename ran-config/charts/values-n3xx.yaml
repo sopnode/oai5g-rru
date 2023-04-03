@@ -1,20 +1,15 @@
 kubernetesType: Vanilla  #Vanilla for community kubernetes distribution
 
 nfimage:   # image name either locally present or in a public/private repository
-#  repository: docker.io/oaisoftwarealliance/oai-gnb
-#  version: 2023.w11b # image tag
-#  version: develop # image tag
-  repository: docker.io/r2labuser/oai-gnb
-  version: bugfix-phy-mac-interface # image tag
-#  version: u20.04-bugfix-record # image tag
-  # pullPolicy: IfNotPresent or Never or Always
-  pullPolicy: IfNotPresent
+  repository: @GNB_N3XX_REPO@
+  version: @GNB_N3XX_TAG@ 
+  pullPolicy: IfNotPresent # IfNotPresent or Never or Always
 
 tcpdumpimage:
   repository: docker.io/corfr/tcpdump
   version: latest
-  #pullPolicy: IfNotPresent or Never or Always
-  pullPolicy: IfNotPresent
+  pullPolicy: IfNotPresent # IfNotPresent or Never or Always
+
 
 # good to use when pulling images from docker-hub mention 
 imagePullSecrets: 
