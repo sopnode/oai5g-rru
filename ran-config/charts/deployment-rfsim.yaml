@@ -20,7 +20,8 @@ spec:
       annotations:
         k8s.v1.cni.cncf.io/networks: >-
           [{
-                 "name": "{{ .Chart.Name }}-net1"
+                 "name": "{{ .Chart.Name }}-net1",
+                 "mac": "12:34:56:78:90:11",
           }]
     {{- end }}
     spec:
