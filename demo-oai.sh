@@ -497,7 +497,7 @@ function configure-gnb() {
 	#multus=false;#mountedConfig=true; # @var@ will be used to set AMF/NGA/NGU IP addresses
 	RRU_TYPE="b210"
 	cat > "$SED_VALUES_FILE" <<EOF
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E--tune-offset 30000000 --log_config.global_log_options level,nocolor,time"|
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"|
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
     elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
