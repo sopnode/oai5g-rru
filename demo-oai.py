@@ -332,7 +332,7 @@ def main():
     parser.add_argument("--amf_spgwu", default=K8S_WORKER_PROD,
                         help="node name that runs oai-amf and oai-spgwu")
 
-    parser.add_argument("--gnb", default=K8S_MASTER_PROD,
+    parser.add_argument("--gnb", default=K8S_WORKER_PROD,
                         help="node name that runs oai-gnb")
 
     parser.add_argument(
