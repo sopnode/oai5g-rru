@@ -982,6 +982,16 @@ EOF
 }
 
 
+function run-ping() {
+    ns=$1
+    shift
+
+    UE_POD_NAME=$(kubectl -n$ns get pods -l app.kubernetes.io/name=oai-nr-ue -o jsonpath="{.items[0].metadata.name}")
+    echo "kubectl -n$ns exec -it $UE_POD_NAME -c nr-ue -- /bin/ping --I oaitun_ue1 c4 google.fr"
+    kubectl -n$ns exec -it $UE_POD_NAME -c nr-ue -- /bin/ping -I oaitun_ue1 -c4 google.fr
+}
+
+
 function stop-cn(){
     ns=$1
     shift

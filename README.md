@@ -45,7 +45,7 @@ run `demo-oai.py --help` for more details.
 
 ### Metal provisioning
 
-The **demo-oai.py** script optionally deploys a preconfigured Kubernetes (k8s) image on a FIT/R2lab node, which by default is *`fit01`*. 
+The **demo-oai.py** script can deploy (if not already done) a preconfigured Kubernetes (k8s) image on a FIT/R2lab node, which by default is *`fit01`*. 
 
 ### Joining the k8s cluster
 Then the script will get the FIT/R2lab node to join the k8s master (*`sopnode-l1.inria.fr`* by default).
@@ -54,10 +54,16 @@ Then the script will get the FIT/R2lab node to join the k8s master (*`sopnode-l1
 ### Configuration
 After that, the script will deploy OAI5G pods on the k8s cluster through the FIT/R2lab worker node. 
 
-First, the script will clone the OAI5G `oai-cn5g-fed` git repository on the FIT node *fit01*. To do it manually, you will have to run:
+First, it will copy on the worker node *fit01* the **demo-oai.sh** bash script and will configure few parameters (e.g., Core Network parameters, k8s namespace, nodes to run amf/spgwu/gnb functions, type of rru, etc.) within this script using the **configure-demo-oai.sh** script.
 
 ```
-root@fit01# git clone -b master https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed
+root@fit01# /root/configure-demo-oai.sh update
+```
+
+Then, the script will clone the OAI5G `oai-cn5g-fed` git repository on the FIT node *fit01*. To do it manually, you will have to run:
+
+```
+root@fit01# git clone -b r2lab-rrus https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed
 ```
 Then it will apply different patches to configure the various OAI5G pods for the SopNode platform. To do it manually, you will have to run on *fit01* :
 
@@ -113,6 +119,8 @@ For instance, if your slicename is `inria_sc` and you have not yet loaded the k8
 $ ./demo-oai.py -s inria_sc
 ```
 
+Using the `-R` option, you can select the type of RRU to be used in the scenario. Currently on R2lab, the gnb can be either a USRP B210, a USRP N300, a USRP N320, a AW2S Jaguar, a AW2S Panther or you can choose to use instead the OAI5G RF simulator. Note that the gnb configuration file name is specified within the **demo-oai.sh** script and all the gnb configuration files are located in the **oai5g-rru/ran-config/conf/** directory. Gnb k8s charts are located in the **oai5g-rru/ran-config/charts/** directory.
+
 We added the two following options to be used only when the demo-oai.py script has already run at least once, i.e., when FIT nodes have joined the k8s cluster and OAI5G setup is ready for R2lab:
 
 * `--stop` to remove all OAI5G pods. 
@@ -143,7 +151,7 @@ root@fit01# GNB_POD_NAME=$(kubectl -noai5g get pods -l app.kubernetes.io/name=oa
 root@fit01# kubectl -noai5g logs $GNB_POD_NAME -c gnb
 ```
 
-It is also possible to run the ping test directly on *fit01*:
+In case of RF simulation (RRU=rfsim), it is possible to run a ping test directly on *fit01*:
 
 ```
 root@fit01# ./demo-oai.sh run-ping
