@@ -122,6 +122,7 @@ def run(*, mode, gateway, slicename, master, namespace,
             gnb=gnb,
         ),
         quectel_dict=quectel_dict,
+        gnb_only=gnb_only,
         rru=rru,
         b210=b210,
         regcred=dict(
