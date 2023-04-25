@@ -8,6 +8,7 @@ DEF_NS= # k8s namespace
 DEF_NODE_AMF_SPGWU= # node in wich run amf and spgwu pods
 DEF_NODE_GNB= # node in which gnb pod runs
 DEF_RRU= # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
+DEF_GNB_ONLY= # boolean if pcap are generated on pods
 DEF_PCAP= # boolean if pcap are generated on pods
 ##########################################################################
 
@@ -129,8 +130,8 @@ GNB_RFSIM_TAG="develop"
 function usage() {
     echo "USAGE:"
     echo "demo-oai.sh init [namespace] |"
-    echo "            start [namespace node_amf_spgwu node_gnb rru pcap] |"
-    echo "            stop [namespace rru pcap] |"
+    echo "            start [namespace node_amf_spgwu node_gnb rru gnb_only pcap] |"
+    echo "            stop [namespace rru gnb_only pcap] |"
     echo "            configure-all [node_amf_spgwu node_gnb rru pcap] |"
     echo "            start-cn [namespace node_amf_spgwu] |"
     echo "            start-gnb [namespace node_gnb rru] |"
@@ -897,6 +898,7 @@ function start() {
     node_amf_spgwu=$1; shift
     node_gnb=$1; shift
     rru=$1; shift
+    gnb_only=$1; shift
     pcap=$1; shift
 
     echo "start: run all oai5g pods on namespace: $ns"
@@ -972,7 +974,9 @@ EOF
     kubectl -n $ns apply -f /tmp/cn5g-pvc.yaml
     fi
 
-    start-cn $ns $node_amf_spgwu
+    if [[ $gnb_only == "False" ]]; then
+	start-cn $ns $node_amf_spgwu
+    fi
     start-gnb $ns $node_gnb $rru
 
     if [[ "$rru" == "rfsim" ]]; then
@@ -1031,6 +1035,7 @@ function stop-nr-ue(){
 function stop() {
     ns=$1; shift
     rru=$1; shift
+    gnb_only=$1; shift
     pcap=$1; shift
 
     echo "Running stop() on namespace:$ns; pcap is $pcap"
@@ -1051,7 +1056,9 @@ function stop() {
     res=$(helm -n $ns ls | wc -l)
     if test $res -gt 1; then
         echo "Remove all 5G OAI pods"
-	stop-cn $ns
+	if [[ $gnb_only == "False" ]]; then
+	    stop-cn $ns
+	fi
 	stop-gnb $ns
 	if [[ "$rru" == "rfsim" ]]; then
 	    stop-nr-ue $ns
@@ -1088,18 +1095,18 @@ else
             usage
         fi
     elif [ "$1" == "start" ]; then
-        if test $# -eq 6; then
-            start $2 $3 $4 $5 $6
+        if test $# -eq 7; then
+            start $2 $3 $4 $5 $6 $7
         elif test $# -eq 1; then
-	    start $DEF_NS $DEF_NODE_AMF_SPGWU $DEF_NODE_GNB $DEF_RRU $DEF_PCAP
+	    start $DEF_NS $DEF_NODE_AMF_SPGWU $DEF_NODE_GNB $DEF_RRU $DEF_GNB_ONLY $DEF_PCAP
 	else
             usage
         fi
     elif [ "$1" == "stop" ]; then
-        if test $# -eq 4; then
-            stop $2 $3 $4
+        if test $# -eq 5; then
+            stop $2 $3 $4 $5
         elif test $# -eq 1; then
-	    stop $DEF_NS $DEF_RRU $DEF_PCAP
+	    stop $DEF_NS $DEF_RRU $DEF_GNB_ONLY $DEF_PCAP
 	else
             usage
         fi
