@@ -73,8 +73,8 @@ default_regcred_password = 'r2labuser-pwd'
 default_regcred_email = 'r2labuser@turletti.com'
 
 
-def run(*, mode, gateway, slicename, master,
-        namespace, pcap, auto_start, load_images, k8s_reset,
+def run(*, mode, gateway, slicename, master, namespace,
+        pcap, auto_start, gnb_only, load_images, k8s_reset,
         k8s_fit, amf_spgwu, gnb, quectel_nodes, rru, b210,
         regcred_name, regcred_password, regcred_email,
         image, quectel_image, verbose, dry_run):
@@ -86,6 +86,7 @@ def run(*, mode, gateway, slicename, master,
         master: k8s master host
         pcap: pcap trace files will be generated
         auto_start: pods will be launched
+        gnb_only: OAI5G cn pods will not be started/stopped
         load_images: FIT images will be deployed
         k8s_reset: with k8s deployment
         k8s_fit: FIT node number attached to the k8s cluster as worker node
@@ -114,6 +115,7 @@ def run(*, mode, gateway, slicename, master,
         master=master,
         namespace=namespace,
         pcap=pcap,
+        auto_start=auto_start,
         nodes=dict(
             k8s_fit=r2lab_hostname(k8s_fit),
             amf_spgwu=amf_spgwu,
@@ -302,6 +304,11 @@ def main():
         help="default is to start the oai-demo after setup")
 
     parser.add_argument(
+        "--gnb-only", default=False,
+        action='store_true', dest='gnb_only',
+        help="default is to manage not only gnb but also CN pods")
+
+    parser.add_argument(
         "-k", "--no-k8s-reset", default=True,
 	action='store_false', dest='k8s_reset',
 	help="default is to reset k8s before setup")
@@ -426,6 +433,8 @@ def main():
             print("Automatically start the demo after setup")
         else:
             print("Do not start the demo after setup")
+        if args.gnb_only:
+            print("Only start/stop oai-gnb pod")
         mode = "run"
     if args.pcap:
         print(f"pcap trace files: {args.pcap}")
@@ -434,7 +443,8 @@ def main():
         pcap_str='False'
     run(mode=mode, gateway=default_gateway, slicename=args.slicename,
         master=args.master, namespace=args.namespace, pcap=pcap_str,
-        auto_start=args.auto_start, load_images=args.load_images,
+        auto_start=args.auto_start, gnb_only=args.gnb_only,
+        load_images=args.load_images,
         k8s_fit=args.k8s_fit, amf_spgwu=args.amf_spgwu, gnb=args.gnb,
         quectel_nodes=args.quectel_nodes, rru=args.rru, b210=b210,
         regcred_name=args.regcred_name,
