@@ -187,8 +187,10 @@ Nota: If you are done with the demo, do not forget to clean up the k8s {master} 
         ok_message = f"OAI5G demo started, you can check kubectl logs on the {master} cluster"
         ko_message = f"Could not launch OAI5G pods"
     else:
-        scheduler.keep_only_between(ends=[j_start_demo] + j_attach_quectels, keep_ends=True)
-#        scheduler.keep_only_between(ends=[j_stop_demo] + j_detach_quectels, keep_ends=False)
+        if auto_start:
+            scheduler.keep_only_between(ends=[j_start_demo] + j_attach_quectels, keep_ends=True)
+        else:
+            scheduler.keep_only_between(ends=[j_start_demo], keep_ends=True)
         if not load_images:
             scheduler.bypass_and_remove(j_load_images)
             purpose += f" (no image loaded)"
