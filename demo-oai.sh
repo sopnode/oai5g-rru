@@ -60,8 +60,8 @@ IF_NAME_NRUE="$IF_NAME_VLAN100"
 CONF_JAGUAR="panther4x4_20MHz.conf"
 CONF_PANTHER="panther4x4_20MHz.conf"
 #CONF_B210="gnb.band78.51PRB.usrpb210.conf" # without -E
-#CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf" # this one needs -E as an additional option
-CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-orig.conf" # this one without -E as an additional option
+CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf" # this one needs -E as an additional option
+#CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-orig.conf" # this one without -E as an additional option
 CONF_N3XX="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
 CONF_RFSIM="gnb.sa.band78.106prb.rfsim.2x2.conf" #this one works
 #CONF_RFSIM="gnb.sa.band78.fr1.51PRB.rfsim.conf"
@@ -508,7 +508,7 @@ function configure-gnb() {
 	#multus=false;#mountedConfig=true; # @var@ will be used to set AMF/NGA/NGU IP addresses
 	RRU_TYPE="b210"
 	cat > "$SED_VALUES_FILE" <<EOF
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"|
+s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"|
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
     elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
