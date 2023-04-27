@@ -16,13 +16,13 @@ PREFIX_STATS="/tmp/oai5g-stats"
 
 # IP Pod addresses
 P100="192.168.100"
-IP_AMF_N2="$P100.241"
-#IP_AMF_N2="172.22.10.6"" # test with external CN
+#IP_AMF_N2="$P100.241"
+IP_AMF_N2="172.22.10.6"" # test with external CN
 IP_UPF_N3="$P100.242" # Nota: only used for CN
-IP_GNB_N2="$P100.243"
-#IP_GNB_N2="10.0.20.243" # test with external CN
-IP_GNB_N3="$P100.244"
-#IP_GNB_N3="10.0.20.244" # test with external CN
+#IP_GNB_N2="$P100.243"
+IP_GNB_N2="10.0.20.243" # test with external CN
+#IP_GNB_N3="$P100.244"
+IP_GNB_N3="10.0.20.244" # test with external CN
 IP_GNB_N2N3="$P100.243"
 IP_GNB_AW2S="$P100.245" 
 IP_NRUE="$P100.246" 
@@ -45,10 +45,10 @@ ADDR_PANTHER="$P100.51" # .51 for eth2
 
 # N2/N3 Interfaces definition
 IF_NAME_AMF_N2_SPGWU_N3="$IF_NAME_VLAN100"
-IF_NAME_GNB_N2="$IF_NAME_VLAN100"
-#IF_NAME_GNB_N2="ran" # test with external CN
-IF_NAME_GNB_N3="$IF_NAME_VLAN100"
-#IF_NAME_GNB_N3="ran" # test with external CN
+#IF_NAME_GNB_N2="$IF_NAME_VLAN100"
+IF_NAME_GNB_N2="ran" # test with external CN
+#IF_NAME_GNB_N3="$IF_NAME_VLAN100"
+IF_NAME_GNB_N3="ran" # test with external CN
 IF_NAME_GNB_N2N3="$IF_NAME_VLAN100"
 IF_NAME_LOCAL_AW2S="$IF_NAME_VLAN100"
 IF_NAME_LOCAL_N3XX_1="$IF_NAME_VLAN10"
