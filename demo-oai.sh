@@ -18,12 +18,11 @@ PREFIX_STATS="/tmp/oai5g-stats"
 P100="192.168.100"
 #IP_AMF_N2="$P100.241"
 IP_AMF_N2="172.22.10.6" # test with external CN
-IP_UPF_N3="$P100.242" # Nota: only used for CN
-#IP_GNB_N2="$P100.243"
-IP_GNB_N2="10.0.20.243" # test with external CN
-#IP_GNB_N3="$P100.244"
-IP_GNB_N3="10.0.20.243" # test with external CN
-IP_GNB_N2N3="$P100.243"
+IP_UPF_N3="$P100.242" # Nota: only used for CN configuration
+IP_GNB_N2="$P100.243"
+IP_GNB_N3="$P100.244"
+#IP_GNB_N2N3="$P100.243"
+IP_GNB_N2N3="10.0.20.243" # test with external CN
 IP_GNB_AW2S="$P100.245" 
 IP_NRUE="$P100.246" 
 
@@ -44,12 +43,11 @@ ADDR_JAGUAR="$P100.48" # for eth1
 ADDR_PANTHER="$P100.51" # .51 for eth2
 
 # N2/N3 Interfaces definition
-IF_NAME_AMF_N2_SPGWU_N3="$IF_NAME_VLAN100"
-#IF_NAME_GNB_N2="$IF_NAME_VLAN100"
-IF_NAME_GNB_N2="ran" # test with external CN
-#IF_NAME_GNB_N3="$IF_NAME_VLAN100"
-IF_NAME_GNB_N3="$IF_NAME_VLAN100" # test with external CN
-IF_NAME_GNB_N2N3="$IF_NAME_VLAN100"
+IF_NAME_AMF_N2_SPGWU_N3="$IF_NAME_VLAN100" # Nota: only used for CN configuration
+IF_NAME_GNB_N2="$IF_NAME_VLAN100"
+IF_NAME_GNB_N3="$IF_NAME_VLAN100"
+#IF_NAME_GNB_N2N3="$IF_NAME_VLAN100"
+IF_NAME_GNB_N2N3="ran" # test with external CN
 IF_NAME_LOCAL_AW2S="$IF_NAME_VLAN100"
 IF_NAME_LOCAL_N3XX_1="$IF_NAME_VLAN10"
 IF_NAME_LOCAL_N3XX_2="$IF_NAME_VLAN20"
@@ -521,9 +519,9 @@ EOF
 	cat > "$SED_CONF_FILE" <<EOF
 s|ipv4       =.*|ipv4       = "$IP_AMF_N2";|
 s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
-s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2/24";|
-s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net2";|
-s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N3/24";|
+s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2N3/24";|
+s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net1";|
+s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N2N3/24";|
 s|sdr_addrs =.*|sdr_addrs = "$SDR_ADDRS,clock_source=internal,time_source=internal"|
 EOF
 	cat > "$SED_VALUES_FILE" <<EOF
@@ -548,10 +546,10 @@ EOF
 	cat > "$SED_CONF_FILE" <<EOF
 s|ipv4       =.*|ipv4       = "$IP_AMF_N2";|
 s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
-s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2/24";|
-s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net2";|
-s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N3/24";|
-s|local_if_name.*|local_if_name  = "net3"|
+s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2N3/24";|
+s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net1";|
+s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N3N3/24";|
+s|local_if_name.*|local_if_name  = "net2"|
 s|remote_address.*|remote_address = "$ADDR_AW2S"|
 s|local_address.*|local_address = "$IP_GNB_AW2S"|
 s|sdr_addrs =.*||
@@ -662,19 +660,10 @@ EOF
 	cat >> "$SED_VALUES_FILE" <<EOF
 s|create: false|create: true|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
-s|n2IPadd:.*|n2IPadd: "$IP_GNB_N2"|
-s|n2Netmask:.*|n2Netmask: "24"|
-s|n2hostInterface:.*|n2hostInterface: "$IF_NAME_GNB_N2"|
-s|n3IPadd:.*|n3IPadd: "$IP_GNB_N3"|
-s|n3Netmask:.*|n3Netmask: "24"|
-s|n3hostInterface:.*|n3hostInterface: "$IF_NAME_GNB_N3"|
+s|n2n3IPadd:.*|n2n3IPadd: "$IP_GNB_N2N3"|
+s|n2n3Netmask:.*|n2n3Netmask: "24"|
+s|n2n3hostInterface:.*|n2n3hostInterface: "$IF_NAME_GNB_N2N3"|
 s|mountConfig:.*|mountConfig: true|
-s|mcc:.*|mcc: "$MCC"|
-s|mnc:.*|mnc: "$MNC"|
-s|gnbNgaIfName:.*|gnbNgaIfName: "net1"|
-s|gnbNgaIpAddress:.*|gnbNgaIpAddress: "$IP_GNB_N2"|
-s|gnbNguIfName:.*|gnbNguIfName: "net2"|
-s|gnbNguIpAddress:.*|gnbNguIpAddress: "$IP_GNB_N3"|
 s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF

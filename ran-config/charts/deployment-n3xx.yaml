@@ -30,10 +30,6 @@ spec:
           {
                  "name": "{{ .Chart.Name }}-net3",
                  "mac": "12:34:56:78:90:13"
-          },
-          {
-                 "name": "{{ .Chart.Name }}-net4",
-                 "mac": "12:34:56:78:90:14"
           }]
     {{- end }}
     spec:

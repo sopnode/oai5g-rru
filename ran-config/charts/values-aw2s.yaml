@@ -53,12 +53,9 @@ start:
 
 multus:    # needed when gnB service will run on another interface rather than traditional eth0
   create: false
-  n2IPadd: "172.21.6.203"
-  n2Netmask: "22"
-  n2hostInterface: "bond0"
-  n3IPadd: "172.21.6.204"
-  n3Netmask: "22"
-  n3hostInterface: "bond1"
+  n2n3IPadd: "172.21.6.203"
+  n2n3Netmask: "22"
+  n2n3hostInterface: "bond0"
   aw2sIPadd: "192.168.100.166" # .100.48 for our Jaguar and .100.50 for our Panther
   aw2sNetmask: "24"
   aw2shostInterface: "team0"
