@@ -17,7 +17,7 @@ PREFIX_STATS="/tmp/oai5g-stats"
 # IP Pod addresses
 P100="192.168.100"
 #IP_AMF_N2="$P100.241"
-IP_AMF_N2="172.22.10.6"" # test with external CN
+IP_AMF_N2="172.22.10.6" # test with external CN
 IP_UPF_N3="$P100.242" # Nota: only used for CN
 #IP_GNB_N2="$P100.243"
 IP_GNB_N2="10.0.20.243" # test with external CN
