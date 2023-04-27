@@ -7,6 +7,8 @@
 # {{quectel_nodes}} - typically {'9': 'fit09', '18': 'fit18'}
 # {{rru}} - typically 'n300' or 'n320' or 'jaguar' or 'panther'
 # {{b210}} - typically '0' or the fit node number used to run oai-gnb with USRP b210 device
+# {{auto_start}} - typically 'True' or 'False'
+# {{gnb_only}} - typically 'True' or 'False'
 # {{regcred}} - typically {'name': 'jdoe', 'password': 'XX', 'email': 'jdoe@yahoo.fr'}
 # {{image}} - typically 'kubernetes'
 # {{quectel_dict}} 
@@ -196,7 +198,7 @@ jobs:
           chmod a+x /root/demo-oai.sh;
           cp oai5g-rru/configure-demo-oai.sh /root/;
           cp oai5g-rru/logs /root/;
-          /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{pcap}} {%for x in regcred.values()%}{{x}} {%endfor %};
+          /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{gnb_only}} {{pcap}} {%for x in regcred.values()%}{{x}} {%endfor %};
           rm -rf oai-cn5g-fed;
           git clone -b r2lab-rrus https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git;
       - type: Run
@@ -211,7 +213,7 @@ jobs:
       Launch OAI5G pods by calling demo-oai.sh start from {{nodes['k8s_fit']}}
     commands:
       - type: Run
-        command: /root/demo-oai.sh start {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{pcap}}
+        command: /root/demo-oai.sh start {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{gnb_only}} {{pcap}}
 
   {% for n in quectel_dict.keys() %}
   - id: attach-quectel-node-{{n}}
@@ -222,7 +224,7 @@ jobs:
     critical: False
     verbose: {{verbose}}
     label: >
-      sleep 40s, attach quectel UE on fit node {{n}}; sleep 40s and test cx
+      sleep 60s, attach quectel UE on fit node {{n}}; sleep 20s and test cx
     commands:
       - type: Run
         command: sleep 60
@@ -231,7 +233,7 @@ jobs:
           {{nodes_sh}} start-quectel
         includes: {{INCLUDES}}
       - type: Run
-        command: sleep 30
+        command: sleep 20
       - type: RunScript
         command: >
           {{nodes_sh}} check-quectel-cx
@@ -247,7 +249,7 @@ jobs:
       Delete OAI5G pods by calling demo-oai.sh stop from {{nodes.k8s_fit}}
     commands:
       - type: Run
-        command: /root/demo-oai.sh stop {{namespace}} {{rru}} {{pcap}}
+        command: /root/demo-oai.sh stop {{namespace}} {{rru}} {{gnb_only}} {{pcap}}
       {% if pcap == 'True' %}
       - type: Pull
         remotepaths: "/tmp/oai5g-stats.tgz"
