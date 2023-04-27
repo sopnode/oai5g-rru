@@ -17,12 +17,10 @@ PREFIX_STATS="/tmp/oai5g-stats"
 # IP Pod addresses
 P100="192.168.100"
 IP_AMF_N2="$P100.241"
-##IP_AMF_N2="172.22.10.6" # test with external CN
 IP_UPF_N3="$P100.242" # Nota: only used for CN configuration
 IP_GNB_N2="$P100.243"
 IP_GNB_N3="$P100.244"
 IP_GNB_N2N3="$P100.243"
-##IP_GNB_N2N3="10.0.20.243" # test with external CN
 IP_GNB_AW2S="$P100.245" 
 IP_NRUE="$P100.246" 
 
@@ -47,11 +45,17 @@ IF_NAME_AMF_N2_SPGWU_N3="$IF_NAME_VLAN100" # Nota: only used for CN configuratio
 IF_NAME_GNB_N2="$IF_NAME_VLAN100"
 IF_NAME_GNB_N3="$IF_NAME_VLAN100"
 IF_NAME_GNB_N2N3="$IF_NAME_VLAN100"
-##IF_NAME_GNB_N2N3="ran" # test with external CN
 IF_NAME_LOCAL_AW2S="$IF_NAME_VLAN100"
 IF_NAME_LOCAL_N3XX_1="$IF_NAME_VLAN10"
 IF_NAME_LOCAL_N3XX_2="$IF_NAME_VLAN20"
 IF_NAME_NRUE="$IF_NAME_VLAN100"
+
+# IN CASE OF EXTERNAL CORE NETWORK USAGE (i.e., DEF_GNB_ONLY IS TRUE), CONFIGURE FOLLOWING PARAMETERS BELOW
+if [[ $DEF_GNB_ONLY == "True" ]]; then
+    IP_AMF_N2="172.22.10.6" # external AMF IP address
+    IP_GNB_N2N3="10.0.20.243" # local IP to reach AMF/UPF
+    IF_NAME_GNB_N2N3="ran" # Corresponding Host network interface to reach AMF/UPF
+fi
 
 # gNB conf file for RRU devices
 #CONF_JAGUAR="jaguar_panther2x2_50MHz.conf"
