@@ -593,8 +593,14 @@ EOF
     echo cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
     cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
     if [[ $DEF_GNB_ONLY == "True" ]]; then
-	echo cp "$DIR_CHARTS"/multus-extcn-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
-	cp "$DIR_CHARTS"/multus-extcn-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+	SED_MULTUS_FILE="/tmp/gnb_multus.sed"
+	cat >> "$SED_MULTUS_FILE" <<EOF
+s|@ROUTE_AMF_MULTUS@|$ROUTE_AMF_MULTUS|
+s|@GW_AMF_MULTUS@|$GW_AMF_MULTUS|
+EOF
+	sed -f "$SED_MULTUS_FILE" < "$DIR_CHARTS"/multus-extcn-"$RRU_TYPE".yaml > "$DIR_TEMPLATES"/multus.yaml
+	echo "configure chart multus for gnb"
+	cat "$DIR_TEMPLATES"/multus.yaml
     else
 	echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
 	cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
