@@ -590,9 +590,13 @@ EOF
     cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
     echo cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
     cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
-    echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
-    cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
-
+    if [[ $DEF_GNB_ONLY == "True" ]]; then
+	echo cp "$DIR_CHARTS"/multus-extcn-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+	cp "$DIR_CHARTS"/multus-extcn"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+    else
+	echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+	cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+    fi
     echo "Set up configmap.yaml chart with the right gNB configuration from $CONF_ORIG"
     # Keep the 17 first lines of configmap.yaml
     head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
