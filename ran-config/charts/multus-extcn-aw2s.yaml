@@ -19,8 +19,8 @@ spec:
         ],
         "routes": [
                 {
-                        "dst": "172.22.10.0/24",
-                        "gw": "10.0.20.1"
+                        "dst": "@ROUTE_AMF_MULTUS@",
+                        "gw": "@GW_AMF_MULTUS@"
                 }
         ]
       }

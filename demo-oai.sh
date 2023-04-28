@@ -52,8 +52,10 @@ IF_NAME_NRUE="$IF_NAME_VLAN100"
 
 # IN CASE OF EXTERNAL CORE NETWORK USAGE (i.e., DEF_GNB_ONLY IS TRUE), CONFIGURE FOLLOWING PARAMETERS BELOW
 if [[ $DEF_GNB_ONLY == "True" ]]; then
-    IP_AMF_N2="172.22.10.6" # external AMF IP address
-    IP_GNB_N2N3="10.0.20.243" # local IP to reach AMF/UPF
+    IP_AMF_N2="172.22.10.6" # external AMF IP address, e.g., "172.22.10.6"
+    ROUTE_AMF_MULTUS="172.22.10.0/24" # route to reach amf for multus.yaml chart, e.g., "172.22.10.0/24"
+    IP_GNB_N2N3="10.0.20.243" # local IP to reach AMF/UPF, e.g., "10.0.20.243"
+    GW_AMF_MULTUS="10.0.20.1" # gw for multus.yaml chart, e.g., "10.0.20.1"
     IF_NAME_GNB_N2N3="ran" # Corresponding Host network interface to reach AMF/UPF
 fi
 
@@ -592,7 +594,7 @@ EOF
     cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
     if [[ $DEF_GNB_ONLY == "True" ]]; then
 	echo cp "$DIR_CHARTS"/multus-extcn-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
-	cp "$DIR_CHARTS"/multus-extcn"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+	cp "$DIR_CHARTS"/multus-extcn-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
     else
 	echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
 	cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
