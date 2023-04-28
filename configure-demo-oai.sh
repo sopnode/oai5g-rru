@@ -5,7 +5,7 @@
 #
 MCC="208"
 MNC="95"
-DNN="oai" # was "oai.ipv4"
+DNN="oai.ipv4" # default is "oai.ipv4"
 FULL_KEY="8baf473f2f8fd09487cccbd7097c6862"
 OPC="8E27B6AF0E692E750F32667A3B14605D"
 RFSIM_IMSI="208950000001121"
