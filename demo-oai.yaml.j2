@@ -113,7 +113,7 @@ jobs:
         includes: {{INCLUDES}}
       - type: RunScript
         command: >
-          {{nodes_sh}} stop-quectel
+          {{nodes_sh}} init-quectel
         includes: {{INCLUDES}}
   {% endfor %}
 
