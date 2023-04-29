@@ -183,7 +183,7 @@ Nota: If you are done with the demo, do not forget to clean up the k8s {master} 
 \t ./demo-oai.py [--master {master}] --cleanup
 """
     elif mode == "start":
-        scheduler.keep_only([j_start_demo] + j_init_quectels + j_attach_quectels)
+        scheduler.keep_only([j_start_demo] + j_attach_quectels)
         ok_message = f"OAI5G demo started, you can check kubectl logs on the {master} cluster"
         ko_message = f"Could not launch OAI5G pods"
     else:
