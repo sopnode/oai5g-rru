@@ -176,12 +176,36 @@ jobs:
         command: kube-install.sh join-cluster r2lab@{{master}}
   {% endif %}
 
-  - id: init-demo
+
+  {% for n in quectel_dict.keys() %}
+  - id: stop-quectel-node-{{n}}
     required:
       - leave-join-k8s-fit-node
   {% if b210 %}    
       - leave-join-gnb
   {% endif %}
+      - init-quectel-node-{{n}}
+    node: quectel_node_{{n}}
+    critical: True
+    verbose: {{verbose}}
+    label: ensure Quectel UE on fit node {{n}} is stopped before running gnb
+    commands:
+      - type: RunScript
+        command: >
+          {{nodes_sh}} stop-quectel
+        includes: {{INCLUDES}}
+  {% endfor %}
+
+
+  - id: init-demo
+    required:
+      - leave-join-k8s-fit-node
+    {% if b210 %}    
+      - leave-join-gnb
+    {% endif %}
+    {% for n in quectel_dict.keys() %}
+      - stop-quectel-node-{{n}}
+    {% endfor %}
     node: k8s_fit
     critical: True
     verbose: {{verbose}}

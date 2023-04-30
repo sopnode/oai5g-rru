@@ -166,6 +166,7 @@ def run(*, mode, gateway, slicename, master, namespace,
     j_init_quectels = [jobs_map[k] for k in jobs_map if k.startswith('init-quectel-')]
     j_attach_quectels = [jobs_map[k] for k in jobs_map if k.startswith('attach-quectel-')]
     j_detach_quectels = [jobs_map[k] for k in jobs_map if k.startswith('detach-quectel-')]
+    j_stop_quectels = [jobs_map[k] for k in jobs_map if k.startswith('stop-quectel-')]
 
     # run subparts as requested
     purpose = f"{mode} mode"
