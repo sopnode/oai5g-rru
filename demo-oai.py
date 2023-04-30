@@ -166,6 +166,7 @@ def run(*, mode, gateway, slicename, master, namespace,
     j_init_quectels = [jobs_map[k] for k in jobs_map if k.startswith('init-quectel-')]
     j_attach_quectels = [jobs_map[k] for k in jobs_map if k.startswith('attach-quectel-')]
     j_detach_quectels = [jobs_map[k] for k in jobs_map if k.startswith('detach-quectel-')]
+    j_stop_quectels = [jobs_map[k] for k in jobs_map if k.startswith('stop-quectel-')]
 
     # run subparts as requested
     purpose = f"{mode} mode"
@@ -190,7 +191,7 @@ Nota: If you are done with the demo, do not forget to clean up the k8s {master} 
         if auto_start:
             scheduler.keep_only_between(ends=[j_start_demo] + j_attach_quectels, keep_ends=True)
         else:
-            scheduler.keep_only_between(ends=[j_start_demo], keep_ends=True)
+            scheduler.keep_only_between(ends=[j_start_demo] + j_init_quectels, keep_ends=True)
         if not load_images:
             scheduler.bypass_and_remove(j_load_images)
             purpose += f" (no image loaded)"
