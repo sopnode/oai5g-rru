@@ -104,12 +104,6 @@ def run(*, mode, gateway, slicename, master, namespace,
       "r2labutils.sh", "nodes.sh",
     )]
 
-    quectelCM_service = Service(
-        command="quectel-CM -s oai.ipv4 -4",
-        service_id="QuectelCM",
-        verbose=verbose,
-    )
-
     jinja_variables = dict(
         gateway=gateway,
         master=master,
@@ -135,7 +129,6 @@ def run(*, mode, gateway, slicename, master, namespace,
         verbose=verbose,
         nodes_sh=find_local_embedded_script("nodes.sh"),
         INCLUDES=INCLUDES,
-        quectel_service_start = quectelCM_service.start_command()
     )
 
     # (*) first compute the complete logic (but without check_lease)
