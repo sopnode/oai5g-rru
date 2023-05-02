@@ -311,9 +311,15 @@ EOF
 	NET_IF="eth0"
     fi
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
+    if [[ $pcap == "True" ]]; then
+	tcpdump="true"
+    else
+	tcpdump="false"
+    fi
     cat > /tmp/basic-r2lab.sed <<EOF
 s|privileged:.*|privileged: $PRIVILEGED|
 s|create: false|create: $multus|
+s|includeTcpDumpContainer:.*|includeTcpDumpContainer: $tcpdump|
 s|n2IPadd:.*|n2IPadd: "$IP_AMF_N2"|
 s|n2Netmask:.*|n2Netmask: "24"|
 s|hostInterface:.*|hostInterface: "$IF_NAME_AMF_N2_SPGWU_N3" # interface of the nodes for amf/N2 and spgwu/N3|
