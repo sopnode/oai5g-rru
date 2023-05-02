@@ -187,6 +187,7 @@ Nota: If you are done with the demo, do not forget to clean up the k8s {master} 
             scheduler.keep_only_between(ends=[j_start_demo] + j_init_quectels, keep_ends=True)
         if not load_images:
             scheduler.bypass_and_remove(j_load_images)
+#TT see how to add scheduler.bypass_and_remove(j_init_quectels)
             purpose += f" (no image loaded)"
             if quectel_nodes and j_prepare_quectels in scheduler.jobs:
                 scheduler.bypass_and_remove(j_prepare_quectels)
