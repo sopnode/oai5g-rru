@@ -199,4 +199,75 @@ Then, to shutdown FIT/R2lab worker nodes and remove them from the k8s cluster, r
 
 ``` bash
 $ ./demo-oai.py --cleanup
+
 ```
+
+
+
+### Scenario with an external Core Network
+
+Using the option --gnb-only, it is possible to run only the OAI5G RAN part, i.e., oai-gnb pod and UEs. 
+
+For instance, the following command will prepare a scenario from scratch to launch the USRP N300-based gNB with 2 Quectel-based UEs:
+
+```
+$ ./demo-oai.py -R n300 -Q7 -Q9 --gnb-only -a -l
+```
+
+Once the script terminates, you need to log on a k8s worker node and configure the following parameters in the script demo-oai.sh to match the external CN parameters:
+
+```
+    IP_AMF_N2="172.22.10.6" # external AMF IP address, e.g., "172.22.10.6"
+    ROUTE_AMF_MULTUS="172.22.10.0/24" # route to reach amf for multus.yaml chart, e.g., "172.22.10.0/24"
+    IP_GNB_N2N3="10.0.20.243" # local IP to reach AMF/UPF, e.g., "10.0.20.243"
+    GW_AMF_MULTUS="10.0.20.1" # gw for multus.yaml chart, e.g., "10.0.20.1"
+    IF_NAME_GNB_N2N3="ran" # Corresponding Host network interface to reach AMF/UPF
+```
+
+Let's assume that the oai-gnb pod can reach the external Core Network through a VPN client running on the server that hosts the oai-gnb pod, the VPN client will provide an IP address in 10.0.20.0/24. Let's also assume that the IP address of the AMF is *172.22.10.6*. 
+The following routes should be added on the latter server.
+
+```
+ip link add ran type veth peer name ran-int
+ip link set up ran
+ip link set up ran-int
+ip addr add 10.0.20.1/24 dev ran-int
+
+```
+
+ 
+At the Core Network side, you should configure the following parameters:
+
+ * MNC="208"
+ * MCC="95"
+ * DNN="oai.ipv4"
+ * SST="1"
+ * TAC="1"
+ * FULL_KEY="8baf473f2f8fd09487cccbd7097c6862"
+ * OPC="8E27B6AF0E692E750F32667A3B14605D"
+
+As precised in https://r2lab.inria.fr/hardware.md, the two Quectel UEs on fit07 and fit09 have IMSI: <208950000000014> and <208950000000015> respectively. So, to authenticate UEs in the CN, the mysql database should be configured with:
+
+```
+INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
+('208950000000014', '5G_AKA', '8baf473f2f8fd09487cccbd7097c6862', '8baf473f2f8fd09487cccbd7097c6862', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"\lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '8E27B6AF0E692E750F32667A3B14605D', NULL, NULL, NULL, NULL, '208950000000014');
+
+INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
+('208950000000015', '5G_AKA', '8baf473f2f8fd09487cccbd7097c6862', '8baf473f2f8fd09487cccbd7097c6862', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"\lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '8E27B6AF0E692E750F32667A3B14605D', NULL, NULL, NULL, NULL, '208950000000015');
+
+INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES
+('208950000000014', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}', '{\"oai.ipv4\":{\"pduSessionTypes\": { \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15, \"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1}, \"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"\downlink\":\"1000Mbps\"}}}');
+
+INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES
+('208950000000015', '20895', '{\"sst\": 1, \"sd\": \"16777215\"}', '{\"oai.ipv4\":{\"pduSessionTypes\": { \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15, \"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"}, \"priorityLevel\":1}, \"sessionAmbr\":{\"uplink\": \"1000Mbps\", \"\downlink\": \"1000Mbps\"}}}');
+
+```
+
+Before running the oai-gnb pod, you should check that you have the following route *172.22.10.0/24* set to reach the AMF.
+
+Then, log on the k8s worker node and start the oai-gnb pod:
+
+```
+root@fit01# ./demo-oai.sh start-gnb
+```
+
