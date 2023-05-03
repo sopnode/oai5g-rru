@@ -51,6 +51,7 @@ multus:    # needed when gnB service will run on another interface rather than t
 
 config:
   mountConfig: true #If config file is mounted then please edit mount.conf in configmap.yaml properly 
+  includeTcpDumpContainer: false #If true it will add a tcpdump container inside network function pod for debugging
   useSATddMono: true
   timeZone: "Europe/Paris"
   rfSimulator: "server"
@@ -75,8 +76,6 @@ config:
 start:
   gnb: true
   tcpdump: false
-
-includeTcpDumpContainer: false #If true it will add a tcpdump container inside network function pod for debugging
 
 podSecurityContext:
   runAsUser: 0

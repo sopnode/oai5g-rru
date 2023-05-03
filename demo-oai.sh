@@ -231,7 +231,7 @@ function get-cn-pcap(){
 
     AMF_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-amf" -o jsonpath="{.items[0].metadata.name}")
     echo "Retrieve OAI5G CN pcap files from the AMF pod on ns $ns"
-    echo "kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz pcap"
+    echo "kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz -C tmp pcap"
     kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz -C tmp pcap || true
     echo "kubectl -c tcpdump cp $ns/$AMF_POD_NAME:cn-pcap.tgz $prefix/cn-pcap.tgz"
     kubectl -c tcpdump cp $ns/$AMF_POD_NAME:cn-pcap.tgz $prefix/cn-pcap-"$DATE".tgz || true
