@@ -5,12 +5,6 @@ nfimage:   # image name either locally present or in a public/private repository
   version: @GNB_N3XX_TAG@ 
   pullPolicy: IfNotPresent # IfNotPresent or Never or Always
 
-tcpdumpimage:
-  repository: docker.io/corfr/tcpdump
-  version: latest
-  pullPolicy: IfNotPresent # IfNotPresent or Never or Always
-
-
 # good to use when pulling images from docker-hub mention 
 imagePullSecrets: 
  - name: "regcred"
@@ -24,44 +18,36 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: "oai-gnb-sa"
 
-podSecurityContext:
-  runAsUser: 0
-  runAsGroup: 0
-
-securityContext:
-  privileged: true
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
 #service type is fixed to clusterIP, it is only support for non multus interface (eth0)
 
-start:
-  gnb: true
-  tcpdump: false
+# These helm-charts can be used for two purpose
+# 1. RFSimulated oai-gNB: Only requires 1 interface for N2 and N3. You can use Kubernetes default interface eth0
+# 2. Physical gNB with Ethernet based USRP or RRU: You need to use ruInterface to connect with RU. Make sure that the ip-address you choose can reach to RU. 
+#                                                 Using a dedicated interface for N2 or N3 is optional you can still use eth0. 
+# 3. Another thing you can chose to use same virtual interface for N2/N3 its optional to have two different
 
-# gNB needs two seperate interface one for ngap (N2) and other one for gtpu (N3) 
-# But for experimentation only one interface can be used. 
-# When you need multus:
-# 1. you want seperate interface for N2 and N3 
-# 2. You want static ip-address for N2 and N3 interface
-# 3. Different interfaces for different packets
+## NOTE: To use these charts with USRP B210 you need to modify and mount usb from the host. 
+## Change these ip-addresses according to your environment
+# Multus interface name
 
 multus:    # needed when gnB service will run on another interface rather than traditional eth0
-  create: false
-  n2n3IPadd: "172.21.6.203"
-  n2n3Netmask: "22"
-  n2n3hostInterface: "bond0"
-  sfp1IPadd: "192.168.10.132" # .10.129 for our USRP N300 and .10.130 for our N320
-  sfp1Netmask: "24"
-  sfp1hostInterface: "eth2"
-  sfp2IPadd: "192.168.20.132" #	.20.129 for our USRP N300 and .20.130 for our N320
-  sfp2Netmask: "24"
-  sfp2hostInterface: "eth3"
-
+  n2n3Interface:
+    create: false
+    IPadd: "172.21.6.203"
+    Netmask: "22"
+    hostInterface: "bond0"
+  sfp1Interface:
+    create: false
+    IPadd: "192.168.10.132" # .10.129 for our USRP N300 and .10.130 for our N320
+    Netmask: "24"
+    mtu: 9000
+    hostInterface: "eth2"
+  sfp2Interface:
+    create: false
+    IPadd: "192.168.20.132" #	.20.129 for our USRP N300 and .20.130 for our N320
+    Netmask: "24"
+    mtu: 9000
+    hostInterface: "eth3"
 
 config:
   mountConfig: true #If config file is mounted then please edit mount.conf in configmap.yaml properly 
@@ -85,19 +71,61 @@ config:
   threadParallelConfig: "PARALLEL_SINGLE_THREAD"
   sdrAddrs: "serial=XXXXXXX"
 
+## Debugging section
+start:
+  gnb: true
+  tcpdump: false
+
+includeTcpDumpContainer: false #If true it will add a tcpdump container inside network function pod for debugging
+
+podSecurityContext:
+  runAsUser: 0
+  runAsGroup: 0
+
+securityContext:
+  privileged: true
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+tcpdumpimage:
+  repository: docker.io/corfr/tcpdump
+  version: latest
+  pullPolicy: IfNotPresent # IfNotPresent or Never or Always
+
+
+# gNB needs two seperate interface one for ngap (N2) and other one for gtpu (N3) 
+# But for experimentation only one interface can be used. 
+# When you need multus:
+# 1. you want seperate interface for N2 and N3 
+# 2. You want static ip-address for N2 and N3 interface
+# 3. Different interfaces for different packets
+
+
 persistent:
   sharedvolume: false
   volumeName: oai5g-volume
   size: 1Gi
 
 resources:
-  define: false
+  define: true
   limits:
-    cpu: 100m
-    memory: 128Mi
+    tcpdump:
+      cpu: 100m
+      memory: 128Mi
+    nf:
+      cpu: 100m
+      memory: 128Mi
   requests:
-   cpu: 100m
-   memory: 256Mi
+    tcpdump:
+      cpu: 100m
+      memory: 128Mi
+    nf:
+      cpu: 100m
+      memory: 128Mi
 
 
 tolerations: []

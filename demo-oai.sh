@@ -232,7 +232,7 @@ function get-cn-pcap(){
     AMF_POD_NAME=$(kubectl get pods --namespace $ns -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-amf" -o jsonpath="{.items[0].metadata.name}")
     echo "Retrieve OAI5G CN pcap files from the AMF pod on ns $ns"
     echo "kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz pcap"
-    kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz pcap || true
+    kubectl -c tcpdump -n $ns exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz -C tmp pcap || true
     echo "kubectl -c tcpdump cp $ns/$AMF_POD_NAME:cn-pcap.tgz $prefix/cn-pcap.tgz"
     kubectl -c tcpdump cp $ns/$AMF_POD_NAME:cn-pcap.tgz $prefix/cn-pcap-"$DATE".tgz || true
 }
@@ -543,8 +543,8 @@ EOF
 	cat > "$SED_VALUES_FILE" <<EOF
 s|@GNB_N3XX_REPO@|$GNB_N3XX_REPO|
 s|@GNB_N3XX_TAG@|$GNB_N3XX_TAG|
-s|sfp1hostInterface:.*|sfp1hostInterface: "$IF_NAME_LOCAL_N3XX_1"|
-s|sfp2hostInterface:.*|sfp2hostInterface: "$IF_NAME_LOCAL_N3XX_2"|
+s|sfp1Interface.hostInterface:.*|sfp1Interface.hostInterface: "$IF_NAME_LOCAL_N3XX_1"|
+s|sfp2Interface.hostInterface:.*|sfp2Interface.hostInterface: "$IF_NAME_LOCAL_N3XX_2"|
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
 EOF
 	RRU_TYPE="n3xx"
@@ -686,9 +686,10 @@ EOF
 	cat >> "$SED_VALUES_FILE" <<EOF
 s|create: false|create: true|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
-s|n2n3IPadd:.*|n2n3IPadd: "$IP_GNB_N2N3"|
-s|n2n3Netmask:.*|n2n3Netmask: "24"|
-s|n2n3hostInterface:.*|n2n3hostInterface: "$IF_NAME_GNB_N2N3"|
+s|includeTcpDumpContainer:.*|includeTcpDumpContainer: $GENER_PCAP|
+s|n2n3Interface.IPadd:.*|n2n3Interface.IPadd: "$IP_GNB_N2N3"|
+s|n2n3Interface.Netmask:.*|n2n3Interface.Netmask: "24"|
+s|n2n3Interface.hostInterface:.*|n2n3Interface.hostInterface: "$IF_NAME_GNB_N2N3"|
 s|mountConfig:.*|mountConfig: true|
 s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
 s|nodeName:.*|nodeName: $node_gnb|
