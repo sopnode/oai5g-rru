@@ -106,14 +106,14 @@ resources:
   limits:
     nf:
       cpu: 8
-      memory: 128Mi
+    #  memory: 128Mi
     # tcpdump:
     #   cpu: 8
     #   memory: 128Mi
   requests:
     nf:
       cpu: 8
-      memory: 128Mi
+    #  memory: 128Mi
     # tcpdump:
     #   cpu: 8
     #   memory: 128Mi
