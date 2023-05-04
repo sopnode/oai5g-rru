@@ -36,21 +36,21 @@ serviceAccount:
 multus:    # needed when gnB service will run on another interface rather than traditional eth0
   n2n3Interface:
     create: false
-    IPadd: "172.21.6.203"
-    Netmask: "22"
-    hostInterface: "bond0"
+    IPadd: "@IP_GNB_N2N3@"
+    Netmask: "@NETMASK_GNB_N2N3@"
+    hostInterface: "@IF_NAME_GNB_N2N3@"
   sfp1Interface:
     create: false
-    IPadd: "192.168.10.132" # .10.129 for our USRP N300 and .10.130 for our N320
+    IPadd: "@IP_GNB_SFP1@" 
     Netmask: "24"
     mtu: 9000
-    hostInterface: "eth2"
+    hostInterface: "@IF_NAME_N3XX_1@"
   sfp2Interface:
     create: false
-    IPadd: "192.168.20.132" # .20.129 for our USRP N300 and .20.130 for our N320
+    IPadd: "@IP_GNB_SFP2@" 
     Netmask: "24"
     mtu: 9000
-    hostInterface: "eth3"
+    hostInterface: "@IF_NAME_N3XX_2@"
 
 config:
   mountConfig: true #If config file is mounted then please edit mount.conf in configmap.yaml properly 

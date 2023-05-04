@@ -14,20 +14,20 @@ DEF_PCAP= # boolean if pcap are generated on pods
 
 PREFIX_STATS="/tmp/oai5g-stats"
 
-# IP Pod addresses
+# IP local Pod addresses
 P100="192.168.100"
 IP_AMF_N2="$P100.241"
 IP_UPF_N3="$P100.242" # Nota: only used for CN configuration
 IP_GNB_N2="$P100.243"
 IP_GNB_N3="$P100.244"
 IP_GNB_N2N3="$P100.243"
+IP_GNB_SFP1="192.168.10.132"
+IP_GNB_SFP2="192.168.20.132"
 IP_GNB_AW2S="$P100.245" 
-IP_NRUE="$P100.246" 
+IP_NRUE="$P100.246"
 
-# Interfaces names of VLANs in sopnode servers
-IF_NAME_VLAN100="p4-net"
-IF_NAME_VLAN10="p4-net-10"
-IF_NAME_VLAN20="p4-net-20"
+# Netmask definitions
+NETMASK_GNB_N2N3="24"
 
 # IP addresses of RRU devices
 # USRP N3XX devices
@@ -40,14 +40,19 @@ ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130"
 ADDR_JAGUAR="$P100.48" # for eth1
 ADDR_PANTHER="$P100.51" # .51 for eth2
 
-# N2/N3 Interfaces definition
+# Interfaces names of VLANs in sopnode servers
+IF_NAME_VLAN100="p4-net"
+IF_NAME_VLAN10="p4-net-10"
+IF_NAME_VLAN20="p4-net-20"
+
+# N2/N3 and RRU Interfaces definitions
 IF_NAME_AMF_N2_SPGWU_N3="$IF_NAME_VLAN100" # Nota: only used for CN configuration
 IF_NAME_GNB_N2="$IF_NAME_VLAN100"
 IF_NAME_GNB_N3="$IF_NAME_VLAN100"
 IF_NAME_GNB_N2N3="$IF_NAME_VLAN100"
-IF_NAME_LOCAL_AW2S="$IF_NAME_VLAN100"
-IF_NAME_LOCAL_N3XX_1="$IF_NAME_VLAN10"
-IF_NAME_LOCAL_N3XX_2="$IF_NAME_VLAN20"
+IF_NAME_AW2S="$IF_NAME_VLAN100"
+IF_NAME_N3XX_1="$IF_NAME_VLAN10"
+IF_NAME_N3XX_2="$IF_NAME_VLAN20"
 IF_NAME_NRUE="$IF_NAME_VLAN100"
 
 # IN CASE OF EXTERNAL CORE NETWORK USAGE (i.e., DEF_GNB_ONLY IS TRUE), CONFIGURE FOLLOWING PARAMETERS BELOW
@@ -543,8 +548,8 @@ EOF
 	cat > "$SED_VALUES_FILE" <<EOF
 s|@GNB_N3XX_REPO@|$GNB_N3XX_REPO|
 s|@GNB_N3XX_TAG@|$GNB_N3XX_TAG|
-s|sfp1Interface.hostInterface:.*|sfp1Interface.hostInterface: "$IF_NAME_LOCAL_N3XX_1"|
-s|sfp2Interface.hostInterface:.*|sfp2Interface.hostInterface: "$IF_NAME_LOCAL_N3XX_2"|
+s|sfp1Interface.hostInterface:.*|sfp1Interface.hostInterface: "$IF_NAME_N3XX_1"|
+s|sfp2Interface.hostInterface:.*|sfp2Interface.hostInterface: "$IF_NAME_N3XX_2"|
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
 EOF
 	RRU_TYPE="n3xx"
@@ -574,7 +579,7 @@ EOF
 s|@GNB_AW2S_REPO@|$GNB_AW2S_REPO|
 s|@GNB_AW2S_TAG@|$GNB_AW2S_TAG|
 s|aw2sIPadd:.*|aw2sIPadd: "$IP_GNB_AW2S"|
-s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_LOCAL_AW2S"|
+s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_AW2S"|
 s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
 EOF
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
@@ -687,9 +692,13 @@ EOF
 s|create: false|create: true|
 s|tcpdump:.*|tcpdump: $GENER_PCAP|
 s|includeTcpDumpContainer:.*|includeTcpDumpContainer: $GENER_PCAP|
-s|n2n3Interface.IPadd:.*|n2n3Interface.IPadd: "$IP_GNB_N2N3"|
-s|n2n3Interface.Netmask:.*|n2n3Interface.Netmask: "24"|
-s|n2n3Interface.hostInterface:.*|n2n3Interface.hostInterface: "$IF_NAME_GNB_N2N3"|
+s|@IP_GNB_N2N3@|$IP_GNB_N2N3|
+s|@NETMASK_GNB_N2N3@|$NETMASK_GNB_N2N3|
+s|@IF_NAME_GNB_N2N3@|$IF_NAME_GNB_N2N3|
+s|@IP_GNB_SFP1@|$IP_GNB_SFP1|
+s|@IF_NAME_N3XX_1@|$IF_NAME_N3XX_1|
+s|@IP_GNB_SFP2@|$IP_GNB_SFP2|
+s|@IF_NAME_N3XX_2@|$IF_NAME_N3XX_2|
 s|mountConfig:.*|mountConfig: true|
 s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
 s|nodeName:.*|nodeName: $node_gnb|
