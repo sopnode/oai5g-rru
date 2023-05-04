@@ -15,7 +15,7 @@ spec:
     metadata:
       labels:
         {{- include "oai-gnb.selectorLabels" . | nindent 8 }}
-        app: 5gnb
+        app: oai-gnb
     {{- if .Values.multus.n2n3Interface.create }}
       annotations:
         k8s.v1.cni.cncf.io/networks: >-
@@ -47,12 +47,16 @@ spec:
       containers:
       - name: gnb
         image: "{{ .Values.nfimage.repository }}:{{ .Values.nfimage.version }}"
+        imagePullPolicy: {{ .Values.nfimage.pullPolicy }}
         {{- if .Values.config.mountConfig}}
         volumeMounts:
           - mountPath: /opt/oai-gnb/etc/mounted.conf
             name: configuration
             subPath: mounted.conf
         {{- end}}
+          ## USRP B210/B200 Mini
+          # - mountPath: /dev/bus/usb/
+          #   name: usrp
         {{- if .Values.resources.define}}
         resources:
           requests:
@@ -70,10 +74,10 @@ spec:
            #    drop:
            #     - ALL
         ports:
-         - containerPort: 2152
+        - containerPort: 2152
           name: n3
           protocol: UDP
-       - containerPort: 36412
+        - containerPort: 36412
           name: n2
           protocol: SCTP
         {{- if .Values.start.gnb}}
@@ -214,25 +218,28 @@ spec:
           - /bin/sleep
           - infinity
         {{- end}}
-        {{- if .Values.persistent.sharedvolume}}
+        {{- if .Values.persistent.sharedvolume }}
         volumeMounts:
         - mountPath: "/pcap"
           name: oai5g-pv
         {{- end}}
       {{- end }}
       volumes:
-      {{- if .Values.persistent.sharedvolume}}
+      {{- if .Values.persistent.sharedvolume }}
       - name: oai5g-pv
         persistentVolumeClaim:
           claimName: oai5g-pvc
       {{- end }}
-      {{- if .Values.config.mountConfig}}
+      {{- if .Values.config.mountConfig }}
       - configMap:
           name: {{ .Chart.Name }}-configmap
         name: configuration
       {{- end}}
-      Dnspolicy: Clusterfirst
-      Restartpolicy: Always
+      # - name: usrp
+      #   hostPath:
+      #     path: /dev/bus/usb/
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
       schedulerName: default-scheduler
       serviceAccountName: {{ .Values.serviceAccount.name }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
