@@ -74,6 +74,7 @@ CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf" # this one needs -E as an 
 CONF_N3XX="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
 CONF_RFSIM="gnb.sa.band78.106prb.rfsim.2x2.conf" #this one works
 #CONF_RFSIM="gnb.sa.band78.fr1.51PRB.rfsim.conf"
+N3XX_QOS_GUARANTEE="true"
 
 
 
@@ -701,6 +702,7 @@ s|@IP_GNB_SFP2@|$IP_GNB_SFP2|
 s|@IF_NAME_N3XX_2@|$IF_NAME_N3XX_2|
 s|mountConfig:.*|mountConfig: true|
 s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
+s|define:.*|define: $N3XX_QOS_GUARANTEE|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
     fi
