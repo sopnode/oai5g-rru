@@ -606,7 +606,7 @@ function configure-gnb() {
 	MULTUS_GNB_RU1="true"
 	IP_GNB_RU1="$IP_GNB_AW2S"
 	MTU_GNB_RU1=""
-	IF_NAME_GNB_RU1="IF_NAME_AW2S"
+	IF_NAME_GNB_RU1="$IF_NAME_AW2S"
 	MULTUS_GNB_RU2="false"
 	IP_GNB_RU2=""
 	MTU_GNB_RU2=""
