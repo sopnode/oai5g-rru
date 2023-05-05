@@ -753,7 +753,11 @@ function configure-nr-ue() {
     cp "$DIR_CHARTS"/nr-ue-multus-rfsim.yaml "$DIR_TEMPLATES"/multus.yaml
     
     if [[ $pcap == "True" ]]; then
+	TCPDUMP_CONTAINER_NRUE_CREATE="true"
 	echo "nr-ue: will NOT generate PCAP file to avoid wasting all memory resources!"
+	echo "However, a tcpdump container will be created for testing purpose"
+    else
+	TCPDUMP_CONTAINER_NRUE_CREATE="false"
     fi
 
     ORIG_CHART="$DIR"/values.yaml
@@ -776,7 +780,7 @@ s|@SST@|$SST|
 s|@SSD@|$SSD|
 s|@ADD_OPTIONS_NRUE@|$ADD_OPTIONS_NRUE|
 s|@TCPDUMP_NRUE_START@|false|
-s|@TCPDUMP_CONTAINER_NRUE_CREATE@|false|
+s|@TCPDUMP_CONTAINER_NRUE_CREATE@|$TCPDUMP_CONTAINER_NRUE_CREATE|
 s|@SHARED_VOL_NRUE@|false|
 s|@QOS_NRUE_DEF@|false|
 s|nodeName:.*|nodeName:|
