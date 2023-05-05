@@ -57,7 +57,7 @@ config:
   mountConfig: @MOUNTCONFIG_GNB@ #If config file is mounted then please edit mount.conf in configmap.yaml properly
   rru: @RRU_TYPE@
   useAdditionalOptions: "@ADD_OPTIONS_GNB@"
-# Following config paramters unused as config is mounted
+# Following config parameters unused and set with mounted conf file in configmap.yaml chart
   useSATddMono: true
   timeZone: "Europe/Paris"
   rfSimulator: "server"
@@ -70,7 +70,7 @@ config:
   nssaiSst: "1"  #currently only 4 standard values are allowed 1,2,3,4 
   nssaiSd0: "ffffff"    #values in hexa-decimal format
   amfIpAddress: "oai-amf-svc"  # amf ip-address or service-name oai-amf-svc
-  gnbNgaIfName: "eth0"            # net1 in case multus create is true that means another interface is created for ngap interface, n2 to communicate with amf
+  gnbNgaIfName: "eth0" # net1 in case multus create is true that means another interface is created for ngap interface, n2 to communicate with amf
   gnbNgaIpAddress: "status.podIP" # n2n3IPadd in case multus create is true
   gnbNguIfName: "eth0"   #net1 in case multus create is true gtu interface for upf/spgwu
   gnbNguIpAddress: "status.podIP" # n2n3IPadd in case multus create is true
