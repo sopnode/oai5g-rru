@@ -106,18 +106,18 @@ resources:
   define: @QOS_GNB_DEF@
   limits:
     nf:
-      cpu: @NB_CPU_GNB@ #8
-      memory: @MEMORY_GNB@ #3500M
+      cpu: 8
+      memory: 3500M
     # tcpdump:
     #   cpu: 8
-    #   memory: 128Mi
+    #   memory: 3500M
   requests:
     nf:
-      cpu: @NB_CPU_GNB@
-      memory: @MEMORY_GNB@ 
+      cpu: 8
+      memory: 3500M
     # tcpdump:
     #   cpu: 8
-    #   memory: 128Mi
+    #   memory: 3500M
 
 
 tolerations: []
