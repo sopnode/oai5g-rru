@@ -96,8 +96,10 @@ spec:
         {{- if .Values.config.mountConfig}}
           - name: USE_VOLUMED_CONF
             value: "yes"
+        {{- if eq .Values.useN3XX "true" }}
           - name: USE_N3XX
             value: "True"
+        {{- end}}
         {{- end}}
         {{- if not .Values.config.mountConfig}}
           - name: USE_SA_TDD_MONO

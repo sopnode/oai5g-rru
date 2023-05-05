@@ -54,7 +54,8 @@ multus:
     hostInterface: "@IF_NAME_GNB_RU2@"
 
 config:
-  mountConfig: @MOUNTCONFIG_GNB@ #If config file is mounted then please edit mount.conf in configmap.yaml properly 
+  mountConfig: @MOUNTCONFIG_GNB@ #If config file is mounted then please edit mount.conf in configmap.yaml properly
+  useN3XX: @USE_N3XX@
   useSATddMono: true
   timeZone: "Europe/Paris"
   rfSimulator: "server"

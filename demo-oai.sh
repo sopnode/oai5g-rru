@@ -561,6 +561,7 @@ function configure-gnb() {
 	MTU_GNB_RU2=""
 	IF_NAME_GNB_RU2=""
 	MOUNTCONFIG_GNB="true"
+	USE_N3XX="false"
 	ADD_OPTIONS_GNB="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 	QOS_GNB_DEF="false"
 
@@ -585,6 +586,7 @@ function configure-gnb() {
 	MTU_GNB_RU2="$MTU_N3XX"
 	IF_NAME_GNB_RU2="$IF_NAME_N3XX_2"
 	MOUNTCONFIG_GNB="true"
+	USE_N3XX="true"
 	ADD_OPTIONS_GNB="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
 	QOS_GNB_DEF="true"
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
@@ -610,6 +612,7 @@ function configure-gnb() {
 	MTU_GNB_RU2=""
 	IF_NAME_GNB_RU2=""
 	MOUNTCONFIG_GNB="true"
+	USE_N3XX="false"
 	ADD_OPTIONS_GNB="--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
 	QOS_GNB_DEF="true"
 	
@@ -628,6 +631,7 @@ function configure-gnb() {
 	MTU_GNB_RU2=""
 	IF_NAME_GNB_RU2=""
 	MOUNTCONFIG_GNB="true"
+	USE_N3XX="false"
 	ADD_OPTIONS_GNB="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
 	QOS_GNB_DEF="false"
 
@@ -710,6 +714,7 @@ s|@NETMASK_GNB_RU2@|$NETMASK_GNB_RU2|
 s|@MTU_GNB_RU2@|$MTU_GNB_RU2|
 s|@IF_NAME_GNB_RU2@|$IF_NAME_GNB_RU2|
 s|@MOUNTCONFIG_GNB@|$MOUNTCONFIG_GNB|
+s|@USE_N3XX@|$USE_N3XX|
 s|@TCPDUMP_GNB_START@|$TCPDUMP_GNB_START|
 s|@TCPDUMP_CONTAINER_GNB_CREATE@|$TCPDUMP_CONTAINER_GNB_CREATE|
 s|@GNB_SHARED_VOL@|$GNB_SHARED_VOL|
