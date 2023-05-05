@@ -2,7 +2,7 @@ kubernetesType: Vanilla  #Vanilla for community kubernetes distribution
 
 nfimage:
   repository: @NRUE_REPO@           # dockehub oaisoftwarealliance/oai-nr-ue
-  version: @NRUE_TAG # image tag    # develop tag experimental features 
+  version: @NRUE_TAG@ # image tag    # develop tag experimental features 
   pullPolicy: IfNotPresent # IfNotPresent or Never or Always
 
 
