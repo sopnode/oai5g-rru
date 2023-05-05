@@ -56,6 +56,8 @@ multus:
 config:
   mountConfig: @MOUNTCONFIG_GNB@ #If config file is mounted then please edit mount.conf in configmap.yaml properly
   useN3XX: @USE_N3XX@
+  useAdditionalOptions: "@ADD_OPTIONS_GNB@"
+# Following config paramters unused as config is mounted
   useSATddMono: true
   timeZone: "Europe/Paris"
   rfSimulator: "server"
@@ -72,7 +74,6 @@ config:
   gnbNgaIpAddress: "status.podIP" # n2n3IPadd in case multus create is true
   gnbNguIfName: "eth0"   #net1 in case multus create is true gtu interface for upf/spgwu
   gnbNguIpAddress: "status.podIP" # n2n3IPadd in case multus create is true
-  useAdditionalOptions: "--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
   threadParallelConfig: "PARALLEL_SINGLE_THREAD"
   sdrAddrs: "serial=XXXXXXX"
 
