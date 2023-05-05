@@ -28,6 +28,11 @@ IP_NRUE="$P100.246"
 
 # Netmask definitions
 NETMASK_GNB_N2N3="24"
+NETMASK_GNB_RU1="24"
+NETMASK_GNB_RU2="24"
+
+#MTU definitions
+MTU_N3XX="9000"
 
 # IP addresses of RRU devices
 # USRP N3XX devices
@@ -57,10 +62,10 @@ IF_NAME_NRUE="$IF_NAME_VLAN100"
 
 # IN CASE OF EXTERNAL CORE NETWORK USAGE (i.e., DEF_GNB_ONLY IS TRUE), CONFIGURE FOLLOWING PARAMETERS BELOW
 if [[ $DEF_GNB_ONLY == "True" ]]; then
-    IP_AMF_N2="172.22.10.6" # external AMF IP address, e.g., "172.22.10.6"
-    ROUTE_AMF_MULTUS="172.22.10.0/24" # route to reach amf for multus.yaml chart, e.g., "172.22.10.0/24"
+    AMF_IP_ADDR="172.22.10.6" # external AMF IP address, e.g., "172.22.10.6"
+    ROUTE_GNB_TO_EXTCN="172.22.10.0/24" # route to reach amf for multus.yaml chart, e.g., "172.22.10.0/24"
     IP_GNB_N2N3="10.0.20.243" # local IP to reach AMF/UPF, e.g., "10.0.20.243"
-    GW_AMF_MULTUS="10.0.20.1" # gw for multus.yaml chart, e.g., "10.0.20.1"
+    GW_GNB_TO_EXTCN="10.0.20.1" # gw for multus.yaml chart, e.g., "10.0.20.1"
     IF_NAME_GNB_N2N3="ran" # Corresponding Host network interface to reach AMF/UPF
 fi
 
@@ -98,6 +103,8 @@ FULL_KEY="@FULL_KEY@"
 OPC="@OPC@"
 RFSIM_IMSI="@RFSIM_IMSI@"
 #
+TAC="1"
+SST="1"
 
 ####
 #    Following variables used to select repo and tag for OAI5G docker images
@@ -510,7 +517,7 @@ function configure-gnb() {
     
 
     # Prepare mounted.conf and gnb chart files
-    echo "configure-gnb to run on node $node_gnb with RRU $rru and pcap is $pcap"
+    echo "configure-gnb: gNB on node $node_gnb with RRU $rru and pcap is $pcap"
     echo "First prepare gNB mounted.conf and values/multus/configmap/deployment charts for $rru"
 
     FUNCTION="oai-gnb"
@@ -523,104 +530,124 @@ function configure-gnb() {
     SED_CONF_FILE="/tmp/gnb_conf.sed"
     SED_VALUES_FILE="/tmp/$FUNCTION-values.sed"
     SED_DEPLOYMENT_FILE="/tmp/$FUNCTION-deployment.sed"
-    
+
+    if [[ $pcap == "True" ]]; then
+	TCPDUMP_CONTAINER_GNB_CREATE="true"
+	TCPDUMP_GNB_START="true"
+	GNB_SHARED_VOL="true"
+    else
+	TCPDUMP_CONTAINER_GNB_CREATE="false"
+	TCPDUMP_GNB_START="false"
+	GNB_SHARED_VOL="false"
+    fi
+
+    GNB_NAME="gNB_R2lab"
+    # Configure parameters for values.yaml chart according to RRU type
     if [[  "$rru" == "b210" ]]; then
-	#multus=false;#mountedConfig=true; # @var@ will be used to set AMF/NGA/NGU IP addresses
-	RRU_TYPE="b210"
-	cat > "$SED_VALUES_FILE" <<EOF
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"|
-EOF
+	# no multus;  @var@ will be used to set AMF/NGA/NGU IP addresses just before the gnb starts
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
+	GNB_REPO=$GNB_B210_REPO
+	GNB_TAG=$GNB_B210_TAG
+	GNB_NAME="$GNB_NAME-b210"
+	MULTUS_GNB_N2N3="true"
+	MULTUS_GNB_RU1="false"
+	IP_GNB_RU1=""
+	MTU_GNB_RU1=""
+	IF_NAME_GNB_RU1=""
+	MULTUS_GNB_RU2=""
+	IP_GNB_RU2=""
+	MTU_GNB_RU2=""
+	IF_NAME_GNB_RU2=""
+	MOUNTCONFIG_GNB="true"
+	ADD_OPTIONS_GNB="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
     elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
-	#multus=true; 
 	if [[ "$rru" == "n300" ]]; then
+	    GNB_NAME="$GNB_NAME-n300"
 	    SDR_ADDRS="$ADDRS_N300"
 	elif [[ "$rru" == "n320" ]]; then
+	    GNB_NAME="$GNB_NAME-n320"
 	    SDR_ADDRS="$ADDRS_N320"
 	fi
-	cat > "$SED_CONF_FILE" <<EOF
-s|ipv4       =.*|ipv4       = "$IP_AMF_N2";|
-s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
-s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2N3/24";|
-s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net1";|
-s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N2N3/24";|
-s|sdr_addrs =.*|sdr_addrs = "$SDR_ADDRS,clock_source=internal,time_source=internal"|
-EOF
-	cat > "$SED_VALUES_FILE" <<EOF
-s|@GNB_N3XX_REPO@|$GNB_N3XX_REPO|
-s|@GNB_N3XX_TAG@|$GNB_N3XX_TAG|
-s|sfp1Interface.hostInterface:.*|sfp1Interface.hostInterface: "$IF_NAME_N3XX_1"|
-s|sfp2Interface.hostInterface:.*|sfp2Interface.hostInterface: "$IF_NAME_N3XX_2"|
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
-EOF
-	RRU_TYPE="n3xx"
 	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
+	GNB_REPO=$GNB_N3XX_REPO
+	GNB_TAG=$GNB_N3XX_TAG
+	MULTUS_GNB_N2N3="true"
+	MULTUS_GNB_RU1="true"
+	IP_GNB_RU1="$IP_GNB_SFP1"
+	MTU_GNB_RU1="$MTU_N3XX"
+	IF_NAME_GNB_RU1="IF_NAME_N3XX_1"
+	MULTUS_GNB_RU2="true"
+	IP_GNB_RU2="$IP_GNB_SFP2"
+	MTU_GNB_RU2="$MTU_N3XX"
+	IF_NAME_GNB_RU2="IF_NAME_N3XX_2"
+	MOUNTCONFIG_GNB="true"
+	ADD_OPTIONS_GNB="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
-	# multus=true; 
-	RRU_TYPE="aw2s"
 	if [[  "$rru" == "jaguar" ]]; then
+	    GNB_NAME="$GNB_NAME-jaguar"
 	    CONF_AW2S="$CONF_JAGUAR"
 	    ADDR_AW2S="$ADDR_JAGUAR"
 	else
+	    GNB_NAME="$GNB_NAME-panther"
 	    CONF_AW2S="$CONF_PANTHER"
 	    ADDR_AW2S="$ADDR_PANTHER"
 	fi
-	cat > "$SED_CONF_FILE" <<EOF
-s|ipv4       =.*|ipv4       = "$IP_AMF_N2";|
-s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
-s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2N3/24";|
-s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net1";|
-s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N3N3/24";|
-s|local_if_name.*|local_if_name  = "net2"|
-s|remote_address.*|remote_address = "$ADDR_AW2S"|
-s|local_address.*|local_address = "$IP_GNB_AW2S"|
-s|sdr_addrs =.*||
-EOF
-	cat >> "$SED_VALUES_FILE" <<EOF
-s|@GNB_AW2S_REPO@|$GNB_AW2S_REPO|
-s|@GNB_AW2S_TAG@|$GNB_AW2S_TAG|
-s|aw2sIPadd:.*|aw2sIPadd: "$IP_GNB_AW2S"|
-s|aw2shostInterface:.*|aw2shostInterface: "$IF_NAME_AW2S"|
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"|
-EOF
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
+	GNB_REPO=$GNB_AW2S_REPO
+	GNB_TAG=$GNB_AW2S_TAG
+	MULTUS_GNB_N2N3="true"
+	MULTUS_GNB_RU1="true"
+	IP_GNB_RU1="$IP_GNB_AW2S"
+	MTU_GNB_RU1=""
+	IF_NAME_GNB_RU1="IF_NAME_AW2S"
+	MULTUS_GNB_RU2="false"
+	IP_GNB_RU2=""
+	MTU_GNB_RU2=""
+	IF_NAME_GNB_RU2=""
+	MOUNTCONFIG_GNB="true"
+	ADD_OPTIONS_GNB="--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
     elif [[ "$rru" == "rfsim" ]]; then
-	# multus=true; 
-	RRU_TYPE="rfsim"
+        GNB_NAME="$GNB_NAME-rfsim"
 	CONF_ORIG="$DIR_CONF/$CONF_RFSIM"
-	cat > "$SED_CONF_FILE" <<EOF
-s|ipv4       =.*|ipv4       = "$IP_AMF_N2";|
-s|GNB_INTERFACE_NAME_FOR_NG_AMF.*|GNB_INTERFACE_NAME_FOR_NG_AMF            = "net1";|
-s|GNB_IPV4_ADDRESS_FOR_NG_AMF.*|GNB_IPV4_ADDRESS_FOR_NG_AMF              = "$IP_GNB_N2N3/24";|
-s|GNB_INTERFACE_NAME_FOR_NGU.*|GNB_INTERFACE_NAME_FOR_NGU               = "net1";|
-s|GNB_IPV4_ADDRESS_FOR_NGU.*|GNB_IPV4_ADDRESS_FOR_NGU                 = "$IP_GNB_N2N3/24";|
-EOF
-cat > "$SED_VALUES_FILE" <<EOF
-s|useAdditionalOptions:.*|useAdditionalOptions: "--sa -E --rfsim --log_config.global_log_options level,nocolor,time"|
-EOF
+	GNB_REPO=$GNB_RFSIM_REPO
+	GNB_TAG=$GNB_RFSIM_TAG
+	MULTUS_GNB_N2N3="true"
+	MULTUS_GNB_RU1="false"
+	IP_GNB_RU1=""
+	MTU_GNB_RU1=""
+	IF_NAME_GNB_RU1=""
+	MULTUS_GNB_RU2="false"
+	IP_GNB_RU2=""
+	MTU_GNB_RU2=""
+	IF_NAME_GNB_RU2=""
+	MOUNTCONFIG_GNB="true"
+	ADD_OPTIONS_GNB="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
     else
 	echo "Unknown rru selected: $rru"
 	usage
     fi
     
-    echo "Copy the relevant chart files corresponding to $RRU_TYPE RRU"
-    echo cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
-    cp "$DIR_CHARTS"/values-"$RRU_TYPE".yaml "$DIR_GNB_DEST"/values.yaml
-    echo cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
-    cp "$DIR_CHARTS"/deployment-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/deployment.yaml
+    echo "Copy the modified chart files in the right place"
+    echo cp "$DIR_CHARTS"/values.yaml "$DIR_GNB_DEST"/values.yaml
+    cp "$DIR_CHARTS"/values.yaml "$DIR_GNB_DEST"/values.yaml
+    echo cp "$DIR_CHARTS"/deployment.yaml "$DIR_TEMPLATES"/deployment.yaml
+    cp "$DIR_CHARTS"/deployment.yaml "$DIR_TEMPLATES"/deployment.yaml
     if [[ $DEF_GNB_ONLY == "True" ]]; then
+	GW_N2N3="true"
 	SED_MULTUS_FILE="/tmp/gnb_multus.sed"
 	cat >> "$SED_MULTUS_FILE" <<EOF
-s|@ROUTE_AMF_MULTUS@|$ROUTE_AMF_MULTUS|
-s|@GW_AMF_MULTUS@|$GW_AMF_MULTUS|
+s|@ROUTE_GNB_TO_EXTCN@|$ROUTE_GNB_TO_EXTCN|
+s|@GW_GNB_TO_EXTCN|$GW_GNB_TO_EXTCN|
 EOF
-	sed -f "$SED_MULTUS_FILE" < "$DIR_CHARTS"/multus-extcn-"$RRU_TYPE".yaml > "$DIR_TEMPLATES"/multus.yaml
+	sed -f "$SED_MULTUS_FILE" < "$DIR_CHARTS"/multus.yaml > "$DIR_TEMPLATES"/multus.yaml
 	echo "configure chart multus for gnb"
 	cat "$DIR_TEMPLATES"/multus.yaml
     else
-	echo cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
-	cp "$DIR_CHARTS"/multus-"$RRU_TYPE".yaml "$DIR_TEMPLATES"/multus.yaml
+	GW_N2N3="false"
+	echo cp "$DIR_CHARTS"/multus.yaml "$DIR_TEMPLATES"/multus.yaml
+	cp "$DIR_CHARTS"/multus.yaml "$DIR_TEMPLATES"/multus.yaml
     fi
+    
     echo "Set up configmap.yaml chart with the right gNB configuration from $CONF_ORIG"
     # Keep the 17 first lines of configmap.yaml
     head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
@@ -632,14 +659,19 @@ EOF
     mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
     echo "First configure gnb.conf within configmap.yaml"
-    # remove NSSAI sd info for PLMN and add other parameters for RUs 
-    #s|sd = 0x010203|sd = 0x000001|
+    # remove NSSAI sd info for PLMN and add other parameters for RUs
+    # in the case of b210 (without multus), AMF_IP_ADDR will be set again just before running the gNB
     cat >> "$SED_CONF_FILE" <<EOF
-s|sd = 0x010203;||
-s|, sd = 0x010203||
-s|sd = 0x010203||
-s|mcc = [0-9][0-9][0-9];|mcc = $MCC;|
-s|mnc = [0-9][0-9];|mnc = $MNC;|
+s|@GNB_NAME@|$GNB_NAME|
+s|@TAC@|$TAC|
+s|@MCC@|$MCC|
+s|@MNC@|$MNC|
+s|@SST@|$SST|
+s|@AMF_IP_ADDR@|$IP_AMF_N2|
+s|@IP_GNB_N2N3@|$IP_GNB_N2N3|
+s|@ADDR_AW2S@|$ADDR_AW2S|
+s|@IP_GNB_AW2S@|$IP_GNB_AW2S|
+s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
 EOF
     cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
     sed -f "$SED_CONF_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
@@ -650,59 +682,31 @@ EOF
     DIR="$OAI5G_RAN/$FUNCTION"
 
     echo "Then configure charts of oai-gnb"
-    if [[ $pcap == "True" ]]; then
-	GENER_PCAP="true"
-	SHARED_VOL="true"
-    else
-	GENER_PCAP="false"
-	SHARED_VOL="false"
-    fi
-    if [[ "$rru" == "rfsim" ]]; then
-	ORIG_CHART="$DIR"/templates/deployment.yaml
-	cat >> "$SED_VALUES_FILE" <<EOF
-s|@GNB_RFSIM_REPO@|$GNB_RFSIM_REPO|
-s|@GNB_RFSIM_TAG@|$GNB_RFSIM_TAG|
-s|create: false|create: true|
-s|tcpdump:.*|tcpdump: $GENER_PCAP|
-s|n2n3IPadd:.*|n2n3IPadd: "$IP_GNB_N2N3"|
-s|n2n3Netmask:.*|n2n3Netmask: "24"|
-s|hostInterface:.*|hostInterface: "$IF_NAME_GNB_N2N3"|
-s|mountConfig:.*|mountConfig: true|
-s|mcc:.*|mcc: "$MCC"|
-s|mnc:.*|mnc: "$MNC"|
-s|gnbNgaIfName:.*|gnbNgaIfName: "net1"|
-s|gnbNgaIpAddress:.*|gnbNgaIpAddress: "$IP_GNB_N2N3"|
-s|gnbNguIfName:.*|gnbNguIfName: "net1"|
-s|gnbNguIpAddress:.*|gnbNguIpAddress: "$IP_GNB_N2N3"|
-s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
-s|nodeName:.*|nodeName: $node_gnb|
-EOF
-    elif [[ "$rru" == "b210" ]]; then
-	cat >> "$SED_VALUES_FILE" <<EOF
-s|@GNB_B210_REPO@|$GNB_B210_REPO|
-s|@GNB_B210_TAG@|$GNB_B210_TAG|
-s|tcpdump:.*|tcpdump: $GENER_PCAP|
-s|mountConfig:.*|mountConfig: true|
-s|mcc:.*|mcc: "$MCC"|
-s|mnc:.*|mnc: "$MNC"|
-s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
-s|nodeName:.*|nodeName: $node_gnb|
-EOF
-    else # AW2S or N3XX RRUs
-	cat >> "$SED_VALUES_FILE" <<EOF
-s|create: false|create: true|
-s|tcpdump:.*|tcpdump: $GENER_PCAP|
-s|includeTcpDumpContainer:.*|includeTcpDumpContainer: $GENER_PCAP|
+    cat >> "$SED_VALUES_FILE" <<EOF
+s|@GNB_REPO@|$GNB_REPO|
+s|@GNB_TAG@|$GNB_TAG|
+s|@MULTUS_GNB_N2N3@|$MULTUS_GNB_N2N3|
 s|@IP_GNB_N2N3@|$IP_GNB_N2N3|
 s|@NETMASK_GNB_N2N3@|$NETMASK_GNB_N2N3|
 s|@IF_NAME_GNB_N2N3@|$IF_NAME_GNB_N2N3|
-s|@IP_GNB_SFP1@|$IP_GNB_SFP1|
-s|@IF_NAME_N3XX_1@|$IF_NAME_N3XX_1|
-s|@IP_GNB_SFP2@|$IP_GNB_SFP2|
-s|@IF_NAME_N3XX_2@|$IF_NAME_N3XX_2|
-s|mountConfig:.*|mountConfig: true|
-s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
-s|define:.*|define: $N3XX_QOS_GUARANTEE|
+s|@GW_N2N3@|$GW_N2N3|
+s|@MULTUS_GNB_RU1@|$MULTUS_GNB_RU1|
+s|@IP_GNB_RU1@|$IP_GNB_RU1|
+s|@NETMASK_GNB_RU1@|$NETMASK_GNB_RU1|
+s|@MTU_GNB_RU1@|$MTU_GNB_RU1|
+s|@IF_NAME_RU_1@|$IF_NAME_RU_1|
+s|@MULTUS_GNB_RU2@|$MULTUS_GNB_RU2|
+s|@IP_GNB_RU2@|$IP_GNB_RU2|
+s|@NETMASK_GNB_RU2@|$NETMASK_GNB_RU2|
+s|@MTU_GNB_RU2@|$MTU_GNB_RU2|
+s|@IF_NAME_RU_2@|$IF_NAME_RU_2|
+s|@MOUNTCONFIG_GNB@|$MOUNTCONFIG_GNB|
+s|@TCPDUMP_GNB_START@|$TCPDUMP_GNB_START|
+s|@TCPDUMP_CONTAINER_GNB_CREATE@|$TCPDUMP_CONTAINER_GNB_CREATE|
+s|@GNB_SHARED_VOL@|$GNB_SHARED_VOL|
+s|@QOS_GNB_DEF@|$QOS_GNB_DEF|
+s|@NB_CPU_GNB@|$NB_CPU_GNB|
+s|@MEMORY_GNB@|$MEMORY_GNB|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
     fi
