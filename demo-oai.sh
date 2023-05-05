@@ -30,6 +30,7 @@ IP_NRUE="$P100.246"
 NETMASK_GNB_N2N3="24"
 NETMASK_GNB_RU1="24"
 NETMASK_GNB_RU2="24"
+NETMASK_NRUE="24"
 
 #MTU definitions
 MTU_N3XX="9000"
@@ -148,8 +149,9 @@ GNB_N3XX_REPO="${OAISA_REPO}/oai-gnb"
 GNB_N3XX_TAG="${RAN_TAG}"
 #GNB_N3XX_TAG="bugfix-phy-mac-interface"
 GNB_RFSIM_REPO="${OAISA_REPO}/oai-gnb"
-GNB_RFSIM_TAG="develop"
-
+GNB_RFSIM_TAG="${RAN_TAG}"
+NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
+NRUE_TAG="${RAN_TAG}"
 
 ####
 
@@ -739,10 +741,8 @@ function configure-nr-ue() {
     DIR="$OAI5G_RAN/$FUNCTION"
     DIR_TEMPLATES="$DIR"/templates
 
-
     DIR_RAN="/root/oai5g-rru/ran-config"
     DIR_CHARTS="$DIR_RAN/charts"
-
 
     echo "Copy the nr-ue chart files"
     echo cp "$DIR_CHARTS"/nr-ue-values-rfsim.yaml "$DIR"/values.yaml
@@ -751,51 +751,40 @@ function configure-nr-ue() {
     cp "$DIR_CHARTS"/nr-ue-deployment-rfsim.yaml "$DIR_TEMPLATES"/deployment.yaml
     echo cp "$DIR_CHARTS"/nr-ue-multus-rfsim.yaml "$DIR_TEMPLATES"/multus.yaml
     cp "$DIR_CHARTS"/nr-ue-multus-rfsim.yaml "$DIR_TEMPLATES"/multus.yaml
-
     
     if [[ $pcap == "True" ]]; then
 	echo "nr-ue: will NOT generate PCAP file to avoid wasting all memory resources!"
-	GENER_PCAP="false"
-	SHARED_VOL="false"
-    else
-	GENER_PCAP="false"
-	SHARED_VOL="false"
     fi
-    
+
     ORIG_CHART="$DIR"/values.yaml
     SED_FILE="/tmp/$FUNCTION-values.sed"
     echo "Configuring chart $ORIG_CHART"
+    ADD_OPTIONS_NRUE="-E --sa --rfsim -r 106 --numerology 1 -C 3619200000 --nokrnmod"
+    SSD="16777215"
     cat > "$SED_FILE" <<EOF
-s|tcpdump:.*|tcpdump: $GENER_PCAP|
-s|create: false|create: true|
-s|ipadd:.*|ipadd: "$IP_NRUE"|
-s|netmask:.*|netmask: "24"|
-s|hostInterface:.*|hostInterface: "$IF_NAME_NRUE"|
-s|fullImsi:.*|fullImsi: "$RFSIM_IMSI"|
-s|fullKey:.*|fullKey: "$FULL_KEY"|
-s|opc:.*|opc: "$OPC"|
-s|dnn:.*|dnn: "$DNN"|
-s|nssaiSst:.*|nssaiSst: "1"|
-s|nssaiSd:.*|nssaiSd: "16777215"|
-s|sharedvolume:.*|sharedvolume: $SHARED_VOL|
+s|@NRUE_REPO@|$NRUE_REPO|
+s|@NRUE_TAG@|$NRUE_TAG|
+s|@MULTUS_NRUE@|"true"|
+s|@IP_NRUE@|$IP_NRUE|
+s|@NETMASK_NRUE@|$NETMASK_NRUE|
+s|@IF_NAME_NRUE@|$IF_NAME_NRUE|
+s|@RFSIM_IMSI@|$RFSIM_IMSI|
+s|@FULL_KEY@|$FULL_KEY|
+s|@OPC@|$OPC|
+s|@DNN@|$DNN|
+s|@SST@|$SST|
+s|@SSD@|$SSD|
+s|@ADD_OPTIONS_NRUE@|$ADD_OPTIONS_NRUE|
+s|@TCPDUMP_NRUE_START@|false|
+s|@TCPDUMP_CONTAINER_NRUE_CREATE@|false|
+s|@SHARED_VOL_NRUE@|false|
+s|@QOS_NRUE_DEF@|false|
 s|nodeName:.*|nodeName:|
 EOF
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
     sed -f "$SED_FILE" < /tmp/"$FUNCTION"_values.yaml-orig > "$ORIG_CHART"
     diff /tmp/"$FUNCTION"_values.yaml-orig "$ORIG_CHART"
-
-    
-    ORIG_CHART="$DIR"/templates/deployment.yaml
-    echo "Configuring chart $ORIG_CHART for R2lab"
-    SED_DEPLOYMENT_FILE="/tmp/$FUNCTION-deployment.sed"
-    cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
-    cat > "$SED_DEPLOYMENT_FILE" <<EOF
-s|/usr/sbin/tcpdump.*|/usr/sbin/tcpdump -i any -w /pcap/oai-nr-ue_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap|
-EOF
-    sed -f "$SED_DEPLOYMENT_FILE" < /tmp/"$FUNCTION"_deployment.yaml-orig > "$ORIG_CHART"
-    perl -i -p0e 's/>-.*?\}]/"{{ .Chart.Name }}-net1"/s' "$ORIG_CHART"
-    diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 }
 
 
