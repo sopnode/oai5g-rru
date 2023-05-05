@@ -643,7 +643,7 @@ function configure-gnb() {
     if [[ $DEF_GNB_ONLY == "True" ]]; then
 	GW_N2N3="true"
 	SED_MULTUS_FILE="/tmp/gnb_multus.sed"
-	cat >> "$SED_MULTUS_FILE" <<EOF
+	cat > "$SED_MULTUS_FILE" <<EOF
 s|@ROUTE_GNB_TO_EXTCN@|$ROUTE_GNB_TO_EXTCN|
 s|@GW_GNB_TO_EXTCN|$GW_GNB_TO_EXTCN|
 EOF
@@ -669,7 +669,7 @@ EOF
     echo "First configure gnb.conf within configmap.yaml"
     # remove NSSAI sd info for PLMN and add other parameters for RUs
     # in the case of b210 (without multus), AMF_IP_ADDR will be set again just before running the gNB
-    cat >> "$SED_CONF_FILE" <<EOF
+    cat > "$SED_CONF_FILE" <<EOF
 s|@GNB_NAME@|$GNB_NAME|
 s|@TAC@|$TAC|
 s|@MCC@|$MCC|
@@ -690,7 +690,7 @@ EOF
     DIR="$OAI5G_RAN/$FUNCTION"
 
     echo "Then configure charts of oai-gnb"
-    cat >> "$SED_VALUES_FILE" <<EOF
+    cat > "$SED_VALUES_FILE" <<EOF
 s|@GNB_REPO@|$GNB_REPO|
 s|@GNB_TAG@|$GNB_TAG|
 s|@MULTUS_GNB_N2N3@|$MULTUS_GNB_N2N3|
