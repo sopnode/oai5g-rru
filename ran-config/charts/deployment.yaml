@@ -50,7 +50,11 @@ spec:
         imagePullPolicy: {{ .Values.nfimage.pullPolicy }}
         {{- if .Values.config.mountConfig}}
         volumeMounts:
+        {{- if eq .Values.config.rru "aw2s" }}
+          - mountPath: /opt/oai-gnb-aw2s/etc/mounted.conf
+        {{- else }}
           - mountPath: /opt/oai-gnb/etc/mounted.conf
+        {{- end }}
             name: configuration
             subPath: mounted.conf
         {{- end}}
@@ -96,7 +100,7 @@ spec:
         {{- if .Values.config.mountConfig}}
           - name: USE_VOLUMED_CONF
             value: "yes"
-        {{- if eq .Values.useN3XX "true" }}
+        {{- if eq .Values.config.rru "n3xx" }}
           - name: USE_N3XX
             value: "True"
         {{- end}}

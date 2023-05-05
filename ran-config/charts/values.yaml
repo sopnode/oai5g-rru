@@ -55,7 +55,7 @@ multus:
 
 config:
   mountConfig: @MOUNTCONFIG_GNB@ #If config file is mounted then please edit mount.conf in configmap.yaml properly
-  useN3XX: @USE_N3XX@
+  rru: @RRU_TYPE@
   useAdditionalOptions: "@ADD_OPTIONS_GNB@"
 # Following config paramters unused as config is mounted
   useSATddMono: true
