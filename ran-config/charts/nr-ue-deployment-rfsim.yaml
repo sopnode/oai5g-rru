@@ -131,6 +131,7 @@ spec:
         - mountPath: "/pcap"
           name: oai5g-pv
         {{- end}}
+      {{- end}}
       volumes:
       {{- if .Values.persistent.sharedvolume}}
       - name: oai5g-pv
