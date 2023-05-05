@@ -110,16 +110,16 @@ resources:
     nf:
       cpu: 8
       memory: 3500M
-    # tcpdump:
-    #   cpu: 8
-    #   memory: 3500M
+    tcpdump:
+      cpu: 8
+      memory: 3500M
   requests:
     nf:
       cpu: 8
       memory: 3500M
-    # tcpdump:
-    #   cpu: 8
-    #   memory: 3500M
+    tcpdump:
+      cpu: 8
+      memory: 3500M
 
 
 tolerations: []
