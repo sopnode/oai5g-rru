@@ -547,8 +547,8 @@ function configure-gnb() {
     if [[  "$rru" == "b210" ]]; then
 	# no multus;  @var@ will be used to set AMF/NGA/NGU IP addresses just before the gnb starts
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
-	GNB_REPO=$GNB_B210_REPO
-	GNB_TAG=$GNB_B210_TAG
+	GNB_REPO="$GNB_B210_REPO"
+	GNB_TAG="$GNB_B210_TAG"
 	GNB_NAME="$GNB_NAME-b210"
 	MULTUS_GNB_N2N3="false"
 	MULTUS_GNB_RU1="false"
@@ -572,8 +572,8 @@ function configure-gnb() {
 	    SDR_ADDRS="$ADDRS_N320"
 	fi
 	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
-	GNB_REPO=$GNB_N3XX_REPO
-	GNB_TAG=$GNB_N3XX_TAG
+	GNB_REPO="$GNB_N3XX_REPO"
+	GNB_TAG="$GNB_N3XX_TAG"
 	MULTUS_GNB_N2N3="true"
 	MULTUS_GNB_RU1="true"
 	IP_GNB_RU1="$IP_GNB_SFP1"
@@ -597,8 +597,8 @@ function configure-gnb() {
 	    ADDR_AW2S="$ADDR_PANTHER"
 	fi
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
-	GNB_REPO=$GNB_AW2S_REPO
-	GNB_TAG=$GNB_AW2S_TAG
+	GNB_REPO="$GNB_AW2S_REPO"
+	GNB_TAG="$GNB_AW2S_TAG"
 	MULTUS_GNB_N2N3="true"
 	MULTUS_GNB_RU1="true"
 	IP_GNB_RU1="$IP_GNB_AW2S"
@@ -615,8 +615,8 @@ function configure-gnb() {
     elif [[ "$rru" == "rfsim" ]]; then
         GNB_NAME="$GNB_NAME-rfsim"
 	CONF_ORIG="$DIR_CONF/$CONF_RFSIM"
-	GNB_REPO=$GNB_RFSIM_REPO
-	GNB_TAG=$GNB_RFSIM_TAG
+	GNB_REPO="$GNB_RFSIM_REPO"
+	GNB_TAG="$GNB_RFSIM_TAG"
 	MULTUS_GNB_N2N3="true"
 	MULTUS_GNB_RU1="false"
 	IP_GNB_RU1=""
