@@ -103,6 +103,14 @@ spec:
         {{- if eq .Values.config.rru "b210" }}
           - name: USE_B2XX
             value: "True"
+          - name: GNB_NGA_IP_ADDRESS
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: GNB_NGU_IP_ADDRESS
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
         {{- end}}
         {{- if eq .Values.config.rru "n3xx" }}
           - name: USE_N3XX
