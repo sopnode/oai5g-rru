@@ -99,8 +99,8 @@ OAI5G_NRUE="$OAI5G_CORE"/oai-nr-ue
 MCC="@DEF_MCC@"
 MNC="@DEF_MNC@"
 DNN="@DEF_DNN@"
-TAC="@TAC@"
-SST="@SST@"
+TAC="@DEF_TAC@"
+SST="@DEF_SST@"
 FULL_KEY="@DEF_FULL_KEY@"
 OPC="@DEF_OPC@"
 RFSIM_IMSI="@DEF_RFSIM_IMSI@"
@@ -550,17 +550,19 @@ function configure-gnb() {
 	GNB_REPO=$GNB_B210_REPO
 	GNB_TAG=$GNB_B210_TAG
 	GNB_NAME="$GNB_NAME-b210"
-	MULTUS_GNB_N2N3="true"
+	MULTUS_GNB_N2N3="false"
 	MULTUS_GNB_RU1="false"
 	IP_GNB_RU1=""
 	MTU_GNB_RU1=""
 	IF_NAME_GNB_RU1=""
-	MULTUS_GNB_RU2=""
+	MULTUS_GNB_RU2="false"
 	IP_GNB_RU2=""
 	MTU_GNB_RU2=""
 	IF_NAME_GNB_RU2=""
 	MOUNTCONFIG_GNB="true"
 	ADD_OPTIONS_GNB="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+	QOS_GNB_DEF="false"
+
     elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
 	if [[ "$rru" == "n300" ]]; then
 	    GNB_NAME="$GNB_NAME-n300"
@@ -583,6 +585,7 @@ function configure-gnb() {
 	IF_NAME_GNB_RU2="IF_NAME_N3XX_2"
 	MOUNTCONFIG_GNB="true"
 	ADD_OPTIONS_GNB="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
+	QOS_GNB_DEF="true"
     elif [[ "$rru" == "jaguar" || "$rru" == "panther" ]]; then
 	if [[  "$rru" == "jaguar" ]]; then
 	    GNB_NAME="$GNB_NAME-jaguar"
@@ -607,6 +610,8 @@ function configure-gnb() {
 	IF_NAME_GNB_RU2=""
 	MOUNTCONFIG_GNB="true"
 	ADD_OPTIONS_GNB="--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
+	QOS_GNB_DEF="true"
+	
     elif [[ "$rru" == "rfsim" ]]; then
         GNB_NAME="$GNB_NAME-rfsim"
 	CONF_ORIG="$DIR_CONF/$CONF_RFSIM"
@@ -623,6 +628,8 @@ function configure-gnb() {
 	IF_NAME_GNB_RU2=""
 	MOUNTCONFIG_GNB="true"
 	ADD_OPTIONS_GNB="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
+	QOS_GNB_DEF="false"
+
     else
 	echo "Unknown rru selected: $rru"
 	usage
