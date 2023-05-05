@@ -50,8 +50,8 @@ multus:
     create: @MULTUS_GNB_RU2@
     IPadd: "@IP_GNB_RU2@" 
     Netmask: "@NETMASK_GNB_RU2@" #"24"
-    mtu: @MTU_GNB_RU1@ #9000
-    hostInterface: "@IF_NAME_RU2@"
+    mtu: @MTU_GNB_RU2@ #9000
+    hostInterface: "@IF_NAME_GNB_RU2@"
 
 config:
   mountConfig: @MOUNTCONFIG_GNB@ #If config file is mounted then please edit mount.conf in configmap.yaml properly 
