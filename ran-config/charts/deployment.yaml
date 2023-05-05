@@ -230,7 +230,11 @@ spec:
         command:
           - /bin/sh
           - -c
+        {{- if eq .Values.config.rru "b210" }}
+          - /usr/sbin/tcpdump -ni any -w /pcap/oai-gnb-n2_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap
+        {{- else}}
           - /usr/sbin/tcpdump -ni net1 src {{ .Values.multus.n2n3IPadd }} or dst {{ .Values.multus.n2n3IPadd }} -w /pcap/oai-gnb-n2_`date +%Y-%m-%d_%H_%M-%S-%Z`.pcap
+        {{- end}}
         {{- else}}
         command:
           - /bin/sleep
