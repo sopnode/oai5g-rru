@@ -198,7 +198,8 @@ jobs:
           cp oai5g-rru/demo-oai.sh /root/;
           chmod a+x /root/demo-oai.sh;
           cp oai5g-rru/configure-demo-oai.sh /root/;
-          cp oai5g-rru/logs /root/;
+          cp oai5g-rru/perfs/logs.sh /root/;
+          cp oai5g-rru/perfs/run-iperf-server.sh /root/;
           /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{gnb_only}} {{pcap}} {%for x in regcred.values()%}{{x}} {%endfor %};
           rm -rf oai-cn5g-fed;
           git clone -b r2lab-rrus-feat https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git;
