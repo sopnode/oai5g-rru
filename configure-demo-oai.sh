@@ -1,14 +1,16 @@
 #!/bin/bash
 
 ####
-#    Following variables used to configure mysql database in demo-oai.sh script
+#    Configure here the following variables used in demo-oai.sh script
 #
-MCC="208"
-MNC="95"
+MCC="208" # default is "208"
+MNC="95" # default is "95"
+TAC="1" # default is "1"
+SST="1" # default is "1"
 DNN="oai.ipv4" # default is "oai.ipv4"
-FULL_KEY="8baf473f2f8fd09487cccbd7097c6862"
-OPC="8E27B6AF0E692E750F32667A3B14605D"
-RFSIM_IMSI="208950000001121"
+FULL_KEY="8baf473f2f8fd09487cccbd7097c6862" # default is "8baf473f2f8fd09487cccbd7097c6862"
+OPC="8E27B6AF0E692E750F32667A3B14605D" # default is "8E27B6AF0E692E750F32667A3B14605D"
+RFSIM_IMSI="208950000001121" # default is "208950000001121"
 ####
 
 function update() {
@@ -34,12 +36,14 @@ s|DEF_PCAP=.*|DEF_PCAP="${pcap}"|
 s|username=r2labuser|username=${regcred_name}|
 s|password=r2labuser-pwd|password=${regcred_password}|
 s|email=r2labuser@turletti.com|email=${regcred_email}|
-s|@MCC@|${MCC}|g
-s|@MNC@|${MNC}|g
-s|@DNN@|${DNN}|g
-s|@FULL_KEY@|${FULL_KEY}|g
-s|@OPC@|${OPC}|g
-s|@RFSIM_IMSI@|${RFSIM_IMSI}|g
+s|@DEF_MCC@|${MCC}|g
+s|@DEF_MNC@|${MNC}|g
+s|@DEF_TAC@|${TAC}|g
+s|@DEF_SST@|${SST}|g
+s|@DEF_DNN@|${DNN}|g
+s|@DEF_FULL_KEY@|${FULL_KEY}|g
+s|@DEF_OPC@|${OPC}|g
+s|@DEF_RFSIM_IMSI@|${RFSIM_IMSI}|g
 EOF
 
     cp demo-oai.sh /tmp/demo-oai-orig.sh

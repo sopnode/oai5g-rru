@@ -93,18 +93,19 @@ OAI5G_SMF="$OAI5G_CORE"/oai-smf
 OAI5G_SPGWU="$OAI5G_CORE"/oai-spgwu-tiny
 OAI5G_NRUE="$OAI5G_CORE"/oai-nr-ue
 
-# Following variables used to configure mysql database are set by configure-demo.sh script
+# Following variables are set by the configure-demo.sh script
 # Do not modify them here !
 #
-MCC="@MCC@"
-MNC="@MNC@"
-DNN="@DNN@"
-FULL_KEY="@FULL_KEY@"
-OPC="@OPC@"
-RFSIM_IMSI="@RFSIM_IMSI@"
+MCC="@DEF_MCC@"
+MNC="@DEF_MNC@"
+DNN="@DEF_DNN@"
+TAC="@TAC@"
+SST="@SST@"
+FULL_KEY="@DEF_FULL_KEY@"
+OPC="@DEF_OPC@"
+RFSIM_IMSI="@DEF_RFSIM_IMSI@"
 #
-TAC="1"
-SST="1"
+
 
 ####
 #    Following variables used to select repo and tag for OAI5G docker images
@@ -709,7 +710,6 @@ s|@NB_CPU_GNB@|$NB_CPU_GNB|
 s|@MEMORY_GNB@|$MEMORY_GNB|
 s|nodeName:.*|nodeName: $node_gnb|
 EOF
-    fi
     ORIG_CHART="$DIR"/values.yaml
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
