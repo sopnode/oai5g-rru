@@ -217,11 +217,12 @@ $ ./demo-oai.py -R n300 -Q7 -Q9 --gnb-only -a -l
 Once the script terminates, you need to log on a k8s worker node and configure the following parameters in the script demo-oai.sh to match the external CN parameters:
 
 ```
-    IP_AMF_N2="172.22.10.6" # external AMF IP address, e.g., "172.22.10.6"
-    ROUTE_AMF_MULTUS="172.22.10.0/24" # route to reach amf for multus.yaml chart, e.g., "172.22.10.0/24"
+    AMF_IP_ADDR="172.22.10.6" # external AMF IP address, e.g., "172.22.10.6"
+    ROUTE_GNB_TO_EXTCN="172.22.10.0/24" # route to reach amf for multus.yaml chart, e.g., "172.22.10.0/24"
     IP_GNB_N2N3="10.0.20.243" # local IP to reach AMF/UPF, e.g., "10.0.20.243"
-    GW_AMF_MULTUS="10.0.20.1" # gw for multus.yaml chart, e.g., "10.0.20.1"
-    IF_NAME_GNB_N2N3="ran" # Corresponding Host network interface to reach AMF/UPF
+    GW_GNB_TO_EXTCN="10.0.20.1" # gw for multus.yaml chart, e.g., "10.0.20.1"
+    IF_NAME_GNB_N2N3="ran" # Right Host network interface to reach AMF/UPF
+
 ```
 
 Let's assume that the oai-gnb pod can reach the external Core Network through a VPN client running on the server that hosts the oai-gnb pod, the VPN client will provide an IP address in 10.0.20.0/24. Let's also assume that the IP address of the AMF is *172.22.10.6*. 

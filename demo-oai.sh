@@ -59,13 +59,13 @@ IF_NAME_N3XX_1="$IF_NAME_VLAN10"
 IF_NAME_N3XX_2="$IF_NAME_VLAN20"
 IF_NAME_NRUE="$IF_NAME_VLAN100"
 
-# IN CASE OF EXTERNAL CORE NETWORK USAGE (i.e., DEF_GNB_ONLY IS TRUE), CONFIGURE FOLLOWING PARAMETERS BELOW
+# IN CASE OF EXTERNAL CORE NETWORK USAGE (i.e., DEF_GNB_ONLY IS TRUE), CONFIGURE THE FOLLOWING PARAMETERS BELOW:
 if [[ $DEF_GNB_ONLY == "True" ]]; then
     AMF_IP_ADDR="172.22.10.6" # external AMF IP address, e.g., "172.22.10.6"
     ROUTE_GNB_TO_EXTCN="172.22.10.0/24" # route to reach amf for multus.yaml chart, e.g., "172.22.10.0/24"
     IP_GNB_N2N3="10.0.20.243" # local IP to reach AMF/UPF, e.g., "10.0.20.243"
     GW_GNB_TO_EXTCN="10.0.20.1" # gw for multus.yaml chart, e.g., "10.0.20.1"
-    IF_NAME_GNB_N2N3="ran" # Corresponding Host network interface to reach AMF/UPF
+    IF_NAME_GNB_N2N3="ran" # Right Host network interface to reach AMF/UPF
 fi
 
 # gNB conf file for RRU devices
@@ -768,7 +768,7 @@ function configure-nr-ue() {
     cat > "$SED_FILE" <<EOF
 s|@NRUE_REPO@|$NRUE_REPO|
 s|@NRUE_TAG@|$NRUE_TAG|
-s|@MULTUS_NRUE@|"true"|
+s|@MULTUS_NRUE@|true|
 s|@IP_NRUE@|$IP_NRUE|
 s|@NETMASK_NRUE@|$NETMASK_NRUE|
 s|@IF_NAME_NRUE@|$IF_NAME_NRUE|
