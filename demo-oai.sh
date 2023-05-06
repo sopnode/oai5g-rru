@@ -18,13 +18,11 @@ PREFIX_STATS="/tmp/oai5g-stats"
 P100="192.168.100"
 IP_AMF_N2="$P100.241"
 IP_UPF_N3="$P100.242" # Nota: only used for CN configuration
-IP_GNB_N2="$P100.243"
-IP_GNB_N3="$P100.244"
 IP_GNB_N2N3="$P100.243"
 IP_GNB_SFP1="192.168.10.132"
 IP_GNB_SFP2="192.168.20.132"
-IP_GNB_AW2S="$P100.245" 
-IP_NRUE="$P100.246"
+IP_GNB_AW2S="$P100.244" 
+IP_NRUE="$P100.245"
 
 # Netmask definitions
 NETMASK_GNB_N2N3="24"
@@ -72,7 +70,8 @@ fi
 
 # gNB conf file for RRU devices
 #CONF_JAGUAR="jaguar_panther2x2_50MHz.conf"
-CONF_JAGUAR="panther4x4_20MHz.conf"
+#CONF_JAGUAR="panther4x4_20MHz.conf"
+CONF_JAGUAR="aw2s4x4_50MHz.conf"
 CONF_PANTHER="panther4x4_20MHz.conf"
 #CONF_B210="gnb.band78.51PRB.usrpb210.conf" # without -E
 CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf" # this one needs -E as an additional option
@@ -682,8 +681,9 @@ s|@TAC@|$TAC|
 s|@MCC@|$MCC|
 s|@MNC@|$MNC|
 s|@SST@|$SST|
-s|@AMF_IP_ADDR@|$IP_AMF_N2|
-s|@IP_GNB_N2N3@|$IP_GNB_N2N3|
+s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
+s|@GNB_NGA_IP_ADDRESS@|$IP_GNB_N2N3/24|
+s|@GNB_NGU_IP_ADDRESS@|$IP_GNB_N2N3/24|
 s|@ADDR_AW2S@|$ADDR_AW2S|
 s|@IP_GNB_AW2S@|$IP_GNB_AW2S|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
