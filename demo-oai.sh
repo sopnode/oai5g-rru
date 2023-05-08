@@ -71,10 +71,12 @@ fi
 # gNB conf file for RRU devices
 #CONF_JAGUAR="jaguar_panther2x2_50MHz.conf"
 #CONF_JAGUAR="panther4x4_20MHz.conf"
-CONF_JAGUAR="aw2s4x4_50MHz.conf"
+#CONF_JAGUAR="aw2s4x4_50MHz.conf"
+CONF_JAGUAR="gnb.sa.band78.51prb.aw2s.ddsuu.conf"
 CONF_PANTHER="panther4x4_20MHz.conf"
 #CONF_B210="gnb.band78.51PRB.usrpb210.conf" # without -E
-CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf" # this one needs -E as an additional option
+#CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf" # this one needs -E as an additional option
+CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-latest.conf"
 #CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-orig.conf" # this one without -E as an additional option
 CONF_N3XX="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
 CONF_RFSIM="gnb.sa.band78.106prb.rfsim.2x2.conf" #this one works
@@ -141,8 +143,8 @@ RAN_TAG="develop"
 GNB_AW2S_REPO="docker.io/r2labuser/oai-gnb-aw2s"
 GNB_AW2S_TAG="new"
 GNB_B210_REPO="${OAISA_REPO}/oai-gnb"
-#GNB_B210_TAG="${RAN_TAG}"
-GNB_B210_TAG="2023.w11b"
+GNB_B210_TAG="${RAN_TAG}"
+#GNB_B210_TAG="2023.w11b"
 GNB_N3XX_REPO="${OAISA_REPO}/oai-gnb"
 #GNB_N3XX_REPO="docker.io/r2labuser/oai-gnb"
 GNB_N3XX_TAG="${RAN_TAG}"
