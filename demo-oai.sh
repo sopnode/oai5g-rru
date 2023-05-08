@@ -563,7 +563,7 @@ function configure-gnb() {
 	IF_NAME_GNB_RU2=""
 	MOUNTCONFIG_GNB="true"
 	RRU_TYPE="b210"
-	ADD_OPTIONS_GNB="--sa --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+	ADD_OPTIONS_GNB="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 	QOS_GNB_DEF="false"
 
     elif [[ "$rru" == "n300" || "$rru" == "n320" ]]; then
