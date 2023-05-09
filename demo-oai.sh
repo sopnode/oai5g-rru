@@ -342,6 +342,7 @@ s|create: false|create: $multus|
 s|includeTcpDumpContainer:.*|includeTcpDumpContainer: $tcpdump|
 s|n2IPadd:.*|n2IPadd: "$IP_AMF_N2"|
 s|n2Netmask:.*|n2Netmask: "24"|
+s|defaultGateway:.*|defaultGateway: |
 s|hostInterface:.*|hostInterface: "$IF_NAME_AMF_N2_SPGWU_N3" # interface of the nodes for amf/N2 and spgwu/N3|
 s|amfInterfaceNameForNGAP:.*|amfInterfaceNameForNGAP: "$NET_IF" # If multus creation is true then net1 else eth0|
 s|mcc:.*|mcc: "$MCC"|
@@ -498,7 +499,7 @@ function configure-amf() {
     echo "Configuring chart $ORIG_CHART for R2lab"
 
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
-    perl -i -p0e 's/"default.*?\}"]/"mac": "12:34:56:78:90:00"/s' "$ORIG_CHART"
+    perl -i -p0e 's/-n2-net1"/-n2-net1"\n                "mac": "12:34:56:78:90:00"/s' "$ORIG_CHART"
     diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 }
 
@@ -511,7 +512,7 @@ function configure-spgwu-tiny() {
     echo "Configuring chart $ORIG_CHART for R2lab"
 
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
-    perl -i -p0e 's/"default.*?\}"]/"mac": "12:34:56:78:90:01"/s' "$ORIG_CHART"
+    perl -i -p0e 's/-n2-net1"/-n2-net1"\n                "mac": "12:34:56:78:90:01"/s' "$ORIG_CHART"
     diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 }
 
