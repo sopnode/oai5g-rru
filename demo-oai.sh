@@ -499,7 +499,7 @@ function configure-amf() {
     echo "Configuring chart $ORIG_CHART for R2lab"
 
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
-    perl -i -p0e 's/-n2-net1"/-n2-net1"\n                "mac": "12:34:56:78:90:00"/s' "$ORIG_CHART"
+    perl -i -p0e 's/-n2-net1"/-n2-net1",\n                "mac": "12:34:56:78:90:00"/s' "$ORIG_CHART"
     diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 }
 
@@ -512,7 +512,7 @@ function configure-spgwu-tiny() {
     echo "Configuring chart $ORIG_CHART for R2lab"
 
     cp "$ORIG_CHART" /tmp/"$FUNCTION"_deployment.yaml-orig
-    perl -i -p0e 's/-n2-net1"/-n2-net1"\n                "mac": "12:34:56:78:90:01"/s' "$ORIG_CHART"
+    perl -i -p0e 's/-n3-net1"/-n3-net1",\n                "mac": "12:34:56:78:90:01"/s' "$ORIG_CHART"
     diff /tmp/"$FUNCTION"_deployment.yaml-orig "$ORIG_CHART"
 }
 
