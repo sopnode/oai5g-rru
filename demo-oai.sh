@@ -913,13 +913,17 @@ function start-gnb() {
 
     if [[ "$rru" == "b210" ]]; then
 	echo "Set AMF IP address in gnb conf"
-	AMF_POD_NAME=$(kubectl -n$ns get pods -l app.kubernetes.io/name=oai-amf -o jsonpath="{.items[0].metadata.name}")
-	AMF_POD_IP=$(kubectl -n$ns get pod $AMF_POD_NAME --template '{{.status.podIP}}')
+	if [[ $DEF_GNB_ONLY == "True" ]]; then
+	    AMF_IP="$AMF_IP_ADDR" # external CN including AMF
+	else
+	    AMF_POD_NAME=$(kubectl -n$ns get pods -l app.kubernetes.io/name=oai-amf -o jsonpath="{.items[0].metadata.name}")
+	    AMF_IP=$(kubectl -n$ns get pod $AMF_POD_NAME --template '{{.status.podIP}}')
+	fi
 	DIR="$OAI5G_RAN/$FUNCTION"
 	DIR_TEMPLATES="$OAI5G_RAN/oai-gnb/templates"
 	SED_FILE="/tmp/gnb-configmap.sed"
 	cat > "$SED_FILE" <<EOF
-s|ipv4       =.*|ipv4       = "$AMF_POD_IP";|
+s|ipv4       =.*|ipv4       = "$AMF_IP";|
 EOF
 	cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
 	sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
