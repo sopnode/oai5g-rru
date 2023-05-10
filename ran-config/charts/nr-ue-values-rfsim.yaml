@@ -56,7 +56,6 @@ tcpdumpimage:
   pullPolicy: IfNotPresent # IfNotPresent or Never or Always
 
 resources:
-resources:
   define: @QOS_NRUE_DEF@
   limits:
     nf:
