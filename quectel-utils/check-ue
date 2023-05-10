@@ -1,0 +1,55 @@
+#!/usr/bin/python3
+
+import time
+import sys
+import serial
+
+try:
+    phone = serial.Serial("/dev/ttyUSB2",  460800, timeout=5)
+except:
+    print("Device /dev/ttyUSB2 not found, is Quectel device on ?")
+    sys.exit()
+
+
+def send_msg(command, delay):
+    """
+    send command to Quectel, wait for delay and print msg
+    """
+    
+    ret = []
+    phone.write(f"{command}".encode())
+    time.sleep(delay)
+    while phone.inWaiting()>0:
+        msg=phone.readline()
+        msg=msg.decode("utf-8")
+        msg=msg.replace("\r","")
+        msg=msg.replace("\n","")
+        if msg!="":
+           ret.append(msg)
+    print(ret)
+    return True
+
+
+
+def main():
+    """
+    CLI frontend
+    """
+    
+try:
+    delay=0.1
+    print("Get IMSI")
+    send_msg("AT+CIMI\r", delay)
+    print("Check APN")
+    send_msg("AT+CGDCONT?\r", delay)
+    print("Check 4G/5G mode")
+    send_msg("at+qnwprefcfg=\"mode_pref\"\r", delay)
+    print("Check LTE bands")
+    send_msg("at+qnwprefcfg=\"lte_band\"\r", delay)
+    print("Check NR 5G bands")
+    send_msg("at+qnwprefcfg=\"nr5g_band\"\r", delay)
+    print("Check MBIM/QMI mode")
+    send_msg("at+qcfg=\"usbnet\"\r", delay)
+
+finally:
+    phone.close()
