@@ -814,7 +814,6 @@ s|@DNN@|$DNN|
 s|@SST@|$SST|
 s|@SSD@|$SSD|
 s|@ADD_OPTIONS_NRUE@|$ADD_OPTIONS_NRUE|
-s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
 s|@TCPDUMP_NRUE_START@|false|
 s|@TCPDUMP_CONTAINER_NRUE_CREATE@|$TCPDUMP_CONTAINER_NRUE_CREATE|
 s|@SHARED_VOL_NRUE@|false|
@@ -915,6 +914,8 @@ function start-gnb() {
 
     echo "Running start-gnb() with namespace: $ns, node_gnb:$node_gnb with rru $rru"
 
+    DIR="$OAI5G_RAN/oai-gnb"
+    DIR_TEMPLATES="$DIR/templates"
     if [[ "$rru" == "b210" ]]; then
 	echo "Set AMF IP address in gnb conf"
 	if [[ $DEF_GNB_ONLY == "True" ]]; then
@@ -923,8 +924,6 @@ function start-gnb() {
 	    AMF_POD_NAME=$(kubectl -n$ns get pods -l app.kubernetes.io/name=oai-amf -o jsonpath="{.items[0].metadata.name}")
 	    AMF_IP=$(kubectl -n$ns get pod $AMF_POD_NAME --template '{{.status.podIP}}')
 	fi
-	DIR="$OAI5G_RAN/$FUNCTION"
-	DIR_TEMPLATES="$OAI5G_RAN/oai-gnb/templates"
 	SED_FILE="/tmp/gnb-configmap.sed"
 	cat > "$SED_FILE" <<EOF
 s|ipv4       =.*|ipv4       = "$AMF_IP";|
@@ -932,7 +931,20 @@ EOF
 	cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
 	sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
 	diff  /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+    else
+	AMF_IP="$IP_AMF_N2"
     fi
+
+    ORIG_CHART="$DIR"/values.yaml
+    SED_FILE="/tmp/oai-gnb_values.sed"
+    echo "Setting AMF IP address (for tcpdump filter) in chart $ORIG_CHART"
+    cat > $SED_FILE <<EOF
+s|@AMF_IP_ADDRESS@|$AMF_IP|
+EOF
+    cp "$ORIG_CHART" /tmp/oai-gnb_values.yaml-orig
+    echo "(Over)writing $DIR/values.yaml"
+    sed -f "$SED_FILE" < /tmp/oai-gnb_values.yaml-orig > "$ORIG_CHART"
+    diff /tmp/oai-gnb_values.yaml-orig "$ORIG_CHART"
     
     echo "cd $OAI5G_RAN"
     cd "$OAI5G_RAN"
