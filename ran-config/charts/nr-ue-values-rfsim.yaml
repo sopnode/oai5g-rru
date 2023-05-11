@@ -27,7 +27,7 @@ multus:
 
 config:
   timeZone: "Europe/Paris"
-  rfSimulator: "oai-gnb"   # ip-address of gnb rf-sim or service name oai-gnb in case of du change it with oai-gnb-du if multus is true then provide ip-address of oai-gnb
+  rfSimulator: @IP_GNB@   # ip-address of gnb rf-sim or service name oai-gnb in case of du change it with oai-gnb-du if multus is true then provide ip-address of oai-gnb
   fullImsi: "@RFSIM_IMSI@" # make sure all the below entries are present in the subscriber database
   fullKey: "@FULL_KEY@" 
   opc: "@OPC@"
