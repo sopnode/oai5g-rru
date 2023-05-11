@@ -953,22 +953,6 @@ function start-nr-ue() {
 
     echo "Running start-ue() on namespace: $ns, node_gnb:$node_gnb"
 
-    echo "cd $OAI5G_RAN"
-    cd "$OAI5G_RAN"
-
-    # Retrieve the IP address of the gnb pod and set it
-    GNB_POD_NAME=$(kubectl -n$ns get pods -l app.kubernetes.io/name=oai-gnb -o jsonpath="{.items[0].metadata.name}")
-    GNB_POD_IP=$(kubectl -n$ns get pod $GNB_POD_NAME --template '{{.status.podIP}}')
-    echo "gNB pod IP is $GNB_POD_IP"
-    conf_ue_dir="$OAI5G_RAN/oai-nr-ue"
-    cat >/tmp/gnb-values.sed <<EOF
-s|rfSimulator:.*|rfSimulator: "${GNB_POD_IP}"|
-EOF
-    echo "(Over)writing oai-nr-ue chart $conf_ue_dir/values.yaml"
-    cp $conf_ue_dir/values.yaml /tmp/values-orig.yaml
-    sed -f /tmp/gnb-values.sed </tmp/values-orig.yaml >/tmp/values.yaml
-    cp /tmp/values.yaml $conf_ue_dir/
-
     echo "helm -n$ns install oai-nr-ue oai-nr-ue/"
     helm -n$ns install oai-nr-ue oai-nr-ue/
 
