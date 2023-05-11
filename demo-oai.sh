@@ -169,7 +169,7 @@ function usage() {
     echo "            configure-all [node_amf_spgwu node_gnb rru pcap] |"
     echo "            start-cn [namespace node_amf_spgwu] |"
     echo "            start-gnb [namespace node_gnb rru] |"
-    echo "            start-ue [namespace node_gnb] |"
+    echo "            start-nr-ue [namespace node_gnb] |"
     echo "            stop-cn [namespace] |"
     echo "            stop-gnb [namespace] |"
     echo "            stop-nr-ue [namespace] |"
@@ -797,7 +797,7 @@ function configure-nr-ue() {
     ORIG_CHART="$DIR"/values.yaml
     SED_FILE="/tmp/$FUNCTION-values.sed"
     echo "Configuring chart $ORIG_CHART"
-    ADD_OPTIONS_NRUE="-E --sa --rfsim -r 106 --numerology 1 -C 3619200000 --nokrnmod"
+    ADD_OPTIONS_NRUE="--sa --rfsim -r 106 --numerology 1 -C 3619200000 --nokrnmod"
     SSD="16777215"
     cat > "$SED_FILE" <<EOF
 s|@NRUE_REPO@|$NRUE_REPO|
@@ -951,7 +951,7 @@ function start-nr-ue() {
     node_gnb=$1
     shift
 
-    echo "Running start-ue() on namespace: $ns, node_gnb:$node_gnb"
+    echo "Running start-nr-ue() on namespace: $ns, node_gnb:$node_gnb"
 
     echo "helm -n$ns install oai-nr-ue oai-nr-ue/"
     helm -n$ns install oai-nr-ue oai-nr-ue/
@@ -1204,11 +1204,11 @@ else
 	else
             usage
         fi
-    elif [ "$1" == "start-ue" ]; then
+    elif [ "$1" == "start-nr-ue" ]; then
         if test $# -eq 3; then
-            start-ue $2 $3
+            start-nr-ue $2 $3
         elif test $# -eq 1; then
-	    start-ue $DEF_NS $DEF_NODE_GNB
+	    start-nr-ue $DEF_NS $DEF_NODE_GNB
 	else
             usage
         fi
