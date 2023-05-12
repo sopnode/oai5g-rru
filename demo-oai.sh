@@ -809,7 +809,7 @@ function configure-nr-ue() {
     SED_FILE="/tmp/$FUNCTION-values.sed"
     echo "Configuring chart $ORIG_CHART"
 #    ADD_OPTIONS_NRUE="--sa --rfsim -r 106 --numerology 1 -C 3619200000 --nokrnmod"
-    ADD_OPTIONS_NRUE="--sa --rfsim -r 106 --numerology 1 -C 3319680000 --nokrnmod"
+    ADD_OPTIONS_NRUE="--sa -E --rfsim -r 106 --numerology 1 -C 3319680000 --nokrnmod"
     SSD="16777215"
     cat > "$SED_FILE" <<EOF
 s|@NRUE_REPO@|$NRUE_REPO|
