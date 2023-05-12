@@ -60,7 +60,8 @@ IF_NAME_N3XX_1="$IF_NAME_VLAN10"
 IF_NAME_N3XX_2="$IF_NAME_VLAN20"
 IF_NAME_NRUE="$IF_NAME_VLAN100"
 
-# IN CASE OF EXTERNAL CORE NETWORK USAGE (i.e., DEF_GNB_ONLY IS TRUE), CONFIGURE THE FOLLOWING PARAMETERS BELOW:
+
+# In case an external Core Network is used (i.e., DEF_GNB_ONLY is True), you must configure the following:
 if [[ $DEF_GNB_ONLY == "True" ]]; then
     AMF_IP_ADDR="172.22.10.6" # external AMF IP address, e.g., "172.22.10.6"
     ROUTE_GNB_TO_EXTCN="172.22.10.0/24" # route to reach amf for multus.yaml chart, e.g., "172.22.10.0/24"
@@ -694,7 +695,7 @@ EOF
 	cp "$DIR_CHARTS"/multus.yaml "$DIR_TEMPLATES"/multus.yaml
     fi
 
-    if [[ $MOUNTCONFIG_GNB == "True" ]]; then
+    if [[ $MOUNTCONFIG_GNB == "true" ]]; then
 	# Following not useful when using rfsim rfsim
 	echo "Set up configmap.yaml chart with the right gNB configuration from $CONF_ORIG"
 	# Keep the 17 first lines of configmap.yaml
