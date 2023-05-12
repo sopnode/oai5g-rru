@@ -58,24 +58,24 @@ config:
   rru: @RRU_TYPE@
   useAdditionalOptions: "@ADD_OPTIONS_GNB@"
   amfIpAddress: "@AMF_IP_ADDRESS@"  # amf ip-address or service-name oai-amf-svc
-# Following config parameters unused and set with mounted conf file in configmap.yaml chart
+  ## NOTE: Following config parameters only useful if mountConfig is false
   useSATddMono: true
   timeZone: "Europe/Paris"
   rfSimulator: "server"
   useSATddMono: "yes"
-  gnbName: "gnb-n3xx"
-  mcc: "001"   # check the information with AMF, SMF, UPF/SPGWU
-  mnc: "01"    # check the information with AMF, SMF, UPF/SPGWU
+  gnbName: "@GNB_NAME@"
+  mcc: "@MCC@"   # check the information with AMF, SMF, UPF/SPGWU
+  mnc: "@MNC@"    # check the information with AMF, SMF, UPF/SPGWU
   mncLength: "2" # check the information with AMF, SMF, UPF/SPGWU
-  tac: "1"     # check the information with AMF
-  nssaiSst: "1"  #currently only 4 standard values are allowed 1,2,3,4 
-  nssaiSd0: "ffffff"    #values in hexa-decimal format
-  gnbNgaIfName: "eth0" # net1 in case multus create is true that means another interface is created for ngap interface, n2 to communicate with amf
-  gnbNgaIpAddress: "status.podIP" # n2n3IPadd in case multus create is true
-  gnbNguIfName: "eth0"   #net1 in case multus create is true gtu interface for upf/spgwu
-  gnbNguIpAddress: "status.podIP" # n2n3IPadd in case multus create is true
+  tac: "@TAC@"     # check the information with AMF
+  nssaiSst: "@SST@"  #currently only 4 standard values are allowed 1,2,3,4 
+  nssaiSd0: "0xffffff"    #values in hexa-decimal format
+  gnbNgaIfName: "@GNB_NGA_IF_NAME@" # net1 in case multus create is true that means another interface is created for ngap interface, n2 to communicate with amf
+  gnbNgaIpAddress: "@IP_GNB_N2N3@" # "status.podIP" or n2n3IPadd in case multus is used
+  gnbNguIfName: "@GNB_NGU_IF_NAME@"   #net1 in case multus create is true gtu interface for upf/spgwu
+  gnbNguIpAddress: "@IP_GNB_N2N3@" # "status.podIP" or n2n3IPadd in case multus is used
   threadParallelConfig: "PARALLEL_SINGLE_THREAD"
-  sdrAddrs: "serial=XXXXXXX"
+  sdrAddrs: "serial=XXXXXXX" #unused
 
 ## Debugging section
 start:

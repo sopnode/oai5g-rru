@@ -550,7 +550,7 @@ function configure-gnb() {
 	GNB_SHARED_VOL="false"
     fi
 
-    GNB_NAME="gNB_R2lab"
+    GNB_NAME="gNB-r2lab"
     # Configure parameters for values.yaml chart according to RRU type
     if [[  "$rru" == "b210" ]]; then
 	# no multus;  @var@ will be used to set AMF/NGA/NGU IP addresses just before the gnb starts
@@ -595,11 +595,11 @@ function configure-gnb() {
 	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
 	GNB_REPO="$GNB_N3XX_REPO"
 	GNB_TAG="$GNB_N3XX_TAG"
+	MULTUS_GNB_N2N3="true"
 	GNB_NGA_IF_NAME="net1"
 	GNB_NGA_IP_ADDRESS="$IP_GNB_N2N3/24"
 	GNB_NGU_IF_NAME="net1"
 	GNB_NGU_IP_ADDRESS="$IP_GNB_N2N3/24"
-	MULTUS_GNB_N2N3="true"
 	MULTUS_GNB_RU1="true"
 	IP_GNB_RU1="$IP_GNB_SFP1"
 	MTU_GNB_RU1="$MTU_N3XX"
@@ -625,12 +625,12 @@ function configure-gnb() {
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
 	GNB_REPO="$GNB_AW2S_REPO"
 	GNB_TAG="$GNB_AW2S_TAG"
+	MULTUS_GNB_N2N3="true"
 	GNB_NGA_IF_NAME="net1"
 	GNB_NGA_IP_ADDRESS="$IP_GNB_N2N3/24"
 	GNB_NGU_IF_NAME="net1"
 	GNB_NGU_IP_ADDRESS="$IP_GNB_N2N3/24"
 	GNB_AW2S_IF_NAME="net1"
-	MULTUS_GNB_N2N3="true"
 	MULTUS_GNB_RU1="false"
 	IP_GNB_RU1=""
 	MTU_GNB_RU1=""
@@ -645,15 +645,16 @@ function configure-gnb() {
 	QOS_GNB_DEF="true"
 	
     elif [[ "$rru" == "rfsim" ]]; then
+	# multus used for N2N3, mountConfig is false in this case
         GNB_NAME="$GNB_NAME-rfsim"
-	CONF_ORIG="$DIR_CONF/$CONF_RFSIM"
+	# CONF_ORIG="$DIR_CONF/$CONF_RFSIM" # unused as rfsim gNB config done in values.yaml chart
 	GNB_REPO="$GNB_RFSIM_REPO"
 	GNB_TAG="$GNB_RFSIM_TAG"
+	MULTUS_GNB_N2N3="true"
 	GNB_NGA_IF_NAME="net1"
 	GNB_NGA_IP_ADDRESS="$IP_GNB_N2N3/24"
 	GNB_NGU_IF_NAME="net1"
 	GNB_NGU_IP_ADDRESS="$IP_GNB_N2N3/24"
-	MULTUS_GNB_N2N3="true"
 	MULTUS_GNB_RU1="false"
 	IP_GNB_RU1=""
 	MTU_GNB_RU1=""
@@ -662,7 +663,7 @@ function configure-gnb() {
 	IP_GNB_RU2=""
 	MTU_GNB_RU2=""
 	IF_NAME_GNB_RU2=""
-	MOUNTCONFIG_GNB="true"
+	MOUNTCONFIG_GNB="false"
 	RRU_TYPE="rfsim"
 	ADD_OPTIONS_GNB="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
 	QOS_GNB_DEF="false"
@@ -692,21 +693,23 @@ EOF
 	echo cp "$DIR_CHARTS"/multus.yaml "$DIR_TEMPLATES"/multus.yaml
 	cp "$DIR_CHARTS"/multus.yaml "$DIR_TEMPLATES"/multus.yaml
     fi
-    
-    echo "Set up configmap.yaml chart with the right gNB configuration from $CONF_ORIG"
-    # Keep the 17 first lines of configmap.yaml
-    head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
-    # Add a 6-characters margin to gnb.conf
-    awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
-    # Append the modified gnb.conf to /tmp/configmap.yaml
-    cat /tmp/gnb.conf >> /tmp/configmap.yaml
-    echo -e "\n{{- end }}\n" >> /tmp/configmap.yaml
-    mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
-    echo "First configure gnb.conf within configmap.yaml"
-    # remove NSSAI sd info for PLMN and add other parameters for RUs
-    # in the case of b210 (without multus), AMF_IP_ADDR will be set again just before running the gNB
-    cat > "$SED_CONF_FILE" <<EOF
+    if [[ $MOUNTCONFIG_GNB == "True" ]]; then
+	# Following not useful when using rfsim rfsim
+	echo "Set up configmap.yaml chart with the right gNB configuration from $CONF_ORIG"
+	# Keep the 17 first lines of configmap.yaml
+	head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
+	# Add a 6-characters margin to gnb.conf
+	awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
+	# Append the modified gnb.conf to /tmp/configmap.yaml
+	cat /tmp/gnb.conf >> /tmp/configmap.yaml
+	echo -e "\n{{- end }}\n" >> /tmp/configmap.yaml
+	mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+
+	echo "First configure gnb.conf within configmap.yaml"
+	# remove NSSAI sd info for PLMN and add other parameters for RUs
+	# in the case of b210 (without multus), AMF_IP_ADDR will be set again just before running the gNB
+	cat > "$SED_CONF_FILE" <<EOF
 s|@GNB_NAME@|$GNB_NAME|
 s|@TAC@|$TAC|
 s|@MCC@|$MCC|
@@ -722,10 +725,11 @@ s|@GNB_AW2S_IP_ADDRESS@|$IP_AW2S|
 s|@GNB_AW2S_IF_NAME@|$GNB_AW2S_IF_NAME|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
 EOF
-    cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
-    sed -f "$SED_CONF_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
-    echo "Display new $DIR_TEMPLATES/configmap.yaml"
-    cat "$DIR_TEMPLATES"/configmap.yaml
+	cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
+	sed -f "$SED_CONF_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
+	echo "Display new $DIR_TEMPLATES/configmap.yaml"
+	cat "$DIR_TEMPLATES"/configmap.yaml
+    fi
 
     # Configure gnb values.yaml chart
     DIR="$OAI5G_RAN/$FUNCTION"
@@ -752,6 +756,13 @@ s|@IF_NAME_GNB_RU2@|$IF_NAME_GNB_RU2|
 s|@MOUNTCONFIG_GNB@|$MOUNTCONFIG_GNB|
 s|@RRU_TYPE@|$RRU_TYPE|
 s|@ADD_OPTIONS_GNB@|$ADD_OPTIONS_GNB|
+s|@GNB_NAME@|$GNB_NAME|
+s|@MCC@|$MCC|
+s|@MNC@|$MNC|
+s|@TAC@|$TAC|
+s|@SST@|$SST|
+s|@GNB_NGA_IF_NAME@|$GNB_NGA_IF_NAME|
+s|@GNB_NGU_IF_NAME@|$GNB_NGU_IF_NAME|
 s|@TCPDUMP_GNB_START@|$TCPDUMP_GNB_START|
 s|@TCPDUMP_CONTAINER_GNB_CREATE@|$TCPDUMP_CONTAINER_GNB_CREATE|
 s|@GNB_SHARED_VOL@|$GNB_SHARED_VOL|
