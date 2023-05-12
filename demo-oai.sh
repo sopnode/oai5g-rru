@@ -977,6 +977,8 @@ function start-nr-ue() {
     shift
 
     echo "Running start-nr-ue() on namespace: $ns, node_gnb:$node_gnb"
+    echo "cd $OAI5G_RAN"
+    cd "$OAI5G_RAN"
 
     echo "helm -n$ns install oai-nr-ue oai-nr-ue/"
     helm -n$ns install oai-nr-ue oai-nr-ue/
