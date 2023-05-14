@@ -50,8 +50,8 @@ EOF
 
     cp demo-oai.sh /tmp/demo-oai-orig.sh
     echo "Configuring demo-oai.sh script with possible new R2lab FIT nodes and registry credentials"
-    sed -f /tmp/demo-oai.sed < /tmp/demo-oai-orig.sh > /root/demo-oai.sh
-    diff /tmp/demo-oai-orig.sh /root/demo-oai.sh
+    sed -f /tmp/demo-oai.sed < /tmp/demo-oai-orig.sh > demo-oai.sh
+    diff /tmp/demo-oai-orig.sh demo-oai.sh
 }
 
 if test $# -ne 11; then
