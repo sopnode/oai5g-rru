@@ -13,6 +13,7 @@ DEF_PCAP= # boolean if pcap are generated on pods
 ##########################################################################
 
 PREFIX_STATS="/tmp/oai5g-stats"
+PREFIX_DEMO="@DEF_PREFIX_DEMO@" # the place where the all scripts will be copied on the k8s server to run the demo
 
 # IP local Pod addresses
 P100="192.168.100"
@@ -531,10 +532,10 @@ function configure-gnb() {
     echo "First prepare gNB mounted.conf and values/multus/configmap/deployment charts for $rru"
 
     FUNCTION="oai-gnb"
-    DIR_RAN="/root/oai5g-rru/ran-config"
+    DIR_RAN="$PREFIX_DEMO/oai5g-rru/ran-config"
     DIR_CONF="$DIR_RAN/conf"
     DIR_CHARTS="$DIR_RAN/charts"
-    DIR_GNB_DEST="/root/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
+    DIR_GNB_DEST="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
     DIR_TEMPLATES="$DIR_GNB_DEST/templates"
 
     SED_CONF_FILE="/tmp/gnb_conf.sed"
@@ -787,7 +788,7 @@ function configure-nr-ue() {
     DIR="$OAI5G_RAN/$FUNCTION"
     DIR_TEMPLATES="$DIR"/templates
 
-    DIR_RAN="/root/oai5g-rru/ran-config"
+    DIR_RAN="$PREFIX_DEMO/oai5g-rru/ran-config"
     DIR_CHARTS="$DIR_RAN/charts"
 
     echo "Copy the nr-ue chart files"
