@@ -87,7 +87,7 @@ CONF_RFSIM="gnb.sa.band78.106prb.rfsim.2x2.conf" #this one works
 
 
 
-OAI5G_CHARTS="$HOME"/oai-cn5g-fed/charts
+OAI5G_CHARTS="$PREFIX_DEMO"/oai-cn5g-fed/charts
 OAI5G_CORE="$OAI5G_CHARTS"/oai-5g-core
 OAI5G_BASIC="$OAI5G_CORE"/oai-5g-basic
 OAI5G_RAN="$OAI5G_CHARTS"/oai-5g-ran
@@ -847,7 +847,7 @@ function configure-all() {
     rru=$1; shift
     pcap=$1; shift
 
-    echo "configure-all: Applying SophiaNode patches to OAI5G charts located on "$HOME"/oai-cn5g-fed"
+    echo "configure-all: Applying SophiaNode patches to OAI5G charts located on "$PREFIX_DEMO"/oai-cn5g-fed"
     echo -e "\t with oai-spgwu-tiny running on $node_amf_spgwu"
     echo -e "\t with oai-gnb running on $node_gnb"
     echo -e "\t with generate-pcap: $pcap"
