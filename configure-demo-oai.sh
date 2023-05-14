@@ -34,7 +34,7 @@ s|DEF_NODE_GNB=.*|DEF_NODE_GNB="${node_gnb}"|
 s|DEF_RRU=.*|DEF_RRU="${rru}"|
 s|DEF_GNB_ONLY=.*|DEF_GNB_ONLY="${gnb_only}"|
 s|DEF_PCAP=.*|DEF_PCAP="${pcap}"|
-s|@DEF_PREFIX_DEMO@|"${prefix_demo}"|
+s|@DEF_PREFIX_DEMO@|${prefix_demo}|
 s|username=r2labuser|username=${regcred_name}|
 s|password=r2labuser-pwd|password=${regcred_password}|
 s|email=r2labuser@turletti.com|email=${regcred_email}|
