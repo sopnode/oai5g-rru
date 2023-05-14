@@ -24,6 +24,9 @@ IP_GNB_SFP1="192.168.10.132"
 IP_GNB_SFP2="192.168.20.132"
 IP_AW2S="$IP_GNB_N2N3" # in R2lab setup, single interface to join AW2S device and AMF/SPGWU (N2/N3)
 IP_NRUE="$P100.244"
+IP_FLEXRIC="$P100.245"
+IP_RNIS_XAPP="$P100.246"
+IP_RABBIT_MQ="$P100.247"
 
 # Netmask definitions
 NETMASK_GNB_N2N3="24"
