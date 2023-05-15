@@ -60,7 +60,7 @@ spec:
         {{- end}}
         {{- if .Values.config.mountConfigRnis}}
           - mountPath: /usr/local/etc/flexric/flexric.conf
-            name: configuration-rnis
+            name: configuration
             subPath: flexric.conf
           - mountPath: /usr/local/lib/flexric
             name: flexric-lib
@@ -266,8 +266,6 @@ spec:
         name: configuration
       {{- end}}
       {{- if .Values.config.mountConfigRnis}}
-          name: {{ .Chart.Name }}-configmap
-        name: configuration-rnis
       - name: flexric-lib
         hostPath:
           path: /tmp
