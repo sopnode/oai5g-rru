@@ -61,7 +61,7 @@ spec:
         {{- if .Values.config.mountConfigRnis}}
           - mountPath: /usr/local/etc/flexric/flexric.conf
             name: configuration-rnis
-            subpath: flexric.conf
+            subPath: flexric.conf
         {{- end}}
           ## USRP B210/B200 Mini
           # - mountPath: /dev/bus/usb/
