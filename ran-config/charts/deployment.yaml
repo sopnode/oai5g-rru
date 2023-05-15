@@ -260,16 +260,16 @@ spec:
         persistentVolumeClaim:
           claimName: oai5g-pvc
       {{- end }}
-      - configMap:
-      {{- if .Values.config.mountConfig}}
-          name: {{ .Chart.Name }}-configmap
-        name: configuration
-      {{- end}}
       {{- if .Values.config.mountConfigRnis}}
       - name: flexric-lib
         hostPath:
           path: /tmp
           type: Directory
+      {{- end}}
+      - configMap:
+      {{- if .Values.config.mountConfig}}
+          name: {{ .Chart.Name }}-configmap
+        name: configuration
       {{- end}}
       # - name: usrp
       #   hostPath:
