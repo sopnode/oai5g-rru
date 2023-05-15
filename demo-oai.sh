@@ -14,6 +14,7 @@ DEF_PCAP= # boolean if pcap are generated on pods
 
 PREFIX_STATS="/tmp/oai5g-stats"
 PREFIX_DEMO="@DEF_PREFIX_DEMO@" # the place where the all scripts will be copied on the k8s server to run the demo
+RNIS="@DEF_RNIS@"
 
 # IP local Pod addresses
 P100="192.168.100"
@@ -556,6 +557,12 @@ function configure-gnb() {
 	GNB_SHARED_VOL="false"
     fi
 
+    if [[ $RNIS == "True" ]]; then
+	MOUNTCONFIG_RNIS="true"
+    else
+	MOUNTCONFIG_RNIS="false"
+    fi	
+
     GNB_NAME="gNB-r2lab"
     # Configure parameters for values.yaml chart according to RRU type
     if [[  "$rru" == "b210" ]]; then
@@ -760,6 +767,7 @@ s|@NETMASK_GNB_RU2@|$NETMASK_GNB_RU2|
 s|@MTU_GNB_RU2@|$MTU_GNB_RU2|
 s|@IF_NAME_GNB_RU2@|$IF_NAME_GNB_RU2|
 s|@MOUNTCONFIG_GNB@|$MOUNTCONFIG_GNB|
+s|@MOUNTCONFIG_RNIS@|$MOUNTCONFIG_RNIS|
 s|@RRU_TYPE@|$RRU_TYPE|
 s|@ADD_OPTIONS_GNB@|$ADD_OPTIONS_GNB|
 s|@GNB_NAME@|$GNB_NAME|

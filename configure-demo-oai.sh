@@ -24,7 +24,9 @@ function update() {
     regcred_name=$1; shift
     regcred_password=$1; shift
     regcred_email=$1; shift
-    
+
+    # For now, rnis is not part yet of the update input set of parameters
+    rnis="True"
 
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
     cat > /tmp/demo-oai.sed <<EOF
@@ -35,6 +37,7 @@ s|DEF_RRU=.*|DEF_RRU="${rru}"|
 s|DEF_GNB_ONLY=.*|DEF_GNB_ONLY="${gnb_only}"|
 s|DEF_PCAP=.*|DEF_PCAP="${pcap}"|
 s|@DEF_PREFIX_DEMO@|${prefix_demo}|
+s|@DEF_RNIS@|${rnis}|
 s|username=r2labuser|username=${regcred_name}|
 s|password=r2labuser-pwd|password=${regcred_password}|
 s|email=r2labuser@turletti.com|email=${regcred_email}|

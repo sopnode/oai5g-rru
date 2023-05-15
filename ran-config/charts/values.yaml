@@ -55,6 +55,7 @@ multus:
 
 config:
   mountConfig: @MOUNTCONFIG_GNB@ #If config file is mounted then please edit mount.conf in configmap.yaml properly
+  mountConfigRnis: @MOUNTCONFIG_RNIS@
   rru: "@RRU_TYPE@"
   useAdditionalOptions: "@ADD_OPTIONS_GNB@"
   amfIpAddress: "@AMF_IP_ADDRESS@"  # amf ip-address or service-name oai-amf-svc

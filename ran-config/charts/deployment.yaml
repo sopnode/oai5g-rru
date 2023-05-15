@@ -48,16 +48,21 @@ spec:
       - name: gnb
         image: "{{ .Values.nfimage.repository }}:{{ .Values.nfimage.version }}"
         imagePullPolicy: {{ .Values.nfimage.pullPolicy }}
-        {{- if .Values.config.mountConfig}}
         volumeMounts:
-        {{- if eq .Values.config.rru "aw2s" }}
+        {{- if .Values.config.mountConfig}}
+        {{- if eq .Values.config.rru "aw2s"}}
           - mountPath: /opt/oai-gnb-aw2s/etc/mounted.conf
-        {{- else }}
+        {{- else}}
           - mountPath: /opt/oai-gnb/etc/mounted.conf
-        {{- end }}
+        {{- end}}
             name: configuration
             subPath: mounted.conf
         {{- end}}
+        {{- if .Values.config.mountConfigRnis}}
+          - mountPath: /usr/local/etc/flexric/flexric.conf
+            name: configuration-rnis
+            subpath: flexric.conf
+        {{-end}}
           ## USRP B210/B200 Mini
           # - mountPath: /dev/bus/usb/
           #   name: usrp
@@ -245,17 +250,21 @@ spec:
         - mountPath: "/pcap"
           name: oai5g-pv
         {{- end}}
-      {{- end }}
+      {{- end}}
       volumes:
-      {{- if .Values.persistent.sharedvolume }}
+      {{- if .Values.persistent.sharedvolume}}
       - name: oai5g-pv
         persistentVolumeClaim:
           claimName: oai5g-pvc
       {{- end }}
-      {{- if .Values.config.mountConfig }}
       - configMap:
+      {{- if .Values.config.mountConfig}}
           name: {{ .Chart.Name }}-configmap
         name: configuration
+      {{- end}}
+      {{- if .Values.config.mountConfigRnis}}
+          name: {{ .Chart.Name }}-configmap
+        name: configuration-rnis
       {{- end}}
       # - name: usrp
       #   hostPath:
