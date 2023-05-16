@@ -194,7 +194,7 @@ jobs:
       - type: Run
         command: >
           rm -rf oai5g-rru;
-          git clone -b master https://github.com/sopnode/oai5g-rru.git;
+          git clone -b feat-latest https://github.com/sopnode/oai5g-rru.git;
           cp oai5g-rru/demo-oai.sh /root/;
           chmod a+x /root/demo-oai.sh;
           cp oai5g-rru/configure-demo-oai.sh /root/;
@@ -202,7 +202,7 @@ jobs:
           cp oai5g-rru/perfs/run-iperf-server.sh /root/;
           /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{gnb_only}} {{pcap}} {%for x in regcred.values()%}{{x}} {%endfor %};
           rm -rf oai-cn5g-fed;
-          git clone -b r2lab-rrus-feat https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git;
+          git clone -b r2lab-rrus-feat-latest https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git;
       - type: Run
         command: /root/demo-oai.sh configure-all {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{pcap}}
 
