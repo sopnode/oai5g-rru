@@ -148,7 +148,7 @@ ROUTES_SMF_N4=""
 IF_NAME_SMF_N4="" 
 IP_DNS1="138.96.0.210"
 IP_DNS2="193.51.196.138"
-IP_CSCF=""
+IP_CSCF="8.8.8.8" # unused but without an IP, the SMF pod crashes..
 
 
 
