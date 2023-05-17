@@ -14,30 +14,30 @@ RFSIM_IMSI="208950000001121" # default is "208950000001121"
 ####
 
 function update() {
-    ns=$1; shift
-    node_amf_spgwu=$1; shift
-    node_gnb=$1; shift
-    rru=$1; shift
-    gnb_only=$1; shift
-    pcap=$1; shift
-    prefix_demo=$1; shift
-    regcred_name=$1; shift
-    regcred_password=$1; shift
-    regcred_email=$1; shift
+    NS=$1; shift
+    NODE_AMF_SPGWU=$1; shift
+    NODE_GNB=$1; shift
+    RRU=$1; shift 
+    GNB_ONLY=$1; shift # boolean in [true, false]
+    PCAP=$1; shift # boolean in [true, false]
+    PREFIX_DEMO=$1; shift
+    REGCRED_NAME=$1; shift
+    REGCRED_PWD=$1; shift
+    REGCRED_EMAIL=$1; shift
     
 
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
     cat > /tmp/demo-oai.sed <<EOF
-s|DEF_NS=.*|DEF_NS="${ns}"|
-s|DEF_NODE_AMF_SPGWU=.*|DEF_NODE_AMF_SPGWU="${node_amf_spgwu}"|
-s|DEF_NODE_GNB=.*|DEF_NODE_GNB="${node_gnb}"|
-s|DEF_RRU=.*|DEF_RRU="${rru}"|
-s|DEF_GNB_ONLY=.*|DEF_GNB_ONLY="${gnb_only}"|
-s|DEF_PCAP=.*|DEF_PCAP="${pcap}"|
-s|@DEF_PREFIX_DEMO@|${prefix_demo}|
-s|username=r2labuser|username=${regcred_name}|
-s|password=r2labuser-pwd|password=${regcred_password}|
-s|email=r2labuser@turletti.com|email=${regcred_email}|
+s|@NS@|$NS|
+s|@NODE_AMF_SPGWU@|$NODE_AMF_SPGWU|
+s|@NODE_GNB@|$NODE_GNB|
+s|@RRU@|$RRU|
+s|@GNB_ONLY@|$GNB_ONLY|
+s|@PCAP@|$PCAP|
+s|@PREFIX_DEMO@|$PREFIX_DEMO|
+s|@REGCRED_NAME@|$REGCRED_NAME|
+s|@REGCRED_PWD@|$REGCRED_PWD|
+s|@REGCRED_EMAIL@|$REGCRED_EMAIL|
 s|@DEF_MCC@|${MCC}|g
 s|@DEF_MNC@|${MNC}|g
 s|@DEF_TAC@|${TAC}|g

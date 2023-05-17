@@ -84,4 +84,4 @@ terminationGracePeriodSeconds: 5
 
 nodeSelector: {}
 
-nodeName:
+nodeName: @NODE_NRUE@
