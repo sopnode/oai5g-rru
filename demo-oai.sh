@@ -71,8 +71,8 @@ else
     MULTUS_CREATE="true"
     IF_N2="n2"
     IF_N3="n3"
-    IF_N4="n4"
-    IF_N6="n6"
+    IF_N4="eth0" # should be "n4" but not still work to be done
+    IF_N6="eth0" # should be "n6" but not still work to be done
 fi
 CN_DEFAULT_GW=""
 
