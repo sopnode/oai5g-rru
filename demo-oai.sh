@@ -54,7 +54,8 @@ IF_NAME_VLAN20="p4-net-20"
 ##########################################################################
 # Parameters for OAI5G CN charts
 #
-CN_TAG="develop"
+#CN_TAG="develop"
+CN_TAG="v1.5.1"
 #
 OAI5G_CHARTS="$PREFIX_DEMO/oai-cn5g-fed/charts"
 OAI5G_CORE="$OAI5G_CHARTS/oai-5g-core"
@@ -109,10 +110,10 @@ OAI5G_AUSF="$OAI5G_CORE/oai-ausf"
 
 ## oai-spgwu-tiny chart definitions
 OAI5G_SPGWU="$OAI5G_CORE/oai-spgwu-tiny"
-SPGWU_REPO="docker.io/r2labuser/oai-spgwu-tiny"
-SPGWU_TAG="rocky-test90"
-#SPGWU_REPO="${OAISA_REPO}/oai-spgwu-tiny"
-#SPGWU_TAG="${CN_TAG}"
+#SPGWU_REPO="docker.io/r2labuser/oai-spgwu-tiny"
+#SPGWU_TAG="rocky-test90"
+SPGWU_REPO="${OAISA_REPO}/oai-spgwu-tiny"
+SPGWU_TAG="${CN_TAG}"
 #
 MULTUS_SPGWU_N3="$MULTUS_CREATE"
 IP_SPGWU_N3="$P100.242" 
