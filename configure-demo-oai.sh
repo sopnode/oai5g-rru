@@ -28,24 +28,24 @@ function update() {
 
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
     cat > /tmp/demo-oai.sed <<EOF
-s|@NS@|$NS|
-s|@NODE_AMF_SPGWU@|$NODE_AMF_SPGWU|
-s|@NODE_GNB@|$NODE_GNB|
-s|@RRU@|$RRU|
-s|@GNB_ONLY@|$GNB_ONLY|
-s|@PCAP@|$PCAP|
-s|@PREFIX_DEMO@|$PREFIX_DEMO|
-s|@REGCRED_NAME@|$REGCRED_NAME|
-s|@REGCRED_PWD@|$REGCRED_PWD|
-s|@REGCRED_EMAIL@|$REGCRED_EMAIL|
+s|@DEF_NS@|$NS|
+s|@DEF_NODE_AMF_SPGWU@|$NODE_AMF_SPGWU|
+s|@DEF_NODE_GNB@|$NODE_GNB|
+s|@DEF_RRU@|$RRU|
+s|@DEF_GNB_ONLY@|$GNB_ONLY|
+s|@DEF_PCAP@|$PCAP|
 s|@DEF_MCC@|${MCC}|g
 s|@DEF_MNC@|${MNC}|g
 s|@DEF_TAC@|${TAC}|g
-s|@DEF_SST@|${SST}|g
+s|@DEF_SST0@|${SST0}|g
 s|@DEF_DNN@|${DNN}|g
 s|@DEF_FULL_KEY@|${FULL_KEY}|g
 s|@DEF_OPC@|${OPC}|g
 s|@DEF_RFSIM_IMSI@|${RFSIM_IMSI}|g
+s|@DEF_PREFIX_DEMO@|$PREFIX_DEMO|
+s|@DEF_REGCRED_NAME@|$REGCRED_NAME|
+s|@DEF_REGCRED_PWD@|$REGCRED_PWD|
+s|@DEF_REGCRED_EMAIL@|$REGCRED_EMAIL|
 EOF
 
     cp demo-oai.sh /tmp/demo-oai-orig.sh

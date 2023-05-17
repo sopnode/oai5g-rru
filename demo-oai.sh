@@ -19,23 +19,23 @@ function usage() {
 ##########################################################################
 # Following parameters automatically set by configure-demo-oai.sh script
 # do not change them here !
-NS="@NS@" # k8s namespace
-NODE_AMF_SPGWU="@NODE_AMF_SPGWU@" # node in wich run amf and spgwu pods
-NODE_GNB="@NODE_GNB@" # node in which gnb pod runs
-RRU="@RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
-GNB_ONLY="@GNB_ONLY@" # boolean if pcap are generated on pods
-PCAP="@PCAP@" # boolean if pcap are generated on pods
+NS="@DEF_NS@" # k8s namespace
+NODE_AMF_SPGWU="@DEF_NODE_AMF_SPGWU@" # node in wich run amf and spgwu pods
+NODE_GNB="@DEF_NODE_GNB@" # node in which gnb pod runs
+RRU="@DEF_RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
+GNB_ONLY="@DEF_GNB_ONLY@" # boolean if pcap are generated on pods
+PCAP="@DEF_PCAP@" # boolean if pcap are generated on pods
 #
-MCC="@MCC@"
-MNC="@MNC@"
-DNN="@DNN@"
-TAC="@TAC@"
-SST0="@SST@"
-FULL_KEY="@FULL_KEY@"
-OPC="@OPC@"
-RFSIM_IMSI="@RFSIM_IMSI@"
+MCC="@DEF_MCC@"
+MNC="@DEF_MNC@"
+DNN="@DEF_DNN@"
+TAC="@DEF_TAC@"
+SST0="@DEF_SST0@"
+FULL_KEY="@DEF_FULL_KEY@"
+OPC="@DEF_OPC@"
+RFSIM_IMSI="@DEF_RFSIM_IMSI@"
 #
-PREFIX_DEMO="@PREFIX_DEMO@" # the place where the all scripts will be copied on the k8s server to run the demo
+PREFIX_DEMO="@DEF_PREFIX_DEMO@" # the place where the all scripts will be copied on the k8s server to run the demo
 #
 ##########################################################################
 
@@ -626,7 +626,7 @@ s|@GNB_NAME@|$GNB_NAME|
 s|@TAC@|$TAC|
 s|@MCC@|$MCC|
 s|@MNC@|$MNC|
-s|@SST@|$SST0|
+s|@SST0@|$SST0|
 s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
 s|@GNB_NGA_IF_NAME@|$GNB_NGA_IF_NAME|
 s|@GNB_NGA_IP_ADDRESS@|$GNB_NGA_IP_ADDRESS|
@@ -770,7 +770,7 @@ function init() {
     echo "init: create regcred secret"	     
     kubectl create namespace $NS || true
     kubectl -n $NS delete secret regcred || true
-    kubectl -n $NS create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=@REGCRED_NAME@ --docker-password=@REGCRED_PWD@ --docker-email=@REGCRED_EMAIL@ || true
+    kubectl -n $NS create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=@DEF_REGCRED_NAME@ --docker-password=@DEF_REGCRED_PWD@ --docker-email=@DEF_REGCRED_EMAIL@ || true
 
     # Ensure that helm spray plugin is installed
     echo "init: ensure spray is installed and possibly create secret docker-registry"
