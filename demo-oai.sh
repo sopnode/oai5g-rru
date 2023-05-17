@@ -686,8 +686,8 @@ EOF
     ORIG_CHART="$DIR"/values.yaml
     cp "$ORIG_CHART" /tmp/oai-gnb_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_VALUES_FILE" < /tmp/oai_gnb_values.yaml-orig > "$ORIG_CHART"
-    diff /tmp/oai_gnb_values.yaml-orig "$ORIG_CHART" 
+    sed -f "$SED_VALUES_FILE" < /tmp/oai-gnb_values.yaml-orig > "$ORIG_CHART"
+    diff /tmp/oai-gnb_values.yaml-orig "$ORIG_CHART" 
 }
 
 
