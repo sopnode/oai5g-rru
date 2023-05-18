@@ -16,7 +16,8 @@ function usage() {
 }
 
 
-##########################################################################
+#################################################################################
+#################################################################################
 # Following parameters automatically set by configure-demo-oai.sh script
 # do not change them here !
 NS="@DEF_NS@" # k8s namespace
@@ -35,28 +36,24 @@ FULL_KEY="@DEF_FULL_KEY@"
 OPC="@DEF_OPC@"
 RFSIM_IMSI="@DEF_RFSIM_IMSI@"
 #
-PREFIX_DEMO="@DEF_PREFIX_DEMO@" # the place where the all scripts will be copied on the k8s server to run the demo
+PREFIX_DEMO="@DEF_PREFIX_DEMO@" # Directory in which all scripts will be copied on the k8s server to run the demo
 #
-##########################################################################
-
-# 
+#################################################################################
+##################################################################################
 PREFIX_STATS="/tmp/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance"
 P100="192.168.100"
 
 # Interfaces names of VLANs in sopnode servers
-#IF_NAME_VLAN100="p4-net"
 IF_NAME_VLAN100="eth5"
+#IF_NAME_VLAN100="p4-net"
 IF_NAME_VLAN10="p4-net-10"
 IF_NAME_VLAN20="p4-net-20"
 
-
-##########################################################################
-# Parameters for OAI5G CN charts
-#
-#CN_TAG="develop"
+############################### oai-cn5g chart parameters ########################
 CN_TAG="v1.5.1"
-#
+#CN_TAG="develop"
+
 OAI5G_CHARTS="$PREFIX_DEMO/oai-cn5g-fed/charts"
 OAI5G_CORE="$OAI5G_CHARTS/oai-5g-core"
 OAI5G_BASIC="$OAI5G_CORE/oai-5g-basic"
@@ -75,25 +72,27 @@ else
     IF_N4="eth0" # should be "n4" but not still work to be done
     IF_N6="eth0" # should be "n6" but not still work to be done
 fi
+
 CN_DEFAULT_GW=""
 
-## nrf-amf chart definitions
+#### nrf-amf chart definitions ####
 NRF_REPO="${OAISA_REPO}/oai-nrf"
 NRF_TAG="${CN_TAG}"
 
-## oai-udr chart definitions
+#### oai-udr chart definitions ####
 UDR_REPO="${OAISA_REPO}/oai-udr"
 UDR_TAG="${CN_TAG}"
 
-## oai-udm chart definitions
+#### oai-udm chart definitions ####
 UDM_REPO="${OAISA_REPO}/oai-udm"
 UDM_TAG="${CN_TAG}"
 
-## nrf-ausf chart definitions
+#### nrf-ausf chart definitions ####
+OAI5G_AUSF="$OAI5G_CORE/oai-ausf"
 AUSF_REPO="${OAISA_REPO}/oai-ausf"
 AUSF_TAG="${CN_TAG}"
 
-## oai-amf chart definitions
+#### oai-amf chart definitions ####
 OAI5G_AMF="$OAI5G_CORE/oai-amf"
 AMF_REPO="${OAISA_REPO}/oai-amf"
 AMF_TAG="${CN_TAG}"
@@ -105,10 +104,7 @@ GW_AMF_N2=""
 ROUTES_AMF_N2=""
 IF_NAME_AMF_N2="$IF_NAME_VLAN100" 
 
-## oai-ausf chart definitions
-OAI5G_AUSF="$OAI5G_CORE/oai-ausf"
-
-## oai-spgwu-tiny chart definitions
+#### oai-spgwu-tiny chart definitions ####
 OAI5G_SPGWU="$OAI5G_CORE/oai-spgwu-tiny"
 #SPGWU_REPO="docker.io/r2labuser/oai-spgwu-tiny"
 #SPGWU_TAG="rocky-test90"
@@ -136,7 +132,7 @@ GW_SPGWU_N6=""
 ROUTES_SPGWU_N6=""
 IF_NAME_SPGWU_N6="" 
 
-## oai-smf chart definitions
+#### oai-smf chart definitions ####
 OAI5G_SMF="$OAI5G_CORE/oai-smf"
 SMF_REPO="${OAISA_REPO}/oai-smf"
 SMF_TAG="${CN_TAG}"
@@ -148,53 +144,40 @@ ROUTES_SMF_N4=""
 IF_NAME_SMF_N4="" 
 IP_DNS1="138.96.0.210"
 IP_DNS2="193.51.196.138"
-IP_CSCF="8.8.8.8" # unused but without an IP, the SMF pod crashes..
+IP_CSCF="127.0.0.1" # unused but without an IP, the SMF pod crashes!
 
-
-
-##########################################################################
-# Parameters for OAI5G RAN charts
-#
+################################ oai-gnb chart parameters ########################
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
-OAI5G_NRUE="$OAI5G_CORE/oai-nr-ue"
-RAN_TAG="develop"
+RAN_TAG="develop"DEFAULT_GW_GNB=""
+GNB_NAME="gNB-r2lab"
+IP_GNB_N2N3="$P100.243"
+IF_NAME_GNB_N2="$IF_NAME_VLAN100"
+IF_NAME_GNB_N3="" # unused for current scenario with same PHY network interface for N2/N3
+NETMASK_GNB_N2="24"
+NETMASK_GNB_N3=""
+NETMASK_GNB_RU="24"
 
-# OAI5G RAN docker images
-GNB_AW2S_REPO="docker.io/r2labuser/oai-gnb-aw2s"
-#GNB_AW2S_TAG="new"
-GNB_AW2S_TAG="rocky"
+#### RFSIM RU case ####
+GNB_RFSIM_REPO="${OAISA_REPO}/oai-gnb"
+GNB_RFSIM_TAG="${RAN_TAG}"
+#GNB_RFSIM_TAG="2023.w12"
+CONF_RFSIM="gnb.sa.band78.106prb.rfsim.2x2.conf" 
+OPTIONS_RFSIM="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
+
+#### B210 RU case ####
 GNB_B210_REPO="${OAISA_REPO}/oai-gnb"
 GNB_B210_TAG="${RAN_TAG}"
 #GNB_B210_TAG="2023.w11b"
+CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
+OPTIONS_B210="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+
+#### N3XX RU case ####
 GNB_N3XX_REPO="${OAISA_REPO}/oai-gnb"
 #GNB_N3XX_REPO="docker.io/r2labuser/oai-gnb"
 GNB_N3XX_TAG="${RAN_TAG}"
 #GNB_N3XX_TAG="bugfix-phy-mac-interface"
-GNB_RFSIM_REPO="${OAISA_REPO}/oai-gnb"
-GNB_RFSIM_TAG="${RAN_TAG}"
-#GNB_RFSIM_TAG="2023.w12"
-NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
-NRUE_TAG="${RAN_TAG}"
-#NRUE_TAG="2023.w12"
-
-
-## oai-gnb chart definitions
-IP_GNB_N2N3="$P100.243"
-IF_NAME_GNB_N2="$IF_NAME_VLAN100"
-IF_NAME_GNB_N3="$IF_NAME_VLAN100"
-IF_NAME_GNB_N2N3="$IF_NAME_VLAN100"
-IF_NAME_GNB_AW2S="$IF_NAME_VLAN100"
-NETMASK_GNB_N2N3="24"
-NETMASK_GNB_RU1="24"
-NETMASK_GNB_RU2="24"
-# RFSIM RU case
-CONF_RFSIM="gnb.sa.band78.106prb.rfsim.2x2.conf" #this one works
-#CONF_RFSIM="gnb.sa.band78.fr1.51PRB.rfsim.conf"
-# B210 RU case
-#CONF_B210="gnb.band78.51PRB.usrpb210.conf" # without -E
-CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf" # this one needs -E as an additional option
-#CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-latest.conf"
-# N3XX RU case
+CONF_N3XX="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
+OPTIONS_N3XX="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
 IP_GNB_SFP1="192.168.10.132"
 IP_GNB_SFP2="192.168.20.132"
 MTU_N3XX="9000"
@@ -202,31 +185,47 @@ IF_NAME_N3XX_1="$IF_NAME_VLAN10"
 IF_NAME_N3XX_2="$IF_NAME_VLAN20"
 ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129"
 ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130"
-CONF_N3XX="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
 
-# AW2S RU case
-IP_AW2S="$IP_GNB_N2N3" # in R2lab setup, single interface to join AW2S device and AMF/SPGWU (N2/N3)
-ADDR_JAGUAR="$P100.48" 
-ADDR_PANTHER="$P100.51"
-#CONF_JAGUAR="jaguar_panther2x2_50MHz.conf"
-#CONF_JAGUAR="panther4x4_20MHz.conf"
-#CONF_JAGUAR="aw2s4x4_50MHz.conf"
+#### AW2S RU case ####
+GNB_AW2S_REPO="docker.io/r2labuser/oai-gnb-aw2s"
+#GNB_AW2S_TAG="new"
+GNB_AW2S_TAG="rocky"
 CONF_JAGUAR="gnb.sa.band78.51prb.aw2s.ddsuu.conf"
 CONF_PANTHER="panther4x4_20MHz.conf"
-## oai-nr-ue chart definitions
+OPTIONS_AW2S="--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
+IP_GNB_AW2S="$IP_GNB_N2N3" # in R2lab setup, single interface to join AW2S device and AMF/SPGWU (N2/N3)
+IF_NAME_GNB_AW2S="$IF_NAME_VLAN100"
+ADDR_JAGUAR="$P100.48" 
+ADDR_PANTHER="$P100.51"
+
+
+########################### oai-nr-ue rfsim chart parameters #####################
+OAI5G_NRUE="$OAI5G_CORE/oai-nr-ue"
+NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
+NRUE_TAG="${RAN_TAG}"
+OPTIONS_NRUE="--sa -E --rfsim -r 106 --numerology 1 -C 3319680000 --nokrnmod"
 IP_NRUE="$P100.244"
 NETMASK_NRUE="24"
 IF_NAME_NRUE="$IF_NAME_VLAN100"
 
+###################### Scenario with External Core Network #######################
 
-# In case an external Core Network is used (i.e., GNB_ONLY is "true"), you must configure the following:
+
+# If an external Core Network is used (i.e., GNB_ONLY is "true")
+# then, configure the following parameters
 if [[ $GNB_ONLY = "true" ]]; then
+    # Set the external AMF IP address
     AMF_IP_ADDR="172.22.10.6" # external AMF IP address, e.g., "172.22.10.6"
-    ROUTE_GNB_TO_EXTCN="172.22.10.0/24" # route to reach amf for multus.yaml chart, e.g., "172.22.10.0/24"
+    # Set the local host network interface to reach AMF/UPF
+    IF_NAME_GNB_N2="ran" # Host network interface to reach AMF/UPF
+    # Set the local IP address of the latter network interface
     IP_GNB_N2N3="10.0.20.243" # local IP to reach AMF/UPF, e.g., "10.0.20.243"
-    GW_GNB_TO_EXTCN="10.0.20.1" # gw for multus.yaml chart, e.g., "10.0.20.1"
-    IF_NAME_GNB_N2N3="ran" # Right Host network interface to reach AMF/UPF
+    # Set the route to reach AMF/UPF
+    ROUTES_GNB_N2="[{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
 fi
+
+##################################################################################
+##################################################################################
 
 
 function configure-oai-5g-basic() {
@@ -336,6 +335,7 @@ EOF
     helm dependency update
 }
 
+#################################################################################
 
 function configure-mysql() {
 
@@ -347,16 +347,18 @@ function configure-mysql() {
     cp $DIR_PATCHED_CHART/oai_db-basic.sql $DIR_ORIG_CHART/
 }
 
+#################################################################################
+
 
 function configure-gnb() {
 
     # Prepare mounted.conf and gnb chart files
     echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and pcap is $pcap"
-    echo "First prepare gNB mounted.conf and values/multus/configmap/deployment charts for $RRU"
 
     DIR_RAN="$PREFIX_DEMO/oai5g-rru/ran-config"
     DIR_CONF="$DIR_RAN/conf"
-    DIR_CHARTS="$DIR_RAN/charts"
+#    DIR_CHARTS="$DIR_RAN/charts"
+    DIR_CHARTS="$PREFIX_DEMO/oai-cn5g-fed/charts"
     DIR_GNB_DEST="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
     DIR_TEMPLATES="$DIR_GNB_DEST/templates"
 
@@ -374,38 +376,33 @@ function configure-gnb() {
 	GNB_SHARED_VOL="false"
     fi
 
-    GNB_NAME="gNB-r2lab"
     # Configure parameters for values.yaml chart according to RRU type
     if [[ "$RRU" = "b210" ]]; then
-	# no multus;  @var@ will be used to set AMF/NGA/NGU IP addresses just before the gnb starts
+	# no multus as FIT nodes not connected to VLAN100
+	# AMF/NGA/NGU IP addresses will be set just before the gnb pod starts
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
 	GNB_REPO="$GNB_B210_REPO"
 	GNB_TAG="$GNB_B210_TAG"
 	GNB_NAME="$GNB_NAME-b210"
 	if [[ "$GNB_ONLY" = "true" ]]; then
-	    MULTUS_GNB_N2N3="true"
-	    GNB_NGA_IF_NAME="$IF_NAME_GNB_N2N3"
-	    GNB_NGA_IP_ADDRESS="$IP_GNB_N2N3"
-	    GNB_NGU_IF_NAME="$IF_NAME_GNB_N2N3"
-	    GNB_NGU_IP_ADDRESS="$IP_GNB_N2N3"
+	    MULTUS_GNB_N2="true"
+	    GNB_NGA_IF_NAME="$IF_NAME_GNB_N2"
+	    GNB_NGA_IP_ADDRESS="$IP_GNB_N2"
+	    GNB_NGU_IF_NAME="$IF_NAME_GNB_N2"
+	    GNB_NGU_IP_ADDRESS="$IP_GNB_N2"
 	else
-	    MULTUS_GNB_N2N3="false"
+	    MULTUS_GNB_N2="false"
 	    GNB_NGA_IF_NAME="eth0"
 	    GNB_NGA_IP_ADDRESS="@GNB_NGA_IP_ADDRESS@"
 	    GNB_NGU_IF_NAME="eth0"
 	    GNB_NGU_IP_ADDRESS="@GNB_NGU_IP_ADDRESS@"
 	fi
+	MULTUS_GNB_N3="false"
 	MULTUS_GNB_RU1="false"
-	IP_GNB_RU1=""
-	MTU_GNB_RU1=""
-	IF_NAME_GNB_RU1=""
 	MULTUS_GNB_RU2="false"
-	IP_GNB_RU2=""
-	MTU_GNB_RU2=""
-	IF_NAME_GNB_RU2=""
 	MOUNTCONFIG_GNB="true"
 	RRU_TYPE="b210"
-	ADD_OPTIONS_GNB="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+	ADD_OPTIONS_GNB="$OPTIONS_B210"
 	QOS_GNB_DEF="false"
 
     elif [[ "$RRU" = "n300" || "$RRU" = "n320" ]]; then
@@ -419,10 +416,10 @@ function configure-gnb() {
 	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
 	GNB_REPO="$GNB_N3XX_REPO"
 	GNB_TAG="$GNB_N3XX_TAG"
-	MULTUS_GNB_N2N3="true"
-	GNB_NGA_IF_NAME="net1"
+	MULTUS_GNB_N2="true"
+	GNB_NGA_IF_NAME="n2"
 	GNB_NGA_IP_ADDRESS="$IP_GNB_N2N3/24"
-	GNB_NGU_IF_NAME="net1"
+	GNB_NGU_IF_NAME="n2"
 	GNB_NGU_IP_ADDRESS="$IP_GNB_N2N3/24"
 	MULTUS_GNB_RU1="true"
 	IP_GNB_RU1="$IP_GNB_SFP1"
@@ -434,10 +431,11 @@ function configure-gnb() {
 	IF_NAME_GNB_RU2="$IF_NAME_N3XX_2"
 	MOUNTCONFIG_GNB="true"
 	RRU_TYPE="n3xx"
-	ADD_OPTIONS_GNB="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
+	ADD_OPTIONS_GNB="$OPTIONS_N3XX"
 	QOS_GNB_DEF="true"
+
     elif [[ "$RRU" = "jaguar" || "$RRU" = "panther" ]]; then
-	if [[  "$RRU" = "jaguar" ]]; then
+	if [[ "$RRU" = "jaguar" ]]; then
 	    GNB_NAME="$GNB_NAME-jaguar"
 	    CONF_AW2S="$CONF_JAGUAR"
 	    ADDR_AW2S="$ADDR_JAGUAR"
@@ -449,47 +447,34 @@ function configure-gnb() {
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
 	GNB_REPO="$GNB_AW2S_REPO"
 	GNB_TAG="$GNB_AW2S_TAG"
-	MULTUS_GNB_N2N3="true"
-	GNB_NGA_IF_NAME="net1"
+	MULTUS_GNB_N2="true"
+	GNB_NGA_IF_NAME="n2"
 	GNB_NGA_IP_ADDRESS="$IP_GNB_N2N3/24"
-	GNB_NGU_IF_NAME="net1"
+	GNB_NGU_IF_NAME="n2"
 	GNB_NGU_IP_ADDRESS="$IP_GNB_N2N3/24"
-	GNB_AW2S_IF_NAME="net1"
-	MULTUS_GNB_RU1="false"
-	IP_GNB_RU1=""
-	MTU_GNB_RU1=""
-	IF_NAME_GNB_RU1=""
-	MULTUS_GNB_RU2="false"
-	IP_GNB_RU2=""
-	MTU_GNB_RU2=""
-	IF_NAME_GNB_RU2=""
+	GNB_AW2S_IF_NAME="n2"
+	MULTUS_GNB_N3="false"
+	MULTUS_GNB_RU="false"
 	MOUNTCONFIG_GNB="true"
 	RRU_TYPE="aw2s"
-	ADD_OPTIONS_GNB="--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
+	ADD_OPTIONS_GNB="$OPTIONS_AW2S"
 	QOS_GNB_DEF="true"
 	
     elif [[ "$RRU" = "rfsim" ]]; then
-	# multus used for N2N3, mountConfig is false in this case
+	# For rfsim, no need to mount the gNB conf file
         GNB_NAME="$GNB_NAME-rfsim"
-	# CONF_ORIG="$DIR_CONF/$CONF_RFSIM" # unused as rfsim gNB config done in values.yaml chart
 	GNB_REPO="$GNB_RFSIM_REPO"
 	GNB_TAG="$GNB_RFSIM_TAG"
-	MULTUS_GNB_N2N3="true"
-	GNB_NGA_IF_NAME="net1"
+	MULTUS_GNB_N2="true"
+	GNB_NGA_IF_NAME="n2"
 	GNB_NGA_IP_ADDRESS="$IP_GNB_N2N3/24"
-	GNB_NGU_IF_NAME="net1"
+	GNB_NGU_IF_NAME="n2"
 	GNB_NGU_IP_ADDRESS="$IP_GNB_N2N3/24"
-	MULTUS_GNB_RU1="false"
-	IP_GNB_RU1=""
-	MTU_GNB_RU1=""
-	IF_NAME_GNB_RU1=""
-	MULTUS_GNB_RU2="false"
-	IP_GNB_RU2=""
-	MTU_GNB_RU2=""
-	IF_NAME_GNB_RU2=""
+	MULTUS_GNB_N3="false"
+	MULTUS_GNB_RU="false"
 	MOUNTCONFIG_GNB="false"
 	RRU_TYPE="rfsim"
-	ADD_OPTIONS_GNB="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
+	ADD_OPTIONS_GNB="$OPTIONS_RFSIM"
 	QOS_GNB_DEF="false"
 
     else
@@ -497,30 +482,8 @@ function configure-gnb() {
 	usage
     fi
     
-    echo "Copy the modified chart files in the right place"
-    echo cp "$DIR_CHARTS"/values.yaml "$DIR_GNB_DEST"/values.yaml
-    cp "$DIR_CHARTS"/values.yaml "$DIR_GNB_DEST"/values.yaml
-    echo cp "$DIR_CHARTS"/deployment.yaml "$DIR_TEMPLATES"/deployment.yaml
-    cp "$DIR_CHARTS"/deployment.yaml "$DIR_TEMPLATES"/deployment.yaml
-    if [[ "$GNB_ONLY" = "true" ]]; then
-	GW_N2N3="true"
-	SED_MULTUS_FILE="/tmp/gnb_multus.sed"
-	cat > "$SED_MULTUS_FILE" <<EOF
-s|@ROUTE_GNB_TO_EXTCN@|$ROUTE_GNB_TO_EXTCN|
-s|@GW_GNB_TO_EXTCN|$GW_GNB_TO_EXTCN|
-EOF
-	sed -f "$SED_MULTUS_FILE" < "$DIR_CHARTS"/multus.yaml > "$DIR_TEMPLATES"/multus.yaml
-	echo "configure chart multus for gnb"
-	cat "$DIR_TEMPLATES"/multus.yaml
-    else
-	GW_N2N3="false"
-	echo cp "$DIR_CHARTS"/multus.yaml "$DIR_TEMPLATES"/multus.yaml
-	cp "$DIR_CHARTS"/multus.yaml "$DIR_TEMPLATES"/multus.yaml
-    fi
-
     if [[ "$MOUNTCONFIG_GNB" = "true" ]]; then
-	# Following not useful when using rfsim rfsim
-	echo "Set up configmap.yaml chart with the right gNB configuration from $CONF_ORIG"
+	echo "Insert gNB conf file $CONF_ORIG in configmap.yaml"
 	# Keep the 17 first lines of configmap.yaml
 	head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
 	# Add a 6-characters margin to gnb.conf
@@ -545,7 +508,7 @@ s|@GNB_NGA_IP_ADDRESS@|$GNB_NGA_IP_ADDRESS|
 s|@GNB_NGU_IF_NAME@|$GNB_NGU_IF_NAME|
 s|@GNB_NGU_IP_ADDRESS@|$GNB_NGU_IP_ADDRESS|
 s|@AW2S_IP_ADDRESS@|$ADDR_AW2S|
-s|@GNB_AW2S_IP_ADDRESS@|$IP_AW2S|
+s|@GNB_AW2S_IP_ADDRESS@|$IP_GNB_AW2S|
 s|@GNB_AW2S_IF_NAME@|$GNB_AW2S_IF_NAME|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
 EOF
@@ -558,41 +521,50 @@ EOF
     # Configure gnb values.yaml chart
     DIR="$OAI5G_RAN/oai-gnb"
 
-    echo "Then configure charts of oai-gnb"
+    echo "Then configure oai-gnb charts"
     cat > "$SED_VALUES_FILE" <<EOF
 s|@GNB_REPO@|$GNB_REPO|
 s|@GNB_TAG@|$GNB_TAG|
-s|@MULTUS_GNB_N2N3@|$MULTUS_GNB_N2N3|
-s|@IP_GNB_N2N3@|$IP_GNB_N2N3|
-s|@NETMASK_GNB_N2N3@|$NETMASK_GNB_N2N3|
-s|@IF_NAME_GNB_N2N3@|$IF_NAME_GNB_N2N3|
-s|@GW_N2N3@|$GW_N2N3|
+s|@MULTUS_GNB_N2@|$MULTUS_GNB_N2|
+s|@IP_GNB_N2@|$IP_GNB_N2|
+s|@NETMASK_GNB_N2@|$NETMASK_GNB_N2|
+s|@GW_GNB_N2@|$GW_GNB_N2|
+s|@ROUTES_GNB_N2@|$ROUTES_GNB_N2|
+s|@IF_NAME_GNB_N2@|$IF_NAME_GNB_N2|
+s|@MULTUS_GNB_N3@|$MULTUS_GNB_N3|
+s|@IP_GNB_N3@|$IP_GNB_N3|
+s|@NETMASK_GNB_N3@|$NETMASK_GNB_N3|
+s|@GW_GNB_N3@|$GW_GNB_N3|
+s|@ROUTES_GNB_N3@|$ROUTES_GNB_N3|
+s|@IF_NAME_GNB_N3@|$IF_NAME_GNB_N3|
 s|@MULTUS_GNB_RU1@|$MULTUS_GNB_RU1|
 s|@IP_GNB_RU1@|$IP_GNB_RU1|
 s|@NETMASK_GNB_RU1@|$NETMASK_GNB_RU1|
+s|@GW_GNB_RU1@|$GW_GNB_RU1|
 s|@MTU_GNB_RU1@|$MTU_GNB_RU1|
 s|@IF_NAME_GNB_RU1@|$IF_NAME_GNB_RU1|
 s|@MULTUS_GNB_RU2@|$MULTUS_GNB_RU2|
 s|@IP_GNB_RU2@|$IP_GNB_RU2|
 s|@NETMASK_GNB_RU2@|$NETMASK_GNB_RU2|
+s|@GW_GNB_RU2@|$GW_GNB_RU2|
 s|@MTU_GNB_RU2@|$MTU_GNB_RU2|
 s|@IF_NAME_GNB_RU2@|$IF_NAME_GNB_RU2|
 s|@MOUNTCONFIG_GNB@|$MOUNTCONFIG_GNB|
 s|@RRU_TYPE@|$RRU_TYPE|
 s|@ADD_OPTIONS_GNB@|$ADD_OPTIONS_GNB|
+s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
 s|@GNB_NAME@|$GNB_NAME|
 s|@MCC@|$MCC|
 s|@MNC@|$MNC|
 s|@TAC@|$TAC|
 s|@SST@|$SST0|
 s|@GNB_NGA_IF_NAME@|$GNB_NGA_IF_NAME|
+s|@IP_GNB_N2N3@|$IP_GNB_N2N3|
 s|@GNB_NGU_IF_NAME@|$GNB_NGU_IF_NAME|
 s|@TCPDUMP_GNB_START@|$TCPDUMP_GNB_START|
 s|@TCPDUMP_CONTAINER_GNB_CREATE@|$TCPDUMP_CONTAINER_GNB_CREATE|
 s|@GNB_SHARED_VOL@|$GNB_SHARED_VOL|
 s|@QOS_GNB_DEF@|$QOS_GNB_DEF|
-s|@NB_CPU_GNB@|$NB_CPU_GNB|
-s|@MEMORY_GNB@|$MEMORY_GNB|
 s|@NODE_GNB@|$NODE_GNB|
 EOF
     ORIG_CHART="$DIR"/values.yaml
@@ -602,21 +574,11 @@ EOF
     diff /tmp/oai-gnb_values.yaml-orig "$ORIG_CHART" 
 }
 
+#################################################################################
 
 function configure-nr-ue() {
     DIR="$OAI5G_RAN/oai-nr-ue"
-    DIR_TEMPLATES="$DIR"/templates
-    DIR_RAN="$PREFIX_DEMO/oai5g-rru/ran-config"
-    DIR_CHARTS="$DIR_RAN/charts"
 
-    echo "Copy the nr-ue chart files"
-    echo cp "$DIR_CHARTS"/nr-ue-values-rfsim.yaml "$DIR"/values.yaml
-    cp "$DIR_CHARTS"/nr-ue-values-rfsim.yaml "$DIR"/values.yaml
-    echo cp "$DIR_CHARTS"/nr-ue-deployment-rfsim.yaml "$DIR_TEMPLATES"/deployment.yaml
-    cp "$DIR_CHARTS"/nr-ue-deployment-rfsim.yaml "$DIR_TEMPLATES"/deployment.yaml
-    echo cp "$DIR_CHARTS"/nr-ue-multus-rfsim.yaml "$DIR_TEMPLATES"/multus.yaml
-    cp "$DIR_CHARTS"/nr-ue-multus-rfsim.yaml "$DIR_TEMPLATES"/multus.yaml
-    
     if [[ $PCAP = "true" ]]; then
 	TCPDUMP_CONTAINER_NRUE_CREATE="true"
 	echo "nr-ue: will NOT generate PCAP file to avoid wasting all memory resources!"
@@ -628,8 +590,7 @@ function configure-nr-ue() {
     ORIG_CHART="$DIR"/values.yaml
     SED_FILE="/tmp/oai-nr-ue-values.sed"
     echo "Configuring chart $ORIG_CHART"
-#    ADD_OPTIONS_NRUE="--sa --rfsim -r 106 --numerology 1 -C 3619200000 --nokrnmod"
-    ADD_OPTIONS_NRUE="--sa -E --rfsim -r 106 --numerology 1 -C 3319680000 --nokrnmod"
+    ADD_OPTIONS_NRUE="$OPTIONS_NRUE"
     SSD="16777215"
     cat > "$SED_FILE" <<EOF
 s|@NRUE_REPO@|$NRUE_REPO|
@@ -637,6 +598,7 @@ s|@NRUE_TAG@|$NRUE_TAG|
 s|@MULTUS_NRUE@|true|
 s|@IP_NRUE@|$IP_NRUE|
 s|@NETMASK_NRUE@|$NETMASK_NRUE|
+s|@DEFAULT_GW_NRUE@|$DEFAULT_GW_NRUE|
 s|@IF_NAME_NRUE@|$IF_NAME_NRUE|
 s|@IP_GNB@|$IP_GNB_N2N3|
 s|@RFSIM_IMSI@|$RFSIM_IMSI|
@@ -648,8 +610,8 @@ s|@SSD@|$SSD|
 s|@ADD_OPTIONS_NRUE@|$ADD_OPTIONS_NRUE|
 s|@TCPDUMP_NRUE_START@|false|
 s|@TCPDUMP_CONTAINER_NRUE_CREATE@|$TCPDUMP_CONTAINER_NRUE_CREATE|
-s|@SHARED_VOL_NRUE@|false|
 s|@QOS_NRUE_DEF@|false|
+s|@SHARED_VOL_NRUE@|false|
 s|@NODE_NRUE@||
 EOF
     cp "$ORIG_CHART" /tmp/oai-nr-ue_values.yaml-orig
@@ -658,6 +620,7 @@ EOF
     diff /tmp/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
 }
 
+#################################################################################
 
 function configure-all() {
     echo "configure-all: Applying SophiaNode patches to OAI5G charts located on "$PREFIX_DEMO"/oai-cn5g-fed"
@@ -673,6 +636,7 @@ function configure-all() {
     fi
 }
 
+#################################################################################
 
 
 function init() {
@@ -700,6 +664,7 @@ function init() {
     fi  
 }
 
+#################################################################################
 
 function start-cn() {
     ns=$1
@@ -721,6 +686,8 @@ function start-cn() {
     echo "Wait until all 5G Core pods are READY"
     kubectl wait pod -n $NS --for=condition=Ready --all
 }
+
+#################################################################################
 
 
 function start-gnb() {
@@ -769,6 +736,7 @@ EOF
     kubectl -n $NS wait pod --for=condition=Ready --all
 }
 
+#################################################################################
 
 function start-nr-ue() {
     ns=$1
@@ -788,6 +756,7 @@ function start-nr-ue() {
 }
 
 
+#################################################################################
 
 function start() {
     echo "start: run all oai5g pods on namespace=$NS"
@@ -876,6 +845,7 @@ EOF
     echo "When you finish, to clean-up the k8s cluster, please run demo-oai.py --clean"
 }
 
+#################################################################################
 
 function run-ping() {
     UE_POD_NAME=$(kubectl -n $NS get pods -l app.kubernetes.io/name=oai-nr-ue -o jsonpath="{.items[0].metadata.name}")
@@ -883,6 +853,7 @@ function run-ping() {
     kubectl -n $NS exec -it $UE_POD_NAME -c nr-ue -- /bin/ping -I oaitun_ue1 -c4 google.fr
 }
 
+#################################################################################
 
 function stop-cn(){
     echo "helm -n $NS uninstall oai-spgwu-tiny oai-nrf oai-udr oai-udm oai-ausf oai-smf oai-amf mysql"
@@ -951,7 +922,9 @@ function stop() {
     fi
 }
 
-####
+#################################################################################
+#################################################################################
+
 
 function get-all-logs() {
     prefix=$1; shift
@@ -1018,6 +991,7 @@ kubectl -c gnb cp $NS/$GNB_POD_NAME:nrMAC_stats.log $prefix/nrMAC_stats.log"$DAT
 kubectl -c gnb cp $NS/$GNB_POD_NAME:nrRRC_stats.log $prefix/nrRRC_stats.log"$DATE" || true
 }
 
+#################################################################################
 
 function get-cn-pcap(){
     prefix=$1; shift
@@ -1032,6 +1006,7 @@ function get-cn-pcap(){
     kubectl -c tcpdump cp $NS/$AMF_POD_NAME:cn-pcap.tgz $prefix/cn-pcap-"$DATE".tgz || true
 }
 
+#################################################################################
 
 function get-ran-pcap(){
     prefix=$1; shift
@@ -1054,6 +1029,8 @@ function get-ran-pcap(){
     fi
 }
 
+#################################################################################
+
 
 function get-all-pcap(){
     prefix=$1; shift
@@ -1062,8 +1039,8 @@ function get-all-pcap(){
     get-ran-pcap $prefix
 }
 
-
-# ****************************************************************************** #
+#################################################################################
+#################################################################################
 # Handle the different function calls 
 
 if test $# -lt 1; then
