@@ -48,10 +48,16 @@ s|@DEF_REGCRED_PWD@|$REGCRED_PWD|
 s|@DEF_REGCRED_EMAIL@|$REGCRED_EMAIL|
 EOF
 
-    cp demo-oai.sh /tmp/demo-oai-orig.sh
+    cp "$PREFIX_DEMO"/demo-oai.sh /tmp/demo-oai-orig.sh
     echo "Configuring demo-oai.sh script with possible new R2lab FIT nodes and registry credentials"
     sed -f /tmp/demo-oai.sed < /tmp/demo-oai-orig.sh > $PREFIX_DEMO/demo-oai.sh
     diff /tmp/demo-oai-orig.sh $PREFIX_DEMO/demo-oai.sh
+
+    DIR_GENERIC_DB="$PREFIX_DEMO/oai5g-rru/patch-mysql"
+    cp $DIR_GENERIC_DB/oai_db-basic-generic.sql /tmp/
+    echo "Patching oai_db-basic.sql generic database with input parameters"
+    sed -f /tmp/demo-oai.sed < /tmp/oai_db-basic-generic.sql > $DIR_GENERIC_DB/oai_db-basic.sql
+    diff $DIR_GENERIC_DB/oai_db-basic-generic.sql $DIR_GENERIC_DB/oai_db-basic.sql
 }
 
 if test $# -ne 11; then
