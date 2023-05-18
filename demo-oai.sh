@@ -148,7 +148,7 @@ IP_CSCF="127.0.0.1" # unused but without an IP, the SMF pod crashes!
 
 ################################ oai-gnb chart parameters ########################
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
-RAN_TAG="develop"DEFAULT_GW_GNB=""
+RAN_TAG="develop"
 GNB_NAME="gNB-r2lab"
 IP_GNB_N2N3="$P100.243"
 IF_NAME_GNB_N2="$IF_NAME_VLAN100"
