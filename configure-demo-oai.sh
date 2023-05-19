@@ -24,6 +24,10 @@ function update() {
     REGCRED_NAME=$1; shift
     REGCRED_PWD=$1; shift
     REGCRED_EMAIL=$1; shift
+
+    # Convert to lowercase boolean parameters
+    GNB_ONLY="${GNB_ONLY,,}"
+    PCAP="${PCAP,,}"
     
 
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
