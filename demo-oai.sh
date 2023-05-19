@@ -540,13 +540,13 @@ s|@ROUTES_GNB_N3@|$ROUTES_GNB_N3|
 s|@IF_NAME_GNB_N3@|$IF_NAME_GNB_N3|
 s|@MULTUS_GNB_RU1@|$MULTUS_GNB_RU1|
 s|@IP_GNB_RU1@|$IP_GNB_RU1|
-s|@NETMASK_GNB_RU1@|$NETMASK_GNB_RU1|
+s|@NETMASK_GNB_RU1@|$NETMASK_GNB_RU|
 s|@GW_GNB_RU1@|$GW_GNB_RU1|
 s|@MTU_GNB_RU1@|$MTU_GNB_RU1|
 s|@IF_NAME_GNB_RU1@|$IF_NAME_GNB_RU1|
 s|@MULTUS_GNB_RU2@|$MULTUS_GNB_RU2|
 s|@IP_GNB_RU2@|$IP_GNB_RU2|
-s|@NETMASK_GNB_RU2@|$NETMASK_GNB_RU2|
+s|@NETMASK_GNB_RU2@|$NETMASK_GNB_RU|
 s|@GW_GNB_RU2@|$GW_GNB_RU2|
 s|@MTU_GNB_RU2@|$MTU_GNB_RU2|
 s|@IF_NAME_GNB_RU2@|$IF_NAME_GNB_RU2|
@@ -754,7 +754,7 @@ function start-nr-ue() {
     node_gnb=$1
     shift
 
-    echo "Running start-nr-ue() on namespace: $NS=NODE_GNB=$NODE_GNB"
+    echo "Running start-nr-ue() on namespace: $NS, NODE_GNB=$NODE_GNB"
     echo "cd $OAI5G_RAN"
     cd "$OAI5G_RAN"
 
