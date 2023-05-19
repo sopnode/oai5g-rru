@@ -151,7 +151,7 @@ jobs:
       - type: Run
         command: kube-install.sh join-cluster r2lab@{{master}}
       - type: RunScript
-        command: demo-oai.sh init {{namespace}}
+        command: demo-oai.sh init
 
 
   {% if b210 %}
@@ -204,7 +204,7 @@ jobs:
           rm -rf oai-cn5g-fed;
           git clone -b r2lab-rrus-feat-latest https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git;
       - type: Run
-        command: /root/demo-oai.sh configure-all {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{pcap}}
+        command: /root/demo-oai.sh configure-all
 
   - id: start-demo
     required: init-demo
@@ -215,7 +215,7 @@ jobs:
       Launch OAI5G pods by calling demo-oai.sh start from {{nodes['k8s_fit']}}
     commands:
       - type: Run
-        command: /root/demo-oai.sh start {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{gnb_only}} {{pcap}}
+        command: /root/demo-oai.sh start
 
   {% for n in quectel_dict.keys() %}
   - id: attach-quectel-node-{{n}}
@@ -251,7 +251,7 @@ jobs:
       Delete OAI5G pods by calling demo-oai.sh stop from {{nodes.k8s_fit}}
     commands:
       - type: Run
-        command: /root/demo-oai.sh stop {{namespace}} {{rru}} {{gnb_only}} {{pcap}}
+        command: /root/demo-oai.sh stop
       {% if pcap == 'True' %}
       - type: Pull
         remotepaths: "/tmp/oai5g-stats.tgz"
