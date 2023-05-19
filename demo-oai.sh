@@ -485,7 +485,7 @@ function configure-gnb() {
     if [[ "$MOUNTCONFIG_GNB" = "true" ]]; then
 	echo "Insert gNB conf file $CONF_ORIG in configmap.yaml"
 	# Keep the 17 first lines of configmap.yaml
-	head -17  "$DIR_CHARTS"/configmap.yaml > /tmp/configmap.yaml
+	head -17  "$DIR_TEMPLATES"/configmap.yaml > /tmp/configmap.yaml
 	# Add a 6-characters margin to gnb.conf
 	awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
 	# Append the modified gnb.conf to /tmp/configmap.yaml
@@ -710,7 +710,16 @@ s|ipv4       =.*|ipv4       = "$AMF_IP";|
 EOF
 	cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
 	sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
-	diff  /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+	echo "set AMF IP address in chart $DIR_TEMPLATES/configmap.yaml"
+	diff /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+	SED_FILE="/tmp/gnb-values.sed"
+	cat > "$SED_FILE" <<EOF
+s|amfIpAddress:.*|amfIpAddress: "$AMF_IP"|
+EOF
+	cp "$DIR"/values.yaml /tmp/values.yaml
+	sed -f "$SED_FILE" < /tmp/values.yaml > "$DIR"/values.yaml
+	echo "set AMF IP address in chart $DIR/values.yaml"
+	diff /tmp/values.yaml "$DIR"/values.yaml
     else
 	AMF_IP="$IP_AMF_N2"
     fi
