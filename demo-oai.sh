@@ -3,7 +3,6 @@
 function usage() {
     echo "USAGE:"
     echo "demo-oai.sh init |"
-    echo "            prepare-repos |"
     echo "            start |"
     echo "            stop |"
     echo "            configure-all |"
@@ -246,32 +245,6 @@ function init() {
         [[ -f /etc/lsb-release ]] && apt-get install -y patch
     fi  
 }
-
-#################################################################################
-
-function prepare-repos() {
-
-    echo "Prepare the environment locally on $PREFIX_DEMO to run oai5g-rru scenarios"
-    echo "cd $PREFIX_DEMO"
-    cd "$PREFIX_DEMO"
-    echo "rm -rf oai5g-rru"
-    rm -rf oai5g-rru
-    echo "git clone --branch $OAI5G_TAG $OAI5G_REPO"
-    git clone --branch "$OAI5G_TAG" "$OAI5G_REPO"
-    echo "cp oai5g-rru/demo-oai.sh $PREFIX_DEMO/"
-    cp oai5g-rru/demo-oai.sh "$PREFIX_DEMO"/
-    echo "chmod a+x $PREFIX_DEMO/demo-oai.sh"
-    chmod a+x "$PREFIX_DEMO"/demo-oai.sh
-    echo "cp oai5g-rru/configure-demo-oai.sh $PREFIX_DEMO/"
-    cp oai5g-rru/configure-demo-oai.sh "$PREFIX_DEMO"/
-    echo "cp oai5g-rru/perfs/logs.sh $PREFIX_DEMO/"
-    cp oai5g-rru/perfs/logs.sh "$PREFIX_DEMO"/
-    echo "cp oai5g-rru/perfs/run-iperf-server.sh $PREFIX_DEMO/"
-    cp oai5g-rru/perfs/run-iperf-server.sh "$PREFIX_DEMO"/
-    echo "$PREFIX_DEMO/configure-demo-oai.sh update $NS $NODE_AMF_SPGWU $NODE_GNB $RRU $GNB_ONLY $PCAP $PREFIX_DEMO @DEF_REGCRED_NAME@ @DEF_REGCRED_PWD@ @DEF_REGCRED_EMAIL@"
-    "$PREFIX_DEMO"/configure-demo-oai.sh update "$NS" "$NODE_AMF_SPGWU" "$NODE_GNB" "$RRU" "$GNB_ONLY" "$PCAP" "$PREFIX_DEMO" @DEF_REGCRED_NAME@ @DEF_REGCRED_PWD@ @DEF_REGCRED_EMAIL@
-}
-
 
 #################################################################################
 
@@ -1084,7 +1057,7 @@ if test $# -lt 1; then
     usage
 else
     case $1 in
-	init|prepare-repos|start|stop|configure-all|start-cn|start-gnb|start-nr-ue|stop-cn|stop-gnb|stop-nr-ue)
+	init|start|stop|configure-all|start-cn|start-gnb|start-nr-ue|stop-cn|stop-gnb|stop-nr-ue)
 	    echo "$0: running $1"
 	    "$1"
 	;;

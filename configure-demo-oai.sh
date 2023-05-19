@@ -12,15 +12,6 @@ FULL_KEY="8baf473f2f8fd09487cccbd7097c6862" # default is "8baf473f2f8fd09487cccb
 OPC="8E27B6AF0E692E750F32667A3B14605D" # default is "8E27B6AF0E692E750F32667A3B14605D"
 RFSIM_IMSI="208950000001121" # default is "208950000001121"
 ##########################################################################################
-OAI_CN5G_FED_REPO="https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git"
-OAI_CN5G_FED_TAG="v1.5.1-1.0"
-OAI5G_REPO="https://github.com/sopnode/oai5g-rru.git"
-#OAI5G_TAG="v1.5.1-1.0"
-OAI5G_TAG="feat-latest"
-
-
-##########################################################################################
-
 
 function update() {
     NS=$1; shift
