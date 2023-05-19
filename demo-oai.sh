@@ -227,6 +227,26 @@ fi
 ##################################################################################
 ##################################################################################
 
+function init() {
+    # init function should be run once per demo.
+
+    # Ensure that helm spray plugin is installed
+    echo "init: ensure spray is installed and possibly create secret docker-registry"
+    helm plugin uninstall helm-spray || true
+    helm plugin install https://github.com/ThalesGroup/helm-spray || true
+
+    # Just in case the k8s cluster has been restarted without multus enabled..
+    echo "kube-install.sh enable-multus"
+    kube-install.sh enable-multus || true
+
+    # Install patch command...
+    if [ ! -x "$(command -v patch)" ]; then
+        [[ -f /etc/fedora-release ]] && dnf install -y patch
+        [[ -f /etc/lsb-release ]] && apt-get install -y patch
+    fi  
+}
+
+#################################################################################
 
 function configure-oai-5g-basic() {
     
@@ -629,6 +649,13 @@ function configure-all() {
     echo -e "\t with oai-gnb running on $NODE_GNB"
     echo -e "\t with generate-pcap: $pcap"
 
+    # Remove pulling limitations from docker-hub with anonymous account
+    echo "Create $NS if not present and regcred secret"	     
+    kubectl create namespace $NS || true
+    kubectl -n $NS delete secret regcred || true
+    kubectl -n $NS create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=@DEF_REGCRED_NAME@ --docker-password=@DEF_REGCRED_PWD@ --docker-email=@DEF_REGCRED_EMAIL@ || true
+
+    # Ensure that helm spray plugin is installed
     configure-oai-5g-basic 
     configure-mysql
     configure-gnb
@@ -639,33 +666,6 @@ function configure-all() {
 
 #################################################################################
 
-
-function init() {
-    # init function should be run once per demo.
-
-    # Remove pulling limitations from docker-hub with anonymous account
-    echo "init: create regcred secret"	     
-    kubectl create namespace $NS || true
-    kubectl -n @DEF_NS@ delete secret regcred || true
-    kubectl -n @DEF_NS@ create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=@DEF_REGCRED_NAME@ --docker-password=@DEF_REGCRED_PWD@ --docker-email=@DEF_REGCRED_EMAIL@ || true
-
-    # Ensure that helm spray plugin is installed
-    echo "init: ensure spray is installed and possibly create secret docker-registry"
-    helm plugin uninstall helm-spray || true
-    helm plugin install https://github.com/ThalesGroup/helm-spray || true
-
-    # Just in case the k8s cluster has been restarted without multus enabled..
-    echo "kube-install.sh enable-multus"
-    kube-install.sh enable-multus || true
-
-    # Install patch command...
-    if [ ! -x "$(command -v patch)" ]; then
-        [[ -f /etc/fedora-release ]] && dnf install -y patch
-        [[ -f /etc/lsb-release ]] && apt-get install -y patch
-    fi  
-}
-
-#################################################################################
 
 function start-cn() {
     ns=$1
