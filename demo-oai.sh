@@ -646,8 +646,8 @@ function init() {
     # Remove pulling limitations from docker-hub with anonymous account
     echo "init: create regcred secret"	     
     kubectl create namespace $NS || true
-    kubectl -n $NS delete secret regcred || true
-    kubectl -n $NS create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=@DEF_REGCRED_NAME@ --docker-password=@DEF_REGCRED_PWD@ --docker-email=@DEF_REGCRED_EMAIL@ || true
+    kubectl -n @DEF_NS@ delete secret regcred || true
+    kubectl -n @DEF_NS@ create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=@DEF_REGCRED_NAME@ --docker-password=@DEF_REGCRED_PWD@ --docker-email=@DEF_REGCRED_EMAIL@ || true
 
     # Ensure that helm spray plugin is installed
     echo "init: ensure spray is installed and possibly create secret docker-registry"
