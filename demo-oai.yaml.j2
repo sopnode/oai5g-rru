@@ -8,8 +8,6 @@
 # {{rru}} - typically 'n300' or 'n320' or 'jaguar' or 'panther'
 # {{b210}} - typically '0' or the fit node number used to run oai-gnb with USRP b210 device
 # {{auto_start}} - typically 'True' or 'False'
-# {{gnb_only}} - typically 'True' or 'False'
-# {{regcred}} - typically {'name': 'jdoe', 'password': 'XX', 'email': 'jdoe@yahoo.fr'}
 # {{image}} - typically 'kubernetes'
 # {{quectel_dict}} 
 # {{quectel_image}} - typically 'quectel-mbim'
@@ -187,24 +185,12 @@ jobs:
     critical: True
     verbose: {{verbose}}
     label: >
-      Clone oai5g-rru, configure demo-oai.sh script on {{nodes['k8s_fit']}},
-      clone oai-cn5g-fed, apply patches for SophiaNode R2lab environment,
-      and run the k8s demo-oai script from {{nodes['k8s_fit']}}
+      Prepare repos and configure scripts on {{nodes['k8s_fit']}}
     commands:
       - type: Run
         command: >
-          rm -rf oai5g-rru;
-          git clone -b feat-latest https://github.com/sopnode/oai5g-rru.git;
-          cp oai5g-rru/demo-oai.sh /root/;
-          chmod a+x /root/demo-oai.sh;
-          cp oai5g-rru/configure-demo-oai.sh /root/;
-          cp oai5g-rru/perfs/logs.sh /root/;
-          cp oai5g-rru/perfs/run-iperf-server.sh /root/;
-          /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{gnb_only}} {{pcap}} /root {%for x in regcred.values()%}{{x}} {%endfor %};
-          rm -rf oai-cn5g-fed;
-          git clone -b r2lab-rrus-feat-latest https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git;
-      - type: Run
-        command: /root/demo-oai.sh configure-all
+          /root/demo-oai.sh prepare-repos
+          /root/demo-oai.sh configure-all
 
   - id: start-demo
     required: init-demo
