@@ -26,8 +26,8 @@ function update() {
     REGCRED_PWD=$1; shift
     REGCRED_EMAIL=$1; shift
 
-    # For now, rnis is not part yet of the update input set of parameters
-    rnis="True"
+    # For now, RNIS parameter is not part yet of the update input set of parameters
+    RNIS="True"
 
     # Convert to lowercase boolean parameters
     GNB_ONLY="${GNB_ONLY,,}"
@@ -42,7 +42,6 @@ s|@DEF_NODE_GNB@|$NODE_GNB|
 s|@DEF_RRU@|$RRU|
 s|@DEF_GNB_ONLY@|$GNB_ONLY|
 s|@DEF_PCAP@|$PCAP|
->>>>>>> master
 s|@DEF_MCC@|${MCC}|g
 s|@DEF_MNC@|${MNC}|g
 s|@DEF_TAC@|${TAC}|g
@@ -52,7 +51,7 @@ s|@DEF_FULL_KEY@|${FULL_KEY}|g
 s|@DEF_OPC@|${OPC}|g
 s|@DEF_RFSIM_IMSI@|${RFSIM_IMSI}|g
 s|@DEF_PREFIX_DEMO@|$PREFIX_DEMO|
-s|@DEF_RNIS@|${rnis}|
+s|@DEF_RNIS@|${RNIS}|
 s|@DEF_REGCRED_NAME@|$REGCRED_NAME|
 s|@DEF_REGCRED_PWD@|$REGCRED_PWD|
 s|@DEF_REGCRED_EMAIL@|$REGCRED_EMAIL|
