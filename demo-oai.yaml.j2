@@ -13,6 +13,10 @@
 # {{image}} - typically 'kubernetes'
 # {{quectel_dict}} 
 # {{quectel_image}} - typically 'quectel-mbim'
+# {{oai5g_rru_repo}} - typically 'https://github.com/sopnode/oai5g-rru.git'
+# {{oai5g_rru_tag}} - typically 'v1.5.1-1.0'
+# {{oai_cn5g_fed_repo}} - typically 'https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git'
+# {{oai_cn5g_fed_tag}} - typically 'v1.5.1-1.0'
 # {{verbose}} - typically 'True' or 'False'
 
 nodes:
@@ -151,7 +155,7 @@ jobs:
       - type: Run
         command: kube-install.sh join-cluster r2lab@{{master}}
       - type: RunScript
-        command: demo-oai.sh init {{namespace}}
+        command: demo-oai.sh init
 
 
   {% if b210 %}
@@ -194,7 +198,7 @@ jobs:
       - type: Run
         command: >
           rm -rf oai5g-rru;
-          git clone -b rnis https://github.com/sopnode/oai5g-rru.git;
+          git clone --branch {{oai5g_rru_tag}} {{oai5g_rru_repo}};
           cp oai5g-rru/demo-oai.sh /root/;
           chmod a+x /root/demo-oai.sh;
           cp oai5g-rru/configure-demo-oai.sh /root/;
@@ -202,9 +206,9 @@ jobs:
           cp oai5g-rru/perfs/run-iperf-server.sh /root/;
           /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{gnb_only}} {{pcap}} /root {%for x in regcred.values()%}{{x}} {%endfor %};
           rm -rf oai-cn5g-fed;
-          git clone -b r2lab-rrus-rnis https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git;
+          git clone --branch {{oai_cn5g_fed_tag}} {{oai_cn5g_fed_repo}}
       - type: Run
-        command: /root/demo-oai.sh configure-all {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{pcap}}
+        command: /root/demo-oai.sh configure-all
 
   - id: start-demo
     required: init-demo
@@ -215,7 +219,7 @@ jobs:
       Launch OAI5G pods by calling demo-oai.sh start from {{nodes['k8s_fit']}}
     commands:
       - type: Run
-        command: /root/demo-oai.sh start {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{gnb_only}} {{pcap}}
+        command: /root/demo-oai.sh start
 
   {% for n in quectel_dict.keys() %}
   - id: attach-quectel-node-{{n}}
@@ -251,7 +255,7 @@ jobs:
       Delete OAI5G pods by calling demo-oai.sh stop from {{nodes.k8s_fit}}
     commands:
       - type: Run
-        command: /root/demo-oai.sh stop {{namespace}} {{rru}} {{gnb_only}} {{pcap}}
+        command: /root/demo-oai.sh stop
       {% if pcap == 'True' %}
       - type: Pull
         remotepaths: "/tmp/oai5g-stats.tgz"

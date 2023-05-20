@@ -31,6 +31,13 @@ from apssh import YamlLoader, SshJob, Run, Service # Push
 # make sure to pip install r2lab
 from r2lab import r2lab_hostname, ListOfChoices, find_local_embedded_script # ListOfChoicesNullReset
 
+##########################################################################################
+#    Configure here OAI5G_RRU and OAI_CN5G_FED repo and tag
+OAI5G_RRU_REPO = 'https://github.com/sopnode/oai5g-rru.git'
+OAI5G_RRU_TAG = 'v1.5.1-1.0-1.0'
+OAI_CN5G_FED_REPO = 'https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git'
+OAI_CN5G_FED_TAG = 'v1.5.1-1.0'
+##########################################################################################
 
 # Currently, TWO k8s clusters are available on the SophiaNode:
 # - A Production k8s cluster with 2 PowerEdge servers :
@@ -126,6 +133,10 @@ def run(*, mode, gateway, slicename, master, namespace,
         ),
         image=image,
         quectel_image=quectel_image,
+        oai5g_rru_repo=OAI5G_RRU_REPO,
+        oai5g_rru_tag=OAI5G_RRU_TAG,
+        oai_cn5g_fed_repo=OAI_CN5G_FED_REPO,
+        oai_cn5g_fed_tag=OAI_CN5G_FED_TAG,
         verbose=verbose,
         nodes_sh=find_local_embedded_script("nodes.sh"),
         INCLUDES=INCLUDES,
