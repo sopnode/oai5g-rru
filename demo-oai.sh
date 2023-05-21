@@ -264,7 +264,7 @@ function gener-mac()
     fi
     (( CPT++ ))
     echo "${CPT}" > "$CPTfile"
-    SUFFIX=$(printf "%02s" $CPT)
+    SUFFIX=$(printf "%02x" $CPT)
     echo "$PREFIX$SUFFIX"
 }
 
