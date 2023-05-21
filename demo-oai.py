@@ -34,8 +34,8 @@ from r2lab import r2lab_hostname, ListOfChoices, find_local_embedded_script # Li
 ##########################################################################################
 #    Configure here OAI5G_RRU and OAI_CN5G_FED repo and tag
 OAI5G_RRU_REPO = 'https://github.com/sopnode/oai5g-rru.git'
-OAI5G_RRU_TAG = 'master'
-#OAI5G_RRU_TAG = 'v1.5.1-1.0-1.0'
+#OAI5G_RRU_TAG = 'master'
+OAI5G_RRU_TAG = 'v1.5.1-1.0-1.0'
 OAI_CN5G_FED_REPO = 'https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git'
 OAI_CN5G_FED_TAG = 'v1.5.1-1.0'
 ##########################################################################################
