@@ -226,6 +226,48 @@ if [[ $GNB_ONLY = "true" ]]; then
 fi
 
 ##################################################################################
+
+# Generate unique MAC addresses for multus interfaces in oai5g pods
+function gener-mac()
+{
+    CPTfile="/tmp/cpt-$$.dat"
+    PREFIXfile="/tmp/prefix-$$.dat"
+    if [ ! -f "$CPTfile" ]; then
+	CPT=0
+    else
+	CPT=$(cat "$CPTfile")
+    fi
+    if [ ! -f "$PREFIXfile" ]; then
+	PREFIX="12:34:"
+	if [[ $IF_NAME_VLAN100 = "eth5" ]]; then
+	    PREFIX=$PREFIX"00:"
+	else
+	    PREFIX=$PREFIX"01:"
+	fi
+	case $NODE_AMF_SGPWU in
+	    "sopnode-l1.inria.fr")
+		PREFIX=$PREFIX"00:";;
+	    "sopnode-w1.inria.fr")
+		PREFIX=$PREFIX"01:";;
+	    *)PREFIX=$PREFIX"02:";;
+	esac
+	if [[ $NODE_GNB = "sopnode-l1.inria.fr" ]]; then
+	    PREFIX=$PREFIX"00:"
+	elif [[ $NODE_GNB = "sopnode-w1.inria.fr" ]]; then
+	    PREFIX=$PREFIX"01:"
+	else
+	    PREFIX=$PREFIX"02:"
+	fi
+	echo "${PREFIX}" > "$PREFIXfile"
+    else
+	PREFIX=$(cat "$PREFIXfile")
+    fi
+    (( CPT++ ))
+    echo "${CPT}" > "$CPTfile"
+    SUFFIX=$(printf "%02s" $CPT)
+    echo "$PREFIX$SUFFIX"
+}
+
 ##################################################################################
 
 function init() {
@@ -300,6 +342,7 @@ s|@AMF_TAG@|${AMF_TAG}|
 s|@MULTUS_AMF_N2@|$MULTUS_AMF_N2|
 s|@IP_AMF_N2@|$IP_AMF_N2|
 s|@NETMASK_AMF_N2@|$NETMASK_AMF_N2|
+s|@MAC_AMF_N2@|$(gener-mac)|
 s|@GW_AMF_N2@|$GW_AMF_N2|
 s|@ROUTES_AMF_N2@|$ROUTES_AMF_N2|
 s|@IF_NAME_AMF_N2@|$IF_NAME_AMF_N2|
@@ -313,18 +356,21 @@ s|@SPGWU_TAG@|${SPGWU_TAG}|
 s|@MULTUS_SPGWU_N3@|$MULTUS_SPGWU_N3|
 s|@IP_SPGWU_N3@|$IP_SPGWU_N3|
 s|@NETMASK_SPGWU_N3@|$NETMASK_SPGWU_N3|
+s|@MAC_SPGWU_N3@|$(gener-mac)|
 s|@GW_SPGWU_N3@|$GW_SPGWU_N3|
 s|@ROUTES_SPGWU_N3@|$ROUTES_SPGWU_N3|
 s|@IF_NAME_SPGWU_N3@|$IF_NAME_SPGWU_N3|
 s|@MULTUS_SPGWU_N4@|$MULTUS_SPGWU_N4|
 s|@IP_SPGWU_N4@|$IP_SPGWU_N4|
 s|@NETMASK_SPGWU_N4@|$NETMASK_SPGWU_N4|
+s|@MAC_SPGWU_N4@|$(gener-mac)|
 s|@GW_SPGWU_N4@|$GW_SPGWU_N4|
 s|@ROUTES_SPGWU_N4@|$ROUTES_SPGWU_N4|
 s|@IF_NAME_SPGWU_N4@|$IF_NAME_SPGWU_N4|
 s|@MULTUS_SPGWU_N6@|$MULTUS_SPGWU_N6|
 s|@IP_SPGWU_N6@|$IP_SPGWU_N6|
 s|@NETMASK_SPGWU_N6@|$NETMASK_SPGWU_N6|
+s|@MAC_SPGWU_N6@|$(gener-mac)|
 s|@GW_SPGWU_N6@|$GW_SPGWU_N6|
 s|@ROUTES_SPGWU_N6@|$ROUTES_SPGWU_N6|
 s|@IF_NAME_SPGWU_N6@|$IF_NAME_SPGWU_N6|
@@ -337,6 +383,7 @@ s|@SMF_TAG@|${SMF_TAG}|
 s|@MULTUS_SMF_N4@|$MULTUS_SMF_N4|
 s|@IP_SMF_N4@|$IP_SMF_N4|
 s|@NETMASK_SMF_N4@|$NETMASK_SMF_N4|
+s|@MAC_SMF_N4@|$(gener-mac)|
 s|@GW_SMF_N4@|$GW_SMF_N4|
 s|@ROUTES_SMF_N4@|$ROUTES_SMF_N4|
 s|@IF_NAME_SMF_N4@|$IF_NAME_SMF_N4|
@@ -554,24 +601,28 @@ s|@DEFAULT_GW_GNB@|$DEFAULT_GW_GNB|
 s|@MULTUS_GNB_N2@|$MULTUS_GNB_N2|
 s|@IP_GNB_N2@|$IP_GNB_N2N3|
 s|@NETMASK_GNB_N2@|$NETMASK_GNB_N2|
+s|@MAC_GNB_N2@|$(gener-mac)|
 s|@GW_GNB_N2@|$GW_GNB_N2|
 s|@ROUTES_GNB_N2@|$ROUTES_GNB_N2|
 s|@IF_NAME_GNB_N2@|$IF_NAME_GNB_N2|
 s|@MULTUS_GNB_N3@|$MULTUS_GNB_N3|
 s|@IP_GNB_N3@|$IP_GNB_N3|
 s|@NETMASK_GNB_N3@|$NETMASK_GNB_N3|
+s|@MAC_GNB_N3@|$(gener-mac)|
 s|@GW_GNB_N3@|$GW_GNB_N3|
 s|@ROUTES_GNB_N3@|$ROUTES_GNB_N3|
 s|@IF_NAME_GNB_N3@|$IF_NAME_GNB_N3|
 s|@MULTUS_GNB_RU1@|$MULTUS_GNB_RU1|
 s|@IP_GNB_RU1@|$IP_GNB_RU1|
 s|@NETMASK_GNB_RU1@|$NETMASK_GNB_RU|
+s|@MAC_GNB_RU1@|$(gener-mac)|
 s|@GW_GNB_RU1@|$GW_GNB_RU1|
 s|@MTU_GNB_RU1@|$MTU_GNB_RU1|
 s|@IF_NAME_GNB_RU1@|$IF_NAME_GNB_RU1|
 s|@MULTUS_GNB_RU2@|$MULTUS_GNB_RU2|
 s|@IP_GNB_RU2@|$IP_GNB_RU2|
 s|@NETMASK_GNB_RU2@|$NETMASK_GNB_RU|
+s|@MAC_GNB_RU2@|$(gener-mac)|
 s|@GW_GNB_RU2@|$GW_GNB_RU2|
 s|@MTU_GNB_RU2@|$MTU_GNB_RU2|
 s|@IF_NAME_GNB_RU2@|$IF_NAME_GNB_RU2|
@@ -624,6 +675,7 @@ s|@NRUE_TAG@|$NRUE_TAG|
 s|@MULTUS_NRUE@|true|
 s|@IP_NRUE@|$IP_NRUE|
 s|@NETMASK_NRUE@|$NETMASK_NRUE|
+s|@MAC_NRUE@|$(gener-mac)|
 s|@DEFAULT_GW_NRUE@|$DEFAULT_GW_NRUE|
 s|@IF_NAME_NRUE@|$IF_NAME_NRUE|
 s|@IP_GNB@|$IP_GNB_N2N3|
