@@ -106,10 +106,10 @@ IF_NAME_AMF_N2="$IF_NAME_VLAN100"
 
 #### oai-spgwu-tiny chart definitions ####
 OAI5G_SPGWU="$OAI5G_CORE/oai-spgwu-tiny"
-#SPGWU_REPO="docker.io/r2labuser/oai-spgwu-tiny"
-#SPGWU_TAG="rocky-test90"
-SPGWU_REPO="${OAISA_REPO}/oai-spgwu-tiny"
-SPGWU_TAG="${CN_TAG}"
+SPGWU_REPO="docker.io/r2labuser/oai-spgwu-tiny"
+SPGWU_TAG="rocky-test90"
+#SPGWU_REPO="${OAISA_REPO}/oai-spgwu-tiny"
+#SPGWU_TAG="${CN_TAG}"
 #
 MULTUS_SPGWU_N3="$MULTUS_CREATE"
 IP_SPGWU_N3="$P100.242" 
@@ -144,10 +144,11 @@ ROUTES_SMF_N4=""
 IF_NAME_SMF_N4="" 
 IP_DNS1="138.96.0.210"
 IP_DNS2="193.51.196.138"
-IP_CSCF="127.0.0.1" # unused but without an IP, the SMF pod crashes!
+IP_CSCF="127.0.0.1" # unused but without seting an IP, the SMF pod crashes!
 
 ################################ oai-gnb chart parameters ########################
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
+#
 RAN_TAG="2023.w19"
 GNB_NAME="gNB-r2lab"
 IP_GNB_N2N3="$P100.243"
@@ -239,25 +240,26 @@ function gener-mac()
     fi
     if [ ! -f "$PREFIXfile" ]; then
 	PREFIX="12:34:"
-	if [[ $IF_NAME_VLAN100 = "eth5" ]]; then
-	    PREFIX=$PREFIX"00:"
-	else
-	    PREFIX=$PREFIX"01:"
-	fi
+	case $IF_NAME_VLAN100 in
+	    "eth5")
+		PREFIX=$PREFIX"00:";;
+	    "p4-net")
+		PREFIX=$PREFIX"01:";;
+	    *)  PREFIX=$PREFIX"02:";;
+	esac
 	case $NODE_AMF_SGPWU in
 	    "sopnode-l1.inria.fr")
 		PREFIX=$PREFIX"00:";;
 	    "sopnode-w1.inria.fr")
 		PREFIX=$PREFIX"01:";;
-	    *)PREFIX=$PREFIX"02:";;
+	    *)  PREFIX=$PREFIX"02:";;
 	esac
-	if [[ $NODE_GNB = "sopnode-l1.inria.fr" ]]; then
-	    PREFIX=$PREFIX"00:"
-	elif [[ $NODE_GNB = "sopnode-w1.inria.fr" ]]; then
-	    PREFIX=$PREFIX"01:"
-	else
-	    PREFIX=$PREFIX"02:"
-	fi
+	case $NODE_GNB in
+	    "sopnode-l1.inria.fr")
+		PREFIX=$PREFIX"00:";;	
+	    "sopnode-w1.inria.fr")
+		PREFIX=$PREFIX"01:";;	
+	    *)  PREFIX=$PREFIX"02:";;	
 	echo "${PREFIX}" > "$PREFIXfile"
     else
 	PREFIX=$(cat "$PREFIXfile")
@@ -392,7 +394,6 @@ s|@IP_DNS2@|$IP_DNS2|
 s|@IP_CSCF@|$IP_CSCF|
 s|@NODE_SMF@||
 EOF
-
     cp "$OAI5G_BASIC"/values.yaml /tmp/basic_values.yaml-orig
     echo "(Over)writing $OAI5G_BASIC/values.yaml"
     sed -f /tmp/basic-r2lab.sed < /tmp/basic_values.yaml-orig > "$OAI5G_BASIC"/values.yaml
@@ -425,7 +426,6 @@ function configure-gnb() {
 
     DIR_RAN="$PREFIX_DEMO/oai5g-rru/ran-config"
     DIR_CONF="$DIR_RAN/conf"
-#    DIR_CHARTS="$DIR_RAN/charts"
     DIR_CHARTS="$PREFIX_DEMO/oai-cn5g-fed/charts"
     DIR_GNB_DEST="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
     DIR_TEMPLATES="$DIR_GNB_DEST/templates"
@@ -697,6 +697,7 @@ EOF
     sed -f "$SED_FILE" < /tmp/oai-nr-ue_values.yaml-orig > "$ORIG_CHART"
     diff /tmp/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
 }
+
 
 #################################################################################
 
@@ -989,6 +990,7 @@ function stop() {
     fi
 }
 
+
 #################################################################################
 #################################################################################
 
@@ -1105,6 +1107,7 @@ function get-all-pcap(){
     get-cn-pcap $prefix 
     get-ran-pcap $prefix
 }
+
 
 #################################################################################
 #################################################################################
