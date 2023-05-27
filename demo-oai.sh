@@ -259,7 +259,8 @@ function gener-mac()
 		PREFIX=$PREFIX"00:";;	
 	    "sopnode-w1.inria.fr")
 		PREFIX=$PREFIX"01:";;	
-	    *)  PREFIX=$PREFIX"02:";;	
+	    *)  PREFIX=$PREFIX"02:";;
+	esac
 	echo "${PREFIX}" > "$PREFIXfile"
     else
 	PREFIX=$(cat "$PREFIXfile")
