@@ -45,8 +45,8 @@ OAISA_REPO="docker.io/oaisoftwarealliance"
 P100="192.168.100"
 
 # Interfaces names of VLANs in sopnode servers
-#IF_NAME_VLAN100="eth5"
-IF_NAME_VLAN100="p4-net"
+IF_NAME_VLAN100="eth5"
+#IF_NAME_VLAN100="p4-net"
 IF_NAME_VLAN10="p4-net-10"
 IF_NAME_VLAN20="p4-net-20"
 
