@@ -1089,14 +1089,15 @@ function get-ran-pcap(){
     kubectl -c tcpdump -n $NS exec -i $GNB_POD_NAME -- /bin/tar cfz gnb-pcap.tgz pcap || true
     echo "kubectl -c tcpdump cp $NS/$GNB_POD_NAME:gnb-pcap.tgz $prefix/gnb-pcap-"$DATE".tgz"
     kubectl -c tcpdump cp $NS/$GNB_POD_NAME:gnb-pcap.tgz $prefix/gnb-pcap-"$DATE".tgz || true
-    if [[ "$RRU" = "rfsim" ]]; then
-	NRUE_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nr-ue,app.kubernetes.io/instance=oai-nr-ue" -o jsonpath="{.items[0].metadata.name}")
-	echo "Retrieve OAI5G pcap file from the oai-nr-ue pod on ns $NS"
-	echo "kubectl -c tcpdump -n $NS exec -i $NRUE_POD_NAME -- /bin/tar cfz nr-ue-pcap.tgz pcap"
-	kubectl -c tcpdump -n $NS exec -i $NRUE_POD_NAME -- /bin/tar cfz nr-ue-pcap.tgz pcap || true
-	echo "kubectl -c tcpdump cp $NS/$NRUE_POD_NAME:nr-ue-pcap.tgz $prefix/nr-ue-pcap-"$DATE".tgz"
-	kubectl -c tcpdump cp $NS/$NRUE_POD_NAME:nr-ue-pcap.tgz $prefix/nr-ue-pcap-"$DATE".tgz || true
-    fi
+# No more pcap for UE now
+#    if [[ "$RRU" = "rfsim" ]]; then
+#	NRUE_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nr-ue,app.kubernetes.io/instance=oai-nr-ue" -o jsonpath="{.items[0].metadata.name}")
+#	echo "Retrieve OAI5G pcap file from the oai-nr-ue pod on ns $NS"
+#	echo "kubectl -c tcpdump -n $NS exec -i $NRUE_POD_NAME -- /bin/tar cfz nr-ue-pcap.tgz pcap"
+#	kubectl -c tcpdump -n $NS exec -i $NRUE_POD_NAME -- /bin/tar cfz nr-ue-pcap.tgz pcap || true
+#	echo "kubectl -c tcpdump cp $NS/$NRUE_POD_NAME:nr-ue-pcap.tgz $prefix/nr-ue-pcap-"$DATE".tgz"
+#	kubectl -c tcpdump cp $NS/$NRUE_POD_NAME:nr-ue-pcap.tgz $prefix/nr-ue-pcap-"$DATE".tgz || true
+#    fi
 }
 
 #################################################################################
