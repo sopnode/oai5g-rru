@@ -35,7 +35,7 @@ from r2lab import r2lab_hostname, ListOfChoices, find_local_embedded_script # Li
 #    Configure here OAI5G_RRU and OAI_CN5G_FED repo and tag
 OAI5G_RRU_REPO = 'https://github.com/sopnode/oai5g-rru.git'
 #OAI5G_RRU_TAG = 'master'
-OAI5G_RRU_TAG = 'v1.5.1-1.0-1.0'
+OAI5G_RRU_TAG = 'v1.5.1-1.0-1.1'
 OAI_CN5G_FED_REPO = 'https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git'
 OAI_CN5G_FED_TAG = 'v1.5.1-1.0'
 ##########################################################################################
@@ -85,7 +85,7 @@ def run(*, mode, gateway, slicename, master, namespace,
         pcap, auto_start, gnb_only, load_images, k8s_reset,
         k8s_fit, amf_spgwu, gnb, quectel_nodes, rru, b210,
         regcred_name, regcred_password, regcred_email,
-        image, quectel_image, verbose, dry_run):
+        image, quectel_image, verbose, dry_run, demo_tag, charts_tag):
     """
     run the OAI5G demo on the k8s cluster
 
@@ -104,6 +104,8 @@ def run(*, mode, gateway, slicename, master, namespace,
         rru: hardware device attached to gNB
         b210: if usrp b210 used, fit number used to run it, else 0
         image: R2lab k8s image name
+        demo_tag: this demo script tag
+        charts_tag: oai_cn5g_fed charts tag
     """
 
     quectel_dict = dict((n, r2lab_hostname(n)) for n in quectel_nodes)
@@ -135,9 +137,9 @@ def run(*, mode, gateway, slicename, master, namespace,
         image=image,
         quectel_image=quectel_image,
         oai5g_rru_repo=OAI5G_RRU_REPO,
-        oai5g_rru_tag=OAI5G_RRU_TAG,
+        oai5g_rru_tag=demo_tag,
         oai_cn5g_fed_repo=OAI_CN5G_FED_REPO,
-        oai_cn5g_fed_tag=OAI_CN5G_FED_TAG,
+        oai_cn5g_fed_tag=charts_tag,
         verbose=verbose,
         nodes_sh=find_local_embedded_script("nodes.sh"),
         INCLUDES=INCLUDES,
@@ -397,8 +399,17 @@ def main():
                         action='store_true', dest='dry_run',
                         help="only pretend to run, don't do anything")
 
+    parser.add_argument(
+        "--demo_tag", default=OAI5G_RRU_TAG,
+        help=f"this demo script tag, default is {OAI5G_RRU_TAG}")
+
+    parser.add_argument(
+        "--charts_tag", default=OAI_CN5G_FED_TAG,
+        help=f"oai-cn5g-fed charts tag, default is {OAI_CN5G_FED_TAG}")
+
 
     args = parser.parse_args()
+    print(f"Running the demo version {args.demo_tag} with oai-cn5g-fed {args.charts_tag} tag")
     if args.devel:
         args.master = K8S_MASTER_DEVEL
         # in case of Devel Cluster, modify the default servers to run amf/spgwu/gnb pods
@@ -461,7 +472,8 @@ def main():
         regcred_password=args.regcred_password,
         regcred_email=args.regcred_email,
         dry_run=args.dry_run, verbose=args.verbose, image=args.image,
-        quectel_image=args.quectel_image, k8s_reset=args.k8s_reset)
+        quectel_image=args.quectel_image, k8s_reset=args.k8s_reset,
+        demo_tag=args.demo_tag, charts_tag=args.charts_tag)
 
 
 if __name__ == '__main__':
