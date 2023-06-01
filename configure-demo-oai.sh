@@ -3,8 +3,10 @@
 ##########################################################################################
 #    Configure here the following variables used in demo-oai.sh script
 #
-MCC="208" # default is "208"
-MNC="95" # default is "95"
+MCC="001" # default is "208"
+#MCC="208" # default is "208"
+MNC="01" # default is "95"
+#MNC="95" # default is "95"
 TAC="1" # default is "1"
 SST0="1" # default is "1"
 DNN="oai.ipv4" # default is "oai.ipv4"
