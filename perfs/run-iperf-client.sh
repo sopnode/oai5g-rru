@@ -4,24 +4,41 @@
 ip_server="12.1.1.1"
 duration="10"
 udp_rate="100M"
+nif="wwan0"
+reverse_mode=""
+quectel_node=""
 
 usage()
 {
-   echo "Usage: $0 fitXX"
-   echo -e "\tLaunch iperf3 client on fit node on the wwan0 interface"
+   echo "Usage: $0 -f fitXX [-t duration] [-b UDP rate] [-i wireless_interface] [-R]"
+   echo -e "\tLaunch iperf3 client on the fit node that hosts UE Quectel"
    exit 1
 }
 
-if [ $# -ne 1 ]; then
+while getopts 'f:t:b:i:R' flag; do
+  case "${flag}" in
+    f) quectel_node="${OPTARG}" ;;
+    t) duration="${OPTARG}" ;;
+    b) udp_rate="${OPTARG}" ;;
+    i) nif="${OPTARG}" ;;
+    R) reverse_mode="-R" ;;
+    *) usage
+       exit 1 ;;
+  esac
+done
+
+if [ -z "$quectel_node" ]; then
     usage
-else
-    quectel_node="$1"
 fi
 
-ip_client=$(ssh $quectel_node ifconfig wwan0 |grep "inet " | awk '{print $2}')
+ip_client=$(ssh $quectel_node ifconfig $nif |grep "inet " | awk '{print $2}')
+iperf_options="-c $ip_server -B $ip_client -u -b $udp_rate $reverse_mode -t $duration"
 
-echo "ssh -o StrictHostKeyChecking=no $quectel_node /usr/bin/iperf3 -c $ip_server -B $ip_client -b $udp_rate -u -R -t $duration"
-ssh -o StrictHostKeyChecking=no $quectel_node /usr/bin/iperf3 -c $ip_server -B $ip_client -b $udp_rate -u -R -t $duration
+echo "Running iperf3 client on $quectel_node with following options:"
+echo "$iperf_options"
+
+echo "ssh -o StrictHostKeyChecking=no $quectel_node /usr/bin/iperf3 $iperf_options"
+ssh -o StrictHostKeyChecking=no $quectel_node /usr/bin/iperf3 $iperf_options
 
 
 #nota: perf obtained so far

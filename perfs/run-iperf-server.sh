@@ -18,6 +18,8 @@ else
     ns="$1"
 fi
 
+echo "$0: Install iperf3 on oai-spgwu-tiny pod, $ns namespace and run iperf3 -B 12.1.1.1 -s"
+
 # create iperf3-server.sh installation script
 cat > /tmp/iperf3-server.sh <<EOF
 #!/bin/sh
