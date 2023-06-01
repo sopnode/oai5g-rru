@@ -4,16 +4,13 @@
 #    Configure here the following variables used in demo-oai.sh script
 #
 MCC="001" # default is "208"
-#MCC="208" # default is "208"
 MNC="01" # default is "95"
-#MNC="95" # default is "95"
 TAC="1" # default is "1"
 SST0="1" # default is "1"
-DNN="oai.ipv4" # default is "oai.ipv4"
-#DNN="oai" # default is "oai.ipv4"
-FULL_KEY="8baf473f2f8fd09487cccbd7097c6862" # default is "8baf473f2f8fd09487cccbd7097c6862"
-OPC="8E27B6AF0E692E750F32667A3B14605D" # default is "8E27B6AF0E692E750F32667A3B14605D"
-RFSIM_IMSI="208950000001121" # default is "208950000001121"
+DNN="oai" # default is "oai.ipv4"
+FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f" # default is "8baf473f2f8fd09487cccbd7097c6862"
+OPC="C42449363BBAD02B66D16BC975D77CC1" # default is "8E27B6AF0E692E750F32667A3B14605D"
+RFSIM_IMSI="001010000001121" # default is "208950000001121"
 ##########################################################################################
 
 function update() {
