@@ -150,6 +150,8 @@ CREATE TABLE `AuthenticationSubscription` (
 -- Dumping data for table `AuthenticationSubscription`
 --
 INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
+('@DEF_MCC@@DEF_MNC@0000000002', '5G_AKA', '@DEF_FULL_KEY@', '@DEF_FULL_KEY@', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '@DEF_OPC@', NULL, NULL, NULL, NULL, '@DEF_MCC@@DEF_MNC@0000000002');
+INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
 ('@DEF_MCC@@DEF_MNC@0000000004', '5G_AKA', '@DEF_FULL_KEY@', '@DEF_FULL_KEY@', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '@DEF_OPC@', NULL, NULL, NULL, NULL, '@DEF_MCC@@DEF_MNC@0000000004');
 INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
 ('@DEF_MCC@@DEF_MNC@0000000010', '5G_AKA', '@DEF_FULL_KEY@', '@DEF_FULL_KEY@', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '@DEF_OPC@', NULL, NULL, NULL, NULL, '@DEF_MCC@@DEF_MNC@0000000010');
@@ -310,6 +312,8 @@ ALTER TABLE `SmfSelectionSubscriptionData`
 -- AUTO_INCREMENT for dumped tables
 --
 -- Dynamic IPADDRESS Allocation
+INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES
+('@DEF_MCC@@DEF_MNC@0000000002', '@DEF_MCC@@DEF_MNC@', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"@DEF_DNN@\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
 INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES
 ('@DEF_MCC@@DEF_MNC@0000000004', '@DEF_MCC@@DEF_MNC@', '{\"sst\": 1, \"sd\": \"16777215\"}','{\"@DEF_DNN@\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"downlink\":\"1000Mbps\"}}}');
 INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES
