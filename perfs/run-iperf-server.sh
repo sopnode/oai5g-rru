@@ -2,8 +2,6 @@
 # install and run iperf3 server on the spgwu-tiny pod
 
 ns="oai5g" # Default namespace
-oaiLabel="spgwu-tiny"
-quectel_node="fit07"
 
 usage()
 {
@@ -32,7 +30,7 @@ EOF
 chmod a+x  /tmp/iperf3-server.sh
 
 # retrieve spgwu-tiny pod name and copy iperf3-server.sh script there
-SPGWU_POD_NAME=$(kubectl -n$ns get pods -l app.kubernetes.io/name=oai-"${oaiLabel}" -o jsonpath="{.items[0].metadata.name}")
+SPGWU_POD_NAME=$(kubectl -n$ns get pods -l app.kubernetes.io/name=oai-spgwu-tiny -o jsonpath="{.items[0].metadata.name}")
 
 echo "kubectl -c tcpdump cp /tmp/iperf3-server.sh $ns/$SPGWU_POD_NAME:/iperf3-server.sh || true"
 kubectl -c tcpdump cp /tmp/iperf3-server.sh $ns/$SPGWU_POD_NAME:/iperf3-server.sh || true
