@@ -19,6 +19,7 @@ function update() {
     NODE_GNB=$1; shift
     RRU=$1; shift 
     GNB_ONLY=$1; shift # boolean in [true, false]
+    LOGS=$1; shift # boolean in [true, false]
     PCAP=$1; shift # boolean in [true, false]
     PREFIX_DEMO=$1; shift
     REGCRED_NAME=$1; shift
@@ -27,6 +28,7 @@ function update() {
 
     # Convert to lowercase boolean parameters
     GNB_ONLY="${GNB_ONLY,,}"
+    LOGS="${LOGS,,}"
     PCAP="${PCAP,,}"
     
 
@@ -37,6 +39,7 @@ s|@DEF_NODE_AMF_SPGWU@|$NODE_AMF_SPGWU|
 s|@DEF_NODE_GNB@|$NODE_GNB|
 s|@DEF_RRU@|$RRU|
 s|@DEF_GNB_ONLY@|$GNB_ONLY|
+s|@DEF_LOGS@|$LOGS|
 s|@DEF_PCAP@|$PCAP|
 s|@DEF_MCC@|${MCC}|g
 s|@DEF_MNC@|${MNC}|g
@@ -64,8 +67,8 @@ EOF
     diff $DIR_GENERIC_DB/oai_db-basic-generic.sql $DIR_GENERIC_DB/oai_db-basic.sql
 }
 
-if test $# -ne 11; then
-    echo "USAGE: configure-demo-oai.sh namespace node_amf_spgwu node_gnb rru gnb_only pcap prefix_demo regcred_name regcred_password regcred_email "
+if test $# -ne 12; then
+    echo "USAGE: configure-demo-oai.sh namespace node_amf_spgwu node_gnb rru gnb_only logs pcap prefix_demo regcred_name regcred_password regcred_email "
     exit 1
 else
     shift

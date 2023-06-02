@@ -24,8 +24,9 @@ NS="@DEF_NS@" # k8s namespace
 NODE_AMF_SPGWU="@DEF_NODE_AMF_SPGWU@" # node in wich run amf and spgwu pods
 NODE_GNB="@DEF_NODE_GNB@" # node in which gnb pod runs
 RRU="@DEF_RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
-GNB_ONLY="@DEF_GNB_ONLY@" # boolean if pcap are generated on pods
-PCAP="@DEF_PCAP@" # boolean if pcap are generated on pods
+GNB_ONLY="@DEF_GNB_ONLY@" # boolean, true if only RAN pods are launched
+LOGS="@DEF_LOGS@" # boolean, true if logs are retrieved on pods
+PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
 #
 MCC="@DEF_MCC@"
 MNC="@DEF_MNC@"
@@ -295,39 +296,15 @@ function init() {
 #################################################################################
 
 function configure-oai-5g-basic() {
-    
-    if [[ $PCAP = "true" ]]; then
-	echo "Modify CN charts to generate pcap files"
-	PRIVILEGED="true"
-	cat > /tmp/pcap.sed <<EOF
-s|tcpdump: false.*|tcpdump: true|
-s|sharedvolume:.*|sharedvolume: true|
-EOF
-	cp "$OAI5G_AMF"/values.yaml /tmp/amf_values.yaml-orig
-	echo "(Over)writing $OAI5G_AMF/values.yaml"
-	sed -f /tmp/pcap.sed < /tmp/amf_values.yaml-orig > "$OAI5G_AMF"/values.yaml
-	diff /tmp/amf_values.yaml-orig "$OAI5G_AMF"/values.yaml
-	cp "$OAI5G_AUSF"/values.yaml /tmp/ausf_values.yaml-orig
-	echo "(Over)writing $OAI5G_AUSF/values.yaml"
-	sed -f /tmp/pcap.sed < /tmp/ausf_values.yaml-orig > "$OAI5G_AUSF"/values.yaml
-	diff /tmp/ausf_values.yaml-orig "$OAI5G_AUSF"/values.yaml
-	cp "$OAI5G_SMF"/values.yaml /tmp/smf_values.yaml-orig
-	echo "(Over)writing $OAI5G_SMF/values.yaml"
-	sed -f /tmp/pcap.sed < /tmp/smf_values.yaml-orig > "$OAI5G_SMF"/values.yaml
-	diff /tmp/smf_values.yaml-orig "$OAI5G_SMF"/values.yaml
-	cp "$OAI5G_SPGWU"/values.yaml /tmp/spgwu-tiny_values.yaml-orig
-	echo "(Over)writing $OAI5G_SPGWU/values.yaml"
-	sed -f /tmp/pcap.sed < /tmp/spgwu-tiny_values.yaml-orig > "$OAI5G_SPGWU"/values.yaml
-	diff /tmp/spgwu-tiny_values.yaml-orig "$OAI5G_SPGWU"/values.yaml
-    else
-	PRIVILEGED="false"
-    fi
 
+    # if $LOGS is true, create a tcpdump container with privileges
+    # if $PCAP is true, start tcpdump and create a shared volume to store pcap
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
-
     cat > /tmp/basic-r2lab.sed <<EOF
-s|@PRIVILEGED@|$PRIVILEGED|
-s|@TCPDUMP@|$PCAP|
+s|@PRIVILEGED@|$LOGS|
+s|@TCPDUMP_CONTAINER@|$LOGS|
+s|@START_TCPDUMP@|$PCAP|
+s|@SHAREDVOLUME@|$PCAP|
 s|@CN_DEFAULT_GW@|$CN_DEFAULT_GW|
 s|@NSSAI_SST0@|$SST0|
 s|@NSSAI_SD0@|0xFFFFFF|
@@ -423,7 +400,7 @@ function configure-mysql() {
 function configure-gnb() {
 
     # Prepare mounted.conf and gnb chart files
-    echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and pcap is $pcap"
+    echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $logs"
 
     DIR_RAN="$PREFIX_DEMO/oai5g-rru/ran-config"
     DIR_CONF="$DIR_RAN/conf"
@@ -434,16 +411,6 @@ function configure-gnb() {
     SED_CONF_FILE="/tmp/gnb_conf.sed"
     SED_VALUES_FILE="/tmp/oai-gnb-values.sed"
     SED_DEPLOYMENT_FILE="/tmp/oai-gnb-deployment.sed"
-
-    if [[ "$PCAP" = "true" ]]; then
-	TCPDUMP_CONTAINER_GNB_CREATE="true"
-	TCPDUMP_GNB_START="true"
-	GNB_SHARED_VOL="true"
-    else
-	TCPDUMP_CONTAINER_GNB_CREATE="false"
-	TCPDUMP_GNB_START="false"
-	GNB_SHARED_VOL="false"
-    fi
 
     # Configure parameters for values.yaml chart according to RRU type
     if [[ "$RRU" = "b210" ]]; then
@@ -639,9 +606,10 @@ s|@SST@|$SST0|
 s|@GNB_NGA_IF_NAME@|$GNB_NGA_IF_NAME|
 s|@IP_GNB_N2N3@|$IP_GNB_N2N3|
 s|@GNB_NGU_IF_NAME@|$GNB_NGU_IF_NAME|
-s|@TCPDUMP_GNB_START@|$TCPDUMP_GNB_START|
-s|@TCPDUMP_CONTAINER_GNB_CREATE@|$TCPDUMP_CONTAINER_GNB_CREATE|
-s|@GNB_SHARED_VOL@|$GNB_SHARED_VOL|
+s|@PCAP@|$PCAP|
+s|@START_TCPDUMP@|$PCAP|
+s|@TCPDUMP_CONTAINER@|$LOGS|
+s|@SHAREDVOLUME@|$PCAP|
 s|@QOS_GNB_DEF@|$QOS_GNB_DEF|
 s|@NODE_GNB@|$NODE_GNB|
 EOF
@@ -655,19 +623,13 @@ EOF
 #################################################################################
 
 function configure-nr-ue() {
+
+    # will NOT generate PCAP file to avoid wasting all memory resources
+    # However, a tcpdump container created e.g., to run iperf client"
     DIR="$OAI5G_RAN/oai-nr-ue"
-
-    if [[ $PCAP = "true" ]]; then
-	TCPDUMP_CONTAINER_NRUE_CREATE="true"
-	echo "nr-ue: will NOT generate PCAP file to avoid wasting all memory resources!"
-	echo "However, a tcpdump container will be created for testing purpose"
-    else
-	TCPDUMP_CONTAINER_NRUE_CREATE="false"
-    fi
-
     ORIG_CHART="$DIR"/values.yaml
     SED_FILE="/tmp/oai-nr-ue-values.sed"
-    echo "Configuring chart $ORIG_CHART"
+    echo "configure-nr-ue: $ORIG_CHART configuration"
     ADD_OPTIONS_NRUE="$OPTIONS_NRUE"
     SSD="16777215"
     cat > "$SED_FILE" <<EOF
@@ -687,10 +649,10 @@ s|@DNN@|$DNN|
 s|@SST@|$SST0|
 s|@SSD@|$SSD|
 s|@ADD_OPTIONS_NRUE@|$ADD_OPTIONS_NRUE|
-s|@TCPDUMP_NRUE_START@|false|
-s|@TCPDUMP_CONTAINER_NRUE_CREATE@|$TCPDUMP_CONTAINER_NRUE_CREATE|
+s|@START_TCPDUMP@|false|
+s|@TCPDUMP_CONTAINER@|$LOGS|
 s|@QOS_NRUE_DEF@|false|
-s|@SHARED_VOL_NRUE@|false|
+s|@SHAREDVOLUME@|false|
 s|@NODE_NRUE@||
 EOF
     cp "$ORIG_CHART" /tmp/oai-nr-ue_values.yaml-orig
@@ -706,7 +668,8 @@ function configure-all() {
     echo "configure-all: Applying SophiaNode patches to OAI5G charts located on "$PREFIX_DEMO"/oai-cn5g-fed"
     echo -e "\t with oai-spgwu-tiny running on $NODE_AMF_SPGWU"
     echo -e "\t with oai-gnb running on $NODE_GNB"
-    echo -e "\t with generate-pcap: $pcap"
+    echo -e "\t with generate-logs: $LOGS"
+    echo -e "\t with generate-pcap: $PCAP"
 
     # Remove pulling limitations from docker-hub with anonymous account
     echo "Create $NS if not present and regcred secret"	     
@@ -719,7 +682,7 @@ function configure-all() {
     configure-mysql
     configure-gnb
     if [[ "$RRU" = "rfsim" ]]; then
-	configure-nr-ue $pcap
+	configure-nr-ue
     fi
 }
 
@@ -830,8 +793,8 @@ function start-nr-ue() {
 function start() {
     echo "start: run all oai5g pods on namespace=$NS"
 
-    if [[ $PCAP = "true" ]]; then
-	echo "start: Create a k8s persistence volume for generation of RAN pcap files"
+    if [[ $LOGS = "true" ]]; then
+	echo "start: Create a k8s persistence volume for generation of RAN logs files"
 	cat << \EOF >> /tmp/oai5g-pv.yaml
 apiVersion: v1
 kind: PersistentVolume
@@ -847,7 +810,7 @@ spec:
 EOF
 	kubectl apply -f /tmp/oai5g-pv.yaml
 
-	echo "start: Create a k8s persistence volume for generation of CN pcap files"
+	echo "start: Create a k8s persistence volume for generation of CN logs files"
 	cat << \EOF >> /tmp/cn5g-pv.yaml
 apiVersion: v1
 kind: PersistentVolume
@@ -864,7 +827,7 @@ EOF
 	kubectl apply -f /tmp/cn5g-pv.yaml
 
 	
-	echo "start: Create a k8s persistent volume claim for RAN pcap files"
+	echo "start: Create a k8s persistent volume claim for RAN logs files"
     cat << \EOF >> /tmp/oai5g-pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -882,7 +845,7 @@ EOF
     echo "kubectl -n $NS apply -f /tmp/oai5g-pvc.yaml"
     kubectl -n $NS apply -f /tmp/oai5g-pvc.yaml
 
-	echo "start: Create a k8s persistent volume claim for CN pcap files"
+	echo "start: Create a k8s persistent volume claim for CN logs files"
     cat << \EOF >> /tmp/cn5g-pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -950,15 +913,17 @@ function stop-nr-ue(){
 
 
 function stop() {
-    echo "Running stop() on $NS namespace, pcap=$PCAP"
+    echo "Running stop() on $NS namespace, logs=$LOGS"
 
-    if [[ "$PCAP" = "true" ]]; then
+    if [[ "$LOGS" = "true" ]]; then
 	dir_stats=${PREFIX_STATS-"/tmp/oai5g-stats"}
-	echo "First retrieve all pcap and log files in $dir_stats and compressed it"
+	echo "First retrieve all pcap and logs files in $dir_stats and compressed it"
 	mkdir -p $dir_stats
 	echo "cleanup $dir_stats before including new logs/pcap files"
 	cd $dir_stats; rm -f *.pcap *.tgz *.logs *stats* *.conf
-	get-all-pcap $dir_stats
+	if [[ "$PCAP" = "true" ]]; then
+	    get-all-pcap $dir_stats
+	fi
 	get-all-logs $dir_stats
 	cd /tmp; dirname=$(basename $dir_stats)
 	echo tar cfz "$dirname".tgz $dirname
@@ -982,8 +947,8 @@ function stop() {
     echo "Wait until all $NS pods disppear"
     kubectl delete pods -n $NS --all --wait --cascade=foreground
 
-    if [[ "$PCAP" = "true" ]]; then
-	echo "Delete k8s persistence volume / claim for pcap files"
+    if [[ "$LOGS" = "true" ]]; then
+	echo "Delete k8s persistence volume / claim for logs/pcap files"
 	kubectl -n $NS delete pvc oai5g-pvc || true
 	kubectl -n $NS delete pvc cn5g-pvc || true
 	kubectl delete pv oai5g-pv || true

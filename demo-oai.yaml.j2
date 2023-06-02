@@ -2,6 +2,7 @@
 # {{gateway}} - typically 'faraday.inria.fr'
 # {{master}} - typically 'sopnode-l1.inria.fr'
 # {{namespace}} - typically 'oai5g'
+# {{logs}} - typically 'True' or 'False'
 # {{pcap}} - typically 'True' or 'False'
 # {{nodes}} - typically {'k8s_fit': 'fit01', 'amf_spgwu': 'sopnode-w3.inria.fr', 'gnb' : 'sopnode-w2.inria.fr'}
 # {{quectel_nodes}} - typically {'9': 'fit09', '18': 'fit18'}
@@ -204,7 +205,7 @@ jobs:
           cp oai5g-rru/configure-demo-oai.sh /root/;
           cp oai5g-rru/perfs/logs.sh /root/;
           cp oai5g-rru/perfs/run-iperf-server.sh /root/;
-          /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{gnb_only}} {{pcap}} /root {%for x in regcred.values()%}{{x}} {%endfor %};
+          /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{gnb_only}} {{logs}} {{pcap}} /root {%for x in regcred.values()%}{{x}} {%endfor %};
           rm -rf oai-cn5g-fed;
           git clone --branch {{oai_cn5g_fed_tag}} {{oai_cn5g_fed_repo}}
       - type: Run
@@ -256,7 +257,7 @@ jobs:
     commands:
       - type: Run
         command: /root/demo-oai.sh stop
-      {% if pcap == 'True' %}
+      {% if logs == 'True' %}
       - type: Pull
         remotepaths: "/tmp/oai5g-stats.tgz"
         localpath: "./"

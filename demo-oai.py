@@ -34,10 +34,11 @@ from r2lab import r2lab_hostname, ListOfChoices, find_local_embedded_script # Li
 ##########################################################################################
 #    Configure here OAI5G_RRU and OAI_CN5G_FED repo and tag
 OAI5G_RRU_REPO = 'https://github.com/sopnode/oai5g-rru.git'
-#OAI5G_RRU_TAG = 'master'
-OAI5G_RRU_TAG = 'v1.5.1-1.0-1.1'
+OAI5G_RRU_TAG = 'master'
+#OAI5G_RRU_TAG = 'v1.5.1-1.0-1.1'
 OAI_CN5G_FED_REPO = 'https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git'
-OAI_CN5G_FED_TAG = 'v1.5.1-1.0'
+OAI_CN5G_FED_TAG = 'master'
+#OAI_CN5G_FED_TAG = 'v1.5.1-1.0'
 ##########################################################################################
 
 # Currently, TWO k8s clusters are available on the SophiaNode:
@@ -81,7 +82,7 @@ default_regcred_password = 'r2labuser-pwd'
 default_regcred_email = 'r2labuser@turletti.com'
 
 
-def run(*, mode, gateway, slicename, master, namespace,
+def run(*, mode, gateway, slicename, master, namespace, logs,
         pcap, auto_start, gnb_only, load_images, k8s_reset,
         k8s_fit, amf_spgwu, gnb, quectel_nodes, rru, b210,
         regcred_name, regcred_password, regcred_email,
@@ -93,6 +94,7 @@ def run(*, mode, gateway, slicename, master, namespace,
         slicename: the Unix login name (slice name) to enter the gateway
         master: k8s master host
         pcap: pcap trace files will be generated
+        logs: logs files will be generated
         auto_start: pods will be launched
         gnb_only: OAI5G cn pods will not be started/stopped
         load_images: FIT images will be deployed
@@ -118,6 +120,7 @@ def run(*, mode, gateway, slicename, master, namespace,
         gateway=gateway,
         master=master,
         namespace=namespace,
+        logs=logs,
         pcap=pcap,
         auto_start=auto_start,
         nodes=dict(
@@ -389,7 +392,11 @@ def main():
 
     parser.add_argument("-p", "--pcap", default=False,
                         action='store_true', dest='pcap',
-                        help="run tcpdump on OAI5G pods to store pcap files")
+                        help="run tcpdump on OAI5G pods to store pcap/logs files")
+
+    parser.add_argument("-L", "--logs", default=False,
+                        action='store_true', dest='logs',
+                        help="run tcpdump on OAI5G pods to only store logs files")
 
     parser.add_argument("-v", "--verbose", default=False,
                         action='store_true', dest='verbose',
@@ -458,13 +465,19 @@ def main():
             print("Only start/stop oai-gnb pod")
         mode = "run"
     if args.pcap:
-        print(f"pcap trace files: {args.pcap}")
+        print(f"generate both pcap and logs files")
         pcap_str='True'
     else:
         pcap_str='False'
+        if args.logs:
+            print("generate only logs files")
+            logs_str='True'
+        else:
+            print("do not generate pcap/logs files")
+            logs_str='False'
     run(mode=mode, gateway=default_gateway, slicename=args.slicename,
-        master=args.master, namespace=args.namespace, pcap=pcap_str,
-        auto_start=args.auto_start, gnb_only=args.gnb_only,
+        master=args.master, namespace=args.namespace, logs=logs_str,
+        pcap=pcap_str, auto_start=args.auto_start, gnb_only=args.gnb_only,
         load_images=args.load_images,
         k8s_fit=args.k8s_fit, amf_spgwu=args.amf_spgwu, gnb=args.gnb,
         quectel_nodes=args.quectel_nodes, rru=args.rru, b210=b210,
