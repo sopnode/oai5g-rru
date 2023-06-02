@@ -12,7 +12,7 @@ ns=""
 
 usage()
 {
-   echo "Usage: $0 [-f fitXX | -s]  [-t duration] [-b UDP rate] [-i wireless_interface] [-R]"
+   echo "Usage: $0 -n namespace [-f fitXX | -s]  [-t duration] [-b UDP rate] [-i wireless_interface] [-R]"
    echo -e "\tLaunch iperf3 client on UE (nr-ue pod or fit node with Quectel)"
    exit 1
 }
