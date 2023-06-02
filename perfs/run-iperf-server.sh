@@ -36,6 +36,6 @@ echo "kubectl -c tcpdump cp /tmp/iperf3-server.sh $ns/$SPGWU_POD_NAME:/iperf3-se
 kubectl -c tcpdump cp /tmp/iperf3-server.sh $ns/$SPGWU_POD_NAME:/iperf3-server.sh || true
 
 echo "kubectl -n $ns -c tcpdump exec -i $SPGWU_POD_NAME -- /bin/sh /iperf3-server.sh $ns"
-kubectl -n $ns -c tcpdump exec -i $SPGWU_POD_NAME -- /bin/sh /iperf3-server.sh $ns 
+kubectl -n $ns -c tcpdump exec -i $SPGWU_POD_NAME -- /bin/sh /iperf3-server.sh 
 
 
