@@ -68,7 +68,7 @@ EOF
     chmod a+x  /tmp/iperf3-client.sh
 
     echo "kubectl -n $ns -c tcpdump exec -i $NRUE_POD_NAME -- /bin/sh /iperf-client.sh"
-    kubectl -n $ns -c tcpdump exec -i $NRUE_POD_NAME -- /bin/sh /iperf-client.sh 
+    kubectl -n $ns -c tcpdump exec -i $NRUE_POD_NAME -- /bin/sh /tmp/iperf3-client.sh 
 fi
 
 
