@@ -1,19 +1,24 @@
 #!/bin/bash
 # install and run iperf3 server on the spgwu-tiny pod
 
-ns="oai5g" # Default namespace
+ns="" 
 
 usage()
 {
-   echo "Usage: $0 namespace"
+   echo "Usage: $0 -n namespace"
    echo -e "\tLaunch iperf3 server on oai-spwgu-tiny pod"
    exit 1
 }
 
-if [ $# -ne 1 ]; then
+while getopts 'n:' flag; do
+  case "${flag}" in
+    n) ns="${OPTARG}" ;;
+    *) usage ;;
+  esac
+done
+
+if [ -z "$ns" ]; then
     usage
-else
-    ns="$1"
 fi
 
 echo "$0: Install iperf3 on oai-spgwu-tiny pod, $ns namespace and run iperf3 -B 12.1.1.1 -s"

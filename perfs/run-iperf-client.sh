@@ -8,6 +8,7 @@ nif="wwan0"
 reverse_mode=""
 sim_mode=""
 quectel_node=""
+ns=""
 
 usage()
 {
@@ -16,20 +17,23 @@ usage()
    exit 1
 }
 
-while getopts 'f:t:b:i:Rs' flag; do
+while getopts 'n:f:t:b:i:Rs' flag; do
   case "${flag}" in
+    n) ns="${OPTARG}" ;;
     f) quectel_node="${OPTARG}" ;;
     t) duration="${OPTARG}" ;;
     b) udp_rate="${OPTARG}" ;;
     i) nif="${OPTARG}" ;;
     R) reverse_mode="-R" ;;
     s) sim_mode="true" ;;
-    *) usage
-       exit 1 ;;
+    *) usage ;;
   esac
 done
 
-if [ -z "$quectel_node" ] && [ -z "sim_mode" ]; then
+if [ -z "$quectel_node" ] && [ -z "$sim_mode" ]; then
+    usage
+fi
+if [ -z "$ns" ]; then
     usage
 fi
 
