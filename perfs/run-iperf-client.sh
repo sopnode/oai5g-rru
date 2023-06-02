@@ -37,7 +37,7 @@ if [ -z "$ns" ]; then
     usage
 fi
 
-if [ -z "$sim_node" ]; then
+if [ -z "$sim_mode" ]; then
     # UE is a fit node connected to a Quectel device
     ip_client=$(ssh $quectel_node ifconfig $nif |grep "inet " | awk '{print $2}')
     iperf_options="-c $ip_server -B $ip_client -u -b $udp_rate $reverse_mode -t $duration"
