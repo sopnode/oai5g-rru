@@ -2,9 +2,9 @@
 # run iperf3 client on a fit node connected to Quectel
 
 ip_server="12.1.1.1"
+nif="wwan0"
 duration="10"
 udp_rate="100M"
-nif="wwan0"
 reverse_mode=""
 sim_mode=""
 quectel_node=""
@@ -67,8 +67,8 @@ apk add iperf3
 EOF
     chmod a+x  /tmp/iperf3-client.sh
 
-    echo "kubectl -n $ns tcpdump exec -i $NRUE_POD_NAME -- /bin/sh /iperf-client.sh"
-    kubectl -n $ns tcpdump exec -i $NRUE_POD_NAME -- /bin/sh /iperf-client.sh 
+    echo "kubectl -n $ns -c tcpdump exec -i $NRUE_POD_NAME -- /bin/sh /iperf-client.sh"
+    kubectl -n $ns -c tcpdump exec -i $NRUE_POD_NAME -- /bin/sh /iperf-client.sh 
 fi
 
 
