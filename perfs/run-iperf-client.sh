@@ -2,30 +2,28 @@
 # run iperf3 client on a fit node connected to Quectel
 
 ip_server="12.1.1.1"
-nif="wwan0"
-duration="10"
-udp_rate="100M"
-reverse_mode=""
+quectel_nif="wwan0"
 sim_mode=""
 quectel_node=""
 ns=""
+default_args="-u -b 10M -t 10"
+iperf3_args=""
 
 usage()
 {
-   echo "Usage: $0 -n namespace [-f fitXX | -s]  [-t duration] [-b UDP rate] [-i wireless_interface] [-R]"
+   echo "Usage: $0 -n namespace [-f fitXX | -s]  [-o iperf3_arguments]"
    echo -e "\tLaunch iperf3 client on UE (nr-ue pod or fit node with Quectel)"
+   echo -e "\tdefault iperf3 client options are: $default_args"
+   echo -e "\tuse -o to use your own iperf3 options"
    exit 1
 }
 
 while getopts 'n:f:t:b:i:Rs' flag; do
   case "${flag}" in
     n) ns="${OPTARG}" ;;
-    f) quectel_node="${OPTARG}" ;;
-    t) duration="${OPTARG}" ;;
-    b) udp_rate="${OPTARG}" ;;
-    i) nif="${OPTARG}" ;;
-    R) reverse_mode="-R" ;;
     s) sim_mode="true" ;;
+    f) quectel_node="${OPTARG}" ;;
+    o) iperf3_args="${OPTARG}" ;;
     *) usage ;;
   esac
 done
@@ -36,11 +34,14 @@ fi
 if [ -z "$ns" ]; then
     usage
 fi
+if [ -z "$iperf3_args" ]; then
+    iperf3_args="$default_args"
+fi
 
 if [ -z "$sim_mode" ]; then
     # UE is a fit node connected to a Quectel device
-    ip_client=$(ssh $quectel_node ifconfig $nif |grep "inet " | awk '{print $2}')
-    iperf_options="-c $ip_server -B $ip_client -u -b $udp_rate $reverse_mode -t $duration"
+    ip_client=$(ssh $quectel_node ifconfig $quectel_nif |grep "inet " | awk '{print $2}')
+    iperf_options="-c $ip_server -B $ip_client $iperf3_args"
 
     echo "Running iperf3 client on $quectel_node with following options:"
     echo "$iperf_options"
@@ -54,7 +55,7 @@ else
     # Retrieve the IP address of the 5G interface
     ip_client=$(kubectl -n $ns -c tcpdump exec -i $NRUE_POD_NAME -- ifconfig oaitun_ue1 | perl -nle 's/dr:(\S+)/print $1/e')
     # create iperf3-client.sh installation script
-    iperf_options="-c $ip_server -B $ip_client -u -b $udp_rate $reverse_mode -t $duration"
+    iperf_options="-c $ip_server -B $ip_client $iperf3_args"
     echo "Running iperf3 client on $NRUE_POD_NAME with following options:"
     echo "$iperf_options"
     cat > /tmp/iperf3-client.sh <<EOF
