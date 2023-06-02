@@ -66,9 +66,11 @@ apk add iperf3
 /usr/bin/iperf3 $iperf_options
 EOF
     chmod a+x  /tmp/iperf3-client.sh
+    echo "kubectl -c tcpdump cp /tmp/iperf3-client.sh $ns/$NRUE_POD_NAME:/iperf3-client.sh"
+    kubectl -c tcpdump cp /tmp/iperf3-client.sh $ns/$NRUE_POD_NAME:/iperf3-client.sh || true
 
-    echo "kubectl -n $ns -c tcpdump exec -i $NRUE_POD_NAME -- /bin/sh /iperf-client.sh"
-    kubectl -n $ns -c tcpdump exec -i $NRUE_POD_NAME -- /bin/sh /tmp/iperf3-client.sh 
+    echo "kubectl -n $ns -c tcpdump exec -i $NRUE_POD_NAME -- /bin/sh /iperf3-client.sh"
+    kubectl -n $ns -c tcpdump exec -i $NRUE_POD_NAME -- /bin/sh /iperf3-client.sh 
 fi
 
 
