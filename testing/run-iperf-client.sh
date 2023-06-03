@@ -18,7 +18,7 @@ usage()
    exit 1
 }
 
-while getopts 'n:f:t:b:i:Rs' flag; do
+while getopts 'n:f:o:s' flag; do
   case "${flag}" in
     n) ns="${OPTARG}" ;;
     s) sim_mode="true" ;;
