@@ -400,7 +400,7 @@ function configure-mysql() {
 function configure-gnb() {
 
     # Prepare mounted.conf and gnb chart files
-    echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $logs"
+    echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $LOGS"
 
     DIR_RAN="$PREFIX_DEMO/oai5g-rru/ran-config"
     DIR_CONF="$DIR_RAN/conf"
