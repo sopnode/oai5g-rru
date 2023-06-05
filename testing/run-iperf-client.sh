@@ -11,7 +11,7 @@ iperf3_args=""
 
 usage()
 {
-   echo "Usage: $0 -n namespace [-f fitXX | -s]  [-o iperf3_arguments]"
+   echo "Usage: $0 -n namespace [-f fitXX | -s]  [-o ' iperf3_arguments ... ']"
    echo -e "\tLaunch iperf3 client on UE (nr-ue pod or fit node with Quectel)"
    echo -e "\tdefault iperf3 client options are: $default_args"
    echo -e "\tuse -o to use your own iperf3 options"
