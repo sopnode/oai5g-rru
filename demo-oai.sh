@@ -210,7 +210,7 @@ OAI5G_NRUE="$OAI5G_CORE/oai-nr-ue"
 NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
 NRUE_TAG="${RAN_TAG}"
 OPTIONS_NRUE="--sa -E --rfsim -r 106 --numerology 1 -C 3319680000 --nokrnmod --log_config.global_log_options level,nocolor,time"
-IP_NRUE="$P100.244"
+IP_NRUE="192.168.99.4"
 NETMASK_NRUE="24"
 IF_NAME_NRUE="$IF_NAME_VLAN100"
 
