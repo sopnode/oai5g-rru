@@ -274,3 +274,8 @@ Then, log on the k8s worker node and start the oai-gnb pod:
 root@fit01# ./demo-oai.sh start-gnb
 ```
 
+### Snapshot of a running scenario with a jaguar-based gnb and 7 UEs including phone1 (Huawei P40)
+
+![snapshot with AMF/gNB logs and phone1 through Vysor](snapshot-phone1-6quectels.png "")
+
+
