@@ -43,7 +43,8 @@ OAI_CN5G_FED_TAG = 'v1.5.1-1.1'
 
 # Currently, TWO k8s clusters are available on the SophiaNode:
 # - A Production k8s cluster with 2 PowerEdge servers :
-K8S_MASTER_PROD = 'sopnode-l1.inria.fr'
+#K8S_MASTER_PROD = 'sopnode-l1.inria.fr'
+K8S_MASTER_PROD = 'sopnode-w1.inria.fr'
 K8S_WORKER_PROD = 'sopnode-w1.inria.fr'
 # - An Experimental/Devel cluster with 2 servers :
 K8S_MASTER_DEVEL = 'sopnode-w2.inria.fr'
