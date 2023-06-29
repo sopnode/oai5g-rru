@@ -241,8 +241,8 @@ ip addr add 10.0.20.1/24 dev ran-int
  
 At the Core Network side, you should configure the following parameters:
 
- * MNC="001"
- * MCC="01"
+ * MCC="001"
+ * MNC="01"
  * DNN="oai.ipv4"
  * SST="1"
  * TAC="1"
