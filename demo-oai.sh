@@ -76,6 +76,10 @@ fi
 
 CN_DEFAULT_GW=""
 
+#### mysql chart definitions ####
+MYSQL_REPO="docker.io/mysql"
+MYSQL_TAG="8.0" #previous 5.7 has issues on Rocky sopnode-w1 cluster with docker runtime
+
 #### nrf-amf chart definitions ####
 NRF_REPO="${OAISA_REPO}/oai-nrf"
 NRF_TAG="${CN_TAG}"
