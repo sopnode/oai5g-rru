@@ -514,7 +514,7 @@ function configure-gnb() {
 	QOS_GNB_DEF="true"
 	
     elif [[ "$RRU" = "rfsim" ]]; then
-	# For rfsim, no need to mount the gNB conf file
+	CONF_ORIG="$DIR_CONF/$CONF_RFSIM"
         GNB_NAME="$GNB_NAME-rfsim"
 	GNB_REPO="$GNB_RFSIM_REPO"
 	GNB_TAG="$GNB_RFSIM_TAG"
