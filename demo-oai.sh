@@ -156,7 +156,8 @@ IP_CSCF="127.0.0.1" # unused but without seting an IP, the SMF pod crashes!
 ################################ oai-gnb chart parameters ########################
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 #
-RAN_TAG="2023.w19"
+RAN_TAG="2023.w37"
+#RAN_TAG="2023.w19"
 GNB_NAME="gNB-r2lab"
 #IP_GNB_N2N3="$P100.243"
 IP_GNB_N2N3="192.168.99.3"
@@ -177,7 +178,8 @@ OPTIONS_RFSIM="--sa -E --rfsim --log_config.global_log_options level,nocolor,tim
 GNB_B210_REPO="${OAISA_REPO}/oai-gnb"
 GNB_B210_TAG="${RAN_TAG}"
 #GNB_B210_TAG="2023.w11b"
-CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
+CONF_B210="gnb.sa.band78.51prb.usrpb200.conf"
+#CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
 OPTIONS_B210="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 
 #### N3XX RU case ####
@@ -185,7 +187,8 @@ GNB_N3XX_REPO="${OAISA_REPO}/oai-gnb"
 #GNB_N3XX_REPO="docker.io/r2labuser/oai-gnb"
 GNB_N3XX_TAG="${RAN_TAG}"
 #GNB_N3XX_TAG="bugfix-phy-mac-interface"
-CONF_N3XX="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
+CONF_N3XX="gnb.sa.band78.106prb.usrpn310.ddsuu-2x2.conf"
+#CONF_N3XX="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
 OPTIONS_N3XX="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 0,2,4,6,8,10,12,14,16 --log_config.global_log_options level,nocolor,time"
 IP_GNB_SFP1="192.168.10.132"
 IP_GNB_SFP2="192.168.20.132"
@@ -198,10 +201,12 @@ ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130"
 #### AW2S RU case ####
 GNB_AW2S_REPO="docker.io/r2labuser/oai-gnb-aw2s"
 GNB_AW2S_TAG="rocky.2023.w37"
+#GNB_AW2S_TAG="${RAN_TAG}"
 #GNB_AW2S_TAG="rocky"
 CONF_JAGUAR="gnb.sa.band78.51prb.aw2s.ddsuu.conf"
 #CONF_JAGUAR="oai-gNB-n78_50M_DDDSU.conf"
-CONF_PANTHER="oai-gNB-n78_50M_DDDSU.conf"
+CONF_PANTHER="gnb.sa.band78.51prb.aw2s.ddsuu.conf"
+#CONF_PANTHER="oai-gNB-n78_50M_DDDSU.conf"
 OPTIONS_AW2S="--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
 IP_GNB_AW2S="$P100.243" 
 IF_NAME_GNB_AW2S="$IF_NAME_VLAN100"
@@ -509,7 +514,7 @@ function configure-gnb() {
 	QOS_GNB_DEF="true"
 	
     elif [[ "$RRU" = "rfsim" ]]; then
-	# For rfsim, no need to mount the gNB conf file
+	CONF_ORIG="$DIR_CONF/$CONF_RFSIM"
         GNB_NAME="$GNB_NAME-rfsim"
 	GNB_REPO="$GNB_RFSIM_REPO"
 	GNB_TAG="$GNB_RFSIM_TAG"
@@ -521,7 +526,7 @@ function configure-gnb() {
 	MULTUS_GNB_N3="false"
 	MULTUS_GNB_RU1="false"
 	MULTUS_GNB_RU2="false"
-	MOUNTCONFIG_GNB="false"
+	MOUNTCONFIG_GNB="true"
 	RRU_TYPE="rfsim"
 	ADD_OPTIONS_GNB="$OPTIONS_RFSIM"
 	QOS_GNB_DEF="false"
