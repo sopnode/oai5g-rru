@@ -197,8 +197,8 @@ ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130"
 
 #### AW2S RU case ####
 GNB_AW2S_REPO="docker.io/r2labuser/oai-gnb-aw2s"
-#GNB_AW2S_TAG="new"
-GNB_AW2S_TAG="rocky"
+GNB_AW2S_TAG="rocky.2023.w37"
+#GNB_AW2S_TAG="rocky"
 CONF_JAGUAR="gnb.sa.band78.51prb.aw2s.ddsuu.conf"
 #CONF_JAGUAR="oai-gNB-n78_50M_DDDSU.conf"
 CONF_PANTHER="oai-gNB-n78_50M_DDDSU.conf"
