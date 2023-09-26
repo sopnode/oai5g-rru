@@ -175,8 +175,11 @@ CONF_RFSIM="gnb.sa.band78.106prb.rfsim.2x2.conf"
 OPTIONS_RFSIM="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
 
 #### B210 RU case ####
-GNB_B210_REPO="${OAISA_REPO}/oai-gnb"
-GNB_B210_TAG="${RAN_TAG}"
+## for up4000 ubuntu20
+GNB_B210_REPO="docker.io/r2labuser/oai-gnb"
+#GNB_B210_REPO="${OAISA_REPO}/oai-gnb"
+GNB_B210_TAG="2023.w37"
+#GNB_B210_TAG="${RAN_TAG}"
 #GNB_B210_TAG="2023.w11b"
 CONF_B210="gnb.sa.band78.51prb.usrpb200.conf"
 #CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
