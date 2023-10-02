@@ -176,8 +176,8 @@ OPTIONS_RFSIM="--sa -E --rfsim --log_config.global_log_options level,nocolor,tim
 
 #### B210 RU case ####
 ## for up4000 ubuntu20
-GNB_B210_REPO="docker.io/r2labuser/oai-gnb"
-#GNB_B210_REPO="${OAISA_REPO}/oai-gnb"
+#GNB_B210_REPO="docker.io/r2labuser/oai-gnb"
+GNB_B210_REPO="${OAISA_REPO}/oai-gnb"
 GNB_B210_TAG="2023.w37"
 #GNB_B210_TAG="${RAN_TAG}"
 #GNB_B210_TAG="2023.w11b"
