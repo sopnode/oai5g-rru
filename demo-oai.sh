@@ -237,7 +237,7 @@ if [[ $GNB_ONLY = "true" ]]; then
     # Set the local host network interface to reach AMF/UPF
     IF_NAME_GNB_N2="ran" # Host network interface to reach AMF/UPF
     # Set the local IP address of the latter network interface
-    IP_GNB_N2N3="10.0.20.243" # local IP to reach AMF/UPF, e.g., "10.0.20.243"
+    IP_GNB_N2N3="10.0.20.243" # local gNB IP required by AMF/UPF, e.g., "10.0.20.243"
     # Set the route to reach AMF/UPF
     ROUTES_GNB_N2="[{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
 fi
@@ -742,10 +742,14 @@ function start-gnb() {
 	else
 	    AMF_POD_NAME=$(kubectl -n $NS get pods -l app.kubernetes.io/name=oai-amf -o jsonpath="{.items[0].metadata.name}")
 	    AMF_IP=$(kubectl -n $NS get pod $AMF_POD_NAME --template '{{.status.podIP}}')
+	    GNB_POD_NAME=$(kubectl -n $NS get pods -l app.kubernetes.io/name=oai-gnb -o jsonpath="{.items[0].metadata.name}")
+	    GNB_IP=$(kubectl -n $NS get pod $GNB_POD_NAME --template '{{.status.podIP}}')
 	fi
 	SED_FILE="/tmp/gnb-configmap.sed"
 	cat > "$SED_FILE" <<EOF
 s|ipv4       =.*|ipv4       = "$AMF_IP";|
+s|@GNB_NGA_IP_ADDRESS@|$GNB_IP|
+s|@GNB_NGU_IP_ADDRESS@|$GNB_IP|
 EOF
 	cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
 	sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
