@@ -446,9 +446,7 @@ function configure-gnb() {
 	else
 	    MULTUS_GNB_N2="false"
 	    GNB_NGA_IF_NAME="eth0"
-	    GNB_NGA_IP_ADDRESS="@GNB_NGA_IP_ADDRESS@"
 	    GNB_NGU_IF_NAME="eth0"
-	    GNB_NGU_IP_ADDRESS="@GNB_NGU_IP_ADDRESS@"
 	fi
 	MULTUS_GNB_N3="false"
 	MULTUS_GNB_RU1="false"
@@ -742,14 +740,10 @@ function start-gnb() {
 	else
 	    AMF_POD_NAME=$(kubectl -n $NS get pods -l app.kubernetes.io/name=oai-amf -o jsonpath="{.items[0].metadata.name}")
 	    AMF_IP=$(kubectl -n $NS get pod $AMF_POD_NAME --template '{{.status.podIP}}')
-	    GNB_POD_NAME=$(kubectl -n $NS get pods -l app.kubernetes.io/name=oai-gnb -o jsonpath="{.items[0].metadata.name}")
-	    GNB_IP=$(kubectl -n $NS get pod $GNB_POD_NAME --template '{{.status.podIP}}')
 	fi
 	SED_FILE="/tmp/gnb-configmap.sed"
 	cat > "$SED_FILE" <<EOF
 s|ipv4       =.*|ipv4       = "$AMF_IP";|
-s|@GNB_NGA_IP_ADDRESS@|$GNB_IP|
-s|@GNB_NGU_IP_ADDRESS@|$GNB_IP|
 EOF
 	cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
 	sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
