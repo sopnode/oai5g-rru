@@ -56,9 +56,9 @@ jobs:
     label: load image {{image}} on FIT worker node
   {% if b210 %}    
     commands:
-      - type: Run
-        command: >
-          rhubarbe load -i {{image}} {{nodes['k8s_fit']}} {{nodes['gnb']}}
+#      - type: Run
+#        command: >
+#          rhubarbe load -i {{image}} {{nodes['k8s_fit']}} {{nodes['gnb']}}
       - type: Run
         command: >
           rhubarbe wait {{nodes['k8s_fit']}} {{nodes['gnb']}}
@@ -67,9 +67,9 @@ jobs:
           rhubarbe usrpon {{nodes['gnb']}}
   {% else %}
     commands:
-      - type: Run
-        command: >
-          rhubarbe load -i {{image}} {{nodes['k8s_fit']}}
+#      - type: Run
+#        command: >
+#          rhubarbe load -i {{image}} {{nodes['k8s_fit']}}
       - type: Run
         command: >
           rhubarbe wait {{nodes['k8s_fit']}}
@@ -145,16 +145,16 @@ jobs:
     label: >
       Prepare node {{nodes['k8s_fit']}} for k8s & networking
     commands:
-      - type: Run
-        command: nmcli con down data; nmcli dev status; leave-tunnel
-      - type: Run
-        command: kube-install.sh leave-cluster
-      - type: Run
-        command: sleep 60
-      - type: Run
-        command: nmcli con up data; nmcli dev status; join-tunnel
-      - type: Run
-        command: kube-install.sh join-cluster r2lab@{{master}}
+#     - type: Run
+#        command: nmcli con down data; nmcli dev status; leave-tunnel
+#      - type: Run
+#        command: kube-install.sh leave-cluster
+#      - type: Run
+#        command: sleep 60
+#      - type: Run
+#        command: nmcli con up data; nmcli dev status; join-tunnel
+#      - type: Run
+#        command: kube-install.sh join-cluster r2lab@{{master}}
       - type: RunScript
         command: demo-oai.sh init
 
@@ -169,16 +169,18 @@ jobs:
     label: >
       Prepare node {{nodes['gnb']}} for k8s & networking
     commands:
+#      - type: Run
+#        command: nmcli con down data; nmcli dev status; leave-tunnel
+#      - type: Run
+#        command: kube-install.sh leave-cluster
+#      - type: Run
+#        command: sleep 60
       - type: Run
-        command: nmcli con down data; nmcli dev status; leave-tunnel
-      - type: Run
-        command: kube-install.sh leave-cluster
-      - type: Run
-        command: sleep 60
-      - type: Run
-        command: nmcli con up data; nmcli dev status; join-tunnel
-      - type: Run
-        command: kube-install.sh join-cluster r2lab@{{master}}
+        command: echo "nothing to do here"
+#      - type: Run
+#        command: nmcli con up data; nmcli dev status; join-tunnel
+#      - type: Run
+#        command: kube-install.sh join-cluster r2lab@{{master}}
   {% endif %}
 
 
