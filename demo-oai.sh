@@ -183,7 +183,8 @@ GNB_B210_TAG="2023.w37"
 #GNB_B210_TAG="2023.w11b"
 CONF_B210="gnb.sa.band78.51prb.usrpb200.conf"
 #CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
-OPTIONS_B210="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+OPTIONS_B210="--sa  --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+#OPTIONS_B210="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 
 #### N3XX RU case ####
 GNB_N3XX_REPO="${OAISA_REPO}/oai-gnb"
