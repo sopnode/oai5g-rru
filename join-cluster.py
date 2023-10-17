@@ -14,12 +14,14 @@ from apssh import (LocalNode, SshNode, SshJob, Run, RunString, RunScript,
                    TimeHostFormatter, Service, Deferred, Capture, Variables)
 
 # make sure to pip install r2lab
-from r2lab import r2lab_hostname, ListOfChoices, ListOfChoicesNullReset, find_local_embedded_script
+from r2lab import r2lab_hostname, r2lab_id, ListOfChoices, ListOfChoicesNullReset, find_local_embedded_script
 
 
 default_master = 'sopnode-w1.inria.fr'
 
-default_node_bp = 11
+default_pb_node = 11
+default_fit_worker_node = 2
+default_pc_worker_node = 0
 
 default_gateway  = 'faraday.inria.fr'
 default_slicename  = 'inria_sopnode'
@@ -27,8 +29,16 @@ default_slicename  = 'inria_sopnode'
 default_image = 'u20.04-perf'
 default_bp_image = 'slices-docker-bp'
 
+def _r2lab_name(x, prefix='fit'):
+    return "{}{:02d}".format(prefix, r2lab_id(x))
 
-def run(*, gateway, slicename, master, bp, nodes,
+def r2lab_pc_hostname(id):
+    """
+    returns R2lab pc hostname
+    """
+    return _r2lab_name(id, 'pc')
+
+def run(*, gateway, slicename, master, bp, nodes, pcs,
         load_images=False, image, image_bp,
         verbose, dry_run,
         ):
@@ -39,7 +49,9 @@ def run(*, gateway, slicename, master, bp, nodes,
         slicename: the Unix login name (slice name) to enter the gateway
         master: k8s master node
         bp: node id for the FIT node used to run the ansible blueprint
-        nodes: a list of node ids to run the scenario on; strings or ints
+        nodes: a list of FIT node ids to run the scenario on; strings or ints
+                  are OK;
+        pcs: a list of PC node ids to run the scenario on; strings or ints
                   are OK;
         node_master: the master node id, must be part of selected nodes
     """
@@ -59,7 +71,15 @@ def run(*, gateway, slicename, master, bp, nodes,
         for id in nodes
     }
 
-    worker_ids = nodes[:]
+    pc_index = {
+        id: SshNode(gateway=faraday, hostname=r2lab_pc_hostname(id),
+                    username="root",formatter=TimeHostFormatter(),
+                    verbose=verbose)
+        for id in pcs
+    }
+
+    fit_worker_ids = nodes[:]
+    pc_worker_ids = pcs[:]
 
     # the global scheduler
     scheduler = Scheduler(verbose=verbose)
@@ -74,36 +94,70 @@ def run(*, gateway, slicename, master, bp, nodes,
     )
 
     green_light = check_lease
+    pc_green_light = check_lease
 
     if load_images:
-        green_light = [
-            SshJob(
-                scheduler=scheduler,
-                required=check_lease,
-                node=faraday,
-                critical=True,
-                verbose=verbose,
-                label = f"Load image {image} on worker nodes",
-                commands=[
-                    Run("rhubarbe", "load", *worker_ids, "-i", image),
-                    Run("rhubarbe", "wait", *worker_ids),
-                ],
-            ),
-            SshJob(
-                scheduler=scheduler,
-                required=check_lease,
-                node=faraday,
-                critical=True,
-                verbose=verbose,
-                label = f"Load image {image_bp} on the bp node",
-                command=[
-                    Run("rhubarbe", "load", bp, "-i", image_bp),
-                    Run("rhubarbe", "wait", bp),
-                ]
-            )
-        ]
-
-    prepare = [
+        if fit_worker_ids:
+            green_light = [
+                SshJob(
+                    scheduler=scheduler,
+                    required=check_lease,
+                    node=faraday,
+                    critical=True,
+                    verbose=verbose,
+                    label = f"Load image {image} on worker nodes",
+                    commands=[
+                        Run("rhubarbe", "load", *fit_worker_ids, "-i", image),
+                        Run("rhubarbe", "wait", *fit_worker_ids),
+                    ],
+                ),
+                SshJob(
+                    scheduler=scheduler,
+                    required=check_lease,
+                    node=faraday,
+                    critical=True,
+                    verbose=verbose,
+                    label = f"Load image {image_bp} on the bp node",
+                    command=[
+                        Run("rhubarbe", "load", bp, "-i", image_bp),
+                        Run("rhubarbe", "wait", bp),
+                    ]
+                )
+            ]
+        else:
+            green_light = [
+                SshJob(
+                    scheduler=scheduler,
+                    required=check_lease,
+                    node=faraday,
+                    critical=True,
+                    verbose=verbose,
+                    label = f"Load image {image_bp} on the bp node",
+                    command=[
+                        Run("rhubarbe", "load", bp, "-i", image_bp),
+                        Run("rhubarbe", "wait", bp),
+                    ]
+                )
+            ]
+        if pc_worker_ids:
+            pc_green_light = [
+                SshJob(
+                    scheduler=scheduler,
+                    required=check_lease,
+                    node=faraday,
+                    critical=True,
+                    verbose=verbose,
+                    label=f"switch on {r2lab_pc_hostname(id)}",
+                    command=[
+                        Run("rhubarbe-pdu", "on", bp, r2lab_pc_hostname(id)),
+                        Run("ping", "-c 20", r2lab_pc_hostname(id))
+                    ]
+                ) for id, node in pc_index.items()
+            ]
+            green_light += pc_green_light
+            
+    
+    prepare_fit_workers = [
         SshJob(
             scheduler=scheduler,
             required=green_light,
@@ -112,21 +166,46 @@ def run(*, gateway, slicename, master, bp, nodes,
             verbose=verbose,
             label=f"preparing {r2lab_hostname(id)}",
             command=[
-                Run("ip route add 10.3.1.0/24 dev control via 192.168.3.100"),
-                Run("ip route add 138.96.245.0/24 dev control via 192.168.3.100"),
+                Run("ip route replace 10.3.1.0/24 dev control via 192.168.3.100"),
+                Run("ip route replace 138.96.245.0/24 dev control via 192.168.3.100"),
             ]
         ) for id, node in node_index.items()
     ]
 
+    prepare_pc_workers = [
+        SshJob(
+            scheduler=scheduler,
+            required=green_light,
+            node=node,
+            critical=True,
+            verbose=verbose,
+            label=f"preparing {r2lab_pc_hostname(id)}",
+            command=[
+                Run("ip route replace 10.3.1.0/24 dev eno1 via 192.168.3.100"),
+                Run("ip route replace 138.96.245.0/24 dev eno1 via 192.168.3.100"),
+            ]
+        ) for id, node in pc_index.items()
+    ]
+    
+    prepare = prepare_fit_workers + prepare_pc_workers
+
+    all_workers = ""
+    for i in fit_worker_ids:
+        all_workers += r2lab_hostname(i) + " "
+    for i in pc_worker_ids:
+         all_workers += r2lab_pc_hostname(i) + " "
+
+    
     join = SshJob(
         scheduler=scheduler,
         required=prepare,
         node=bpnode,
         critical=False,
         verbose=verbose,
-        label=f"running the ansible blueprint on {r2lab_hostname(bp)}",
+        label=f"configuring and running the ansible blueprint on {r2lab_hostname(bp)}",
         command=[
-            Run("docker run -t -v /root/SLICES/sopnode/ansible:/blueprint -v /root/.ssh/ssh_r2lab_key:/id_rsa_blueprint blueprint /root/.local/bin/ansible-playbook  -i inventories/sopnode_r2lab/fit02 k8s-node.yaml --extra-vars @params.sopnode_r2lab.yaml"),
+            RunScript("config-playbook.sh", all_workers),
+            Run("docker run -t -v /root/SLICES/sopnode/ansible:/blueprint -v /root/.ssh/ssh_r2lab_key:/id_rsa_blueprint blueprint /root/.local/bin/ansible-playbook  -i inventories/sopnode_r2lab/cluster k8s-node.yaml --extra-vars @params.sopnode_r2lab.yaml"),
         ]
     )
 
@@ -158,14 +237,19 @@ def main():
     parser.add_argument("-s", "--slicename", default=default_slicename,
                         help="specify an alternate slicename")
     parser.add_argument("-B", "--node-ansible", dest='bp',
-                        default=default_node_bp,
+                        default=default_pb_node,
                         help="specify ansible id node")
  
-    parser.add_argument("-N", "--node-id", dest='nodes', default=[2],
-                        choices=[str(x+1) for x in range(37)],
+    parser.add_argument("-N", "--node-id", dest='nodes', default=[default_fit_worker_node],
+                        choices=[str(x) for x in range(38)],
                         action=ListOfChoices,
                         help="specify as many node ids as you want,"
-                             " but for now only id 2 is configured in the blueprint...")
+                             "2 by default, use 0 not to use fit nodes")
+    parser.add_argument("-P", "--pc-id", dest='pcs', default=[default_pc_worker_node],
+                        choices=[str(x) for x in range(3)],
+                        action=ListOfChoices,
+                        help="specify as many pc ids as you want,"
+                             "{default_pc_worker_node} by default, no pc nodes used")
     parser.add_argument("-M", "--master", default=default_master,
                         help="name of the k8s master node")
     parser.add_argument("-v", "--verbose", default=False,
@@ -184,14 +268,23 @@ def main():
 
 
     args = parser.parse_args()
-
-    print(f"join-cluster: FIT node {args.nodes} will join k8s cluster on {args.master}")
+    if '0' in args.nodes and '0' in args.pcs:
+        print("join-cluster: choose at least one FIT or PC node to be added to the cluster")
+        exit(1)
+    
+    print("join-cluster: Please ensure that k8s master is running fine and that:")
+    if '0' not in args.nodes:
+        print(f"   FIT node {args.nodes} not yet part of the k8s cluster on {args.master}")
+    else:
+        args.nodes.clear()
+    if '0' not in args.pcs:
+        print(f"   PC node {args.pcs} not yet part of the k8s cluster on {args.master}")
+    else:
+        args.pcs.clear()
     print(f"Ansible playbook will run on node {r2lab_hostname(args.bp)}")
-    print("Please ensure that k8s master is running fine")
-    print(f"  and that worker FIT node {args.nodes} not already part of the cluster")
 
     run(gateway=default_gateway, slicename=args.slicename, master=args.master,
-        bp=args.bp, nodes=args.nodes, load_images=args.load_images,
+        bp=args.bp, nodes=args.nodes, pcs=args.pcs, load_images=args.load_images,
         image=args.image, image_bp=args.image_bp,
         verbose=args.verbose, dry_run=args.dry_run
     )
