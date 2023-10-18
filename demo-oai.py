@@ -353,10 +353,10 @@ def main():
     parser.add_argument("--k8s_fit", default=default_k8s_fit,
                         help="id of the FIT node that attachs to the k8s cluster")
 
-    parser.add_argument("--amf_spgwu", default=K8S_WORKER_PROD,
+    parser.add_argument("--amf_spgwu", default=default_master,
                         help="node name that runs oai-amf and oai-spgwu")
 
-    parser.add_argument("--gnb", default=K8S_WORKER_PROD,
+    parser.add_argument("--gnb", default=default_master,
                         help="node name that runs oai-gnb")
 
     parser.add_argument(
@@ -428,9 +428,12 @@ def main():
             args.gnb = K8S_MASTER_DEVEL
 
     if args.rru == "b210":
-        b210 = default_b210_node
-        args.gnb = r2lab_hostname(default_b210_node)
-        
+        if args.gnb == default_master:
+            b210 = default_b210_node
+            args.gnb = r2lab_hostname(default_b210_node)
+    else:
+        b210 = 0
+            
     if args.quectel_nodes:
         for quectel in args.quectel_nodes:
             print(f"Using Quectel UE on node {r2lab_hostname(quectel)}")
