@@ -86,7 +86,7 @@ default_regcred_email = 'r2labuser@turletti.com'
 
 def run(*, mode, gateway, slicename, master, namespace, logs,
         pcap, auto_start, gnb_only, load_images, k8s_reset,
-        k8s_fit, amf_spgwu, gnb, quectel_nodes, rru, b210,
+        k8s_fit, amf_spgwu, gnb, quectel_nodes, rru, 
         regcred_name, regcred_password, regcred_email,
         image, quectel_image, verbose, dry_run, demo_tag, charts_tag):
     """
@@ -106,7 +106,6 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         gnb: node name in which oai-gnb will be deployed
         quectel_nodes: list of indices of quectel UE nodes to use
         rru: hardware device attached to gNB
-        b210: if usrp b210 used, fit number used to run it, else 0
         image: R2lab k8s image name
         demo_tag: this demo script tag
         charts_tag: oai_cn5g_fed charts tag
@@ -133,7 +132,6 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         quectel_dict=quectel_dict,
         gnb_only=gnb_only,
         rru=rru,
-        b210=b210,
         regcred=dict(
             name=regcred_name,
             password=regcred_password,
@@ -296,7 +294,6 @@ def main():
     """
     CLI frontend
     """
-    b210 = 0 # by default no USRP B210 used for gnb
     
     parser = ArgumentParser(usage=HELP, formatter_class=ArgumentDefaultsHelpFormatter)
 
@@ -429,10 +426,7 @@ def main():
 
     if args.rru == "b210":
         if args.gnb == default_master:
-            b210 = default_b210_node
             args.gnb = r2lab_hostname(default_b210_node)
-    else:
-        b210 = 0
             
     if args.quectel_nodes:
         for quectel in args.quectel_nodes:
@@ -485,7 +479,7 @@ def main():
         pcap=pcap_str, auto_start=args.auto_start, gnb_only=args.gnb_only,
         load_images=args.load_images,
         k8s_fit=args.k8s_fit, amf_spgwu=args.amf_spgwu, gnb=args.gnb,
-        quectel_nodes=args.quectel_nodes, rru=args.rru, b210=b210,
+        quectel_nodes=args.quectel_nodes, rru=args.rru,
         regcred_name=args.regcred_name,
         regcred_password=args.regcred_password,
         regcred_email=args.regcred_email,

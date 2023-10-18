@@ -7,7 +7,6 @@
 # {{nodes}} - typically {'k8s_fit': 'fit01', 'amf_spgwu': 'sopnode-w3.inria.fr', 'gnb' : 'sopnode-w2.inria.fr'}
 # {{quectel_nodes}} - typically {'9': 'fit09', '18': 'fit18'}
 # {{rru}} - typically 'n300' or 'n320' or 'jaguar' or 'panther'
-# {{b210}} - typically '0' or the fit node number used to run oai-gnb with USRP b210 device
 # {{auto_start}} - typically 'True' or 'False'
 # {{gnb_only}} - typically 'True' or 'False'
 # {{regcred}} - typically {'name': 'jdoe', 'password': 'XX', 'email': 'jdoe@yahoo.fr'}
@@ -54,28 +53,23 @@ jobs:
     critical: True
     verbose: {{verbose}}
     label: load image {{image}} on FIT worker node
-  {% if b210 %}    
     commands:
-#      - type: Run
-#        command: >
-#          rhubarbe load -i {{image}} {{nodes['k8s_fit']}} {{nodes['gnb']}}
       - type: Run
         command: >
-          rhubarbe wait {{nodes['k8s_fit']}} {{nodes['gnb']}}
-      - type: Run
-        command: >
+  {% if rru == "b210" %}    
+    {% if nodes['gnb'] == "pc01" %}
+          rhubarbe wait {{nodes['k8s_fit']}};
+          rhubarbe pdu on usrp01
+    {% elif nodes['gnb'] == "pc02" %}
+          rhubarbe wait {{nodes['k8s_fit']}};
+          rhubarbe pdu on usrp02
+    {% else %}
+          rhubarbe wait {{nodes['k8s_fit']}} {{nodes['gnb']}};
           rhubarbe usrpon {{nodes['gnb']}}
+    {% endif %}
   {% else %}
-    commands:
-#      - type: Run
-#        command: >
-#          rhubarbe load -i {{image}} {{nodes['k8s_fit']}}
-      - type: Run
-        command: >
-          rhubarbe wait {{nodes['k8s_fit']}}
+          rhubarbe wait {{nodes['k8s_fit']}};
   {% if rru != "rfsim" %}
-      - type: Run
-        command: >
           rhubarbe-pdu on {{rru}}
   {% endif %}
   {% endif %}
@@ -159,7 +153,7 @@ jobs:
         command: demo-oai.sh init
 
 
-  {% if b210 %}
+  {% if rru == "b210" %}    
   - id: leave-join-gnb
     required:
     - load-images
@@ -187,7 +181,7 @@ jobs:
   - id: init-demo
     required:
       - leave-join-k8s-fit-node
-    {% if b210 %}    
+    {% if rru == "b210" %}    
       - leave-join-gnb
     {% endif %}
     node: k8s_fit
@@ -300,13 +294,23 @@ jobs:
     commands:
       - type: Run
         command: >
-  {% if b210 %}    
+  {% if rru == "b210" %}    
+    {% if nodes['gnb'] == "pc01" %}
+          rhubarbe pdu off usrp01;
+          rhubarbe pdu off pc01;
+          rhubarbe off {{nodes['k8s_fit']}}
+    {% elif nodes['gnb'] == "pc02" %}
+          rhubarbe pdu off usrp02;
+          rhubarbe pdu off pc02;
+          rhubarbe off {{nodes['k8s_fit']}}
+    {% else %}
           rhubarbe usrpoff {{nodes['gnb']}};
           rhubarbe off {{nodes['k8s_fit']}} {{nodes['gnb']}}
+    {% endif %}
   {% else %}
-  {% if rru != "rfsim" %}
+    {% if rru != "rfsim" %}
           rhubarbe-pdu off {{rru}};
-  {% endif %}
+    {% endif %}
           rhubarbe off {{nodes['k8s_fit']}}
   {% endif %}
 
