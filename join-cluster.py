@@ -20,13 +20,14 @@ from r2lab import r2lab_hostname, r2lab_id, ListOfChoices, ListOfChoicesNullRese
 default_master = 'sopnode-w1.inria.fr'
 
 default_pb_node = 11
-default_fit_worker_node = 2
-default_pc_worker_node = 0
+default_fit_worker_node = '2'
+default_pc_worker_node = '0'
 
 default_gateway  = 'faraday.inria.fr'
 default_slicename  = 'inria_sopnode'
 
-default_image = 'u20.04-perf'
+#default_image = 'u20.04-perf'
+default_image = 'slices-worker'
 default_bp_image = 'slices-docker-bp'
 
 def _r2lab_name(x, prefix='fit'):
@@ -205,7 +206,7 @@ def run(*, gateway, slicename, master, bp, nodes, pcs,
         label=f"configuring and running the ansible blueprint on {r2lab_hostname(bp)}",
         command=[
             RunScript("config-playbook.sh", all_workers),
-            Run("docker run -t -v /root/SLICES/sopnode/ansible:/blueprint -v /root/.ssh/ssh_r2lab_key:/id_rsa_blueprint blueprint /root/.local/bin/ansible-playbook  -i inventories/sopnode_r2lab/cluster k8s-node.yaml --extra-vars @params.sopnode_r2lab.yaml"),
+            Run("docker run -t -v /root/SLICES/sopnode/ansible:/blueprint -v /root/.ssh/ssh_r2lab_key:/id_rsa_blueprint blueprint /root/.local/bin/ansible-playbook  -i inventories/sopnode_r2lab/cluster k8s-node.yaml --extra-vars @params.sopnode_r2lab.yaml -v"),
         ]
     )
 
@@ -274,11 +275,13 @@ def main():
     
     print("join-cluster: Please ensure that k8s master is running fine and that:")
     if '0' not in args.nodes:
-        print(f"   FIT node {args.nodes} not yet part of the k8s cluster on {args.master}")
+        for i in args.nodes:
+            print(f" - worker {r2lab_hostname(i)} not already part of the k8s cluster on {args.master}")
     else:
         args.nodes.clear()
     if '0' not in args.pcs:
-        print(f"   PC node {args.pcs} not yet part of the k8s cluster on {args.master}")
+        for i in args.pcs:
+            print(f" - worker {r2lab_pc_hostname(i)} not already part of the k8s cluster on {args.master}")
     else:
         args.pcs.clear()
     print(f"Ansible playbook will run on node {r2lab_hostname(args.bp)}")
