@@ -184,6 +184,13 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
     j_detach_quectels = [jobs_map[k] for k in jobs_map if k.startswith('detach-quectel-')]
     j_stop_quectels = [jobs_map[k] for k in jobs_map if k.startswith('stop-quectel-')]
 
+    if qhat_nodes:
+        j_prepare_qhats = jobs_map['prepare-qhats']
+    j_init_qhats = [jobs_map[k] for k in jobs_map if k.startswith('init-qhat-')]
+    j_attach_qhats = [jobs_map[k] for k in jobs_map if k.startswith('attach-qhat-')]
+    j_detach_qhats = [jobs_map[k] for k in jobs_map if k.startswith('detach-qhat-')]
+    j_stop_qhats = [jobs_map[k] for k in jobs_map if k.startswith('stop-qhat-')]
+    
     # run subparts as requested
     purpose = f"{mode} mode"
     ko_message = f"{purpose} KO"
@@ -200,14 +207,14 @@ Nota: If you are done with the demo, do not forget to clean up the k8s {master} 
 \t ./demo-oai.py [--master {master}] --cleanup
 """
     elif mode == "start":
-        scheduler.keep_only([j_start_demo] + j_attach_quectels)
+        scheduler.keep_only([j_start_demo] + j_attach_quectels + j_attach_qhats)
         ok_message = f"OAI5G demo started, you can check kubectl logs on the {master} cluster"
         ko_message = f"Could not launch OAI5G pods"
     else:
         if auto_start:
-            scheduler.keep_only_between(ends=[j_start_demo] + j_attach_quectels, keep_ends=True)
+            scheduler.keep_only_between(ends=[j_start_demo] + j_attach_quectels + j_attach_qhats, keep_ends=True)
         else:
-            scheduler.keep_only_between(ends=[j_start_demo] + j_init_quectels, keep_ends=True)
+            scheduler.keep_only_between(ends=[j_start_demo] + j_init_quectels + j_init_qhats, keep_ends=True)
         if not load_images:
             scheduler.bypass_and_remove(j_load_images)
 #TT see how to add scheduler.bypass_and_remove(j_init_quectels)
@@ -215,12 +222,19 @@ Nota: If you are done with the demo, do not forget to clean up the k8s {master} 
             if quectel_nodes and j_prepare_quectels in scheduler.jobs:
                 scheduler.bypass_and_remove(j_prepare_quectels)
             purpose += f" (no quectel node prepared)"
+            if qhat_nodes and j_prepare_qhats in scheduler.jobs:
+                scheduler.bypass_and_remove(j_prepare_qhats)
+            purpose += f" (no qhat node prepared)"
         else:
             purpose += f" WITH rhubarbe imaging the FIT nodes"
             if not quectel_nodes:
                 purpose += f" (no quectel node prepared)"
             else:
                 purpose += f" (quectel node(s) prepared: {quectel_nodes})"
+            if not qhat_nodes:
+                purpose += f" (no qhat node prepared)"
+            else:
+                purpose += f" (qhat node(s) prepared: {qhat_nodes})"
 
         if not auto_start:
             scheduler.bypass_and_remove(j_start_demo)

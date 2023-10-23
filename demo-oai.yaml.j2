@@ -234,8 +234,8 @@ jobs:
           cp oai5g-rru/demo-oai.sh /root/;
           chmod a+x /root/demo-oai.sh;
           cp oai5g-rru/configure-demo-oai.sh /root/;
-          cp oai5g-rru/perfs/logs.sh /root/;
-          cp oai5g-rru/perfs/run-iperf-server.sh /root/;
+          cp oai5g-rru/testing/logs.sh /root/;
+          cp oai5g-rru/testing/run-iperf-server.sh /root/;
           /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{gnb_only}} {{logs}} {{pcap}} /root {%for x in regcred.values()%}{{x}} {%endfor %};
           rm -rf oai-cn5g-fed;
           git clone --branch {{oai_cn5g_fed_tag}} {{oai_cn5g_fed_repo}}
