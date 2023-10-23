@@ -70,6 +70,9 @@ default_b210_node = 2
 # Default FIT nodes used as UE Quectel
 default_quectel_nodes = []
 
+# Default Qhat (Raspberry pi 4 nodes used as UE Quectel) nodes
+default_qhat_nodes = []
+
 # Default RRU used for the scenario.
 # Currently, following possible options:
 # ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim'] 
@@ -86,7 +89,7 @@ default_regcred_email = 'r2labuser@turletti.com'
 
 def run(*, mode, gateway, slicename, master, namespace, logs,
         pcap, auto_start, gnb_only, load_images, k8s_reset,
-        k8s_fit, amf_spgwu, gnb, quectel_nodes, rru, 
+        k8s_fit, amf_spgwu, gnb, quectel_nodes, qhat_nodes, rru, 
         regcred_name, regcred_password, regcred_email,
         image, quectel_image, verbose, dry_run, demo_tag, charts_tag):
     """
@@ -105,6 +108,7 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         amf_spgwu: node name in which amf and spgwu-tiny will be deployed
         gnb: node name in which oai-gnb will be deployed
         quectel_nodes: list of indices of quectel UE nodes to use
+        qhat_nodes: list of indices of qhat UE nodes to use
         rru: hardware device attached to gNB
         image: R2lab k8s image name
         demo_tag: this demo script tag
@@ -112,6 +116,7 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
     """
 
     quectel_dict = dict((n, r2lab_hostname(n)) for n in quectel_nodes)
+    qhat_dict = dict((n, "qhat0"+n) for n in qhat_nodes)
 
     INCLUDES = [find_local_embedded_script(x) for x in (
       "r2labutils.sh", "nodes.sh",
@@ -130,6 +135,7 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
             gnb=gnb,
         ),
         quectel_dict=quectel_dict,
+        qhat_dict=qhat_dict,
         gnb_only=gnb_only,
         rru=rru,
         regcred=dict(
@@ -384,6 +390,13 @@ def main():
 	help="specify as many node ids with Quectel UEs as you want.")
 
     parser.add_argument(
+        "-q", "--qhat-id", dest='qhat_nodes',
+        default=default_qhat_nodes,
+        choices=["1", "2", "3"],
+	action=ListOfChoices,
+	help="specify as many node ids with Quectel UEs as you want.")
+
+    parser.add_argument(
         "-R", "--rru", dest='rru',
         default=default_rru,
         choices=("b210", "n300", "n320", "jaguar", "panther", "rfsim"),
@@ -434,6 +447,12 @@ def main():
     else:
         print("No Quectel UE involved")
 
+    if args.qhat_nodes:
+        for i in args.qhat_nodes:
+            print(f"Using qhat0{i} UE")
+    else:
+        print("No qhat UE involved")
+
     if args.start:
         print(f"**** Launch all pods of the oai5g demo on the k8s {args.master} cluster")
         mode = "start"
@@ -479,7 +498,7 @@ def main():
         pcap=pcap_str, auto_start=args.auto_start, gnb_only=args.gnb_only,
         load_images=args.load_images,
         k8s_fit=args.k8s_fit, amf_spgwu=args.amf_spgwu, gnb=args.gnb,
-        quectel_nodes=args.quectel_nodes, rru=args.rru,
+        quectel_nodes=args.quectel_nodes, qhat_nodes=args.qhat_nodes, rru=args.rru,
         regcred_name=args.regcred_name,
         regcred_password=args.regcred_password,
         regcred_email=args.regcred_email,

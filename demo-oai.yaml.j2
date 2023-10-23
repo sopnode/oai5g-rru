@@ -12,6 +12,7 @@
 # {{regcred}} - typically {'name': 'jdoe', 'password': 'XX', 'email': 'jdoe@yahoo.fr'}
 # {{image}} - typically 'kubernetes'
 # {{quectel_dict}} 
+# {{qhat_dict}} 
 # {{quectel_image}} - typically 'quectel-mbim'
 # {{oai5g_rru_repo}} - typically 'https://github.com/sopnode/oai5g-rru.git'
 # {{oai5g_rru_tag}} - typically 'v1.5.1-1.0'
@@ -40,6 +41,14 @@ nodes:
   {% endfor %}
   {% for n, hostname in quectel_dict.items() %}
   - id: quectel_node_{{n}}
+    hostname: {{hostname}}
+    gateway: faraday
+    username: root
+    formatter: TimeHostFormatter
+    verbose: {{verbose}}
+  {% endfor %}
+  {% for n, hostname in qhat_dict.items() %}
+  - id: qhat_node_{{n}}
     hostname: {{hostname}}
     gateway: faraday
     username: root
@@ -98,6 +107,20 @@ jobs:
         command: sleep 30
   {% endif %}
 
+  {% if qhat_dict %}
+  - id: prepare-qhats
+    node: faraday
+    critical: True
+    verbose: {{verbose}}
+    label: switch on qhat UE nodes
+    commands:
+      - type: Run
+        command: >
+          {%for n in qhat_dict.keys()%}rhubarbe-pdu on qhat0{{n}}; {% endfor %}
+      - type: Run
+        command: sleep 30
+  {% endif %}
+
   {% for n in quectel_dict.keys() %}
   - id: init-quectel-node-{{n}}
     required: prepare-quectels
@@ -114,6 +137,18 @@ jobs:
         command: >
           {{nodes_sh}} quectel-init
         includes: {{INCLUDES}}
+  {% endfor %}
+
+  {% for n in qhat_dict.keys() %}
+  - id: init-qhat-node-{{n}}
+    required: prepare-qhats
+    node: qhat_node_{{n}}
+    critical: True
+    verbose: {{verbose}}
+    label: init qhat0{{n}} UE 
+    commands:
+      - type: Run
+        command: prepare-ue
   {% endfor %}
 
   # for now, useless to switch off other nodes as we use RfSimulator
@@ -243,6 +278,31 @@ jobs:
         includes: {{INCLUDES}}
   {% endfor %}
 
+  {% for n in qhat_dict.keys() %}
+  - id: attach-qhat-node-{{n}}
+    required:
+      - start-demo
+      - init-qhat-node-{{n}}
+    node: qhat_node_{{n}}
+    critical: False
+    verbose: {{verbose}}
+    label: >
+      sleep 60s, attach qhat0{{n}} UE; sleep 20s and test cx
+    commands:
+      - type: Run
+        command: sleep 60
+      - type: RunScript
+        command: >
+          {{nodes_sh}} start-quectel
+        includes: {{INCLUDES}}
+      - type: Run
+        command: sleep 20
+      - type: RunScript
+        command: >
+          {{nodes_sh}} check-quectel-cx
+        includes: {{INCLUDES}}
+  {% endfor %}
+
   - id: stop-demo
     required: start-demo
     node: k8s_fit
@@ -269,6 +329,23 @@ jobs:
     verbose: {{verbose}}
     label: >
       detach quectel UE on fit node {{n}}
+    commands:
+      - type: RunScript
+        command: >
+          {{nodes_sh}} stop-quectel
+        includes: {{INCLUDES}}
+  {% endfor %}
+
+  {% for n in qhat_dict.keys() %}
+  - id: detach-qhat-node-{{n}}
+    required:
+      - stop-demo
+      - attach-qhat-node-{{n}}
+    node: qhat_node_{{n}}
+    critical: False
+    verbose: {{verbose}}
+    label: >
+      detach qhat0{{n}} UE
     commands:
       - type: RunScript
         command: >
@@ -330,4 +407,19 @@ jobs:
         command: rhubarbe usrpoff {%for n in quectel_dict.keys()%}{{n}} {% endfor %}
       - type: Run
         command: rhubarbe off {%for n in quectel_dict.keys()%}{{n}} {% endfor %}
+  {% endif %}
+
+  {% if qhat_dict %}
+  - id: cleanup-qhats
+    required:
+    {% for n in qhat_dict.keys() %}
+    - detach-qhat-node-{{n}}
+    {% endfor %}
+    node: faraday
+    critical: False
+    verbose: {{verbose}}
+    label: Turn off qhat nodes {{qhat_dict.keys()}}
+    commands:
+      - type: Run
+        command: {%for n in qhat_dict.keys()%}rhubarbe-pdu off qhat0{{n}}; {% endfor %}
   {% endif %}
