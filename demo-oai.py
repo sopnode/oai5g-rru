@@ -29,7 +29,7 @@ from asynciojobs import Scheduler
 from apssh import YamlLoader, SshJob, Run, Service # Push
 
 # make sure to pip install r2lab
-from r2lab import r2lab_hostname, ListOfChoices, find_local_embedded_script # ListOfChoicesNullReset
+from r2lab import r2lab_hostname, ListOfChoices, ListOfChoicesNullReset, find_local_embedded_script
 
 ##########################################################################################
 #    Configure here OAI5G_RRU and OAI_CN5G_FED repo and tag
@@ -67,6 +67,9 @@ default_k8s_fit = 1
 # Default FIT node used to run oai-gnb with USRP B210
 default_b210_node = 2
 
+# Default Phones used as UE
+default_phones = [0,]
+
 # Default FIT nodes used as UE Quectel
 default_quectel_nodes = []
 
@@ -89,7 +92,7 @@ default_regcred_email = 'r2labuser@turletti.com'
 
 def run(*, mode, gateway, slicename, master, namespace, logs,
         pcap, auto_start, gnb_only, load_images, k8s_reset,
-        k8s_fit, amf_spgwu, gnb, quectel_nodes, qhat_nodes, rru, 
+        k8s_fit, amf_spgwu, gnb, phones, quectel_nodes, qhat_nodes, rru, 
         regcred_name, regcred_password, regcred_email,
         image, quectel_image, verbose, dry_run, demo_tag, charts_tag):
     """
@@ -107,6 +110,7 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         k8s_fit: FIT node number attached to the k8s cluster as worker node
         amf_spgwu: node name in which amf and spgwu-tiny will be deployed
         gnb: node name in which oai-gnb will be deployed
+        phones: list of indices of phones to use
         quectel_nodes: list of indices of quectel UE nodes to use
         qhat_nodes: list of indices of qhat UE nodes to use
         rru: hardware device attached to gNB
@@ -115,11 +119,28 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         charts_tag: oai_cn5g_fed charts tag
     """
 
+    wait1_dict = dict()
+    wait2_dict = dict()
+    if phones:
+        sleeps_ran = (55, 75)
+        phone_msgs = [f"wait for {sleep}s for eNB to start up before waking up phone{id}"
+                      for sleep, id in zip(sleeps_ran, phones)]
+        wait1_cmd = [f"echo '{msg}'; sleep {sleep}"
+                     for msg, sleep in zip(phone_msgs, sleeps_ran)]
+        sleeps_phone = (15, 20)
+        phone2_msgs = [f"wait for {sleep}s for phone{id} before starting tests"
+                       for sleep, id in zip(sleeps_phone, phones)]
+        wait2_cmd = [f"echo '{msg}'; sleep {sleep}"
+                     for msg, sleep in zip(phone2_msgs, sleeps_phone)]
+        for i, n in enumerate(phones):
+            wait1_dict.update({n: wait1_cmd[i]})
+            wait2_dict.update({n: wait2_cmd[i]})
+    
     quectel_dict = dict((n, r2lab_hostname(n)) for n in quectel_nodes)
     qhat_dict = dict((n, "qhat0"+n) for n in qhat_nodes)
 
     INCLUDES = [find_local_embedded_script(x) for x in (
-      "r2labutils.sh", "nodes.sh",
+      "r2labutils.sh", "nodes.sh", "faraday.sh"
     )]
 
     jinja_variables = dict(
@@ -134,6 +155,9 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
             amf_spgwu=amf_spgwu,
             gnb=gnb,
         ),
+        phones=phones,
+        wait1_dict=wait1_dict,
+        wait2_dict=wait2_dict,
         quectel_dict=quectel_dict,
         qhat_dict=qhat_dict,
         gnb_only=gnb_only,
@@ -151,6 +175,7 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         oai_cn5g_fed_tag=charts_tag,
         verbose=verbose,
         nodes_sh=find_local_embedded_script("nodes.sh"),
+        faraday_sh=find_local_embedded_script("faraday.sh"),
         INCLUDES=INCLUDES,
     )
 
@@ -182,14 +207,18 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
     j_init_quectels = [jobs_map[k] for k in jobs_map if k.startswith('init-quectel-')]
     j_attach_quectels = [jobs_map[k] for k in jobs_map if k.startswith('attach-quectel-')]
     j_detach_quectels = [jobs_map[k] for k in jobs_map if k.startswith('detach-quectel-')]
-    j_stop_quectels = [jobs_map[k] for k in jobs_map if k.startswith('stop-quectel-')]
+    #j_stop_quectels = [jobs_map[k] for k in jobs_map if k.startswith('stop-quectel-')]
 
     if qhat_nodes:
         j_prepare_qhats = jobs_map['prepare-qhats']
     j_init_qhats = [jobs_map[k] for k in jobs_map if k.startswith('init-qhat-')]
     j_attach_qhats = [jobs_map[k] for k in jobs_map if k.startswith('attach-qhat-')]
     j_detach_qhats = [jobs_map[k] for k in jobs_map if k.startswith('detach-qhat-')]
-    j_stop_qhats = [jobs_map[k] for k in jobs_map if k.startswith('stop-qhat-')]
+    #j_stop_qhats = [jobs_map[k] for k in jobs_map if k.startswith('stop-qhat-')]
+
+    j_attach_phones = [jobs_map[k] for k in jobs_map if k.startswith('attach-phone')]
+    j_test_cx_phones = [jobs_map[k] for k in jobs_map if k.startswith('test-cx-phone')]
+    j_detach_phones = [jobs_map[k] for k in jobs_map if k.startswith('detach-phone')]
     
     # run subparts as requested
     purpose = f"{mode} mode"
@@ -200,19 +229,20 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         ko_message = f"Could not cleanup demo"
         ok_message = f"Thank you, the k8s {master} cluster is now clean and FIT nodes have been switched off"
     elif mode == "stop":
-        scheduler.keep_only_between(starts=[j_stop_demo], ends=j_cleanups, keep_ends=False)
+        #scheduler.keep_only_between(starts=[j_stop_demo], ends=j_cleanups, keep_ends=False)
+        scheduler.keep_only([j_stop_demo]+j_detach_quectels+j_detach_qhats+j_detach_phones)
         ko_message = f"Could not delete OAI5G pods"
         ok_message = f"""No more OAI5G pods on the {master} cluster
 Nota: If you are done with the demo, do not forget to clean up the k8s {master} cluster by running:
 \t ./demo-oai.py [--master {master}] --cleanup
 """
     elif mode == "start":
-        scheduler.keep_only([j_start_demo] + j_attach_quectels + j_attach_qhats)
+        scheduler.keep_only([j_start_demo] + j_attach_quectels + j_attach_qhats + j_attach_phones + j_test_cx_phones)
         ok_message = f"OAI5G demo started, you can check kubectl logs on the {master} cluster"
         ko_message = f"Could not launch OAI5G pods"
     else:
         if auto_start:
-            scheduler.keep_only_between(ends=[j_start_demo] + j_attach_quectels + j_attach_qhats, keep_ends=True)
+            scheduler.keep_only_between(ends=[j_start_demo] + j_attach_quectels + j_attach_qhats + j_attach_phones + j_test_cx_phones, keep_ends=True)
         else:
             scheduler.keep_only_between(ends=[j_start_demo] + j_init_quectels + j_init_qhats, keep_ends=True)
         if not load_images:
@@ -235,6 +265,10 @@ Nota: If you are done with the demo, do not forget to clean up the k8s {master} 
                 purpose += f" (no qhat node prepared)"
             else:
                 purpose += f" (qhat node(s) prepared: {qhat_nodes})"
+            if not phones:
+                purpose += f" (no phone prepared)"
+            else:
+                purpose += f" (phone(s) prepared: {phones})"
 
         if not auto_start:
             scheduler.bypass_and_remove(j_start_demo)
@@ -396,6 +430,11 @@ def main():
         "--regcred_email", default=default_regcred_email,
         help=f"registry credential email for docker pull")
 
+    parser.add_argument("-P", "--phones", dest='phones',
+                        action=ListOfChoicesNullReset, type=int, choices=(1, 2, 0),
+                        default=default_phones,
+                        help='Commercial phones to use; use -p 0 to choose no phone')
+
     parser.add_argument(
         "-Q", "--quectel-id", dest='quectel_nodes',
         default=default_quectel_nodes,
@@ -461,6 +500,12 @@ def main():
     else:
         print("No Quectel UE involved")
 
+    if args.phones:
+        for i in args.phones:
+            print(f"Using UE phone {i} ")
+    else:
+        print("No UE phone involved")
+
     if args.qhat_nodes:
         for i in args.qhat_nodes:
             print(f"Using qhat0{i} UE")
@@ -512,7 +557,8 @@ def main():
         pcap=pcap_str, auto_start=args.auto_start, gnb_only=args.gnb_only,
         load_images=args.load_images,
         k8s_fit=args.k8s_fit, amf_spgwu=args.amf_spgwu, gnb=args.gnb,
-        quectel_nodes=args.quectel_nodes, qhat_nodes=args.qhat_nodes, rru=args.rru,
+        phones=args.phones, quectel_nodes=args.quectel_nodes,
+        qhat_nodes=args.qhat_nodes, rru=args.rru,
         regcred_name=args.regcred_name,
         regcred_password=args.regcred_password,
         regcred_email=args.regcred_email,

@@ -293,20 +293,20 @@ function gener-mac()
 function init() {
     # init function should be run once per demo.
 
-    # Ensure that helm spray plugin is installed
-    echo "init: ensure spray is installed and possibly create secret docker-registry"
-    helm plugin uninstall helm-spray || true
-    helm plugin install https://github.com/ThalesGroup/helm-spray || true
-
-    # Just in case the k8s cluster has been restarted without multus enabled..
-    echo "kube-install.sh enable-multus"
-    kube-install.sh enable-multus || true
-
     # Install patch command...
     if [ ! -x "$(command -v patch)" ]; then
         [[ -f /etc/fedora-release ]] && dnf install -y patch
         [[ -f /etc/lsb-release ]] && apt-get install -y patch
-    fi  
+    fi
+    # Following is no more useful as it is already done through the ansible playbook
+    ## Ensure that helm spray plugin is installed
+    #echo "init: ensure spray is installed and possibly create secret docker-registry"
+    #helm plugin uninstall helm-spray || true
+    #helm plugin install https://github.com/ThalesGroup/helm-spray || true
+    ## Just in case the k8s cluster has been restarted without multus enabled..
+    #echo "kube-install.sh enable-multus"
+    #kube-install.sh enable-multus || true
+
 }
 
 #################################################################################

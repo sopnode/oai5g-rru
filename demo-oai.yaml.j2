@@ -11,6 +11,9 @@
 # {{gnb_only}} - typically 'True' or 'False'
 # {{regcred}} - typically {'name': 'jdoe', 'password': 'XX', 'email': 'jdoe@yahoo.fr'}
 # {{image}} - typically 'kubernetes'
+# {{phones}} - typically {1, 2,}
+# {{wait1_dict}} 
+# {{wait2_dict}} 
 # {{quectel_dict}} 
 # {{qhat_dict}} 
 # {{quectel_image}} - typically 'quectel-mbim'
@@ -151,7 +154,7 @@ jobs:
         command: prepare-ue
   {% endfor %}
 
-  # for now, useless to switch off other nodes as we use RfSimulator
+  # for now, we do not to switch off other nodes 
   # - id: turn-off-others
   #   node: faraday
   #   critical: False
@@ -174,51 +177,12 @@ jobs:
     label: >
       Prepare node {{nodes['k8s_fit']}} for k8s & networking
     commands:
-#     - type: Run
-#        command: nmcli con down data; nmcli dev status; leave-tunnel
-#      - type: Run
-#        command: kube-install.sh leave-cluster
-#      - type: Run
-#        command: sleep 60
-#      - type: Run
-#        command: nmcli con up data; nmcli dev status; join-tunnel
-#      - type: Run
-#        command: kube-install.sh join-cluster r2lab@{{master}}
       - type: RunScript
         command: demo-oai.sh init
-
-
-  {% if rru == "b210" %}    
-  - id: leave-join-gnb
-    required:
-    - load-images
-    node: gnb
-    critical: False
-    verbose: {{verbose}}
-    label: >
-      Prepare node {{nodes['gnb']}} for k8s & networking
-    commands:
-#      - type: Run
-#        command: nmcli con down data; nmcli dev status; leave-tunnel
-#      - type: Run
-#        command: kube-install.sh leave-cluster
-#      - type: Run
-#        command: sleep 60
-      - type: Run
-        command: echo "nothing to do here"
-#      - type: Run
-#        command: nmcli con up data; nmcli dev status; join-tunnel
-#      - type: Run
-#        command: kube-install.sh join-cluster r2lab@{{master}}
-  {% endif %}
-
 
   - id: init-demo
     required:
       - leave-join-k8s-fit-node
-    {% if rru == "b210" %}    
-      - leave-join-gnb
-    {% endif %}
     node: k8s_fit
     critical: True
     verbose: {{verbose}}
@@ -252,6 +216,46 @@ jobs:
     commands:
       - type: Run
         command: /root/demo-oai.sh start
+ 
+  {% for n, cmd in wait1_dict.items() %}
+  - id: attach-phone{{n}}
+    required:
+      - start-demo
+    node: faraday
+    critical: False
+    verbose: {{verbose}}
+    label: >
+      sleep and wake-up phone{{n}}; sleep 20s and test cx
+    commands:
+      - type: Run
+        command: {{cmd}}
+      - type: RunScript
+        command: >
+          {{faraday_sh}} macphone{{n}} r2lab-embedded/shell/macphone.sh phone-on
+        includes: {{INCLUDES}}
+  {% endfor %}
+
+  {% for n, cmd in wait2_dict.items() %}
+  - id: test-cx-phone{{n}}
+    required:
+      - attach-phone{{n}}
+    node: faraday
+    critical: False
+    verbose: {{verbose}}
+    label: >
+      sleep 20s, test cx and start bandwidth test
+    commands:
+      - type: Run
+        command: sleep {{cmd}} 
+      - type: RunScript
+        command: >
+          {{faraday_sh}} macphone{{n}} r2lab-embedded/shell/macphone.sh phone-check-cx
+        includes: {{INCLUDES}}
+      - type: RunScript
+        command: >
+          {{faraday_sh}} macphone{{n}} r2lab-embedded/shell/macphone.sh phone-start-app
+        includes: {{INCLUDES}}
+  {% endfor %}
 
   {% for n in quectel_dict.keys() %}
   - id: attach-quectel-node-{{n}}
@@ -319,11 +323,26 @@ jobs:
         localpath: "./"
       {% endif %}
 
+  {% for n, cmd in wait1_dict.items() %}
+  - id: detach-phone{{n}}
+    required:
+      - stop-demo
+    node: faraday
+    critical: False
+    verbose: {{verbose}}
+    label: >
+      detach phone{{n}}
+    commands:
+      - type: RunScript
+        command: >
+          {{faraday_sh}} macphone{{n}} r2lab-embedded/shell/macphone.sh phone-off
+        includes: {{INCLUDES}}
+  {% endfor %}
+
   {% for n in quectel_dict.keys() %}
   - id: detach-quectel-node-{{n}}
     required:
       - stop-demo
-      - attach-quectel-node-{{n}}
     node: quectel_node_{{n}}
     critical: False
     verbose: {{verbose}}
@@ -340,7 +359,6 @@ jobs:
   - id: detach-qhat-node-{{n}}
     required:
       - stop-demo
-      - attach-qhat-node-{{n}}
     node: qhat_node_{{n}}
     critical: False
     verbose: {{verbose}}
