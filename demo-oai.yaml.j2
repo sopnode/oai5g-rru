@@ -225,7 +225,7 @@ jobs:
     critical: False
     verbose: {{verbose}}
     label: >
-      sleep and wake-up phone{{n}}; sleep 20s and test cx
+      sleep and then wake-up phone{{n}}
     commands:
       - type: Run
         command: {{cmd}}
@@ -243,10 +243,10 @@ jobs:
     critical: False
     verbose: {{verbose}}
     label: >
-      sleep 20s, test cx and start bandwidth test
+      sleep again, then run test-cx and start bandwidth test with speedtest app
     commands:
       - type: Run
-        command: sleep {{cmd}} 
+        command: {{cmd}} 
       - type: RunScript
         command: >
           {{faraday_sh}} macphone{{n}} r2lab-embedded/shell/macphone.sh phone-check-cx

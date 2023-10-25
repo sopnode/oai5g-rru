@@ -151,7 +151,7 @@ def run(*, gateway, slicename, master, bp, nodes, pcs,
                     label=f"switch on {r2lab_pc_hostname(id)}",
                     command=[
                         Run("rhubarbe-pdu", "on", r2lab_pc_hostname(id)),
-                        Run("ping", "-c 20", r2lab_pc_hostname(id))
+                        Run("ping", "-c 30", r2lab_pc_hostname(id))
                     ]
                 ) for id, node in pc_index.items()
             ]
@@ -206,7 +206,12 @@ def run(*, gateway, slicename, master, bp, nodes, pcs,
         label=f"configuring and running the ansible blueprint on {r2lab_hostname(bp)}",
         command=[
             RunScript("config-playbook.sh", all_workers),
-            Run("docker run -t -v /root/SLICES/sopnode/ansible:/blueprint -v /root/.ssh/ssh_r2lab_key:/id_rsa_blueprint blueprint /root/.local/bin/ansible-playbook  -i inventories/sopnode_r2lab/cluster k8s-node.yaml --extra-vars @params.sopnode_r2lab.yaml -v"),
+            # Following playbook to create a new k8s cluster wit master only
+            #Run("docker run -t -v /root/SLICES/sopnode/ansible:/blueprint -v /root/.ssh/ssh_r2lab_key:/id_rsa_blueprint blueprint /root/.local/bin/ansible-playbook  -i inventories/sopnode_r2lab/cluster k8s-master.yaml --extra-vars @params.sopnode_r2lab.yaml"),
+            # Following playbook to upload and rebuild all required libraries and add workers to the k8s cluster
+            #Run("docker run -t -v /root/SLICES/sopnode/ansible:/blueprint -v /root/.ssh/ssh_r2lab_key:/id_rsa_blueprint blueprint /root/.local/bin/ansible-playbook  -i inventories/sopnode_r2lab/cluster k8s-node-orig.yaml --extra-vars @params.sopnode_r2lab.yaml"),
+            # Following playbook optimized to speed up adding workers to the k8s cluster
+            Run("docker run -t -v /root/SLICES/sopnode/ansible:/blueprint -v /root/.ssh/ssh_r2lab_key:/id_rsa_blueprint blueprint /root/.local/bin/ansible-playbook  -i inventories/sopnode_r2lab/cluster k8s-node.yaml --extra-vars @params.sopnode_r2lab.yaml"),
         ]
     )
 
