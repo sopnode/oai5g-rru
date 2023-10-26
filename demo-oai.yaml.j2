@@ -1,21 +1,21 @@
-# expected jinja variables, set by calling python script
+# expected jinja variables, set by calling python script:
+#
 # {{gateway}} - typically 'faraday.inria.fr'
 # {{master}} - typically 'sopnode-l1.inria.fr'
 # {{namespace}} - typically 'oai5g'
 # {{logs}} - typically 'True' or 'False'
 # {{pcap}} - typically 'True' or 'False'
-# {{nodes}} - typically {'k8s_fit': 'fit01', 'amf_spgwu': 'sopnode-w3.inria.fr', 'gnb' : 'sopnode-w2.inria.fr'}
-# {{quectel_nodes}} - typically {'9': 'fit09', '18': 'fit18'}
-# {{rru}} - typically 'n300' or 'n320' or 'jaguar' or 'panther'
 # {{auto_start}} - typically 'True' or 'False'
+# {{nodes}} - typically {'k8s_fit': 'fit01', 'amf_spgwu': 'sopnode-w3.inria.fr', 'gnb' : 'sopnode-w2.inria.fr'}
+# {{phones}} - typically [1, 2]
+# {{wait1_dict}} - typically  {1: "echo 'wait for 55s for eNB to start up before waking up phone1'; sleep 55"}
+# {{wait2_dict}} - typically {1: "echo 'wait for 15s for phone1 before starting tests'; sleep 15"}
+# {{quectel_dict}} - typically  {'7': 'fit07'}
+# {{qhat_dict}} - typically {'1': 'qhat01', '2': 'qhat02'}
 # {{gnb_only}} - typically 'True' or 'False'
+# {{rru}} - typically 'n300' or 'n320' or 'jaguar' or 'panther'
 # {{regcred}} - typically {'name': 'jdoe', 'password': 'XX', 'email': 'jdoe@yahoo.fr'}
 # {{image}} - typically 'kubernetes'
-# {{phones}} - typically {1, 2,}
-# {{wait1_dict}} 
-# {{wait2_dict}} 
-# {{quectel_dict}} 
-# {{qhat_dict}} 
 # {{quectel_image}} - typically 'quectel-mbim'
 # {{oai5g_rru_repo}} - typically 'https://github.com/sopnode/oai5g-rru.git'
 # {{oai5g_rru_tag}} - typically 'v1.5.1-1.0'
@@ -107,7 +107,7 @@ jobs:
         command: >
           rhubarbe usrpon {%for n in quectel_dict.keys()%}{{n}} {% endfor %}
       - type: Run
-        command: sleep 40
+        command: sleep 45
   {% endif %}
 
   {% if qhat_dict %}

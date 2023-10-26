@@ -68,7 +68,7 @@ default_k8s_fit = 1
 default_b210_node = 2
 
 # Default Phones used as UE
-default_phones = [0,]
+default_phones = []
 
 # Default FIT nodes used as UE Quectel
 default_quectel_nodes = []
@@ -505,6 +505,7 @@ def main():
             print(f"Using UE phone {i} ")
     else:
         print("No UE phone involved")
+        args.phones.clear()
 
     if args.qhat_nodes:
         for i in args.qhat_nodes:
