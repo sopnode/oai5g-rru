@@ -62,7 +62,7 @@ default_quectel_image = 'quectel-mbim-single-dnn'
 
 # This script uses one R2lab FIT node as a k8s worker attached to the cluster
 # in order to launch the scenario 
-default_k8s_fit = 1
+default_k8s_fit = 11
 
 # Default FIT node used to run oai-gnb with USRP B210
 default_b210_node = 2
@@ -79,7 +79,7 @@ default_qhat_nodes = []
 # Default RRU used for the scenario.
 # Currently, following possible options:
 # ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim'] 
-default_rru = 'n300'
+default_rru = 'jaguar'
 
 default_gateway  = 'faraday.inria.fr'
 default_slicename  = 'inria_sopnode'
@@ -195,12 +195,11 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
 
 
     # retrieve jobs for the surgery part
-    j_load_images = jobs_map['load-images']
+    j_load_images = jobs_map['prepare-rru']
     j_start_demo = jobs_map['start-demo']
     j_stop_demo = jobs_map['stop-demo']
     j_cleanups = [jobs_map[k] for k in jobs_map if k.startswith('cleanup')]
 
-    j_leave_joins = [jobs_map[k] for k in jobs_map if k.startswith('leave-join')]
     if quectel_nodes:
         j_prepare_quectels = jobs_map['prepare-quectels']
     j_init_quectels = [jobs_map[k] for k in jobs_map if k.startswith('init-quectel-')]
@@ -275,8 +274,7 @@ Nota: If you are done with the demo, do not forget to clean up the k8s {master} 
             ok_message = f"RUN SetUp OK. You can now start the demo by running ./demo-oai.py --master {master} --start"
         else:
             ok_message = f"RUN SetUp and demo started OK. You can now check the kubectl logs on the k8s {master} cluster."
-        for job in j_leave_joins:
-            scheduler.bypass_and_remove(job)
+
 
     # add this job as a requirement for all scenarios
     check_lease = SshJob(
@@ -390,8 +388,9 @@ def main():
         help=f"equivalent to --master {K8S_MASTER_DEVEL}")
 
 
-    parser.add_argument("--k8s_fit", default=default_k8s_fit,
-                        help="id of the FIT node that attachs to the k8s cluster")
+    parser.add_argument(
+        "-k", "--k8s_fit", default=default_k8s_fit,
+        help="id of the FIT node used as k8s worker to control the OAI5G pods deployment")
 
     parser.add_argument("--amf_spgwu", default=default_master,
                         help="node name that runs oai-amf and oai-spgwu")
@@ -470,7 +469,7 @@ def main():
 
 
     args = parser.parse_args()
-    print(f"Running the demo version {args.demo_tag} with oai-cn5g-fed {args.charts_tag} tag")
+    print(f"Running tag {args.demo_tag} of demo-oai and tag {args.charts_tag} of OAI5G charts")
     if args.devel:
         args.master = K8S_MASTER_DEVEL
         # in case of Devel Cluster, modify the default servers to run amf/spgwu/gnb pods
@@ -485,22 +484,22 @@ def main():
             
     if args.quectel_nodes:
         for quectel in args.quectel_nodes:
-            print(f"Using Quectel UE on node {r2lab_hostname(quectel)}")
+            print(f"  - using Quectel UE on node {r2lab_hostname(quectel)}")
     else:
-        print("No Quectel UE involved")
+        print("  - no Quectel UE involved")
 
     if args.phones:
         for i in args.phones:
-            print(f"Using UE phone {i} ")
+            print(f"  - using phone{i} UE")
     else:
-        print("No UE phone involved")
+        print("  - no UE phone involved")
         args.phones.clear()
 
     if args.qhat_nodes:
         for i in args.qhat_nodes:
-            print(f"Using qhat0{i} UE")
+            print(f"  - using qhat0{i} UE")
     else:
-        print("No qhat UE involved")
+        print("  - no qhat UE involved")
 
     if args.start:
         print(f"**** Launch all pods of the oai5g demo on the k8s {args.master} cluster")
@@ -515,12 +514,12 @@ def main():
         print(f"**** Prepare oai5g demo setup on the k8s {args.master} cluster with {args.slicename} slicename")
         print(f"OAI5G pods will run on the {args.namespace} k8s namespace")
         print(f"the following nodes will be used:")
-        print(f"\t{r2lab_hostname(args.k8s_fit)} as k8s worker node")
-        print(f"\t{args.amf_spgwu} for oai-amf and oai-spgwu-tiny")
+        print(f"  - {r2lab_hostname(args.k8s_fit)} worker node to control OAI5G pods deployment")
+        print(f"  - {args.amf_spgwu} worker node hosting oai-amf and oai-spgwu-tiny")
         if args.rru == "rfsim":
-            print(f"\toai-gnb running in simulation mode")
+            print(f"  - oai-gnb running in simulation mode")
         else:
-            print(f"\t{args.gnb} for oai-gnb with {args.rru} as RRU hardware device")
+            print(f"  - {args.gnb} worker node hosting oai-gnb with {args.rru} as RRU hardware device")
         print(f"FIT image loading:",
               f"YES with {args.image}" if args.load_images
               else "NO (use --load-images if needed)")
@@ -532,8 +531,9 @@ def main():
             print("Only start/stop oai-gnb pod")
         mode = "run"
     if args.pcap:
-        print(f"generate both pcap and logs files")
+        print(f"configured to generate both pcap and logs files")
         pcap_str='True'
+        logs_str='True'
     else:
         pcap_str='False'
         if args.logs:

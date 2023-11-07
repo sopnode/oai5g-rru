@@ -23,15 +23,14 @@ All the forms of the **demo-oai.py** [nepi-ng](https://nepi-ng.inria.fr/) script
 
 The mental model is that we are dealing with essentially three states:
 
-* (0) initially, the k8s cluster is running and the R2lab nodes are down;
-* (1) after setup, one R2lab node is loaded with the proper image, and has joined the cluster;
+* (0) initially, the k8s cluster is running and some R2lab nodes have joined the cluster as workers;
+* (1) after setup, OAI5G charts have been configured and are ready to be started, UEs selected are also configured and ready to be used;
 * (2) at that point one can use the `--start` option to start the system, which amounts to deploying pods on the k8s cluster;
 * (back to 1) it is point one can roll back and come back to the previous state, using the `--stop` option
 
-with none of the `--start/--stop/--cleanup` option the script goes from state 0 to (2),
-unless the `--no-auto-start` or `-k` option is given.
+with none of the `--start/--stop/--cleanup` option the script goes from state 0 to (2), unless the `-a` option is given.
 
-run `demo-oai.py --help` for more details.
+Run `demo-oai.py --help` for more details.
 
 ### References
 
@@ -46,11 +45,11 @@ run `demo-oai.py --help` for more details.
 
 ### Prerequisites:
 
-The required number of R2lab worker nodes for the target experimentation scenario are up and have joined a k8s cluster. 
+The required number of R2lab worker nodes for the target experimentation scenario are up and have joined the k8s cluster. 
 
 This can be done using the **join-cluster.py** nepi-ng script available in the [Extend a SophiaNode Kubernetes cluster with R2lab worker nodes](https://github.com/sopnode/r2lab-join-cluster) repo.
 
-The **demo-oai.py** script will then use one of the R2lab worker nodes to deploy the OAI 5G pods on the cluster. The default R2lab node used for that is *fit11* as declared in the **join-cluster.py** script.
+The **demo-oai.py** script will then use one of the R2lab worker nodes to orchestrate the deployment of OAI 5G pods on the cluster. The default R2lab node used for that is *fit11* as declared in the **join-cluster.py** script.
 
 Note that in many OAI5G scenarios, a single R2lab worker node is enough to run the OAI5G demo as the same r2lab worker node can be used to deploy the OAI5G pods and to host the oai-gnb pod with B210 attached. Also, if the target scenario includes a gNB with USRP N3XX or AW2S RRU device, the oai-gnb pod will not run on a r2lab worker node but on a more powerful worker node in the k8s cluster.
 
@@ -61,52 +60,53 @@ If a USRP B210 gNB or Quectel UE devices are necessary in the target scenario, t
 
 After that, the script will deploy OAI5G pods on the k8s cluster through the R2lab worker node, which is *fit11* by default. 
 
-First, it will copy on the worker node *fit11* the *demo-oai.sh* bash script and will configure few parameters (e.g., Core Network parameters, k8s namespace, nodes to run amf/spgwu/gnb functions, type of rru, etc.) within this script using the **configure-demo-oai.sh** script.
+First, it will copy on the worker node *fit11* the *demo-oai.sh* bash script and will configure all the parameters (e.g., Core Network parameters, k8s namespace, nodes to run amf/spgwu/gnb functions, rru parameters, etc.) within this script using the **configure-demo-oai.sh** script.
 
 ```
 root@fit11# /root/configure-demo-oai.sh update
 ```
 
-Then, the script will clone the OAI5G `oai-cn5g-fed` git repository on the R2lab node *fit11*. To do it manually, you will have to run:
+Then, the script will clone the r2lab-rrus branch of [oai-cn5g-fed](https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git) gitlab repository on the R2lab node *fit11*. To do it manually, you will have to run:
 
 ```
 root@fit11# git clone -b r2lab-rrus https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed
 ```
-Then it will apply different patches to configure the various OAI5G pods for the SopNode platform. To do it manually, you will have to run on *fit11* :
+Then it will apply different patches to configure the different OAI5G pods to be run on R2lab/SophiaNode platform with the desired configuration. To do it manually, you will have to run on *fit11* :
 
 ```
 root@fit11# ./demo-oai.sh configure-all
 ```
 
-These patches include configuration of Multus CNI interfaces specific to the SophiaNode platform. See the IP address configuration in the following figure modified from the [OAI 5G Core Network Deployment using Helm Charts](https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed/-/blob/master/docs/DEPLOY_SA5G_HC.md) tutorial.
+These patches include the configuration of [multus CNI](https://github.com/k8snetworkplumbingwg/multus-cni) interfaces specific to the SophiaNode platform. See an example of IP addresses configuration in the following figure modified from the [OAI 5G Core Network Deployment using Helm Charts](https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed/-/blob/master/docs/DEPLOY_SA5G_HC.md) tutorial.
 
 ![Multus CNI Configuration](./helm-chart-r2lab.png)
 
 ### Deployment
 
-Finally, the **demo-oai.py** script will deploy the OAI5G pods on the k8s cluster. However, if you prefer to do it manually, you will have to do the following directly on *fit11* (or on another k8s worker node or on the k8s master *sopnode-l1*):
+Finally, the **demo-oai.py** script will deploy the OAI5G pods on the k8s cluster. However, if you prefer to do it manually, you will have to do the following steps on *fit11*:
 
 
-```bash
-# Wait until all fit nodes are in READY state
-sopnode-l1$ kubectl wait node --for=condition=Ready fit11 
+##### Wait until all fit nodes are in READY state
+`root@fit11# kubectl wait node --for=condition=Ready fit11` 
 
-# Run the OAI 5G Core pods
-sopnode-l1$ cd /home/oai/oai-cn5g-fed/charts/oai-5g-core/oai-5g-basic
+##### Run the OAI 5G Core Network pods
+``` bash
+root@fit11# cd /home/oai/oai-cn5g-fed/charts/oai-5g-core/oai-5g-basic`
 
-sopnode-l1$ helm --namespace=oai5g spray .
-
-# Wait until all 5G Core pods are READY
-sopnode-l1$ kubectl wait pod -noai5g --for=condition=Ready --all
-
-# Run the oai-gnb pod 
-sopnode-l1$ cd /home/oai/oai-cn5g-fed/charts/oai-5g-ran
-sopnode-l1$ helm --namespace=oai5g install oai-gnb oai-gnb/
-
-# Wait until the gNB pod is READY
-sopnode-l1$ kubectl wait pod -noai5g --for=condition=Ready --all
-
+root@fit11# helm --namespace=oai5g spray .
 ```
+##### Wait until all 5G Core pods are READY
+`root@fit11# kubectl wait pod -noai5g --for=condition=Ready --all`
+
+##### Run the oai-gnb pod 
+``` bash
+root@fit11# cd /home/oai/oai-cn5g-fed/charts/oai-5g-ran
+root@fit11# helm --namespace=oai5g install oai-gnb oai-gnb/
+```
+##### Wait until the gNB pod is READY
+`root@fit11# kubectl wait pod -noai5g --for=condition=Ready --all`
+
+
 
 
 ### Customization
@@ -115,30 +115,36 @@ The **demo-oai.py** nepi-ng script has various options to change default paramet
 
 The main options are:
 
-  * `--k8s_fit`
-  * `-R -Q -q -P -L -p`
+  * `-k id` id of the R2lab node used to control OAI5G pods deployment; it is *fit11* by default.
+  * `-R type` type of RRU device or *rfsim* in case of simulated ran.
+  * `-Q id` R2lab node id used as 5G Quectel UEs; none by default.
+  * `-q id` qhat node id used as 5G UE; none by default.
+  * `-P id` phone id used as 5G UE; none by default.
+  * `-L` to generate and retrieve OAI5G pods logs.
+  * `-p` to generate and retrieve OAI5G pods logs with pcap.
   * `-a` to not launch the OAI5G pods by default.
   * `-s slicename` to provide the slicename that you used to book the platform, which by default is *`inria_sopnode`*.
-  * 
 
-For instance, if your slicename is `inria_sc` and you have not yet loaded the k8s images on the R2lab nodes, to run all the steps described above, you only have to run the following command on your laptop:
+For instance, if your slicename is `inria_sc` and you have not yet loaded the images on the R2lab nodes, to run a scenario with a AW2S jaguar RRU and a single UE (qhat02) without logs generated, you should run the following command on your laptop:
 
 ```bash
-$ ./demo-oai.py -s inria_sc
+$ ./demo-oai.py -s inria_sc -l -R jaguar -q1
 ```
 
-Using the `-R` option, you can select the type of RRU to be used in the scenario. Currently on R2lab, the gnb can be either a USRP B210, a USRP N300, a USRP N320, a AW2S Jaguar, a AW2S Panther or you can choose to use instead the OAI5G RF simulator. Note that the gnb configuration file name is specified within the **demo-oai.sh** script and all the gnb configuration files are located in the **oai5g-rru/ran-config/conf/** directory. Gnb k8s charts are located in the **oai5g-rru/ran-config/charts/** directory.
+The oai-gnb pod can be configured with either a USRP B210, a USRP N300, a USRP N320, a AW2S Jaguar, a AW2S Panther or you can choose to use instead the OAI5G RF simulator. 
 
-We added the two following options to be used only when the demo-oai.py script has already run at least once, i.e., when R2lab nodes have joined the k8s cluster and OAI5G setup is ready for R2lab:
+Note that the gnb configuration file name is set within the **demo-oai.sh** script and all the gnb configuration files are located in the **oai5g-rru/ran-config/conf/** directory on the R2lab node used used to control OAI5G pods deployment. Also, gNB k8s charts are located in the **oai5g-rru/ran-config/charts/** directory.
+
+The two following options should be used only when the demo-oai.py script has already run at least once, i.e., when R2lab nodes have joined the k8s cluster and OAI5G setup is configured:
 
 * `--stop` to remove all OAI5G pods. 
-* `--start` to launch again all OAI5G pods with same configuration as before.
+* `--start` to launch again all OAI5G pods as configured before.
 
 The two above steps can also be done directly on *fit11* worker node:
 
 ```
-root@fit11# ./demo-oai.sh stop
-root@fit11# ./demo-oai.sh start
+root@fit11# /root/demo-oai.sh stop
+root@fit11# /root/demo-oai.sh start
 ```
 
 Note that the *demo-oai.sh* script allows to start/stop specific part of OAI5G pods using the options *start-cn, start-gnb, start-ue, stop-cn, stop-gnb* and *stop-ue*.
@@ -180,9 +186,9 @@ Now, assume that you want to restart the demo with some changes in the CN chart 
 
 * Stop the previous test ``` ./demo-oai.py --stop```
 * Make your changes on *fit11* in configuration file */root/demo-oai.sh*. (If the CN parameters you want to change are not in script */root/demo-oai.sh*, you can directly change chart file */root/oai-cn5g-fed/charts/oai-5g-core/oai-5g-basic/values.yaml*.) Then run on your laptop:
-* ``` ./demo-oai.py --namespace oai5g_v2 -k```
+* ``` ./demo-oai.py --namespace oai5g_v2 ```
 
-The latter command will take into account your changes to reconfigure the charts, and will then launch the OAI5G pods on the *oai5g_v2* namespace. The "-k" option is used to prevent R2lab worker nodes to leave and join the k8s cluster, which takes about 2 minutes to complete...
+The latter command will take into account your changes to reconfigure the charts, and will then launch the OAI5G pods on the *oai5g_v2* namespace. 
 
 Note that we don't use "--start" option in this case as this option skips the reconfiguration step. 
 
@@ -274,7 +280,7 @@ INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singl
 
 ```
 
-Before running the oai-gnb pod, you should check that you have the following route *172.22.10.0/24* set to reach the AMF.
+Before running the oai-gnb pod, you can check that you have the following route *172.22.10.0/24* set to reach the AMF.
 
 Then, log on the k8s worker node and start the oai-gnb pod:
 
