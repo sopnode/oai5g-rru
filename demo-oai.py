@@ -91,7 +91,7 @@ default_regcred_email = 'r2labuser@turletti.com'
 
 
 def run(*, mode, gateway, slicename, master, namespace, logs,
-        pcap, auto_start, gnb_only, load_images, k8s_reset,
+        pcap, auto_start, gnb_only, load_images, 
         k8s_fit, amf_spgwu, gnb, phones, quectel_nodes, qhat_nodes, rru, 
         regcred_name, regcred_password, regcred_email,
         image, quectel_image, verbose, dry_run, demo_tag, charts_tag):
@@ -106,7 +106,6 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         auto_start: pods will be launched
         gnb_only: OAI5G cn pods will not be started/stopped
         load_images: FIT images will be deployed
-        k8s_reset: with k8s deployment
         k8s_fit: FIT node number attached to the k8s cluster as worker node
         amf_spgwu: node name in which amf and spgwu-tiny will be deployed
         gnb: node name in which oai-gnb will be deployed
@@ -276,13 +275,8 @@ Nota: If you are done with the demo, do not forget to clean up the k8s {master} 
             ok_message = f"RUN SetUp OK. You can now start the demo by running ./demo-oai.py --master {master} --start"
         else:
             ok_message = f"RUN SetUp and demo started OK. You can now check the kubectl logs on the k8s {master} cluster."
-        if not k8s_reset:
-            for job in j_leave_joins:
-                scheduler.bypass_and_remove(job)
-            purpose += " (k8s reset SKIPPED)"
-        else:
-            purpose += " (k8s RESET)"
-
+        for job in j_leave_joins:
+            scheduler.bypass_and_remove(job)
 
     # add this job as a requirement for all scenarios
     check_lease = SshJob(
@@ -375,11 +369,6 @@ def main():
         "--gnb-only", default=False,
         action='store_true', dest='gnb_only',
         help="default is to manage not only gnb but also CN pods")
-
-    parser.add_argument(
-        "-k", "--no-k8s-reset", default=True,
-	action='store_false', dest='k8s_reset',
-	help="default is to reset k8s before setup")
 
     parser.add_argument(
         "-l", "--load-images", default=False, action='store_true',
@@ -564,7 +553,7 @@ def main():
         regcred_password=args.regcred_password,
         regcred_email=args.regcred_email,
         dry_run=args.dry_run, verbose=args.verbose, image=args.image,
-        quectel_image=args.quectel_image, k8s_reset=args.k8s_reset,
+        quectel_image=args.quectel_image, 
         demo_tag=args.demo_tag, charts_tag=args.charts_tag)
 
 
