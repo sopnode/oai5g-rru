@@ -62,7 +62,7 @@ default_quectel_image = 'quectel-mbim-single-dnn'
 
 # This script uses one R2lab FIT node as a k8s worker attached to the cluster
 # in order to launch the scenario 
-default_k8s_fit = 11
+default_k8s_fit = 1
 
 # Default FIT node used to run oai-gnb with USRP B210
 default_b210_node = 2
