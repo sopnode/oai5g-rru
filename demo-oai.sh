@@ -266,16 +266,16 @@ function gener-mac()
 	    *)  PREFIX=$PREFIX"02:";;
 	esac
 	case $NODE_AMF_SGPWU in
-	    "sopnode-l1.inria.fr")
+	    "sopnode-l1-v100")
 		PREFIX=$PREFIX"00:";;
-	    "sopnode-w1.inria.fr")
+	    "sopnode-w1-v100")
 		PREFIX=$PREFIX"01:";;
 	    *)  PREFIX=$PREFIX"02:";;
 	esac
 	case $NODE_GNB in
-	    "sopnode-l1.inria.fr")
+	    "sopnode-l1-v100")
 		PREFIX=$PREFIX"00:";;	
-	    "sopnode-w1.inria.fr")
+	    "sopnode-w1-v100")
 		PREFIX=$PREFIX"01:";;	
 	    *)  PREFIX=$PREFIX"02:";;
 	esac
@@ -707,13 +707,7 @@ function configure-all() {
 
 
 function start-cn() {
-    ns=$1
-    shift
-    node_amf_spgwu=$1
-    shift
-
     echo "Running start-cn() with namespace=$NS, NODE_AMF_SPGWU=$NODE_AMF_SPGWU"
-
     echo "cd $OAI5G_BASIC"
     cd "$OAI5G_BASIC"
 
@@ -788,10 +782,6 @@ EOF
 #################################################################################
 
 function start-nr-ue() {
-    ns=$1
-    shift
-    node_gnb=$1
-    shift
 
     echo "Running start-nr-ue() on namespace: $NS, NODE_GNB=$NODE_GNB"
     echo "cd $OAI5G_RAN"

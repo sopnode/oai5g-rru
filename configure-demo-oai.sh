@@ -15,8 +15,8 @@ RFSIM_IMSI="001010000001121" # default is "208950000001121"
 
 function update() {
     NS=$1; shift
-    NODE_AMF_SPGWU=$1; shift
-    NODE_GNB=$1; shift
+    NODE_AMF_SPGWU=$1"-v100"; shift
+    NODE_GNB=$1"-v100"; shift
     RRU=$1; shift 
     GNB_ONLY=$1; shift # boolean in [true, false]
     LOGS=$1; shift # boolean in [true, false]
