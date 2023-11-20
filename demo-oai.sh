@@ -951,7 +951,7 @@ function stop() {
         echo "OAI5G demo is not running, there is no pod on namespace $NS !"
     fi
 
-    echo "Wait until all $NS pods disppear"
+    echo "Wait until all $NS pods disappear"
     kubectl delete pods -n $NS --all --wait --cascade=foreground
 
     if [[ "$LOGS" = "true" ]]; then

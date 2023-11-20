@@ -469,6 +469,11 @@ def main():
 
 
     args = parser.parse_args()
+
+    if args.gnb.isdigit():
+        print("USAGE: use full node name with --gnb option, like fit01 or pc02")
+        exit (1)
+        
     print(f"Running tag {args.demo_tag} of demo-oai and tag {args.charts_tag} of OAI5G charts")
     if args.devel:
         args.master = K8S_MASTER_DEVEL
