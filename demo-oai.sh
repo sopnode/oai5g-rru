@@ -46,7 +46,7 @@ OAISA_REPO="docker.io/oaisoftwarealliance"
 P99="192.168.99"
 P100="192.168.100"
 SUBNET_N2N3="$P99"
-IF_NAME_N2N3="eth2" # for instance...
+IF_NAME_N2N3="eth4"
 
 # Interfaces names of VLANs in sopnode servers
 IF_NAME_VLAN100="eth4.100"
