@@ -49,7 +49,7 @@ SUBNET_N2N3="$P99"
 IF_NAME_N2N3="eth2" # for instance...
 
 # Interfaces names of VLANs in sopnode servers
-IF_NAME_VLAN100="eth4"
+IF_NAME_VLAN100="eth4-100"
 #IF_NAME_VLAN100="eth5"
 #IF_NAME_VLAN100="p4-net"
 IF_NAME_VLAN10="eth4-10"
