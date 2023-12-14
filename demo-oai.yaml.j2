@@ -63,8 +63,11 @@ jobs:
     node: faraday
     critical: True
     verbose: {{verbose}}
-    label: prepare RRU device
+    label: load image {{image}} on FIT worker node and possibly {{nodes['gnb']}}, then prepare RRU device
     commands:
+      - type: Run
+        command: >
+          rhubarbe load -i {{image}} {{nodes['k8s_fit']}} {{nodes['gnb']}}
       - type: Run
         command: >
   {% if rru == "b210" %}    
