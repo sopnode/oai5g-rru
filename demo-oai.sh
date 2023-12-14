@@ -48,13 +48,13 @@ P100="192.168.100"
 SUBNET_N2N3="$P99"
 IF_NAME_N2N3="eth2" # for instance...
 
-# Interfaces names of VLANs in sopnode servers (not virtual interface, e.g., not "eth4.100", but its parent, "eth4")
-IF_NAME_VLAN100="eth4"
+# Interfaces names of VLANs in sopnode servers
+IF_NAME_VLAN100="eth4.100"
 #IF_NAME_VLAN100="eth5"
 #IF_NAME_VLAN100="p4-net"
-IF_NAME_VLAN10="eth4"
+IF_NAME_VLAN10="eth4.10"
 #IF_NAME_VLAN10="p4-net-10"
-IF_NAME_VLAN20="eth4"
+IF_NAME_VLAN20="eth4.20"
 #IF_NAME_VLAN20="p4-net-20"
 
 ############################### oai-cn5g chart parameters ########################
@@ -265,7 +265,7 @@ function gener-mac()
     if [ ! -f "$PREFIXfile" ]; then
 	PREFIX="12:34:"
 	case $IF_NAME_VLAN100 in
-	    "eth5")
+	    "eth4")
 		PREFIX=$PREFIX"00:";;
 	    "p4-net")
 		PREFIX=$PREFIX"01:";;
