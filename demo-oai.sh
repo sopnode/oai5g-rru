@@ -43,10 +43,13 @@ PREFIX_DEMO="@DEF_PREFIX_DEMO@" # Directory in which all scripts will be copied 
 ##################################################################################
 PREFIX_STATS="/tmp/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance"
+P99="192.168.99"
 P100="192.168.100"
+SUBNET_N2N3="$P99"
+IF_NAME_N2N3="eth2" # for instance...
 
 # Interfaces names of VLANs in sopnode servers
-IF_NAME_VLAN100="eth4-100"
+IF_NAME_VLAN100="eth4"
 #IF_NAME_VLAN100="eth5"
 #IF_NAME_VLAN100="p4-net"
 IF_NAME_VLAN10="eth4-10"
@@ -107,11 +110,11 @@ AMF_TAG="${CN_TAG}"
 #
 MULTUS_AMF_N2="$MULTUS_CREATE"
 #IP_AMF_N2="$P100.241"
-IP_AMF_N2="192.168.99.1"
+IP_AMF_N2="$SUBNET_N2N3.1"
 NETMASK_AMF_N2="24"
 GW_AMF_N2=""
 ROUTES_AMF_N2=""
-IF_NAME_AMF_N2="$IF_NAME_VLAN100" 
+IF_NAME_AMF_N2="$IF_NAME_N2N3" 
 
 #### oai-spgwu-tiny chart definitions ####
 OAI5G_SPGWU="$OAI5G_CORE/oai-spgwu-tiny"
@@ -122,11 +125,11 @@ SPGWU_TAG="rocky-test90"
 #
 MULTUS_SPGWU_N3="$MULTUS_CREATE"
 #IP_SPGWU_N3="$P100.242" 
-IP_SPGWU_N3="192.168.99.2" 
+IP_SPGWU_N3="$SUBNET_N2N3.2" 
 NETMASK_SPGWU_N3="24"
 GW_SPGWU_N3=""
 ROUTES_SPGWU_N3=""
-IF_NAME_SPGWU_N3="$IF_NAME_VLAN100"
+IF_NAME_SPGWU_N3="$IF_NAME_N2N3"
 #
 MULTUS_SPGWU_N4="false"
 IP_SPGWU_N4="" 
@@ -163,8 +166,8 @@ RAN_TAG="2023.w37"
 #RAN_TAG="2023.w19"
 GNB_NAME="gNB-r2lab"
 #IP_GNB_N2N3="$P100.243"
-IP_GNB_N2N3="192.168.99.3"
-IF_NAME_GNB_N2="$IF_NAME_VLAN100"
+IP_GNB_N2N3="$SUBNET_N2N3.3"
+IF_NAME_GNB_N2="$IF_NAME_N2N3"
 IF_NAME_GNB_N3="" # unused for current scenario with same PHY network interface for N2/N3
 NETMASK_GNB_N2="24"
 NETMASK_GNB_N3=""
@@ -227,9 +230,9 @@ OAI5G_NRUE="$OAI5G_CORE/oai-nr-ue"
 NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
 NRUE_TAG="${RAN_TAG}"
 OPTIONS_NRUE="--sa -E --rfsim -r 106 --numerology 1 -C 3319680000 --nokrnmod --log_config.global_log_options level,nocolor,time"
-IP_NRUE="192.168.99.4"
+IP_NRUE="$SUBNET_N2N3.4"
 NETMASK_NRUE="24"
-IF_NAME_NRUE="$IF_NAME_VLAN100"
+IF_NAME_NRUE="$IF_NAME_N2N3"
 
 ###################### Scenario with External Core Network #######################
 
