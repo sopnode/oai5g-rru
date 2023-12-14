@@ -67,10 +67,8 @@ jobs:
     commands:
       - type: Run
         command: >
-          rhubarbe load -i {{image}} {{nodes['k8s_fit']}} {{nodes['gnb']}}
-      - type: Run
-        command: >
   {% if rru == "b210" %}    
+          rhubarbe load -i {{image}} {{nodes['k8s_fit']}} {{nodes['gnb']}}
     {% if nodes['gnb'] == "pc01" %}
           rhubarbe wait {{nodes['k8s_fit']}};
           rhubarbe pdu on usrp01
@@ -82,6 +80,7 @@ jobs:
           rhubarbe usrpon {{nodes['gnb']}}
     {% endif %}
   {% else %}
+          rhubarbe load -i {{image}} {{nodes['k8s_fit']}}
           rhubarbe wait {{nodes['k8s_fit']}};
   {% if rru != "rfsim" %}
           rhubarbe-pdu on {{rru}}
