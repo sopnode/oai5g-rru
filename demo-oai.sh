@@ -882,7 +882,7 @@ function run-ping() {
 
 function stop-cn(){
     echo "helm --namespace=$NS uninstall oai-5g-basic"
-    helm --namespace=$NS install oai-5g-basic 
+    helm --namespace=$NS uninstall oai-5g-basic 
 }
 
 
