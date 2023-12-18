@@ -21,7 +21,7 @@ function usage() {
 # Following parameters automatically set by configure-demo-oai.sh script
 # do not change them here !
 NS="@DEF_NS@" # k8s namespace
-NODE_AMF_SPGWU="@DEF_NODE_AMF_SPGWU@" # node in wich run amf and spgwu pods
+NODE_AMF_UPF="@DEF_NODE_AMF_UPF@" # node in wich run amf and upf pods
 NODE_GNB="@DEF_NODE_GNB@" # node in which gnb pod runs
 RRU="@DEF_RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
 GNB_ONLY="@DEF_GNB_ONLY@" # boolean, true if only RAN pods are launched
@@ -118,34 +118,34 @@ GW_AMF_N2=""
 ROUTES_AMF_N2=""
 IF_NAME_AMF_N2="$IF_NAME_N2N3" 
 
-#### oai-spgwu-tiny chart definitions ####
-#OAI5G_SPGWU="$OAI5G_CORE/oai-spgwu-tiny"
-#SPGWU_REPO="docker.io/r2labuser/oai-spgwu-tiny"
-#SPGWU_TAG="rocky-test90"
-#SPGWU_REPO="${OAISA_REPO}/oai-spgwu-tiny"
-#SPGWU_TAG="${CN_TAG}"
+#### oai-upf chart definitions ####
+#OAI5G_UPF="$OAI5G_CORE/oai-upf"
+#UPF_REPO="docker.io/r2labuser/oai-upf"
+#UPF_TAG="rocky-test90"
+#UPF_REPO="${OAISA_REPO}/oai-upf"
+#UPF_TAG="${CN_TAG}"
 #
-MULTUS_SPGWU_N3="$MULTUS_CREATE"
-#IP_SPGWU_N3="$P100.242" 
-IP_SPGWU_N3="$SUBNET_N2N3.2" 
-NETMASK_SPGWU_N3="24"
-GW_SPGWU_N3=""
-ROUTES_SPGWU_N3=""
-IF_NAME_SPGWU_N3="$IF_NAME_N2N3"
+MULTUS_UPF_N3="$MULTUS_CREATE"
+#IP_UPF_N3="$P100.242" 
+IP_UPF_N3="$SUBNET_N2N3.2" 
+NETMASK_UPF_N3="24"
+GW_UPF_N3=""
+ROUTES_UPF_N3=""
+IF_NAME_UPF_N3="$IF_NAME_N2N3"
 #
-MULTUS_SPGWU_N4="false"
-IP_SPGWU_N4="" 
-NETMASK_SPGWU_N4=""
-GW_SPGWU_N4=""
-ROUTES_SPGWU_N4=""
-IF_NAME_SPGWU_N4=""
+MULTUS_UPF_N4="false"
+IP_UPF_N4="" 
+NETMASK_UPF_N4=""
+GW_UPF_N4=""
+ROUTES_UPF_N4=""
+IF_NAME_UPF_N4=""
 #
-MULTUS_SPGWU_N6="false"
-IP_SPGWU_N6="" 
-NETMASK_SPGWU_N6=""
-GW_SPGWU_N6=""
-ROUTES_SPGWU_N6=""
-IF_NAME_SPGWU_N6="" 
+MULTUS_UPF_N6="false"
+IP_UPF_N6="" 
+NETMASK_UPF_N6=""
+GW_UPF_N6=""
+ROUTES_UPF_N6=""
+IF_NAME_UPF_N6="" 
 
 #### oai-smf chart definitions ####
 #OAI5G_SMF="$OAI5G_CORE/oai-smf"
@@ -338,29 +338,29 @@ s|@MAC_AMF_N2@|$(gener-mac)|
 s|@GW_AMF_N2@|$GW_AMF_N2|
 s|@ROUTES_AMF_N2@|$ROUTES_AMF_N2|
 s|@IF_NAME_AMF_N2@|$IF_NAME_AMF_N2|
-s|@NODE_AMF@|"$NODE_AMF_SPGWU"|
-s|@MULTUS_SPGWU_N3@|$MULTUS_SPGWU_N3|
-s|@IP_SPGWU_N3@|$IP_SPGWU_N3|
-s|@NETMASK_SPGWU_N3@|$NETMASK_SPGWU_N3|
-s|@MAC_SPGWU_N3@|$(gener-mac)|
-s|@GW_SPGWU_N3@|$GW_SPGWU_N3|
-s|@ROUTES_SPGWU_N3@|$ROUTES_SPGWU_N3|
-s|@IF_NAME_SPGWU_N3@|$IF_NAME_SPGWU_N3|
-s|@MULTUS_SPGWU_N4@|$MULTUS_SPGWU_N4|
-s|@IP_SPGWU_N4@|$IP_SPGWU_N4|
-s|@NETMASK_SPGWU_N4@|$NETMASK_SPGWU_N4|
-s|@MAC_SPGWU_N4@|$(gener-mac)|
-s|@GW_SPGWU_N4@|$GW_SPGWU_N4|
-s|@ROUTES_SPGWU_N4@|$ROUTES_SPGWU_N4|
-s|@IF_NAME_SPGWU_N4@|$IF_NAME_SPGWU_N4|
-s|@MULTUS_SPGWU_N6@|$MULTUS_SPGWU_N6|
-s|@IP_SPGWU_N6@|$IP_SPGWU_N6|
-s|@NETMASK_SPGWU_N6@|$NETMASK_SPGWU_N6|
-s|@MAC_SPGWU_N6@|$(gener-mac)|
-s|@GW_SPGWU_N6@|$GW_SPGWU_N6|
-s|@ROUTES_SPGWU_N6@|$ROUTES_SPGWU_N6|
-s|@IF_NAME_SPGWU_N6@|$IF_NAME_SPGWU_N6|
-s|@NODE_SPGWU@|"$NODE_AMF_SPGWU"|
+s|@NODE_AMF@|"$NODE_AMF_UPF"|
+s|@MULTUS_UPF_N3@|$MULTUS_UPF_N3|
+s|@IP_UPF_N3@|$IP_UPF_N3|
+s|@NETMASK_UPF_N3@|$NETMASK_UPF_N3|
+s|@MAC_UPF_N3@|$(gener-mac)|
+s|@GW_UPF_N3@|$GW_UPF_N3|
+s|@ROUTES_UPF_N3@|$ROUTES_UPF_N3|
+s|@IF_NAME_UPF_N3@|$IF_NAME_UPF_N3|
+s|@MULTUS_UPF_N4@|$MULTUS_UPF_N4|
+s|@IP_UPF_N4@|$IP_UPF_N4|
+s|@NETMASK_UPF_N4@|$NETMASK_UPF_N4|
+s|@MAC_UPF_N4@|$(gener-mac)|
+s|@GW_UPF_N4@|$GW_UPF_N4|
+s|@ROUTES_UPF_N4@|$ROUTES_UPF_N4|
+s|@IF_NAME_UPF_N4@|$IF_NAME_UPF_N4|
+s|@MULTUS_UPF_N6@|$MULTUS_UPF_N6|
+s|@IP_UPF_N6@|$IP_UPF_N6|
+s|@NETMASK_UPF_N6@|$NETMASK_UPF_N6|
+s|@MAC_UPF_N6@|$(gener-mac)|
+s|@GW_UPF_N6@|$GW_UPF_N6|
+s|@ROUTES_UPF_N6@|$ROUTES_UPF_N6|
+s|@IF_NAME_UPF_N6@|$IF_NAME_UPF_N6|
+s|@NODE_UPF@|"$NODE_AMF_UPF"|
 s|@MULTUS_SMF_N4@|$MULTUS_SMF_N4|
 s|@IP_SMF_N4@|$IP_SMF_N4|
 s|@NETMASK_SMF_N4@|$NETMASK_SMF_N4|
@@ -680,7 +680,7 @@ EOF
 
 function configure-all() {
     echo "configure-all: Applying SophiaNode patches to OAI5G charts located on "$PREFIX_DEMO"/oai-cn5g-fed"
-    echo -e "\t with oai-spgwu-tiny running on $NODE_AMF_SPGWU"
+    echo -e "\t with oai-upf running on $NODE_AMF_UPF"
     echo -e "\t with oai-gnb running on $NODE_GNB"
     echo -e "\t with generate-logs: $LOGS"
     echo -e "\t with generate-pcap: $PCAP"
@@ -704,7 +704,7 @@ function configure-all() {
 
 
 function start-cn() {
-    echo "Running start-cn() with namespace=$NS, NODE_AMF_SPGWU=$NODE_AMF_SPGWU"
+    echo "Running start-cn() with namespace=$NS, NODE_AMF_UPF=$NODE_AMF_UPF"
     echo "cd $OAI5G_BASIC"
     cd "$OAI5G_BASIC"
 
@@ -892,9 +892,9 @@ function run-ping() {
 #################################################################################
 
 function stop-cn(){
-    echo "helm -n $NS uninstall oai-spgwu-tiny oai-nrf oai-udr oai-udm oai-ausf oai-smf oai-amf mysql"
+    echo "helm -n $NS uninstall oai-upf oai-nrf oai-udr oai-udm oai-ausf oai-smf oai-amf mysql"
     helm -n $NS uninstall oai-smf
-    helm -n $NS uninstall oai-spgwu-tiny
+    helm -n $NS uninstall oai-upf
     helm -n $NS uninstall oai-amf
     helm -n $NS uninstall oai-ausf
     helm -n $NS uninstall oai-udm
@@ -995,10 +995,10 @@ SMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-sm
 echo -e "\t - Retrieving logs for oai-smf $SMF_POD_NAME running with IP $SMF_eth0_IP"
 kubectl --namespace $NS -c smf logs $SMF_POD_NAME > "$prefix"/smf-"$DATE".logs
 
-SPGWU_TINY_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-spgwu-tiny,app.kubernetes.io/instance=oai-spgwu-tiny" -o jsonpath="{.items[0].metadata.name}")
-SPGWU_TINY_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-spgwu-tiny,app.kubernetes.io/instance=oai-spgwu-tiny" -o jsonpath="{.items[*].status.podIP}")
-echo -e "\t - Retrieving logs for oai-spgwu-tiny $SPGWU_TINY_POD_NAME running with IP $SPGWU_TINY_eth0_IP"
-kubectl --namespace $NS -c spgwu logs $SPGWU_TINY_POD_NAME > "$prefix"/spgwu-tiny-"$DATE".logs
+UPF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-upf" -o jsonpath="{.items[0].metadata.name}")
+UPF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-upf" -o jsonpath="{.items[*].status.podIP}")
+echo -e "\t - Retrieving logs for oai-upf $UPF_POD_NAME running with IP $UPF_eth0_IP"
+kubectl --namespace $NS -c upf logs $UPF_POD_NAME > "$prefix"/upf-"$DATE".logs
 
 UDM_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-udm" -o jsonpath="{.items[0].metadata.name}")
 UDM_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-udm" -o jsonpath="{.items[*].status.podIP}")
