@@ -32,7 +32,7 @@ MCC="@DEF_MCC@"
 MNC="@DEF_MNC@"
 DNN="@DEF_DNN@"
 TAC="@DEF_TAC@"
-SST0="@DEF_SST0@"
+################SST0="@DEF_SST0@"
 FULL_KEY="@DEF_FULL_KEY@"
 OPC="@DEF_OPC@"
 RFSIM_IMSI="@DEF_RFSIM_IMSI@"
@@ -82,31 +82,33 @@ fi
 
 CN_DEFAULT_GW=""
 
+####################################### TO REMOVE FROM HERE...
 #### mysql chart definitions ####
-MYSQL_REPO="docker.io/mysql"
-MYSQL_TAG="8.0" #previous 5.7 has issues on Rocky sopnode-w1 cluster with docker runtime
+#MYSQL_REPO="docker.io/mysql"
+#MYSQL_TAG="8.0" #previous 5.7 has issues on Rocky sopnode-w1 cluster with docker runtime
 
 #### nrf-amf chart definitions ####
-NRF_REPO="${OAISA_REPO}/oai-nrf"
-NRF_TAG="${CN_TAG}"
+#NRF_REPO="${OAISA_REPO}/oai-nrf"
+#NRF_TAG="${CN_TAG}"
 
 #### oai-udr chart definitions ####
-UDR_REPO="${OAISA_REPO}/oai-udr"
-UDR_TAG="${CN_TAG}"
+#UDR_REPO="${OAISA_REPO}/oai-udr"
+#UDR_TAG="${CN_TAG}"
 
 #### oai-udm chart definitions ####
-UDM_REPO="${OAISA_REPO}/oai-udm"
-UDM_TAG="${CN_TAG}"
+#UDM_REPO="${OAISA_REPO}/oai-udm"
+#UDM_TAG="${CN_TAG}"
 
 #### nrf-ausf chart definitions ####
-OAI5G_AUSF="$OAI5G_CORE/oai-ausf"
-AUSF_REPO="${OAISA_REPO}/oai-ausf"
-AUSF_TAG="${CN_TAG}"
+#OAI5G_AUSF="$OAI5G_CORE/oai-ausf"
+#AUSF_REPO="${OAISA_REPO}/oai-ausf"
+#AUSF_TAG="${CN_TAG}"
+
 
 #### oai-amf chart definitions ####
-OAI5G_AMF="$OAI5G_CORE/oai-amf"
-AMF_REPO="${OAISA_REPO}/oai-amf"
-AMF_TAG="${CN_TAG}"
+#OAI5G_AMF="$OAI5G_CORE/oai-amf"
+#AMF_REPO="${OAISA_REPO}/oai-amf"
+#AMF_TAG="${CN_TAG}"
 #
 MULTUS_AMF_N2="$MULTUS_CREATE"
 #IP_AMF_N2="$P100.241"
@@ -117,9 +119,9 @@ ROUTES_AMF_N2=""
 IF_NAME_AMF_N2="$IF_NAME_N2N3" 
 
 #### oai-spgwu-tiny chart definitions ####
-OAI5G_SPGWU="$OAI5G_CORE/oai-spgwu-tiny"
-SPGWU_REPO="docker.io/r2labuser/oai-spgwu-tiny"
-SPGWU_TAG="rocky-test90"
+#OAI5G_SPGWU="$OAI5G_CORE/oai-spgwu-tiny"
+#SPGWU_REPO="docker.io/r2labuser/oai-spgwu-tiny"
+#SPGWU_TAG="rocky-test90"
 #SPGWU_REPO="${OAISA_REPO}/oai-spgwu-tiny"
 #SPGWU_TAG="${CN_TAG}"
 #
@@ -146,9 +148,9 @@ ROUTES_SPGWU_N6=""
 IF_NAME_SPGWU_N6="" 
 
 #### oai-smf chart definitions ####
-OAI5G_SMF="$OAI5G_CORE/oai-smf"
-SMF_REPO="${OAISA_REPO}/oai-smf"
-SMF_TAG="${CN_TAG}"
+#OAI5G_SMF="$OAI5G_CORE/oai-smf"
+#SMF_REPO="${OAISA_REPO}/oai-smf"
+#SMF_TAG="${CN_TAG}"
 MULTUS_SMF_N4="false"
 IP_SMF_N4="" 
 NETMASK_SMF_N4=""
@@ -157,7 +159,7 @@ ROUTES_SMF_N4=""
 IF_NAME_SMF_N4="" 
 IP_DNS1="138.96.0.210"
 IP_DNS2="193.51.196.138"
-IP_CSCF="127.0.0.1" # unused but without seting an IP, the SMF pod crashes!
+IP_CSCF="127.0.0.1" # unused but without setting an IP, the SMF pod crashes!
 
 ################################ oai-gnb chart parameters ########################
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
@@ -323,27 +325,12 @@ function configure-oai-5g-basic() {
     # if $LOGS is true, create a tcpdump container with privileges
     # if $PCAP is true, start tcpdump and create a shared volume to store pcap
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
-    cat > /tmp/basic-r2lab.sed <<EOF
+    cat > /tmp/basic-values.sed <<EOF
 s|@PRIVILEGED@|$LOGS|
 s|@TCPDUMP_CONTAINER@|$LOGS|
 s|@START_TCPDUMP@|$PCAP|
 s|@SHAREDVOLUME@|$PCAP|
 s|@CN_DEFAULT_GW@|$CN_DEFAULT_GW|
-s|@NSSAI_SST0@|$SST0|
-s|@NSSAI_SD0@|0xFFFFFF|
-s|@DNN0@|$DNN|
-s|@MYSQL_REPO@|$MYSQL_REPO|
-s|@MYSQL_TAG@|$MYSQL_TAG|
-s|@NRF_REPO@|${NRF_REPO}|
-s|@NRF_TAG@|${NRF_TAG}|
-s|@UDR_REPO@|${UDR_REPO}|
-s|@UDR_TAG@|${UDR_TAG}|
-s|@UDM_REPO@|${UDM_REPO}|
-s|@UDM_TAG@|${UDM_TAG}|
-s|@AUSF_REPO@|${AUSF_REPO}|
-s|@AUSF_TAG@|${AUSF_TAG}|
-s|@AMF_REPO@|${AMF_REPO}|
-s|@AMF_TAG@|${AMF_TAG}|
 s|@MULTUS_AMF_N2@|$MULTUS_AMF_N2|
 s|@IP_AMF_N2@|$IP_AMF_N2|
 s|@NETMASK_AMF_N2@|$NETMASK_AMF_N2|
@@ -351,13 +338,7 @@ s|@MAC_AMF_N2@|$(gener-mac)|
 s|@GW_AMF_N2@|$GW_AMF_N2|
 s|@ROUTES_AMF_N2@|$ROUTES_AMF_N2|
 s|@IF_NAME_AMF_N2@|$IF_NAME_AMF_N2|
-s|@IF_N2@|$IF_N2|
-s|@MCC@|$MCC|
-s|@MNC@|$MNC|
-s|@TAC@|0x0001|
 s|@NODE_AMF@|"$NODE_AMF_SPGWU"|
-s|@SPGWU_REPO@|${SPGWU_REPO}|
-s|@SPGWU_TAG@|${SPGWU_TAG}|
 s|@MULTUS_SPGWU_N3@|$MULTUS_SPGWU_N3|
 s|@IP_SPGWU_N3@|$IP_SPGWU_N3|
 s|@NETMASK_SPGWU_N3@|$NETMASK_SPGWU_N3|
@@ -379,12 +360,7 @@ s|@MAC_SPGWU_N6@|$(gener-mac)|
 s|@GW_SPGWU_N6@|$GW_SPGWU_N6|
 s|@ROUTES_SPGWU_N6@|$ROUTES_SPGWU_N6|
 s|@IF_NAME_SPGWU_N6@|$IF_NAME_SPGWU_N6|
-s|@IF_N3@|$IF_N3|
-s|@IF_N4@|$IF_N4|
-s|@IF_N6@|$IF_N6|
 s|@NODE_SPGWU@|"$NODE_AMF_SPGWU"|
-s|@SMF_REPO@|${SMF_REPO}|
-s|@SMF_TAG@|${SMF_TAG}|
 s|@MULTUS_SMF_N4@|$MULTUS_SMF_N4|
 s|@IP_SMF_N4@|$IP_SMF_N4|
 s|@NETMASK_SMF_N4@|$NETMASK_SMF_N4|
@@ -392,16 +368,31 @@ s|@MAC_SMF_N4@|$(gener-mac)|
 s|@GW_SMF_N4@|$GW_SMF_N4|
 s|@ROUTES_SMF_N4@|$ROUTES_SMF_N4|
 s|@IF_NAME_SMF_N4@|$IF_NAME_SMF_N4|
-s|@IP_DNS1@|$IP_DNS1|
-s|@IP_DNS2@|$IP_DNS2|
-s|@IP_CSCF@|$IP_CSCF|
 s|@NODE_SMF@||
 EOF
     cp "$OAI5G_BASIC"/values.yaml /tmp/basic_values.yaml-orig
     echo "(Over)writing $OAI5G_BASIC/values.yaml"
-    sed -f /tmp/basic-r2lab.sed < /tmp/basic_values.yaml-orig > "$OAI5G_BASIC"/values.yaml
+    sed -f /tmp/basic-values.sed < /tmp/basic_values.yaml-orig > "$OAI5G_BASIC"/values.yaml
     diff /tmp/basic_values.yaml-orig "$OAI5G_BASIC"/values.yaml
-        
+
+    echo "Configuring chart $OAI5G_BASIC/config.yaml for R2lab"
+    cat > /tmp/basic-config.sed <<EOF
+s|@IF_N2@|$IF_N2|
+s|@IF_N3@|$IF_N3|
+s|@IF_N4@|$IF_N4|
+s|@IF_N6@|$IF_N6|
+s|@MCC@|$MCC|
+s|@MNC@|$MNC|
+s|@TAC@|0x0001|
+s|@DNN0@|$DNN|
+s|@IP_DNS1@|$IP_DNS1|
+s|@IP_DNS2@|$IP_DNS2|
+EOF
+    cp "$OAI5G_BASIC"/config.yaml /tmp/basic_config.yaml-orig
+    echo "(Over)writing $OAI5G_BASIC/config.yaml"
+    sed -f /tmp/basic-config.sed < /tmp/basic_config.yaml-orig > "$OAI5G_BASIC"/config.yaml
+    diff /tmp/basic_config.yaml-orig "$OAI5G_BASIC"/config.yaml
+    
     cd "$OAI5G_BASIC"
     echo "helm dependency update"
     helm dependency update
