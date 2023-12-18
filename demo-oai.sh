@@ -426,7 +426,6 @@ function configure-gnb() {
 
     SED_CONF_FILE="/tmp/gnb_conf.sed"
     SED_VALUES_FILE="/tmp/oai-gnb-values.sed"
-    SED_DEPLOYMENT_FILE="/tmp/oai-gnb-deployment.sed"
 
     # Configure parameters for values.yaml chart according to RRU type
     if [[ "$RRU" = "b210" ]]; then
@@ -544,7 +543,6 @@ function configure-gnb() {
 	awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
 	# Append the modified gnb.conf to /tmp/configmap.yaml
 	cat /tmp/gnb.conf >> /tmp/configmap.yaml
-	echo -e "\n{{- end }}\n" >> /tmp/configmap.yaml
 	mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
 	echo "First configure gnb.conf within configmap.yaml"
