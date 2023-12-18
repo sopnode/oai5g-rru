@@ -881,15 +881,8 @@ function run-ping() {
 #################################################################################
 
 function stop-cn(){
-    echo "helm -n $NS uninstall oai-upf oai-nrf oai-udr oai-udm oai-ausf oai-smf oai-amf mysql"
-    helm -n $NS uninstall oai-smf
-    helm -n $NS uninstall oai-upf
-    helm -n $NS uninstall oai-amf
-    helm -n $NS uninstall oai-ausf
-    helm -n $NS uninstall oai-udm
-    helm -n $NS uninstall oai-udr
-    helm -n $NS uninstall oai-nrf
-    helm -n $NS uninstall mysql
+    echo "helm --namespace=$NS uninstall oai-5g-basic"
+    helm --namespace=$NS install oai-5g-basic 
 }
 
 
