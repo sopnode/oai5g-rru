@@ -711,8 +711,8 @@ function start-cn() {
     echo "helm dependency update"
     helm dependency update
 
-    echo "helm --namespace=$NS spray ."
-    helm --create-namespace --namespace=$NS spray .
+    echo "helm --namespace=$NS install oai-5g-basic ."
+    helm --create-namespace --namespace=$NS install oai-5g-basic .
 
     echo "Wait until all 5G Core pods are READY"
     kubectl wait pod -n $NS --for=condition=Ready --all
