@@ -212,8 +212,10 @@ ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129"
 ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130"
 
 #### AW2S RU case ####
-GNB_AW2S_REPO="docker.io/r2labuser/oai-gnb-aw2s"
-GNB_AW2S_TAG="rocky.2023.w37"
+#GNB_AW2S_REPO="docker.io/r2labuser/oai-gnb-aw2s"
+GNB_AW2S_REPO="docker.io/oaisoftwarealliance/oai-gnb"
+GNB_AW2S_TAG="2023.w49"
+#GNB_AW2S_TAG="rocky.2023.w37"
 #GNB_AW2S_TAG="${RAN_TAG}"
 #GNB_AW2S_TAG="rocky"
 CONF_JAGUAR="gnb.sa.band78.51prb.aw2s.ddsuu.conf"
@@ -430,27 +432,26 @@ function configure-gnb() {
     # Configure parameters for values.yaml chart according to RRU type
     if [[ "$RRU" = "b210" ]]; then
 	# no multus as FIT nodes not connected to VLAN100
-	# AMF/NGA/NGU IP addresses will be set just before the gnb pod starts
+	# AMF/N2/N3 IP addresses will be set just before the gnb pod starts
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
 	GNB_REPO="$GNB_B210_REPO"
 	GNB_TAG="$GNB_B210_TAG"
 	GNB_NAME="$GNB_NAME-b210"
 	if [[ "$GNB_ONLY" = "true" ]]; then
 	    MULTUS_GNB_N2="true"
-	    GNB_NGA_IF_NAME="$IF_NAME_GNB_N2"
-	    GNB_NGA_IP_ADDRESS="$IP_GNB_N2N3"
-	    GNB_NGU_IF_NAME="$IF_NAME_GNB_N2"
-	    GNB_NGU_IP_ADDRESS="$IP_GNB_N2N3"
+	    GNB_N2_IF_NAME="$IF_NAME_GNB_N2"
+	    #GNB_N2_IP_ADDRESS="$IP_GNB_N2N3"
+	    GNB_N3_IF_NAME="$IF_NAME_GNB_N2"
+	    #GNB_N3_IP_ADDRESS="$IP_GNB_N2N3"
 	else
 	    MULTUS_GNB_N2="false"
-	    GNB_NGA_IF_NAME="eth0"
-	    GNB_NGU_IF_NAME="eth0"
+	    GNB_N2_IF_NAME="eth0"
+	    GNB_N3_IF_NAME="eth0"
 	fi
 	MULTUS_GNB_N3="false"
 	MULTUS_GNB_RU1="false"
 	MULTUS_GNB_RU2="false"
-	MOUNTCONFIG_GNB="true"
-	RRU_TYPE="b210"
+	RRU_TYPE="b2xx"
 	ADD_OPTIONS_GNB="$OPTIONS_B210"
 	QOS_GNB_DEF="false"
 
@@ -466,10 +467,10 @@ function configure-gnb() {
 	GNB_REPO="$GNB_N3XX_REPO"
 	GNB_TAG="$GNB_N3XX_TAG"
 	MULTUS_GNB_N2="true"
-	GNB_NGA_IF_NAME="n2"
-	GNB_NGA_IP_ADDRESS="$IP_GNB_N2N3/24"
-	GNB_NGU_IF_NAME="n2"
-	GNB_NGU_IP_ADDRESS="$IP_GNB_N2N3/24"
+	GNB_N2_IF_NAME="n2"
+	#GNB_N2_IP_ADDRESS="$IP_GNB_N2N3/24"
+	GNB_N3_IF_NAME="n2"
+	#GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/24"
 	MULTUS_GNB_RU1="true"
 	IP_GNB_RU1="$IP_GNB_SFP1"
 	MTU_GNB_RU1="$MTU_N3XX"
@@ -478,7 +479,6 @@ function configure-gnb() {
 	IP_GNB_RU2="$IP_GNB_SFP2"
 	MTU_GNB_RU2="$MTU_N3XX"
 	IF_NAME_GNB_RU2="$IF_NAME_N3XX_2"
-	MOUNTCONFIG_GNB="true"
 	RRU_TYPE="n3xx"
 	ADD_OPTIONS_GNB="$OPTIONS_N3XX"
 	QOS_GNB_DEF="true"
@@ -497,17 +497,16 @@ function configure-gnb() {
 	GNB_REPO="$GNB_AW2S_REPO"
 	GNB_TAG="$GNB_AW2S_TAG"
 	MULTUS_GNB_N2="true"
-	GNB_NGA_IF_NAME="n2"
-	GNB_NGA_IP_ADDRESS="$IP_GNB_N2N3/24"
-	GNB_NGU_IF_NAME="n2"
-	GNB_NGU_IP_ADDRESS="$IP_GNB_N2N3/24"
+	GNB_N2_IF_NAME="n2"
+	#GNB_N2_IP_ADDRESS="$IP_GNB_N2N3/24"
+	GNB_N3_IF_NAME="n2"
+	#GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/24"
 	GNB_AW2S_LOCAL_IF_NAME="ru1"
 	MULTUS_GNB_N3="false"
 	MULTUS_GNB_RU1="true"
 	IP_GNB_RU1="$IP_GNB_AW2S"
 	IF_NAME_GNB_RU1="$IF_NAME_GNB_AW2S"
 	MULTUS_GNB_RU2="false"
-	MOUNTCONFIG_GNB="true"
 	RRU_TYPE="aw2s"
 	ADD_OPTIONS_GNB="$OPTIONS_AW2S"
 	QOS_GNB_DEF="true"
@@ -518,14 +517,13 @@ function configure-gnb() {
 	GNB_REPO="$GNB_RFSIM_REPO"
 	GNB_TAG="$GNB_RFSIM_TAG"
 	MULTUS_GNB_N2="true"
-	GNB_NGA_IF_NAME="n2"
-	GNB_NGA_IP_ADDRESS="$IP_GNB_N2N3/24"
-	GNB_NGU_IF_NAME="n2"
-	GNB_NGU_IP_ADDRESS="$IP_GNB_N2N3/24"
+	GNB_N2_IF_NAME="n2"
+	#GNB_N2_IP_ADDRESS="$IP_GNB_N2N3/24"
+	GNB_N3_IF_NAME="n2"
+	#GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/24"
 	MULTUS_GNB_N3="false"
 	MULTUS_GNB_RU1="false"
 	MULTUS_GNB_RU2="false"
-	MOUNTCONFIG_GNB="true"
 	RRU_TYPE="rfsim"
 	ADD_OPTIONS_GNB="$OPTIONS_RFSIM"
 	QOS_GNB_DEF="false"
@@ -535,40 +533,37 @@ function configure-gnb() {
 	usage
     fi
     
-    if [[ "$MOUNTCONFIG_GNB" = "true" ]]; then
-	echo "Insert gNB conf file $CONF_ORIG in configmap.yaml"
-	# Keep the 8 first lines of configmap.yaml
-	head -8  "$DIR_TEMPLATES"/configmap.yaml > /tmp/configmap.yaml
-	# Add a 6-characters margin to gnb.conf
-	awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
-	# Append the modified gnb.conf to /tmp/configmap.yaml
-	cat /tmp/gnb.conf >> /tmp/configmap.yaml
-	mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+    echo "Insert gNB conf file $CONF_ORIG in configmap.yaml"
+    # Keep the 8 first lines of configmap.yaml
+    head -8  "$DIR_TEMPLATES"/configmap.yaml > /tmp/configmap.yaml
+    # Add a 6-characters margin to gnb.conf
+    awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
+    # Append the modified gnb.conf to /tmp/configmap.yaml
+    cat /tmp/gnb.conf >> /tmp/configmap.yaml
+    mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
-	echo "First configure gnb.conf within configmap.yaml"
-	# remove NSSAI sd info for PLMN and add other parameters for RUs
-	# in the case of b210 (without multus), AMF_IP_ADDR will be set again just before running the gNB
-	cat > "$SED_CONF_FILE" <<EOF
+    echo "First configure gnb.conf within configmap.yaml"
+    # remove NSSAI sd info for PLMN and add other parameters for RUs
+    # in the case of b210 (without multus), AMF_IP_ADDR will be set again just before running the gNB
+    cat > "$SED_CONF_FILE" <<EOF
 s|@GNB_NAME@|$GNB_NAME|
 s|@TAC@|$TAC|
 s|@MCC@|$MCC|
 s|@MNC@|$MNC|
 s|@SST@|1|
 s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
-s|@GNB_NGA_IF_NAME@|$GNB_NGA_IF_NAME|
-s|@GNB_NGA_IP_ADDRESS@|$GNB_NGA_IP_ADDRESS|
-s|@GNB_NGU_IF_NAME@|$GNB_NGU_IF_NAME|
-s|@GNB_NGU_IP_ADDRESS@|$GNB_NGU_IP_ADDRESS|
+s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
+s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
 s|@AW2S_IP_ADDRESS@|$ADDR_AW2S|
 s|@GNB_AW2S_IP_ADDRESS@|$IP_GNB_AW2S|
 s|@GNB_AW2S_LOCAL_IF_NAME@|$GNB_AW2S_LOCAL_IF_NAME|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
 EOF
-	cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
-	sed -f "$SED_CONF_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
-	echo "Display new $DIR_TEMPLATES/configmap.yaml"
-	cat "$DIR_TEMPLATES"/configmap.yaml
-    fi
+    cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
+    sed -f "$SED_CONF_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
+    echo "Display new $DIR_TEMPLATES/configmap.yaml"
+    cat "$DIR_TEMPLATES"/configmap.yaml
+
 
     # Configure gnb values.yaml chart
     DIR="$OAI5G_RAN/oai-gnb"
@@ -606,7 +601,6 @@ s|@MAC_GNB_RU2@|$(gener-mac)|
 s|@GW_GNB_RU2@|$GW_GNB_RU2|
 s|@MTU_GNB_RU2@|$MTU_GNB_RU2|
 s|@IF_NAME_GNB_RU2@|$IF_NAME_GNB_RU2|
-s|@MOUNTCONFIG_GNB@|$MOUNTCONFIG_GNB|
 s|@RRU_TYPE@|$RRU_TYPE|
 s|@ADD_OPTIONS_GNB@|$ADD_OPTIONS_GNB|
 s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
@@ -614,11 +608,8 @@ s|@GNB_NAME@|$GNB_NAME|
 s|@MCC@|$MCC|
 s|@MNC@|$MNC|
 s|@TAC@|$TAC|
-s|@SST@|1|
-s|@GNB_NGA_IF_NAME@|$GNB_NGA_IF_NAME|
-s|@IP_GNB_N2N3@|$IP_GNB_N2N3|
-s|@GNB_NGU_IF_NAME@|$GNB_NGU_IF_NAME|
-s|@PCAP@|$PCAP|
+s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
+s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
 s|@START_TCPDUMP@|$PCAP|
 s|@TCPDUMP_CONTAINER@|$LOGS|
 s|@SHAREDVOLUME@|$PCAP|
