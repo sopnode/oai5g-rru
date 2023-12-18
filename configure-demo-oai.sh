@@ -14,7 +14,7 @@ RFSIM_IMSI="001010000001121" # default is "208950000001121"
 
 function update() {
     NS=$1; shift
-    NODE_AMF_SPGWU=$1"-v100"; shift
+    NODE_AMF_UPF=$1"-v100"; shift
     NODE_GNB=$1"-v100"; shift
     RRU=$1; shift 
     GNB_ONLY=$1; shift # boolean in [true, false]
@@ -34,7 +34,7 @@ function update() {
     echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
     cat > /tmp/demo-oai.sed <<EOF
 s|@DEF_NS@|$NS|
-s|@DEF_NODE_AMF_SPGWU@|$NODE_AMF_SPGWU|
+s|@DEF_NODE_AMF_UPF@|$NODE_AMF_UPF|
 s|@DEF_NODE_GNB@|$NODE_GNB|
 s|@DEF_RRU@|$RRU|
 s|@DEF_GNB_ONLY@|$GNB_ONLY|
@@ -66,7 +66,7 @@ EOF
 }
 
 if test $# -ne 12; then
-    echo "USAGE: configure-demo-oai.sh namespace node_amf_spgwu node_gnb rru gnb_only logs pcap prefix_demo regcred_name regcred_password regcred_email "
+    echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap prefix_demo regcred_name regcred_password regcred_email "
     exit 1
 else
     shift
