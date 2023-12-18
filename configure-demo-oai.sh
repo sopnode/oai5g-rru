@@ -6,7 +6,6 @@
 MCC="001" # default is "208"
 MNC="01" # default is "95"
 TAC="1" # default is "1"
-SST0="1" # default is "1"
 DNN="oai.ipv4" # default is "oai.ipv4"
 FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f" # default is "8baf473f2f8fd09487cccbd7097c6862"
 OPC="C42449363BBAD02B66D16BC975D77CC1" # default is "8E27B6AF0E692E750F32667A3B14605D"
@@ -44,7 +43,6 @@ s|@DEF_PCAP@|$PCAP|
 s|@DEF_MCC@|${MCC}|g
 s|@DEF_MNC@|${MNC}|g
 s|@DEF_TAC@|${TAC}|g
-s|@DEF_SST0@|${SST0}|g
 s|@DEF_DNN@|${DNN}|g
 s|@DEF_FULL_KEY@|${FULL_KEY}|g
 s|@DEF_OPC@|${OPC}|g
