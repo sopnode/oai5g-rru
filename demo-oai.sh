@@ -537,8 +537,8 @@ function configure-gnb() {
     
     if [[ "$MOUNTCONFIG_GNB" = "true" ]]; then
 	echo "Insert gNB conf file $CONF_ORIG in configmap.yaml"
-	# Keep the 17 first lines of configmap.yaml
-	head -17  "$DIR_TEMPLATES"/configmap.yaml > /tmp/configmap.yaml
+	# Keep the 8 first lines of configmap.yaml
+	head -8  "$DIR_TEMPLATES"/configmap.yaml > /tmp/configmap.yaml
 	# Add a 6-characters margin to gnb.conf
 	awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
 	# Append the modified gnb.conf to /tmp/configmap.yaml
