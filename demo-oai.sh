@@ -237,6 +237,7 @@ OPTIONS_NRUE="--sa -E --rfsim -r 106 --numerology 1 -C 3319680000 --nokrnmod --l
 IP_NRUE="$SUBNET_N2N3.4"
 NETMASK_NRUE="24"
 IF_NAME_NRUE="$IF_NAME_N2N3"
+NRUE_USRP="rfsim"
 
 ###################### Scenario with External Core Network #######################
 
@@ -634,7 +635,6 @@ function configure-nr-ue() {
     SED_FILE="/tmp/oai-nr-ue-values.sed"
     echo "configure-nr-ue: $ORIG_CHART configuration"
     ADD_OPTIONS_NRUE="$OPTIONS_NRUE"
-    SSD="16777215"
     cat > "$SED_FILE" <<EOF
 s|@NRUE_REPO@|$NRUE_REPO|
 s|@NRUE_TAG@|$NRUE_TAG|
@@ -649,8 +649,7 @@ s|@RFSIM_IMSI@|$RFSIM_IMSI|
 s|@FULL_KEY@|$FULL_KEY|
 s|@OPC@|$OPC|
 s|@DNN@|$DNN|
-s|@SST@|1|
-s|@SSD@|$SSD|
+s|@NRUE_USRP@|$NRUE_USRP|
 s|@ADD_OPTIONS_NRUE@|$ADD_OPTIONS_NRUE|
 s|@START_TCPDUMP@|false|
 s|@TCPDUMP_CONTAINER@|$LOGS|
