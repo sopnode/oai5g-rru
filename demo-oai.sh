@@ -725,29 +725,13 @@ function start-gnb() {
 	    AMF_POD_NAME=$(kubectl -n $NS get pods -l app.kubernetes.io/name=oai-amf -o jsonpath="{.items[0].metadata.name}")
 	    AMF_IP=$(kubectl -n $NS get pod $AMF_POD_NAME --template '{{.status.podIP}}')
 	fi
-	SED_FILE="/tmp/gnb-configmap.sed"
-	cat > "$SED_FILE" <<EOF
-s|ipv4       =.*|ipv4       = "$AMF_IP";|
-EOF
-	cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
-	sed -f "$SED_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
-	echo "set AMF IP address in chart $DIR_TEMPLATES/configmap.yaml"
-	diff /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
-	SED_FILE="/tmp/gnb-values.sed"
-	cat > "$SED_FILE" <<EOF
-s|amfIpAddress:.*|amfIpAddress: "$AMF_IP"|
-EOF
-	cp "$DIR"/values.yaml /tmp/values.yaml
-	sed -f "$SED_FILE" < /tmp/values.yaml > "$DIR"/values.yaml
-	echo "set AMF IP address in chart $DIR/values.yaml"
-	diff /tmp/values.yaml "$DIR"/values.yaml
     else
 	AMF_IP="$IP_AMF_N2"
     fi
 
     ORIG_CHART="$DIR"/values.yaml
     SED_FILE="/tmp/oai-gnb_values.sed"
-    echo "Setting AMF IP address (for tcpdump filter) in chart $ORIG_CHART"
+    echo "Setting AMF IP address in chart $ORIG_CHART"
     cat > $SED_FILE <<EOF
 s|@AMF_IP_ADDRESS@|$AMF_IP|
 EOF
