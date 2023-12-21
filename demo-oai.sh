@@ -46,15 +46,16 @@ OAISA_REPO="docker.io/oaisoftwarealliance"
 P99="192.168.99"
 P100="192.168.100"
 SUBNET_N2N3="$P99"
-IF_NAME_N2N3="eth4"
+IF_NAME_N2N3="net-100"
+#IF_NAME_N2N3="eth4"
 
 # Interfaces names of VLANs in sopnode servers
-IF_NAME_VLAN100="eth4.100"
+IF_NAME_VLAN100="net-100"
 #IF_NAME_VLAN100="eth5"
 #IF_NAME_VLAN100="p4-net"
-IF_NAME_VLAN10="eth4.10"
+IF_NAME_VLAN10="net-10"
 #IF_NAME_VLAN10="p4-net-10"
-IF_NAME_VLAN20="eth4.20"
+IF_NAME_VLAN20="net-20"
 #IF_NAME_VLAN20="p4-net-20"
 
 ############################### oai-cn5g chart parameters ########################
