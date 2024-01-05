@@ -112,7 +112,7 @@ jobs:
   {% if qhat_dict %}
   - id: prepare-qhats
     node: faraday
-    critical: True
+    critical: False
     verbose: {{verbose}}
     label: switch on qhat UE nodes
     commands:
