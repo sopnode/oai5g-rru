@@ -512,7 +512,6 @@ function configure-gnb() {
 
     echo "First configure gnb.conf within configmap.yaml"
     # remove NSSAI sd info for PLMN and add other parameters for RUs
-    # in the case of b210 (without multus), AMF_IP_ADDR will be set again just before running the gNB
     cat > "$SED_CONF_FILE" <<EOF
 s|@GNB_NAME@|$GNB_NAME|
 s|@TAC@|$TAC|
