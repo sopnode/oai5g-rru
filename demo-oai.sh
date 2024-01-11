@@ -62,20 +62,13 @@ OAI5G_CHARTS="$PREFIX_DEMO/oai-cn5g-fed/charts"
 OAI5G_CORE="$OAI5G_CHARTS/oai-5g-core"
 OAI5G_BASIC="$OAI5G_CORE/oai-5g-basic"
 
-# Multus always used except in the case of B210 RRU
-if [[ "$RRU" = "b210" ]]; then
-    MULTUS_CREATE="false"
-    IF_N2="eth0"
-    IF_N3="eth0"
-    IF_N4="eth0"
-    IF_N6="eth0"
-else
-    MULTUS_CREATE="true"
-    IF_N2="n2"
-    IF_N3="n3"
-    IF_N4="eth0" # should be "n4" but not still work to be done
-    IF_N6="eth0" # should be "n6" but not still work to be done
-fi
+# Multus is now used whatever RRU selected
+MULTUS_CREATE="true"
+IF_N2="n2"
+IF_N3="n3"
+IF_N4="eth0" # should be "n4" but not still work to be done
+IF_N6="eth0" # should be "n6" but not still work to be done
+
 
 CN_DEFAULT_GW=""
 
@@ -428,7 +421,7 @@ function configure-gnb() {
     SED_VALUES_FILE="/tmp/oai-gnb-values.sed"
 
     # Configure general parameters for values.yaml
-    MULTUS_GNB_N2="true"
+    MULTUS_GNB_N2="$MULTUS_CREATE"
     GNB_N2_IF_NAME="n2"
     GNB_N2_IP_ADDRESS="$IP_GNB_N2N3/24"
     MULTUS_GNB_N3="false"
