@@ -243,7 +243,7 @@ NRUE_USRP="rfsim"
 # then, configure the following parameters
 if [[ $GNB_ONLY = "true" ]]; then
     # Set the external AMF IP address
-    AMF_IP_ADDR="172.22.10.6" # external AMF IP address, e.g., "172.22.10.6"
+    IP_AMF_N2="172.22.10.6" # external AMF IP address, e.g., "172.22.10.6"
     # Set the local host network interface to reach AMF/UPF
     IF_NAME_GNB_N2="ran" # Host network interface to reach AMF/UPF
     # Set the local IP address of the latter network interface
@@ -427,26 +427,20 @@ function configure-gnb() {
     SED_CONF_FILE="/tmp/gnb_conf.sed"
     SED_VALUES_FILE="/tmp/oai-gnb-values.sed"
 
-    # Configure parameters for values.yaml chart according to RRU type
+    # Configure general parameters for values.yaml
+    MULTUS_GNB_N2="true"
+    GNB_N2_IF_NAME="n2"
+    GNB_N2_IP_ADDRESS="$IP_GNB_N2N3/24"
+    MULTUS_GNB_N3="false"
+    GNB_N3_IF_NAME="n2"
+    GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/24"
+    
+    # Configure RRU specific parameters for values.yaml chart
     if [[ "$RRU" = "b210" ]]; then
-	# no multus as FIT nodes not connected to VLAN100
-	# AMF/N2/N3 IP addresses will be set just before the gnb pod starts
 	CONF_ORIG="$DIR_CONF/$CONF_B210"
 	GNB_REPO="$GNB_B210_REPO"
 	GNB_TAG="$GNB_B210_TAG"
 	GNB_NAME="$GNB_NAME-b210"
-	if [[ "$GNB_ONLY" = "true" ]]; then
-	    MULTUS_GNB_N2="true"
-	    GNB_N2_IF_NAME="$IF_NAME_GNB_N2"
-	    GNB_N2_IP_ADDRESS="$IP_GNB_N2N3"
-	    GNB_N3_IF_NAME="$IF_NAME_GNB_N2"
-	    GNB_N3_IP_ADDRESS="$IP_GNB_N2N3"
-	else
-	    MULTUS_GNB_N2="false"
-	    GNB_N2_IF_NAME="eth0"
-	    GNB_N3_IF_NAME="eth0"
-	fi
-	MULTUS_GNB_N3="false"
 	MULTUS_GNB_RU1="false"
 	MULTUS_GNB_RU2="false"
 	RRU_TYPE="b2xx"
@@ -464,11 +458,6 @@ function configure-gnb() {
 	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
 	GNB_REPO="$GNB_N3XX_REPO"
 	GNB_TAG="$GNB_N3XX_TAG"
-	MULTUS_GNB_N2="true"
-	GNB_N2_IF_NAME="n2"
-	GNB_N2_IP_ADDRESS="$IP_GNB_N2N3/24"
-	GNB_N3_IF_NAME="n2"
-	GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/24"
 	MULTUS_GNB_RU1="true"
 	IP_GNB_RU1="$IP_GNB_SFP1"
 	MTU_GNB_RU1="$MTU_N3XX"
@@ -494,13 +483,7 @@ function configure-gnb() {
 	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
 	GNB_REPO="$GNB_AW2S_REPO"
 	GNB_TAG="$GNB_AW2S_TAG"
-	MULTUS_GNB_N2="true"
-	GNB_N2_IF_NAME="n2"
-	GNB_N2_IP_ADDRESS="$IP_GNB_N2N3/24"
-	GNB_N3_IF_NAME="n2"
-	GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/24"
 	GNB_AW2S_LOCAL_IF_NAME="ru1"
-	MULTUS_GNB_N3="false"
 	MULTUS_GNB_RU1="true"
 	IP_GNB_RU1="$IP_GNB_AW2S"
 	IF_NAME_GNB_RU1="$IF_NAME_GNB_AW2S"
@@ -514,12 +497,6 @@ function configure-gnb() {
         GNB_NAME="$GNB_NAME-rfsim"
 	GNB_REPO="$GNB_RFSIM_REPO"
 	GNB_TAG="$GNB_RFSIM_TAG"
-	MULTUS_GNB_N2="true"
-	GNB_N2_IF_NAME="n2"
-	GNB_N2_IP_ADDRESS="$IP_GNB_N2N3/24"
-	GNB_N3_IF_NAME="n2"
-	GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/24"
-	MULTUS_GNB_N3="false"
 	MULTUS_GNB_RU1="false"
 	MULTUS_GNB_RU2="false"
 	RRU_TYPE="rfsim"
@@ -573,6 +550,7 @@ s|@GNB_REPO@|$GNB_REPO|
 s|@GNB_TAG@|$GNB_TAG|
 s|@DEFAULT_GW_GNB@|$DEFAULT_GW_GNB|
 s|@MULTUS_GNB_N2@|$MULTUS_GNB_N2|
+s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
 s|@IP_GNB_N2@|$IP_GNB_N2N3|
 s|@NETMASK_GNB_N2@|$NETMASK_GNB_N2|
 s|@MAC_GNB_N2@|$(gener-mac)|
@@ -707,33 +685,8 @@ function start-cn() {
 
 
 function start-gnb() {
-    echo "Running start-gnb() with namespace=$NS, NODE_GNB=$NODE_GNB and rru=$RRU"
+    echo "Running start-gnb() on $NS namespace with NODE_GNB=$NODE_GNB and rru=$RRU"
 
-    DIR="$OAI5G_RAN/oai-gnb"
-    DIR_TEMPLATES="$DIR/templates"
-    if [[ "$RRU" = "b210" ]]; then
-	echo "Set AMF IP address in gnb conf"
-	if [[ $GNB_ONLY = "true" ]]; then
-	    AMF_IP="$AMF_IP_ADDR" # external CN including AMF
-	else
-	    AMF_POD_NAME=$(kubectl -n $NS get pods -l app.kubernetes.io/name=oai-amf -o jsonpath="{.items[0].metadata.name}")
-	    AMF_IP=$(kubectl -n $NS get pod $AMF_POD_NAME --template '{{.status.podIP}}')
-	fi
-    else
-	AMF_IP="$IP_AMF_N2"
-    fi
-
-    ORIG_CHART="$DIR"/values.yaml
-    SED_FILE="/tmp/oai-gnb_values.sed"
-    echo "Setting AMF IP address in chart $ORIG_CHART"
-    cat > $SED_FILE <<EOF
-s|@AMF_IP_ADDRESS@|$AMF_IP|
-EOF
-    cp "$ORIG_CHART" /tmp/oai-gnb_values.yaml-orig
-    echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_FILE" < /tmp/oai-gnb_values.yaml-orig > "$ORIG_CHART"
-    diff /tmp/oai-gnb_values.yaml-orig "$ORIG_CHART"
-    
     echo "cd $OAI5G_RAN"
     cd "$OAI5G_RAN"
 
