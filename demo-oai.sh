@@ -165,58 +165,57 @@ NETMASK_GNB_N2="24"
 NETMASK_GNB_N3=""
 NETMASK_GNB_RU="24"
 
-#### RFSIM RU case ####
-GNB_RFSIM_REPO="${OAISA_REPO}/oai-gnb"
-GNB_RFSIM_TAG="${RAN_TAG}"
-#GNB_RFSIM_TAG="2023.w12"
-CONF_RFSIM="gnb.sa.band78.106prb.rfsim.2x2.conf" 
-OPTIONS_RFSIM="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
+#### rfsim RU case ####
+GNB_REPO_rfsim="${OAISA_REPO}/oai-gnb"
+#GNB_TAG_rfsim="2023.w12"
+GNB_TAG_rfsim="${RAN_TAG}"
+CONF_rfsim="gnb.sa.band78.106prb.rfsim.2x2.conf" 
+OPTIONS_rfsim="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
 
-#### B210 RU case ####
-## for up4000 ubuntu20
-#GNB_B210_REPO="docker.io/r2labuser/oai-gnb"
-GNB_B210_REPO="${OAISA_REPO}/oai-gnb"
-GNB_B210_TAG="2023.w37"
-#GNB_B210_TAG="${RAN_TAG}"
-#GNB_B210_TAG="2023.w11b"
-#CONF_B210="gnb.sa.band78.51prb.usrpb200.conf"
-CONF_B210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
-#OPTIONS_B210="--sa  --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
-OPTIONS_B210="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+#### b2xx RU case ####
+#GNB_REPO_b2xx="docker.io/r2labuser/oai-gnb"
+GNB_REPO_b2xx="${OAISA_REPO}/oai-gnb"
+#GNB_TAG_b2xx="${RAN_TAG}"
+#GNB_TAG_b2xx="2023.w11b"
+GNB_TAG_b2xx="2023.w37"
+#CONF_b2xx="gnb.sa.band78.51prb.usrpb200.conf"
+CONF_b2xx="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
+#OPTIONS_b2xx="--sa  --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+OPTIONS_b2xx="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 
-#### N3XX RU case ####
-GNB_N3XX_REPO="${OAISA_REPO}/oai-gnb"
-#GNB_N3XX_REPO="docker.io/r2labuser/oai-gnb"
-GNB_N3XX_TAG="${RAN_TAG}"
-#GNB_N3XX_TAG="bugfix-phy-mac-interface"
-CONF_N3XX="gnb.sa.band78.106prb.usrpn310.ddsuu-2x2.conf"
-#CONF_N3XX="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
-OPTIONS_N3XX="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
-#OPTIONS_N3XX="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 0,2,4,6,8,10,12,14,16 --log_config.global_log_options level,nocolor,time"
+#### n3xx RU case ####
+#GNB_REPO_n3xx="docker.io/r2labuser/oai-gnb"
+GNB_REPO_n3xx="${OAISA_REPO}/oai-gnb"
+#GNB_TAG_n3xx="bugfix-phy-mac-interface"
+GNB_nTAG_n3xx="${RAN_TAG}"
+#CONF_n3xx="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
+CONF_n3xx="gnb.sa.band78.106prb.usrpn310.ddsuu-2x2.conf"
+#OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 0,2,4,6,8,10,12,14,16 --log_config.global_log_options level,nocolor,time"
+OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
 IP_GNB_SFP1="192.168.10.132"
 IP_GNB_SFP2="192.168.20.132"
-MTU_N3XX="9000"
-IF_NAME_N3XX_1="$IF_NAME_VLAN10"
-IF_NAME_N3XX_2="$IF_NAME_VLAN20"
-ADDRS_N300="addr=192.168.10.129,second_addr=192.168.20.129"
-ADDRS_N320="addr=192.168.10.130,second_addr=192.168.20.130"
+MTU_n3xx="9000"
+IF_NAME_n3xx_1="$IF_NAME_VLAN10"
+IF_NAME_n3xx_2="$IF_NAME_VLAN20"
+ADDRS_n300="addr=192.168.10.129,second_addr=192.168.20.129"
+ADDRS_n320="addr=192.168.10.130,second_addr=192.168.20.130"
 
-#### AW2S RU case ####
-GNB_AW2S_REPO="docker.io/r2labuser/oai-gnb-aw2s"
-#GNB_AW2S_REPO="docker.io/oaisoftwarealliance/oai-gnb"
-#GNB_AW2S_TAG="2023.w49"
-GNB_AW2S_TAG="rocky.2023.w37"
-#GNB_AW2S_TAG="${RAN_TAG}"
-#GNB_AW2S_TAG="rocky"
-CONF_JAGUAR="gnb.sa.band78.51prb.aw2s.ddsuu.conf"
-#CONF_JAGUAR="oai-gNB-n78_50M_DDDSU.conf"
-CONF_PANTHER="gnb.sa.band78.51prb.aw2s.ddsuu.conf"
-#CONF_PANTHER="oai-gNB-n78_50M_DDDSU.conf"
-OPTIONS_AW2S="--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
-IP_GNB_AW2S="$P100.243" 
-IF_NAME_GNB_AW2S="$IF_NAME_VLAN100"
-ADDR_JAGUAR="$P100.48" 
-ADDR_PANTHER="$P100.51"
+#### aw2s RU case ####
+#GNB_REPO_aw2s="docker.io/oaisoftwarealliance/oai-gnb"
+GNB_REPO_aw2s="docker.io/r2labuser/oai-gnb-aw2s"
+#GNB_TAG_aw2s="2023.w49"
+#GNB_TAG_aw2s="${RAN_TAG}"
+#GNB_TAG_aw2s="rocky"
+GNB_TAG_aw2s="rocky.2023.w37"
+CONF_jaguar="gnb.sa.band78.51prb.aw2s.ddsuu.conf"
+#CONF_jaguar="oai-gNB-n78_50M_DDDSU.conf"
+#CONF_panther="oai-gNB-n78_50M_DDDSU.conf"
+CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.conf"
+OPTIONS_aw2s="--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
+IP_GNB_aw2s="$P100.243" 
+IF_NAME_GNB_aw2s="$IF_NAME_VLAN100"
+ADDR_jaguar="$P100.48" 
+ADDR_panther="$P100.51"
 
 
 ########################### oai-nr-ue rfsim chart parameters #####################
@@ -260,11 +259,9 @@ function gener-mac()
     if [ ! -f "$PREFIXfile" ]; then
 	PREFIX="12:34:"
 	case $IF_NAME_VLAN100 in
-	    "eth4")
+	    "net-100")
 		PREFIX=$PREFIX"00:";;
-	    "p4-net")
-		PREFIX=$PREFIX"01:";;
-	    *)  PREFIX=$PREFIX"02:";;
+	    *)  PREFIX=$PREFIX"01:";;
 	esac
 	case $NODE_AMF_SGPWU in
 	    "sopnode-l1-v100")
@@ -300,15 +297,6 @@ function init() {
         [[ -f /etc/fedora-release ]] && dnf install -y patch
         [[ -f /etc/lsb-release ]] && apt-get install -y patch
     fi
-    # Following is no more useful as it is already done through the ansible playbook
-    ## Ensure that helm spray plugin is installed
-    #echo "init: ensure spray is installed and possibly create secret docker-registry"
-    #helm plugin uninstall helm-spray || true
-    #helm plugin install https://github.com/ThalesGroup/helm-spray || true
-    ## Just in case the k8s cluster has been restarted without multus enabled..
-    #echo "kube-install.sh enable-multus"
-    #kube-install.sh enable-multus || true
-
 }
 
 #################################################################################
@@ -429,11 +417,11 @@ function configure-gnb() {
     GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/24"
     
     # Configure RRU specific parameters for values.yaml chart
-    if [[ "$RRU" = "b210" ]]; then
-	CONF_ORIG="$DIR_CONF/$CONF_B210"
-	GNB_REPO="$GNB_B210_REPO"
-	GNB_TAG="$GNB_B210_TAG"
-	GNB_NAME="$GNB_NAME-b210"
+    CONF_ORIG="$DIR_CONF/$CONF_$RRU"
+    GNB_REPO="$GNB_REPO_$RRU"
+    GNB_TAG="$GNB_TAG_$RRU"
+    GNB_NAME="$GNB_NAME_$RRU"
+    if [[ "$RRU" = "b2xx" ]]; then
 	MULTUS_GNB_RU1="false"
 	MULTUS_GNB_RU2="false"
 	RRU_TYPE="b2xx"
@@ -442,54 +430,38 @@ function configure-gnb() {
 
     elif [[ "$RRU" = "n300" || "$RRU" = "n320" ]]; then
 	if [[ "$RRU" = "n300" ]]; then
-	    GNB_NAME="$GNB_NAME-n300"
-	    SDR_ADDRS="$ADDRS_N300"
+	    SDR_ADDRS="$ADDRS_n300"
 	elif [[ "$RRU" = "n320" ]]; then
-	    GNB_NAME="$GNB_NAME-n320"
-	    SDR_ADDRS="$ADDRS_N320"
+	    SDR_ADDRS="$ADDRS_n320"
 	fi
-	CONF_ORIG="$DIR_CONF/$CONF_N3XX"
-	GNB_REPO="$GNB_N3XX_REPO"
-	GNB_TAG="$GNB_N3XX_TAG"
 	MULTUS_GNB_RU1="true"
 	IP_GNB_RU1="$IP_GNB_SFP1"
-	MTU_GNB_RU1="$MTU_N3XX"
-	IF_NAME_GNB_RU1="$IF_NAME_N3XX_1"
+	MTU_GNB_RU1="$MTU_n3xx"
+	IF_NAME_GNB_RU1="$IF_NAME_n3xx_1"
 	MULTUS_GNB_RU2="true"
 	IP_GNB_RU2="$IP_GNB_SFP2"
-	MTU_GNB_RU2="$MTU_N3XX"
-	IF_NAME_GNB_RU2="$IF_NAME_N3XX_2"
+	MTU_GNB_RU2="$MTU_n3xx"
+	IF_NAME_GNB_RU2="$IF_NAME_n3xx_2"
 	RRU_TYPE="n3xx"
-	ADD_OPTIONS_GNB="$OPTIONS_N3XX"
+	ADD_OPTIONS_GNB="$OPTIONS_n3xx"
 	QOS_GNB_DEF="true"
 
     elif [[ "$RRU" = "jaguar" || "$RRU" = "panther" ]]; then
 	if [[ "$RRU" = "jaguar" ]]; then
-	    GNB_NAME="$GNB_NAME-jaguar"
-	    CONF_AW2S="$CONF_JAGUAR"
-	    ADDR_AW2S="$ADDR_JAGUAR"
+	    ADDR_aw2s="$ADDR_jaguar"
 	else
-	    GNB_NAME="$GNB_NAME-panther"
-	    CONF_AW2S="$CONF_PANTHER"
-	    ADDR_AW2S="$ADDR_PANTHER"
+	    ADDR_aw2s="$ADDR_panther"
 	fi
-	CONF_ORIG="$DIR_CONF/$CONF_AW2S"
-	GNB_REPO="$GNB_AW2S_REPO"
-	GNB_TAG="$GNB_AW2S_TAG"
-	GNB_AW2S_LOCAL_IF_NAME="ru1"
+	GNB_aw2s_LOCAL_IF_NAME="ru1"
 	MULTUS_GNB_RU1="true"
-	IP_GNB_RU1="$IP_GNB_AW2S"
-	IF_NAME_GNB_RU1="$IF_NAME_GNB_AW2S"
+	IP_GNB_RU1="$IP_GNB_aw2s"
+	IF_NAME_GNB_RU1="$IF_NAME_GNB_aw2s"
 	MULTUS_GNB_RU2="false"
 	RRU_TYPE="aw2s"
-	ADD_OPTIONS_GNB="$OPTIONS_AW2S"
+	ADD_OPTIONS_GNB="$OPTIONS_aw2s"
 	QOS_GNB_DEF="true"
 	
     elif [[ "$RRU" = "rfsim" ]]; then
-	CONF_ORIG="$DIR_CONF/$CONF_RFSIM"
-        GNB_NAME="$GNB_NAME-rfsim"
-	GNB_REPO="$GNB_RFSIM_REPO"
-	GNB_TAG="$GNB_RFSIM_TAG"
 	MULTUS_GNB_RU1="false"
 	MULTUS_GNB_RU2="false"
 	RRU_TYPE="rfsim"
@@ -522,9 +494,9 @@ s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
 s|@GNB_N2_IP_ADDRESS@|$GNB_N2_IP_ADDRESS|
 s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
 s|@GNB_N3_IP_ADDRESS@|$GNB_N3_IP_ADDRESS|
-s|@AW2S_IP_ADDRESS@|$ADDR_AW2S|
-s|@GNB_AW2S_IP_ADDRESS@|$IP_GNB_AW2S|
-s|@GNB_AW2S_LOCAL_IF_NAME@|$GNB_AW2S_LOCAL_IF_NAME|
+s|@AW2S_IP_ADDRESS@|$ADDR_aw2s|
+s|@GNB_AW2S_IP_ADDRESS@|$IP_GNB_aw2s|
+s|@GNB_AW2S_LOCAL_IF_NAME@|$GNB_aw2s_LOCAL_IF_NAME|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
 EOF
     cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
@@ -965,15 +937,6 @@ function get-ran-pcap(){
     kubectl -c tcpdump -n $NS exec -i $GNB_POD_NAME -- /bin/tar cfz gnb-pcap.tgz pcap || true
     echo "kubectl -c tcpdump cp $NS/$GNB_POD_NAME:gnb-pcap.tgz $prefix/gnb-pcap-"$DATE".tgz"
     kubectl -c tcpdump cp $NS/$GNB_POD_NAME:gnb-pcap.tgz $prefix/gnb-pcap-"$DATE".tgz || true
-# No more pcap for UE now
-#    if [[ "$RRU" = "rfsim" ]]; then
-#	NRUE_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nr-ue,app.kubernetes.io/instance=oai-nr-ue" -o jsonpath="{.items[0].metadata.name}")
-#	echo "Retrieve OAI5G pcap file from the oai-nr-ue pod on ns $NS"
-#	echo "kubectl -c tcpdump -n $NS exec -i $NRUE_POD_NAME -- /bin/tar cfz nr-ue-pcap.tgz pcap"
-#	kubectl -c tcpdump -n $NS exec -i $NRUE_POD_NAME -- /bin/tar cfz nr-ue-pcap.tgz pcap || true
-#	echo "kubectl -c tcpdump cp $NS/$NRUE_POD_NAME:nr-ue-pcap.tgz $prefix/nr-ue-pcap-"$DATE".tgz"
-#	kubectl -c tcpdump cp $NS/$NRUE_POD_NAME:nr-ue-pcap.tgz $prefix/nr-ue-pcap-"$DATE".tgz || true
-#    fi
 }
 
 #################################################################################
