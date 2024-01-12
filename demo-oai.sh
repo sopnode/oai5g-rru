@@ -417,10 +417,10 @@ function configure-gnb() {
     GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/24"
     
     # Configure RRU specific parameters for values.yaml chart
-    CONF_RRU="CONF_$RRU"; CONF_ORIG="$DIR_CONF/$CONF_RRU"
-    GNB_REPO_RRU="GNB_REPO_$RRU"; GNB_REPO="$GNB_REPO_RRU"
-    GNB_TAG_RRU="GNB_TAG_$RRU"; GNB_TAG="$GNB_TAG_RRU"
-    GNB_NAME_RRU="GNB_NAME_$RRU"; GNB_NAME="$GNB_NAME_RRU"
+    CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_$RRU}\")
+    GNB_REPO=$(eval echo \"\${GNB_REPO_$RRU}\")
+    GNB_TAG=$(eval echo \"\${GNB_TAG_$RRU}\")
+    GNB_NAME=$(eval echo \"\${GNB_NAME_$RRU}\")
     if [[ "$RRU" = "b210" ]]; then
 	MULTUS_GNB_RU1="false"
 	MULTUS_GNB_RU2="false"
