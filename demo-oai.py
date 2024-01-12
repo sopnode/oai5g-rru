@@ -164,7 +164,7 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         qhat_dict=qhat_dict,
         gnb_only=gnb_only,
         rru=rru,
-        cn_mode=cn_node,
+        cn_mode=cn_mode,
         regcred=dict(
             name=regcred_name,
             password=regcred_password,
