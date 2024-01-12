@@ -181,7 +181,7 @@ GNB_TAG_b210="2023.w37"
 #CONF_b210="gnb.sa.band78.51prb.usrpb200.conf"
 CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
 #OPTIONS_b210="--sa  --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
-OPTIONS_b210="--sa --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+OPTIONS_b210="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 
 #### n3xx RU case ####
 #GNB_REPO_n3xx="docker.io/r2labuser/oai-gnb"
@@ -420,12 +420,12 @@ function configure-gnb() {
     CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_$RRU}\")
     GNB_REPO=$(eval echo \"\${GNB_REPO_$RRU}\")
     GNB_TAG=$(eval echo \"\${GNB_TAG_$RRU}\")
-    GNB_NAME=$(eval echo \"\${GNB_NAME_$RRU}\")
+    GNB_NAME="${GNB_NAME}_${RRU}"
     if [[ "$RRU" = "b210" ]]; then
 	MULTUS_GNB_RU1="false"
 	MULTUS_GNB_RU2="false"
 	RRU_TYPE="b2xx"
-	ADD_OPTIONS_GNB="$OPTIONS_B210"
+	ADD_OPTIONS_GNB="$OPTIONS_b210"
 	QOS_GNB_DEF="false"
 
     elif [[ "$RRU" = "n300" || "$RRU" = "n320" ]]; then
