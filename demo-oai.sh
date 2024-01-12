@@ -181,7 +181,7 @@ GNB_TAG_b210="2023.w37"
 #CONF_b210="gnb.sa.band78.51prb.usrpb200.conf"
 CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
 #OPTIONS_b210="--sa  --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
-OPTIONS_b210="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+OPTIONS_b210="--sa --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 
 #### n3xx RU case ####
 #GNB_REPO_n3xx="docker.io/r2labuser/oai-gnb"
