@@ -178,8 +178,8 @@ GNB_REPO_b2xx="${OAISA_REPO}/oai-gnb"
 #GNB_TAG_b2xx="${RAN_TAG}"
 #GNB_TAG_b2xx="2023.w11b"
 GNB_TAG_b2xx="2023.w37"
-#CONF_b2xx="gnb.sa.band78.51prb.usrpb200.conf"
-CONF_b2xx="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
+#CONF_b210="gnb.sa.band78.51prb.usrpb200.conf"
+CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
 #OPTIONS_b2xx="--sa  --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 OPTIONS_b2xx="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 
@@ -189,7 +189,8 @@ GNB_REPO_n3xx="${OAISA_REPO}/oai-gnb"
 #GNB_TAG_n3xx="bugfix-phy-mac-interface"
 GNB_nTAG_n3xx="${RAN_TAG}"
 #CONF_n3xx="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
-CONF_n3xx="gnb.sa.band78.106prb.usrpn310.ddsuu-2x2.conf"
+CONF_n320="gnb.sa.band78.106prb.usrpn310.ddsuu-2x2.conf"
+CONF_n300="gnb.sa.band78.106prb.usrpn310.ddsuu-2x2.conf"
 #OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 0,2,4,6,8,10,12,14,16 --log_config.global_log_options level,nocolor,time"
 OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
 IP_GNB_SFP1="192.168.10.132"
@@ -469,7 +470,7 @@ function configure-gnb() {
 	usage
     fi
     
-    CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_$RRU_TYPE}\")
+    CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_$RRU}\")
     GNB_REPO=$(eval echo \"\${GNB_REPO_$RRU_TYPE}\")
     GNB_TAG=$(eval echo \"\${GNB_TAG_$RRU_TYPE}\")
     GNB_NAME="${GNB_NAME}_${RRU}"
