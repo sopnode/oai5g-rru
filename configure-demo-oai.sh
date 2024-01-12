@@ -21,6 +21,7 @@ function update() {
     LOGS=$1; shift # boolean in [true, false]
     PCAP=$1; shift # boolean in [true, false]
     PREFIX_DEMO=$1; shift
+    CN_MODE=$1; shift
     REGCRED_NAME=$1; shift
     REGCRED_PWD=$1; shift
     REGCRED_EMAIL=$1; shift
@@ -29,9 +30,16 @@ function update() {
     GNB_ONLY="${GNB_ONLY,,}"
     LOGS="${LOGS,,}"
     PCAP="${PCAP,,}"
-    
 
-    echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
+    if [[ "$CN_MODE" = "advance" ]]; then
+	mode="advance"
+	MODE="ADVANCE"
+    else
+	mode="basic"
+	MODE="BASIC"
+    fi
+    
+    echo "Configuring demo-oai.sh script"
     cat > /tmp/demo-oai.sed <<EOF
 s|@DEF_NS@|$NS|
 s|@DEF_NODE_AMF_UPF@|$NODE_AMF_UPF|
@@ -48,6 +56,8 @@ s|@DEF_FULL_KEY@|${FULL_KEY}|g
 s|@DEF_OPC@|${OPC}|g
 s|@DEF_RFSIM_IMSI@|${RFSIM_IMSI}|g
 s|@DEF_PREFIX_DEMO@|$PREFIX_DEMO|
+s|@MODE@|$MODE|g
+s|@mode@|$mode|g
 s|@DEF_REGCRED_NAME@|$REGCRED_NAME|
 s|@DEF_REGCRED_PWD@|$REGCRED_PWD|
 s|@DEF_REGCRED_EMAIL@|$REGCRED_EMAIL|
@@ -65,8 +75,8 @@ EOF
     diff $DIR_GENERIC_DB/oai_db-basic-generic.sql $DIR_GENERIC_DB/oai_db-basic.sql
 }
 
-if test $# -ne 12; then
-    echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap prefix_demo regcred_name regcred_password regcred_email "
+if test $# -ne 13; then
+    echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap prefix_demo cn_mode regcred_name regcred_password regcred_email "
     exit 1
 else
     shift

@@ -14,6 +14,7 @@
 # {{qhat_dict}} - typically {'1': 'qhat01', '2': 'qhat02'}
 # {{gnb_only}} - typically 'True' or 'False'
 # {{rru}} - typically 'n300' or 'n320' or 'jaguar' or 'panther'
+# {{cn_mode}} - typically 'basic' or 'advance'
 # {{regcred}} - typically {'name': 'jdoe', 'password': 'XX', 'email': 'jdoe@yahoo.fr'}
 # {{quectel_image}} - typically 'quectel-mbim'
 # {{oai5g_rru_repo}} - typically 'https://github.com/sopnode/oai5g-rru.git'
@@ -199,7 +200,7 @@ jobs:
           cp oai5g-rru/configure-demo-oai.sh /root/;
           cp oai5g-rru/testing/logs.sh /root/;
           cp oai5g-rru/testing/run-iperf-server.sh /root/;
-          /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{gnb_only}} {{logs}} {{pcap}} /root {%for x in regcred.values()%}{{x}} {%endfor %};
+          /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{cn_mode}} {{gnb_only}} {{logs}} {{pcap}} /root {%for x in regcred.values()%}{{x}} {%endfor %};
           rm -rf oai-cn5g-fed;
           git clone --branch {{oai_cn5g_fed_tag}} {{oai_cn5g_fed_repo}}
       - type: Run

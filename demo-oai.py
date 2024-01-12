@@ -95,7 +95,7 @@ default_regcred_email = 'r2labuser@turletti.com'
 def run(*, mode, gateway, slicename, master, namespace, logs,
         pcap, auto_start, gnb_only, load_images, 
         k8s_fit, amf_spgwu, gnb, phones, quectel_nodes, qhat_nodes, rru, 
-        regcred_name, regcred_password, regcred_email,
+        cn_mode, regcred_name, regcred_password, regcred_email,
         image, quectel_image, verbose, dry_run, demo_tag, charts_tag):
     """
     run the OAI5G demo on the k8s cluster
@@ -115,6 +115,7 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         quectel_nodes: list of indices of quectel UE nodes to use
         qhat_nodes: list of indices of qhat UE nodes to use
         rru: hardware device attached to gNB
+        cn_mode: basic or advance
         image: R2lab k8s image name
         demo_tag: this demo script tag
         charts_tag: oai_cn5g_fed charts tag
@@ -163,6 +164,7 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         qhat_dict=qhat_dict,
         gnb_only=gnb_only,
         rru=rru,
+        cn_mode=cn_node,
         regcred=dict(
             name=regcred_name,
             password=regcred_password,
@@ -445,6 +447,10 @@ def main():
         choices=("b210", "n300", "n320", "jaguar", "panther", "rfsim"),
 	help="specify the hardware RRU to use for gNB or rfsim if simulation")
 
+    parser.add_argument("-A", "--advance-cn", default=False,
+                        action='store_true', dest='advance_mode',
+                        help="use oai-5g-advance CN mode")
+
     parser.add_argument("-p", "--pcap", default=False,
                         action='store_true', dest='pcap',
                         help="run tcpdump on OAI5G pods to store pcap/logs files")
@@ -476,7 +482,12 @@ def main():
         print("USAGE: use full node name with --gnb option, like fit01 or pc02")
         exit (1)
         
-    print(f"Running tag {args.demo_tag} of demo-oai and tag {args.charts_tag} of OAI5G charts")
+    if args.advance_mode:
+        cn_mode="advance"
+    else:
+        cn_mode="basic"
+    print(f"Running tag {args.demo_tag} of demo-oai and tag {args.charts_tag} of OAI5G charts with {cn_mode} CN mode")
+
     if args.devel:
         args.master = K8S_MASTER_DEVEL
         # in case of Devel Cluster, modify the default servers to run amf/spgwu/gnb pods
@@ -555,7 +566,7 @@ def main():
         load_images=args.load_images,
         k8s_fit=args.k8s_fit, amf_spgwu=args.amf_spgwu, gnb=args.gnb,
         phones=args.phones, quectel_nodes=args.quectel_nodes,
-        qhat_nodes=args.qhat_nodes, rru=args.rru,
+        qhat_nodes=args.qhat_nodes, rru=args.rru, cn_mode=cn_mode,
         regcred_name=args.regcred_name,
         regcred_password=args.regcred_password,
         regcred_email=args.regcred_email,

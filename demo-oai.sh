@@ -61,13 +61,14 @@ CN_TAG="v1.5.1"
 OAI5G_CHARTS="$PREFIX_DEMO/oai-cn5g-fed/charts"
 OAI5G_CORE="$OAI5G_CHARTS/oai-5g-core"
 OAI5G_BASIC="$OAI5G_CORE/oai-5g-basic"
+OAI5G_ADVANCE="$OAI5G_CORE/oai-5g-advance"
 
 # Multus is now used whatever RRU selected
 MULTUS_CREATE="true"
 IF_N2="n2"
 IF_N3="n3"
-IF_N4="eth0" # should be "n4" but not still work to be done
-IF_N6="eth0" # should be "n6" but not still work to be done
+IF_N4="eth0" # should be "n4" but not, still work to be done
+IF_N6="eth0" # should be "n6" but not, still work to be done
 
 
 CN_DEFAULT_GW=""
@@ -302,12 +303,12 @@ function init() {
 
 #################################################################################
 
-function configure-oai-5g-basic() {
+function configure-oai-5g-@mode@() {
 
     # if $LOGS is true, create a tcpdump container with privileges
     # if $PCAP is true, start tcpdump and create a shared volume to store pcap
-    echo "Configuring chart $OAI5G_BASIC/values.yaml for R2lab"
-    cat > /tmp/basic-values.sed <<EOF
+    echo "Configuring chart $OAI5G_@MODE@/values.yaml for R2lab"
+    cat > /tmp/@mode@-values.sed <<EOF
 s|@PRIVILEGED@|$LOGS|
 s|@TCPDUMP_CONTAINER@|$LOGS|
 s|@START_TCPDUMP@|$PCAP|
@@ -352,13 +353,13 @@ s|@ROUTES_SMF_N4@|$ROUTES_SMF_N4|
 s|@IF_NAME_SMF_N4@|$IF_NAME_SMF_N4|
 s|@NODE_SMF@||
 EOF
-    cp "$OAI5G_BASIC"/values.yaml /tmp/basic_values.yaml-orig
-    echo "(Over)writing $OAI5G_BASIC/values.yaml"
-    sed -f /tmp/basic-values.sed < /tmp/basic_values.yaml-orig > "$OAI5G_BASIC"/values.yaml
-    diff /tmp/basic_values.yaml-orig "$OAI5G_BASIC"/values.yaml
+    cp "$OAI5G_@MODE@"/values.yaml /tmp/@mode@_values.yaml-orig
+    echo "(Over)writing $OAI5G_@MODE@/values.yaml"
+    sed -f /tmp/@mode@-values.sed < /tmp/@mode@_values.yaml-orig > "$OAI5G_@MODE@"/values.yaml
+    diff /tmp/@mode@_values.yaml-orig "$OAI5G_@MODE@"/values.yaml
 
-    echo "Configuring chart $OAI5G_BASIC/config.yaml for R2lab"
-    cat > /tmp/basic-config.sed <<EOF
+    echo "Configuring chart $OAI5G_@MODE@/config.yaml for R2lab"
+    cat > /tmp/@mode@-config.sed <<EOF
 s|@IF_N2@|$IF_N2|
 s|@IF_N3@|$IF_N3|
 s|@IF_N4@|$IF_N4|
@@ -370,12 +371,12 @@ s|@DNN0@|$DNN|
 s|@IP_DNS1@|$IP_DNS1|
 s|@IP_DNS2@|$IP_DNS2|
 EOF
-    cp "$OAI5G_BASIC"/config.yaml /tmp/basic_config.yaml-orig
-    echo "(Over)writing $OAI5G_BASIC/config.yaml"
-    sed -f /tmp/basic-config.sed < /tmp/basic_config.yaml-orig > "$OAI5G_BASIC"/config.yaml
-    diff /tmp/basic_config.yaml-orig "$OAI5G_BASIC"/config.yaml
+    cp "$OAI5G_@MODE@"/config.yaml /tmp/@mode@_config.yaml-orig
+    echo "(Over)writing $OAI5G_@MODE@/config.yaml"
+    sed -f /tmp/@mode@-config.sed < /tmp/@mode@_config.yaml-orig > "$OAI5G_@MODE@"/config.yaml
+    diff /tmp/@mode@_config.yaml-orig "$OAI5G_@MODE@"/config.yaml
     
-    cd "$OAI5G_BASIC"
+    cd "$OAI5G_@MODE@"
     echo "helm dependency update"
     helm dependency update
 }
@@ -621,7 +622,7 @@ function configure-all() {
     kubectl -n $NS create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=@DEF_REGCRED_NAME@ --docker-password=@DEF_REGCRED_PWD@ --docker-email=@DEF_REGCRED_EMAIL@ || true
 
     # Ensure that helm spray plugin is installed
-    configure-oai-5g-basic 
+    configure-oai-5g-@mode@ 
     configure-mysql
     configure-gnb
     if [[ "$RRU" = "rfsim" ]]; then
@@ -634,14 +635,14 @@ function configure-all() {
 
 function start-cn() {
     echo "Running start-cn() with namespace=$NS, NODE_AMF_UPF=$NODE_AMF_UPF"
-    echo "cd $OAI5G_BASIC"
-    cd "$OAI5G_BASIC"
+    echo "cd $OAI5G_@MODE@"
+    cd "$OAI5G_@MODE@"
 
     echo "helm dependency update"
     helm dependency update
 
-    echo "helm --namespace=$NS install oai-5g-basic ."
-    helm --create-namespace --namespace=$NS install oai-5g-basic .
+    echo "helm --namespace=$NS install oai-5g-@mode@ ."
+    helm --create-namespace --namespace=$NS install oai-5g-@mode@ .
 
     echo "Wait until all 5G Core pods are READY"
     kubectl wait pod -n $NS --for=condition=Ready --all
@@ -780,8 +781,8 @@ function run-ping() {
 #################################################################################
 
 function stop-cn(){
-    echo "helm --namespace=$NS uninstall oai-5g-basic"
-    helm --namespace=$NS uninstall oai-5g-basic 
+    echo "helm --namespace=$NS uninstall oai-5g-@mode@"
+    helm --namespace=$NS uninstall oai-5g-@mode@ 
 }
 
 
@@ -851,13 +852,13 @@ function get-all-logs() {
 
 DATE=`date +"%Y-%m-%dT%H.%M.%S"`
 
-AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-basic" -o jsonpath="{.items[0].metadata.name}")
-AMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-basic" -o jsonpath="{.items[*].status.podIP}")
+AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+AMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
 echo -e "\t - Retrieving logs for oai-amf $AMF_POD_NAME running with IP $AMF_eth0_IP"
 kubectl --namespace $NS -c amf logs $AMF_POD_NAME > "$prefix"/amf-"$DATE".logs
 
-AUSF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-5g-basic" -o jsonpath="{.items[0].metadata.name}")
-AUSF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-5g-basic" -o jsonpath="{.items[*].status.podIP}")
+AUSF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+AUSF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
 echo -e "\t - Retrieving logs for oai-ausf $AUSF_POD_NAME running with IP $AUSF_eth0_IP"
 kubectl --namespace $NS -c ausf logs $AUSF_POD_NAME > "$prefix"/ausf-"$DATE".logs
 
@@ -866,28 +867,28 @@ GNB_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-gn
 echo -e "\t - Retrieving logs for oai-gnb $GNB_POD_NAME running with IP $GNB_eth0_IP"
 kubectl --namespace $NS -c gnb logs $GNB_POD_NAME > "$prefix"/gnb-"$DATE".logs
 
-NRF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-5g-basic" -o jsonpath="{.items[0].metadata.name}")
-NRF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-5g-basic" -o jsonpath="{.items[*].status.podIP}")
+NRF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+NRF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
 echo -e "\t - Retrieving logs for oai-nrf $NRF_POD_NAME running with IP $NRF_eth0_IP"
 kubectl --namespace $NS -c nrf logs $NRF_POD_NAME > "$prefix"/nrf-"$DATE".logs
 
-SMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-5g-basic" -o jsonpath="{.items[0].metadata.name}")
-SMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-5g-basic" -o jsonpath="{.items[*].status.podIP}")
+SMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+SMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
 echo -e "\t - Retrieving logs for oai-smf $SMF_POD_NAME running with IP $SMF_eth0_IP"
 kubectl --namespace $NS -c smf logs $SMF_POD_NAME > "$prefix"/smf-"$DATE".logs
 
-UPF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-5g-basic" -o jsonpath="{.items[0].metadata.name}")
+UPF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
 UPF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=" -o jsonpath="{.items[*].status.podIP}")
 echo -e "\t - Retrieving logs for oai-upf $UPF_POD_NAME running with IP $UPF_eth0_IP"
 kubectl --namespace $NS -c upf logs $UPF_POD_NAME > "$prefix"/upf-"$DATE".logs
 
-UDM_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-5g-basic" -o jsonpath="{.items[0].metadata.name}")
-UDM_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-5g-basic" -o jsonpath="{.items[*].status.podIP}")
+UDM_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+UDM_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
 echo -e "\t - Retrieving logs for oai-udm $UDM_POD_NAME running with IP $UDM_eth0_IP"
 kubectl --namespace $NS -c udm logs $UDM_POD_NAME > "$prefix"/udm-"$DATE".logs
 
-UDR_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-5g-basic" -o jsonpath="{.items[0].metadata.name}")
-UDR_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-5g-basic" -o jsonpath="{.items[*].status.podIP}")
+UDR_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+UDR_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
 echo -e "\t - Retrieving logs for oai-udr $UDR_POD_NAME running with IP $UDR_eth0_IP"
 kubectl --namespace $NS -c udr logs $UDR_POD_NAME > "$prefix"/udr-"$DATE".logs
 
@@ -918,7 +919,7 @@ function get-cn-pcap(){
 
     DATE=`date +"%Y-%m-%dT%H.%M.%S"`
 
-    AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-basic" -o jsonpath="{.items[0].metadata.name}")
+    AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
     echo "Retrieve OAI5G CN pcap files from the AMF pod on ns $NS"
     echo "kubectl -c tcpdump -n $NS exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz -C tmp pcap"
     kubectl -c tcpdump -n $NS exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz -C tmp pcap || true
