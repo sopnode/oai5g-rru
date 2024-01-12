@@ -172,16 +172,16 @@ GNB_TAG_rfsim="${RAN_TAG}"
 CONF_rfsim="gnb.sa.band78.106prb.rfsim.2x2.conf" 
 OPTIONS_rfsim="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
 
-#### b210 RU case ####
-#GNB_REPO_b210="docker.io/r2labuser/oai-gnb"
-GNB_REPO_b210="${OAISA_REPO}/oai-gnb"
-#GNB_TAG_b210="${RAN_TAG}"
-#GNB_TAG_b210="2023.w11b"
-GNB_TAG_b210="2023.w37"
-#CONF_b210="gnb.sa.band78.51prb.usrpb200.conf"
-CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
-#OPTIONS_b210="--sa  --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
-OPTIONS_b210="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+#### b2xx RU case ####
+#GNB_REPO_b2xx="docker.io/r2labuser/oai-gnb"
+GNB_REPO_b2xx="${OAISA_REPO}/oai-gnb"
+#GNB_TAG_b2xx="${RAN_TAG}"
+#GNB_TAG_b2xx="2023.w11b"
+GNB_TAG_b2xx="2023.w37"
+#CONF_b2xx="gnb.sa.band78.51prb.usrpb200.conf"
+CONF_b2xx="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
+#OPTIONS_b2xx="--sa  --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+OPTIONS_b2xx="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 
 #### n3xx RU case ####
 #GNB_REPO_n3xx="docker.io/r2labuser/oai-gnb"
@@ -417,10 +417,6 @@ function configure-gnb() {
     GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/24"
     
     # Configure RRU specific parameters for values.yaml chart
-    CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_$RRU}\")
-    GNB_REPO=$(eval echo \"\${GNB_REPO_$RRU}\")
-    GNB_TAG=$(eval echo \"\${GNB_TAG_$RRU}\")
-    GNB_NAME="${GNB_NAME}_${RRU}"
     if [[ "$RRU" = "b210" ]]; then
 	MULTUS_GNB_RU1="false"
 	MULTUS_GNB_RU2="false"
@@ -473,6 +469,11 @@ function configure-gnb() {
 	usage
     fi
     
+    CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_$RRU_TYPE}\")
+    GNB_REPO=$(eval echo \"\${GNB_REPO_$RRU_TYPE}\")
+    GNB_TAG=$(eval echo \"\${GNB_TAG_$RRU_TYPE}\")
+    GNB_NAME="${GNB_NAME}_${RRU}"
+
     echo "Insert gNB conf file $CONF_ORIG in configmap.yaml"
     # Keep the 8 first lines of configmap.yaml
     head -8  "$DIR_TEMPLATES"/configmap.yaml > /tmp/configmap.yaml
