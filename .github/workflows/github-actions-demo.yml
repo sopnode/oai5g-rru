@@ -11,6 +11,6 @@ jobs:
           mkdir -p test-oai5g-rru
           cd test-oai5g-rru
           wget https://raw.githubusercontent.com/sopnode/oai5g-rru/develop-r2lab/testing/prepare-demo-oai.sh
-          ./prepare-demo-oai.sh
+          chmod a+x prepare-demo-oai.sh; ./prepare-demo-oai.sh
       - run: echo "🍏 This job's status is ${{ job.status }}."
       
