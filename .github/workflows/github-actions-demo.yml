@@ -12,8 +12,6 @@ jobs:
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: List files in the repository
         run: |
-          ls ${{ github.workspace }}
-          cd ${{ github.workspace }}
           mkdir -p test-oai5g-rru
           cp testing/prepare-demo-oai.sh test-oai5g-rru/
           cd test-oai5g-rru
