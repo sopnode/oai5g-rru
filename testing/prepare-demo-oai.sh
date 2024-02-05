@@ -6,7 +6,8 @@
 
 #!/bin/bash
 
-DIR="/root/test-oai5g-rru"
+DIR="/home/github-runner/actions-runner/_work/test-oai5g-rru"
+#DIR="/root/test-oai5g-rru"
 REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
 #TAG_OAI5G_RRU="v1.5.1-1.2-1.0"
 #TAG_OAI5G_RRU="master"
