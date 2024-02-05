@@ -5,19 +5,12 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: self-hosted
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+      - name: Retrieve the prepare-demo-oai.sh script to set up the oai5g-rru demo script
         run: |
-          cd ../..
+          pwd; ls
           mkdir -p test-oai5g-rru
-          cp oai5g-rru/oai5g-rru/testing/prepare-demo-oai.sh test-oai5g-rru/
           cd test-oai5g-rru
+          wget https://raw.githubusercontent.com/sopnode/oai5g-rru/develop-r2lab/testing/prepare-demo-oai.sh
           ./prepare-demo-oai.sh
       - run: echo "🍏 This job's status is ${{ job.status }}."
       
