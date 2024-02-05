@@ -7,11 +7,13 @@ jobs:
     steps:
       - name: Retrieve the prepare-demo-oai.sh script to set up the oai5g-rru demo script
         run: |
-          mkdir -p test-oai5g-rru
+          echo "recreate empty directory test-oai5g-rru "
+          rm -rf test-oai5g-rru; mkdir test-oai5g-rru
           cd test-oai5g-rru
+          echo "retrieve prepare-demo-oai.sh script"
           wget https://raw.githubusercontent.com/sopnode/oai5g-rru/develop-r2lab/testing/prepare-demo-oai.sh
-          pwd; ls -lsa
           chmod a+x prepare-demo-oai.sh
+          echo "configure oai5g-rru demo script"
           ./prepare-demo-oai.sh
       - run: echo "🍏 This job's status is ${{ job.status }}."
       
