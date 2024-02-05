@@ -16,7 +16,7 @@ jobs:
         run: |
           cd ../..
           mkdir -p test-oai5g-rru
-          cp testing/prepare-demo-oai.sh test-oai5g-rru/
+          cp oai5g-rru/oai5g-rru/testing/prepare-demo-oai.sh test-oai5g-rru/
           cd test-oai5g-rru
           ./prepare-demo-oai.sh
       - run: echo "🍏 This job's status is ${{ job.status }}."
