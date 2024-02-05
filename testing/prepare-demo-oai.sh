@@ -4,20 +4,31 @@
 # by running all the pods on sopnode servers and simulating RAN with rfsim
 #
 
+#!/bin/bash
+
 DIR="/root/test-oai5g-rru"
 REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
-#TAG_OAI5G_RRU="v1.5.1-1.0-1.0"
-TAG_OAI5G_RRU="master"
+#TAG_OAI5G_RRU="v1.5.1-1.2-1.0"
+#TAG_OAI5G_RRU="master"
+TAG_OAI5G_RRU="develop-r2lab"
 REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git"
-#TAG_OAI_CN5G_FED="v1.5.1-1.0"
-TAG_OAI_CN5G_FED="r2lab-rrus"
-NS="oaiw1"
-HOST_AMF_SPGWU="sopnode-w1.inria.fr"
-HOST_GNB="sopnode-w1.inria.fr"
-RRU="rfsim"
+TAG_OAI_CN5G_FED="develop-r2lab"
+#TAG_OAI_CN5G_FED="r2lab-rrus"
+#TAG_OAI_CN5G_FED="v1.5.1-1.2"
+NS="oaiw1-ci"
+HOST_AMF_UPF="sopnode-w1"
+HOST_GNB="sopnode-w1"
+#HOST_GNB="fit02"
+#HOST_GNB="up02"
+#RRU="rfsim"
+#RRU="b210"
+RRU="jaguar"
+#RRU="n300"
 GNB_ONLY="false"
-PCAP="false"
+#CN_MODE="advance"
+CN_MODE="basic"
 LOGS="true"
+PCAP="false"
 RC_NAME="r2labuser"
 RC_PWD="r2labuser-pwd"
 RC_MAIL="r2labuser@turletti.com"
@@ -33,8 +44,8 @@ git clone -b $TAG_OAI_CN5G_FED $REPO_OAI_CN5G_FED
 cp oai5g-rru/configure-demo-oai.sh .
 cp oai5g-rru/demo-oai.sh .
 chmod a+x demo-oai.sh
-echo "./configure-demo-oai.sh update $NS $HOST_AMF_SPGWU $HOST_GNB $RRU $GNB_ONLY $LOGS $PCAP $DIR $RC_NAME $RC_PWD $RC_MAIL"
-./configure-demo-oai.sh update $NS $HOST_AMF_SPGWU $HOST_GNB $RRU $GNB_ONLY $LOGS $PCAP $DIR $RC_NAME $RC_PWD $RC_MAIL
+echo "./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $GNB_ONLY $LOGS $PCAP $DIR $CN_MODE $RC_NAME $RC_PWD $RC_MAIL"
+./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $GNB_ONLY $LOGS $PCAP $DIR $CN_MODE $RC_NAME $RC_PWD $RC_MAIL
 echo "run init"
 ./demo-oai.sh init
 echo "./demo-oai.sh configure-all"
