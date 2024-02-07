@@ -4,6 +4,9 @@ on: [push]
 jobs:
   Explore-GitHub-Actions:
     runs-on: self-hosted
+    env: 
+      WORK: "/home/github-runner/actions-runner/_work"
+      OAI5G: "/home/github-runner/actions-runner/_work/test-oai5g-rru"
     steps:
       - name: Retrieve the prepare-demo-oai.sh script to set up the oai5g-rru demo script
         run: |
@@ -14,13 +17,13 @@ jobs:
           wget https://raw.githubusercontent.com/sopnode/oai5g-rru/develop-r2lab/testing/prepare-demo-oai.sh
           chmod a+x prepare-demo-oai.sh
           echo "configure oai5g-rru demo script"
-          ./prepare-demo-oai.sh
+          $OAI5G/prepare-demo-oai.sh
           pwd
           echo "retrieve local r2lab-setup.sh script"
-          cp /home/github-runner/actions-runner/_work/local-scripts/r2lab-setup.sh .
+          cp $WORK/local-scripts/r2lab-setup.sh .
           echo "running r2lab-setup.sh script to ensure r2lab slice available and RRU/UE nodes are ready"
-          ./r2lab-setup.sh
+          $OAI5G/r2lab-setup.sh
           echo "Run the oai5g-rry demo"
-          ./demo-oai.sh start
+          $OAI5G/demo-oai.sh start
       - run: echo "🍏 This job's status is ${{ job.status }}."
       
