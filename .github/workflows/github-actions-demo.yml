@@ -15,5 +15,11 @@ jobs:
           chmod a+x prepare-demo-oai.sh
           echo "configure oai5g-rru demo script"
           ./prepare-demo-oai.sh
+          echo "retrieve local r2lab-setup.sh script"
+          cp ../local-scripts/r2lab-setup.sh .
+          echo "running r2lab-setup.sh script to ensure r2lab slice available and RRU/UE nodes are ready"
+          ./r2lab-setup.sh
+          echo "Run the oai5g-rry demo"
+          ./demo-oai.sh start
       - run: echo "🍏 This job's status is ${{ job.status }}."
       
