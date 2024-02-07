@@ -18,12 +18,21 @@ jobs:
           chmod a+x prepare-demo-oai.sh
           echo "configure oai5g-rru demo script"
           $OAI5G/prepare-demo-oai.sh
-          pwd
           echo "retrieve local r2lab-setup.sh script"
-          cp $WORK/local-scripts/r2lab-setup.sh .
-          echo "running r2lab-setup.sh script to ensure r2lab slice available and RRU/UE nodes are ready"
-          $OAI5G/r2lab-setup.sh
-          echo "Run the oai5g-rry demo"
+          cp $WORK/local-scripts/run.sh .
+          echo "Check/book R2lab slice"
+          $OAI5G/run.sh get-slice
+          echo "RRU setup"
+          $OAI5G/run.sh init-rru
+          echo "UE setup"
+          $OAI5G/run.sh init-ue
+          echo "Run the oai5g-rru demo"
           $OAI5G/demo-oai.sh start
+          echo "Sleep 10s"; sleep 10
+          echo "Trigger UE cx"
+          $OAI5G/run.sh start-ue
+          echo "Sleep 1mn"; sleep 60
+          echo "Stop the oai5g-rru demo"
+          $OAI5G/demo-oai.sh stop
       - run: echo "🍏 This job's status is ${{ job.status }}."
       
