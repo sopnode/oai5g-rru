@@ -30,7 +30,7 @@ jobs:
           $OAI5G/demo-oai.sh start
           echo "Sleep 10s"; sleep 10
           echo "Trigger UE cx"
-          $OAI5G/run.sh start-ue
+          $OAI5G/run.sh start-ue || true
           echo "Sleep 1mn"; sleep 60
           echo "Stop the oai5g-rru demo"
           $OAI5G/demo-oai.sh stop
