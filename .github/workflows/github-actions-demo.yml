@@ -15,6 +15,7 @@ jobs:
           cd test-oai5g-rru
           echo "retrieve prepare-demo-oai.sh script"
           wget https://raw.githubusercontent.com/sopnode/oai5g-rru/develop-r2lab/testing/prepare-demo-oai.sh
+          sed -i 's/^TAG_OAI5G_RRU=.*/TAG_OAI5G_RRU="${{ github.ref }}"/g' prepare-demo-oai.sh
           chmod a+x prepare-demo-oai.sh
           echo "configure oai5g-rru demo script"
           $OAI5G/prepare-demo-oai.sh
