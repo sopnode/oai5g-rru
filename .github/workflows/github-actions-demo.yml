@@ -37,7 +37,7 @@ jobs:
           echo "Sleep 1mn"; sleep 60
           echo "Stop the oai5g-rru demo"
           $OAI5G/demo-oai.sh stop
-          echo "Free R2lab resources"
+          echo "Free all R2lab resources"
           $OAI5G/run.sh all-off
       - run: echo "🍏 This job's status is ${{ job.status }}."
       
