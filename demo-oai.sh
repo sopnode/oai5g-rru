@@ -183,8 +183,8 @@ GNB_REPO_b2xx="${R2LAB_REPO}/oai-gnb"
 GNB_TAG_b2xx="${RAN_TAG}"
 CONF_b210="gnb.sa.band78.51prb.usrpb200.conf"
 #CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
-#OPTIONS_b2xx="--sa  --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
-OPTIONS_b2xx="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+OPTIONS_b2xx="--sa --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+#OPTIONS_b2xx="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 
 #### n3xx RU case ####
 #GNB_REPO_n3xx="${OAISA_REPO}/oai-gnb"
@@ -422,7 +422,7 @@ function configure-gnb() {
 	MULTUS_GNB_RU1="false"
 	MULTUS_GNB_RU2="false"
 	RRU_TYPE="b2xx"
-	ADD_OPTIONS_GNB="$OPTIONS_b210"
+	ADD_OPTIONS_GNB="$OPTIONS_b2xx"
 	QOS_GNB_DEF="false"
 
     elif [[ "$RRU" = "n300" || "$RRU" = "n320" ]]; then
