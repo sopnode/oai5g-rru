@@ -181,10 +181,10 @@ OPTIONS_rfsim="--sa -E --rfsim --log_config.global_log_options level,nocolor,tim
 GNB_REPO_b2xx="${R2LAB_REPO}/oai-gnb"
 #GNB_TAG_b2xx="2023.w37"
 GNB_TAG_b2xx="${RAN_TAG}"
-CONF_b210="gnb.sa.band78.51prb.usrpb200.conf"
-#CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
-OPTIONS_b2xx="--sa --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
-#OPTIONS_b2xx="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+#CONF_b210="gnb.sa.band78.51prb.usrpb200.conf"
+CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
+#OPTIONS_b2xx="--sa --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+OPTIONS_b2xx="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 
 #### n3xx RU case ####
 #GNB_REPO_n3xx="${OAISA_REPO}/oai-gnb"
