@@ -158,7 +158,8 @@ OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 #RAN_TAG="2023.w37"
 #RAN_TAG="2024.w02-rocky9.3"
-RAN_TAG="2023.w02-ci"
+#RAN_TAG="2023.w02-ci"
+RAN_TAG="2024.w06"
 GNB_NAME="gNB-r2lab"
 #IP_GNB_N2N3="$P100.243"
 IP_GNB_N2N3="$SUBNET_N2N3.3"
@@ -876,7 +877,7 @@ echo -e "\t - Retrieving logs for oai-smf $SMF_POD_NAME running with IP $SMF_eth
 kubectl --namespace $NS -c smf logs $SMF_POD_NAME > "$prefix"/smf-"$DATE".logs
 
 UPF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
-UPF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=" -o jsonpath="{.items[*].status.podIP}")
+UPF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
 echo -e "\t - Retrieving logs for oai-upf $UPF_POD_NAME running with IP $UPF_eth0_IP"
 kubectl --namespace $NS -c upf logs $UPF_POD_NAME > "$prefix"/upf-"$DATE".logs
 
