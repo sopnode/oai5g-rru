@@ -44,17 +44,7 @@ OAI_CN5G_FED_TAG = 'develop-r2lab'
 #OAI_CN5G_FED_TAG = 'v1.5.1-1.3'
 ##########################################################################################
 
-# Currently, TWO k8s clusters are available on the SophiaNode:
-# - A Production k8s cluster with 2 PowerEdge servers :
-#K8S_MASTER_PROD = 'sopnode-l1'
-K8S_MASTER_PROD = 'sopnode-w1'
-K8S_WORKER_PROD = 'sopnode-w1'
-# - An Experimental/Devel cluster with 2 PowerEdge servers :
-K8S_MASTER_DEVEL = 'sopnode-w2'
-K8S_WORKER_DEVEL = 'sopnode-w3'
-
-# By default, the script uses the Production k8s cluster
-default_master = K8S_MASTER_PROD
+default_master = 'sopnode-w1'
 
 # Default R2lab FIT node images
 #default_image = 'kubernetes'
@@ -388,11 +378,6 @@ def main():
         help="kubernetes master node")
 
     parser.add_argument(
-        "--devel", action='store_true', default=False,
-        help=f"equivalent to --master {K8S_MASTER_DEVEL}")
-
-
-    parser.add_argument(
         "-k", "--k8s_fit", default=default_k8s_fit,
         help="id of the FIT node used as k8s worker to control the OAI5G pods deployment")
 
@@ -487,14 +472,6 @@ def main():
     else:
         cn_mode="basic"
     print(f"Running tag {args.demo_tag} of demo-oai and tag {args.charts_tag} of OAI5G charts with {cn_mode} CN mode")
-
-    if args.devel:
-        args.master = K8S_MASTER_DEVEL
-        # in case of Devel Cluster, modify the default servers to run amf/spgwu/gnb pods
-        if args.amf_spgwu == K8S_WORKER_PROD:
-            args.amf_spgwu = K8S_WORKER_DEVEL
-        if args.gnb == K8S_MASTER_PROD:
-            args.gnb = K8S_MASTER_DEVEL
 
     if args.rru == "b210":
         if args.gnb == default_master:
