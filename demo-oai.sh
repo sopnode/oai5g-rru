@@ -55,7 +55,7 @@ IF_NAME_VLAN10="net-10"
 IF_NAME_VLAN20="net-20"
 
 ############################### oai-cn5g chart parameters ########################
-CN_TAG="v1.5.1"
+#CN_TAG="v1.5.1"
 #CN_TAG="develop"
 
 OAI5G_CHARTS="$PREFIX_DEMO/oai-cn5g-fed/charts"
@@ -68,7 +68,8 @@ MULTUS_CREATE="true"
 IF_N2="n2"
 IF_N3="n3"
 IF_N4="eth0" # should be "n4" but not, still work to be done
-IF_N6="eth0" # should be "n6" but not, still work to be done
+#IF_N6="eth0" # should be "n6" but not, still work to be done
+IF_N6="n3" # test with raphael
 
 
 CN_DEFAULT_GW=""
