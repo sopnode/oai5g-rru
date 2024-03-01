@@ -1,5 +1,5 @@
 #!/bin/bash
-# install and run iperf3 server on the spgwu-tiny pod
+# install and run iperf3 server on the upf pod
 
 ns="" 
 
@@ -21,7 +21,7 @@ if [ -z "$ns" ]; then
     usage
 fi
 
-echo "$0: Install iperf3 on oai-spgwu-tiny pod, $ns namespace and run iperf3 -B 12.1.1.1 -s"
+echo "$0: Install iperf3 on oai-upf pod, $ns namespace and run iperf3 -B 12.1.1.1 -s"
 
 # create iperf3-server.sh installation script
 cat > /tmp/iperf3-server.sh <<EOF
@@ -34,13 +34,13 @@ apk add iperf3
 EOF
 chmod a+x  /tmp/iperf3-server.sh
 
-# retrieve spgwu-tiny pod name and copy iperf3-server.sh script there
-SPGWU_POD_NAME=$(kubectl -n$ns get pods -l app.kubernetes.io/name=oai-spgwu-tiny -o jsonpath="{.items[0].metadata.name}")
+# retrieve upf pod name and copy iperf3-server.sh script there
+UPF_POD_NAME=$(kubectl -n$ns get pods -l app.kubernetes.io/name=oai-upf -o jsonpath="{.items[0].metadata.name}")
 
-echo "kubectl -c tcpdump cp /tmp/iperf3-server.sh $ns/$SPGWU_POD_NAME:/iperf3-server.sh || true"
-kubectl -c tcpdump cp /tmp/iperf3-server.sh $ns/$SPGWU_POD_NAME:/iperf3-server.sh || true
+echo "kubectl -c tcpdump cp /tmp/iperf3-server.sh $ns/$UPF_POD_NAME:/iperf3-server.sh || true"
+kubectl -c tcpdump cp /tmp/iperf3-server.sh $ns/$UPF_POD_NAME:/iperf3-server.sh || true
 
-echo "kubectl -n $ns -c tcpdump exec -i $SPGWU_POD_NAME -- /bin/sh /iperf3-server.sh $ns"
-kubectl -n $ns -c tcpdump exec -i $SPGWU_POD_NAME -- /bin/sh /iperf3-server.sh 
+echo "kubectl -n $ns -c tcpdump exec -i $UPF_POD_NAME -- /bin/sh /iperf3-server.sh $ns"
+kubectl -n $ns -c tcpdump exec -i $UPF_POD_NAME -- /bin/sh /iperf3-server.sh 
 
 
