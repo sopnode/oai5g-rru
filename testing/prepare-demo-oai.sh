@@ -1,5 +1,7 @@
 #!/bin/bash
-
+#
+# Usage: prepare-demo-oai.sh [TAG_OAI5G_RRU]
+#
 # This script aims to test oai5g-rru demo script without fit nodes,
 # by running all the pods on sopnode servers and simulating RAN with rfsim
 #
@@ -11,7 +13,13 @@ DIR="/home/github-runner/actions-runner/_work/test-oai5g-rru"
 REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
 #TAG_OAI5G_RRU="v1.5.1-1.2-1.0"
 #TAG_OAI5G_RRU="master"
-TAG_OAI5G_RRU="develop-r2lab"
+if [ $# -eq 1 ]
+then
+    TAG_OAI5G_RRU="$1"
+else
+    TAG_OAI5G_RRU="develop-r2lab"
+fi
+echo "***** Testing demo oai5g-rru, TAG: $1"
 REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git"
 TAG_OAI_CN5G_FED="develop-r2lab"
 #TAG_OAI_CN5G_FED="r2lab-rrus"
