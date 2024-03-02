@@ -22,7 +22,7 @@ jobs:
           cd test-oai5g-rru
           echo "retrieve prepare-demo-oai.sh script"
           wget https://raw.githubusercontent.com/sopnode/oai5g-rru/$BRANCH/testing/prepare-demo-oai.sh -O $OAI5G/prepare-demo-oai.sh
-          chmod a+x prepare-demo-oai.sh
+          chmod a+x $OAI5G/prepare-demo-oai.sh
           echo "configure oai5g-rru demo script branch $BRANCH"
           $OAI5G/prepare-demo-oai.sh $BRANCH
           echo "retrieve local r2lab-setup.sh script"
