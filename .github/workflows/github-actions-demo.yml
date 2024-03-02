@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Retrieve the prepare-demo-oai.sh script to set up the oai5g-rru demo script
         run: |
+          echo "retrieve current k8s cluster configuration"
+          /usr/local/bin/k8sgetconfig
           echo "retrieve current branch name"
           BRANCH="${{ github.ref }}" 
           BRANCH=$(basename $BRANCH)
