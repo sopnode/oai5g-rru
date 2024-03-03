@@ -23,7 +23,7 @@ All the forms of the **demo-oai.py** [nepi-ng](https://nepi-ng.inria.fr/) script
 
 The mental model is that we are dealing with essentially three states:
 
-* (0) initially, the k8s cluster is running and some R2lab nodes have joined the cluster as workers;
+* (0) initially, the k8s cluster is up and running and some R2lab nodes have joined the cluster as workers;
 * (1) after setup, OAI5G charts have been configured and are ready to be started, UEs selected are also configured and ready to be used;
 * (2) at that point one can use the `--start` option to start the system, which amounts to deploying pods on the k8s cluster;
 * (back to 1) it is point one can roll back and come back to the previous state, using the `--stop` option
@@ -66,12 +66,12 @@ First, it will copy on the worker node *fit01* the *demo-oai.sh* bash script and
 root@fit01# /root/configure-demo-oai.sh update
 ```
 
-Then, the script will clone the r2lab-rrus branch of [oai-cn5g-fed](https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git) gitlab repository on the R2lab node *fit01*. To do it manually, you will have to run:
+Then, the script will clone the *develop-r2lab* branch of [oai-cn5g-fed](https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git) gitlab repository on the worker node. To do it manually, you will have to run:
 
 ```
-root@fit01# git clone -b r2lab-rrus https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed
+root@fit01# git clone -b develop-r2lab https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed
 ```
-Then it will apply different patches to configure the different OAI5G pods to be run on R2lab/SophiaNode platform with the desired configuration. To do it manually, you will have to run on *fit01* :
+Then it will apply different patches to configure the different OAI5G pods to be run on R2lab/SophiaNode platform with the desired configuration. To do it manually, you will have to run:
 
 ```
 root@fit01# ./demo-oai.sh configure-all
@@ -83,7 +83,7 @@ These patches include the configuration of [multus CNI](https://github.com/k8sne
 
 ### Deployment
 
-Finally, the **demo-oai.py** script will deploy the OAI5G pods on the k8s cluster. However, if you prefer to do it manually, you will have to do the following steps on *fit01*:
+Finally, the **demo-oai.py** script will deploy the OAI5G pods on the k8s cluster. However, if you prefer to do it manually, you will have to do the following steps on the k8s worker node:
 
 
 ##### Wait until all fit nodes are in READY state
@@ -91,16 +91,16 @@ Finally, the **demo-oai.py** script will deploy the OAI5G pods on the k8s cluste
 
 ##### Run the OAI 5G Core Network pods
 ``` bash
-root@fit01# cd /home/oai/oai-cn5g-fed/charts/oai-5g-core/oai-5g-basic`
+root@fit01# cd /root/oai-cn5g-fed/charts/oai-5g-core/oai-5g-basic`
 
-root@fit01# helm --namespace=oai5g spray .
+root@fit01# helm --create-namespace --namespace=oai5g install oai-5g-basic .
 ```
 ##### Wait until all 5G Core pods are READY
 `root@fit01# kubectl wait pod -noai5g --for=condition=Ready --all`
 
 ##### Run the oai-gnb pod 
 ``` bash
-root@fit01# cd /home/oai/oai-cn5g-fed/charts/oai-5g-ran
+root@fit01# cd /root/oai-cn5g-fed/charts/oai-5g-ran
 root@fit01# helm --namespace=oai5g install oai-gnb oai-gnb/
 ```
 ##### Wait until the gNB pod is READY
@@ -151,12 +151,10 @@ Note that the *demo-oai.sh* script allows to start/stop specific part of OAI5G p
 
 ### Testing
 
-At the end of the demo, few logs of the oai-gnb pod should be visible on the terminal.
+At the end of the demo, few logs of the oai-gnb pod should be visible on the terminal and if your scenario includes UEs, ping tests should be visible.
 
 
-To check logs of the different pods, you need first to log on one of the k8s workers or master nodes, e.g., *fit01*.
-
-For instance, to check the logs of the `oai-gnb` pod, run:
+To check logs of the different pods, you can do it through a k8s worker. For instance, to check the logs of the `oai-gnb` pod, run:
 
 ``` bash
 
@@ -165,11 +163,11 @@ root@fit01# GNB_POD_NAME=$(kubectl -noai5g get pods -l app.kubernetes.io/name=oa
 root@fit01# kubectl -noai5g logs $GNB_POD_NAME -c gnb
 ```
 
-In case of RF simulation (RRU=rfsim), it is possible to run a ping test directly on *fit01*:
+In case of RF simulation (RRU=rfsim), you can run the following command on a k8s worker node to run a ping test from the UE pod: 
 
 ```
 root@fit01# ./demo-oai.sh run-ping
-ping --I oaitun_ue1 c4 google.fr
+ping -I oaitun_ue1 c4 google.fr
 PING google.fr (172.217.22.131) from 12.1.1.81 oaitun_ue1: 56(84) bytes of data.
 64 bytes from par21s12-in-f3.1e100.net (172.217.22.131): icmp_seq=1 ttl=112 time=37.3 ms
 64 bytes from par21s12-in-f3.1e100.net (172.217.22.131): icmp_seq=2 ttl=112 time=33.1 ms
@@ -185,7 +183,7 @@ Now, assume that you want to restart the demo with some changes in the CN chart 
 
 
 * Stop the previous test ``` ./demo-oai.py --stop```
-* Make your changes on *fit01* in configuration file */root/demo-oai.sh*. (If the CN parameters you want to change are not in script */root/demo-oai.sh*, you can directly change chart file */root/oai-cn5g-fed/charts/oai-5g-core/oai-5g-basic/values.yaml*.) Then run on your laptop:
+* Make your changes on the k8s worker node in configuration file */root/demo-oai.sh*. (If the CN parameters you want to change are not in script */root/demo-oai.sh*, you can directly change chart file */root/oai-cn5g-fed/charts/oai-5g-core/oai-5g-basic/values.yaml*.) Then run on your laptop:
 * ``` ./demo-oai.py --namespace oai5g_v2 ```
 
 The latter command will take into account your changes to reconfigure the charts, and will then launch the OAI5G pods on the *oai5g_v2* namespace. 
@@ -203,13 +201,13 @@ For that, you can run on your laptop ``./demo-oai.py --stop`` or run the followi
 root@fit01# helm -n oai5g ls --short --all | xargs -L1 helm -n oai5g delete
 ```
 
-Another possibility is to run on *fit01*:
+Another possibility is to run on the k8s worker node:
 
 ```
 root@fit01# ./demo-oai.sh stop
 ```
 
-Then, to shutdown R2lab worker nodes and remove them from the k8s cluster, run on your laptop the following command:
+Then, to shutdown R2lab worker nodes, RRU(s) and UE(s), run on your laptop the following command:
 
 ``` bash
 $ ./demo-oai.py --cleanup
@@ -222,10 +220,10 @@ $ ./demo-oai.py --cleanup
 
 Using the option --gnb-only, it is possible to run only the OAI5G RAN part, i.e., oai-gnb pod and UEs. 
 
-For instance, the following command will prepare a scenario from scratch to launch the USRP N300-based gNB with 2 Quectel-based UEs:
+For instance, the following command will prepare a scenario from scratch to launch the AW2S jaguar gNB with qhat03 Quectel-based UE:
 
 ```
-$ ./demo-oai.py -R n300 -Q7 -Q9 --gnb-only -a -l
+$ ./demo-oai.py -R jaguar -q3 --gnb-only -a -l
 ```
 
 Once the script terminates, you need to log on a k8s worker node and configure the following parameters in the script demo-oai.sh to match the external CN parameters:
@@ -263,20 +261,15 @@ At the Core Network side, you should configure the following parameters:
  * FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f"
  * OPC="C42449363BBAD02B66D16BC975D77CC1"
 
-As precised in https://r2lab.inria.fr/hardware.md, the two Quectel UEs on fit07 and fit09 have IMSI: <001010000000003> and <001010000000004> respectively. So, to authenticate UEs in the CN, the mysql database should be configured with:
+As precised in https://r2lab.inria.fr/hardware.md, the qhat03 UE has IMSI: <001010000000006>. So, to authenticate this UE in the CN, the mysql database should be configured with:
 
 ```
 INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
-('001010000000003', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"\lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000003');
+('001010000000006', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"\lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000006');
 
-INSERT INTO `AuthenticationSubscription` (`ueid`, `authenticationMethod`, `encPermanentKey`, `protectionParameterId`, `sequenceNumber`, `authenticationManagementField`, `algorithmId`, `encOpcKey`, `encTopcKey`, `vectorGenerationInHss`, `n5gcAuthMethod`, `rgAuthenticationInd`, `supi`) VALUES
-('001010000000004', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"\lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000004');
 
 INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES
-('001010000000003', '00101', '{\"sst\": 1, \"sd\": \"16777215\"}', '{\"oai.ipv4\":{\"pduSessionTypes\": { \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15, \"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1}, \"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"\downlink\":\"1000Mbps\"}}}');
-
-INSERT INTO `SessionManagementSubscriptionData` (`ueid`, `servingPlmnid`, `singleNssai`, `dnnConfigurations`) VALUES
-('001010000000004', '00101', '{\"sst\": 1, \"sd\": \"16777215\"}', '{\"oai.ipv4\":{\"pduSessionTypes\": { \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15, \"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"}, \"priorityLevel\":1}, \"sessionAmbr\":{\"uplink\": \"1000Mbps\", \"\downlink\": \"1000Mbps\"}}}');
+('001010000000006', '00101', '{\"sst\": 1, \"sd\": \"16777215\"}', '{\"oai.ipv4\":{\"pduSessionTypes\": { \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 1,\"arp\":{\"priorityLevel\": 15, \"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1}, \"sessionAmbr\":{\"uplink\":\"1000Mbps\", \"\downlink\":\"1000Mbps\"}}}');
 
 ```
 
