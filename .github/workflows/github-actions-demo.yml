@@ -41,8 +41,8 @@ jobs:
           echo "Trigger UE cx"
           $OAI5G/run.sh start-ue || true
           echo "Sleep 1mn"; sleep 60
-	  echo "Run IPERF Tests..."
-	  $OAI5G/run.sh run-iperf || true
+          echo "Run IPERF Tests..."
+          $OAI5G/run.sh run-iperf || true
           echo "Stop the oai5g-rru demo"
           $OAI5G/demo-oai.sh stop
           echo "Free R2lab resources"
