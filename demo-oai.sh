@@ -792,7 +792,7 @@ EOF
     if [[ "$GNB_ONLY" = "false" ]]; then
 	start-cn
     else
-	start-upf
+	echo "DO NOT START YET start-upf"
     fi
 
     start-gnb 
