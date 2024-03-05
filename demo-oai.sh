@@ -782,9 +782,9 @@ EOF
 
     if [[ "$GNB_ONLY" = "false" ]]; then
 	start-cn
-    else
-	start-upf
-    fi
+#    else
+#	start-upf
+#    fi
     start-gnb 
 
     if [[ "$RRU" = "rfsim" ]]; then
