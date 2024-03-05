@@ -243,12 +243,12 @@ NRUE_USRP="rfsim"
 # then, configure the following parameters
 if [[ $GNB_ONLY = "true" ]]; then
     # Set the external AMF IP address
-    IP_AMF_N2="192.168.128.195"#"172.22.10.6" # external AMF IP address, e.g., "172.22.10.6"
+    IP_AMF_N2="192.168.128.195" # external AMF IP address, e.g., "172.22.10.6"
     # Set the local host network interface to reach AMF/UPF
     NETMASK_AMF_N2="27"
-    IF_NAME_GNB_N2="eth2"#"ran" # Host network interface to reach AMF/UPF
+    IF_NAME_GNB_N2="eth2" # Host network interface to reach AMF/UPF
     # Set the local IP address of the latter network interface
-    IP_GNB_N2N3="192.168.128.131"#"10.0.20.243" # local gNB IP required by AMF/UPF, e.g., "10.0.20.243"
+    IP_GNB_N2N3="192.168.128.131" 
     NETMASK_GNB_N2="27"
     # Set the route to reach AMF/UPF
     ROUTES_GNB_N2="[{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
