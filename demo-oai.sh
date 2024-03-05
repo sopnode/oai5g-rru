@@ -399,6 +399,60 @@ EOF
 
 #################################################################################
 
+function configure-upf() {
+
+    # if $LOGS is true, create a tcpdump container with privileges
+    # if $PCAP is true, start tcpdump and create a shared volume to store pcap
+    echo "Configuring chart $OAI5G_CORE/oai-upf/values.yaml for R2lab"
+    cat > /tmp/upf-values.sed <<EOF
+s|@PRIVILEGED@|$LOGS|
+s|@TCPDUMP_CONTAINER@|$LOGS|
+s|@START_TCPDUMP@|$PCAP|
+s|@SHAREDVOLUME@|$PCAP|
+s|@CN_DEFAULT_GW@|$CN_DEFAULT_GW|
+s|@MULTUS_UPF_N3@|$MULTUS_UPF_N3|
+s|@IP_UPF_N3@|$IP_UPF_N3|
+s|@NETMASK_UPF_N3@|$NETMASK_UPF_N3|
+s|@MAC_UPF_N3@|$(gener-mac)|
+s|@GW_UPF_N3@|$GW_UPF_N3|
+s|@ROUTES_UPF_N3@|$ROUTES_UPF_N3|
+s|@IF_NAME_UPF_N3@|$IF_NAME_UPF_N3|
+s|@MULTUS_UPF_N4@|$MULTUS_UPF_N4|
+s|@IP_UPF_N4@|$IP_UPF_N4|
+s|@NETMASK_UPF_N4@|$NETMASK_UPF_N4|
+s|@MAC_UPF_N4@|$(gener-mac)|
+s|@GW_UPF_N4@|$GW_UPF_N4|
+s|@ROUTES_UPF_N4@|$ROUTES_UPF_N4|
+s|@IF_NAME_UPF_N4@|$IF_NAME_UPF_N4|
+s|@MULTUS_UPF_N6@|$MULTUS_UPF_N6|
+s|@IP_UPF_N6@|$IP_UPF_N6|
+s|@NETMASK_UPF_N6@|$NETMASK_UPF_N6|
+s|@MAC_UPF_N6@|$(gener-mac)|
+s|@GW_UPF_N6@|$GW_UPF_N6|
+s|@ROUTES_UPF_N6@|$ROUTES_UPF_N6|
+s|@IF_NAME_UPF_N6@|$IF_NAME_UPF_N6|
+s|@NODE_UPF@|"$NODE_UPF"|
+EOF
+    cp "$OAI5G_CORE/oai-upf/values.yaml /tmp/upf_values.yaml-orig
+    echo "(Over)writing $OAI5G_CORE/oai-upf/values.yaml"
+    sed -f /tmp/upf-values.sed < /tmp/upf_values.yaml-orig > "$OAI5G_CORE"/oai-upf/values.yaml
+    diff /tmp/upf_values.yaml-orig "$OAI5G_CORE"/oai-upf/values.yaml
+
+    echo "Configuring chart $OAI5G_CORE/oai-upf/config.yaml for R2lab"
+    cat > /tmp/upf-config.sed <<EOF
+s|@IF_N3@|$IF_N3|
+s|@IF_N4@|$IF_N4|
+s|@IF_N6@|$IF_N6|
+s|@DNN0@|$DNN|
+EOF
+    cp "$OAI5G_CORE"/oai-upf/config.yaml /tmp/upf_config.yaml-orig
+    echo "(Over)writing $OAI5G_CORE/oai-upf/config.yaml"
+    sed -f /tmp/upf-config.sed < /tmp/upf_config.yaml-orig > "$OAI5G_CORE"/oai-upf/config.yaml
+    diff /tmp/upf_config.yaml-orig "$OAI5G_CORE"/oai-upf/config.yaml
+}
+
+#################################################################################
+
 function configure-mysql() {
 
     DIR_ORIG_CHART="$OAI5G_CORE/mysql/initialization"
@@ -637,9 +691,13 @@ function configure-all() {
     kubectl -n $NS delete secret regcred || true
     kubectl -n $NS create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=@DEF_REGCRED_NAME@ --docker-password=@DEF_REGCRED_PWD@ --docker-email=@DEF_REGCRED_EMAIL@ || true
 
-    # Ensure that helm spray plugin is installed
-    configure-oai-5g-@mode@ 
-    configure-mysql
+    if [[ "$GNB_ONLY" = "false" ]]; then
+	configure-oai-5g-@mode@
+	configure-mysql
+    else
+	echo "*** Demo mode with R2lab gNB and UPF and external CN"
+	configure-upf
+    fi
     configure-gnb
     if [[ "$RRU" = "rfsim" ]]; then
 	configure-nr-ue
@@ -792,7 +850,8 @@ EOF
     if [[ "$GNB_ONLY" = "false" ]]; then
 	start-cn
     else
-	echo "DO NOT START YET start-upf"
+	echo "****************************** START start-upf"
+	start-upf
     fi
 
     start-gnb 
