@@ -644,7 +644,7 @@ function configure-all() {
 
 
 function start-cn() {
-    echo "Running start-cn() with namespace=$NS, NODE_AMF=$NODE_AMF, NODE_UPF=$NODE_AMF_UPF"
+    echo "Running start-cn() with namespace=$NS, NODE_AMF=$NODE_AMF, NODE_UPF=$NODE_UPF"
     echo "cd $OAI5G_@MODE@"
     cd "$OAI5G_@MODE@"
 
@@ -659,7 +659,7 @@ function start-cn() {
 }
 
 function start-upf() {
-    echo "Running start-upf() with namespace=$NS, NODE_AMF=$NODE_AMF, NODE_UPF=$NODE_AMF_UPF"
+    echo "Running start-upf() with namespace=$NS, NODE_AMF=$NODE_AMF, NODE_UPF=$NODE_UPF"
     echo "cd $OAI5G_@MODE@"
     cd "$OAI5G_@MODE@"
 
@@ -744,7 +744,7 @@ EOF
 
 	
 	echo "start: Create a k8s persistent volume claim for RAN logs files"
-    cat << \EOF >> /tmp/oai5g-pvc.yaml
+        cat << \EOF >> /tmp/oai5g-pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -758,11 +758,11 @@ spec:
   storageClassName: ""
   volumeName: oai5g-pv
 EOF
-    echo "kubectl -n $NS apply -f /tmp/oai5g-pvc.yaml"
-    kubectl -n $NS apply -f /tmp/oai5g-pvc.yaml
+	echo "kubectl -n $NS apply -f /tmp/oai5g-pvc.yaml"
+	kubectl -n $NS apply -f /tmp/oai5g-pvc.yaml
 
 	echo "start: Create a k8s persistent volume claim for CN logs files"
-    cat << \EOF >> /tmp/cn5g-pvc.yaml
+	cat << \EOF >> /tmp/cn5g-pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -776,8 +776,8 @@ spec:
   storageClassName: ""
   volumeName: cn5g-pv
 EOF
-    echo "kubectl -n $NS apply -f /tmp/cn5g-pvc.yaml"
-    kubectl -n $NS apply -f /tmp/cn5g-pvc.yaml
+	echo "kubectl -n $NS apply -f /tmp/cn5g-pvc.yaml"
+	kubectl -n $NS apply -f /tmp/cn5g-pvc.yaml
     fi
 
     if [[ "$GNB_ONLY" = "false" ]]; then
