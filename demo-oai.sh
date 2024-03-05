@@ -783,8 +783,6 @@ EOF
     if [[ "$GNB_ONLY" = "false" ]]; then
 	start-cn
     fi
-#    else
-#	start-upf
 
     start-gnb 
 
