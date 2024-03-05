@@ -34,7 +34,7 @@ from r2lab import r2lab_hostname, ListOfChoices, ListOfChoicesNullReset, find_lo
 ##########################################################################################
 #    Configure here OAI5G_RRU and OAI_CN5G_FED repo and tag
 OAI5G_RRU_REPO = 'https://github.com/sopnode/oai5g-rru.git'
-OAI5G_RRU_TAG = 'develop-r2lab'
+OAI5G_RRU_TAG = 'develop-r2lab-demo'
 #OAI5G_RRU_TAG = 'r2-helm-charts'
 #OAI5G_RRU_TAG = 'master'
 #OAI5G_RRU_TAG = 'v1.5.1-1.3-1.0'
