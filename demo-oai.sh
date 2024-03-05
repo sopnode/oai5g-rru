@@ -254,6 +254,7 @@ if [[ $GNB_ONLY = "true" ]]; then
     ROUTES_GNB_N2="[{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
     NODE_AMF=$NODE_AMF_UPF
     NODE_UPF=$NODE_AMF_UPF
+    MULTUS_UPF_N3="true"
     IP_UPF_N3="192.168.128.131" 
     NETMASK_UPF_N3="27"
     GW_UPF_N3=""
@@ -850,8 +851,8 @@ EOF
     if [[ "$GNB_ONLY" = "false" ]]; then
 	start-cn
     else
-	echo "DO NOT START start-upf"
-	#start-upf
+	echo "********************************** START start-upf"
+	start-upf
     fi
 
     start-gnb 
