@@ -433,7 +433,7 @@ s|@ROUTES_UPF_N6@|$ROUTES_UPF_N6|
 s|@IF_NAME_UPF_N6@|$IF_NAME_UPF_N6|
 s|@NODE_UPF@|"$NODE_UPF"|
 EOF
-    cp "$OAI5G_CORE/oai-upf/values.yaml /tmp/upf_values.yaml-orig
+    cp "$OAI5G_CORE"/oai-upf/values.yaml /tmp/upf_values.yaml-orig
     echo "(Over)writing $OAI5G_CORE/oai-upf/values.yaml"
     sed -f /tmp/upf-values.sed < /tmp/upf_values.yaml-orig > "$OAI5G_CORE"/oai-upf/values.yaml
     diff /tmp/upf_values.yaml-orig "$OAI5G_CORE"/oai-upf/values.yaml
