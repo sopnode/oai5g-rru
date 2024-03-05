@@ -64,6 +64,10 @@ OAI5G_CORE="$OAI5G_CHARTS/oai-5g-core"
 OAI5G_BASIC="$OAI5G_CORE/oai-5g-basic"
 OAI5G_ADVANCE="$OAI5G_CORE/oai-5g-advance"
 
+# DEMO: NODE_AMF is different from NODE_UPF
+NODE_AMF=$NODE_AMF_UPF
+NODE_UPF=$NODE_AMF_UPF
+
 # Multus is now used whatever RRU selected
 MULTUS_CREATE="true"
 IF_N2="n2"
@@ -248,6 +252,8 @@ if [[ $GNB_ONLY = "true" ]]; then
     NETMASK_GNB_N2="27"
     # Set the route to reach AMF/UPF
     ROUTES_GNB_N2="[{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
+    NODE_AMF=$NODE_AMF_UPF
+    NODE_UPF=$NODE_AMF_UPF
 fi
 
 ##################################################################################
@@ -325,7 +331,7 @@ s|@MAC_AMF_N2@|$(gener-mac)|
 s|@GW_AMF_N2@|$GW_AMF_N2|
 s|@ROUTES_AMF_N2@|$ROUTES_AMF_N2|
 s|@IF_NAME_AMF_N2@|$IF_NAME_AMF_N2|
-s|@NODE_AMF@|"$NODE_AMF_UPF"|
+s|@NODE_AMF@|"$NODE_AMF"|
 s|@MULTUS_UPF_N3@|$MULTUS_UPF_N3|
 s|@IP_UPF_N3@|$IP_UPF_N3|
 s|@NETMASK_UPF_N3@|$NETMASK_UPF_N3|
@@ -347,7 +353,7 @@ s|@MAC_UPF_N6@|$(gener-mac)|
 s|@GW_UPF_N6@|$GW_UPF_N6|
 s|@ROUTES_UPF_N6@|$ROUTES_UPF_N6|
 s|@IF_NAME_UPF_N6@|$IF_NAME_UPF_N6|
-s|@NODE_UPF@|"$NODE_AMF_UPF"|
+s|@NODE_UPF@|"$NODE_UPF"|
 s|@MULTUS_SMF_N4@|$MULTUS_SMF_N4|
 s|@IP_SMF_N4@|$IP_SMF_N4|
 s|@NETMASK_SMF_N4@|$NETMASK_SMF_N4|
@@ -614,7 +620,7 @@ EOF
 
 function configure-all() {
     echo "configure-all: Applying SophiaNode patches to OAI5G charts located on "$PREFIX_DEMO"/oai-cn5g-fed"
-    echo -e "\t with oai-upf running on $NODE_AMF_UPF"
+    echo -e "\t with oai-upf running on $NODE_UPF"
     echo -e "\t with oai-gnb running on $NODE_GNB"
     echo -e "\t with generate-logs: $LOGS"
     echo -e "\t with generate-pcap: $PCAP"
@@ -638,7 +644,7 @@ function configure-all() {
 
 
 function start-cn() {
-    echo "Running start-cn() with namespace=$NS, NODE_AMF_UPF=$NODE_AMF_UPF"
+    echo "Running start-cn() with namespace=$NS, NODE_AMF=$NODE_AMF, NODE_UPF=$NODE_AMF_UPF"
     echo "cd $OAI5G_@MODE@"
     cd "$OAI5G_@MODE@"
 
@@ -653,7 +659,7 @@ function start-cn() {
 }
 
 function start-upf() {
-    echo "Running start-upf() with namespace=$NS, NODE_AMF_UPF=$NODE_AMF_UPF"
+    echo "Running start-upf() with namespace=$NS, NODE_AMF=$NODE_AMF, NODE_UPF=$NODE_AMF_UPF"
     echo "cd $OAI5G_@MODE@"
     cd "$OAI5G_@MODE@"
 
@@ -778,7 +784,9 @@ EOF
     fi
 
     if [[ "$GNB_ONLY" = "false" ]]; then
-	start-cn 
+	start-cn
+    else
+	start-upf
     fi
     start-gnb 
 
@@ -977,7 +985,7 @@ if test $# -lt 1; then
     usage
 else
     case $1 in
-	init|start|stop|configure-all|start-cn|start-gnb|start-nr-ue|stop-cn|stop-gnb|stop-nr-ue|start-upf|run-ping)
+	init|start|stop|configure-all|start-cn|start-gnb|start-nr-ue|start-upf|stop-cn|stop-gnb|stop-nr-ue|run-ping)
 	    echo "$0: running $1"
 	    "$1"
 	;;
