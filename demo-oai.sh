@@ -694,6 +694,7 @@ function configure-all() {
     kubectl -n $NS create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=@DEF_REGCRED_NAME@ --docker-password=@DEF_REGCRED_PWD@ --docker-email=@DEF_REGCRED_EMAIL@ || true
 
     if [[ "$GNB_ONLY" = "false" ]]; then
+	configure-upf
 	configure-oai-5g-@mode@
 	configure-mysql
     else
