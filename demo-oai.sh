@@ -784,7 +784,7 @@ EOF
 	start-cn
 #    else
 #	start-upf
-#    fi
+    fi
     start-gnb 
 
     if [[ "$RRU" = "rfsim" ]]; then
