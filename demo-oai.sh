@@ -663,11 +663,8 @@ function start-upf() {
     echo "cd $OAI5G_@MODE@"
     cd "$OAI5G_@MODE@"
 
-    echo "helm dependency update"
-    helm dependency update
-
-    echo "helm --create-namespace --namespace=$NS install oai-upf ."
-    helm --create-namespace --namespace=$NS install oai-upf .
+    echo "helm --create-namespace --namespace=$NS install oai-upf oai-upf/"
+    helm --create-namespace --namespace=$NS install oai-upf oai-upf/
 
     echo "Wait until UPF pod is READY"
     kubectl wait pod -n $NS --for=condition=Ready --all
