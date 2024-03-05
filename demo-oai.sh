@@ -663,7 +663,7 @@ function start-cn() {
 
 function start-upf() {
     echo "Running start-upf() with namespace=$NS, NODE_AMF=$NODE_AMF, NODE_UPF=$NODE_UPF"
-    echo "cd $OAI5G_@MODE@'; cd .."
+    echo "cd $OAI5G_@MODE@; cd .."
     cd "$OAI5G_@MODE@"; cd ..
 
     echo "helm --create-namespace --namespace=$NS install oai-upf oai-upf/"
