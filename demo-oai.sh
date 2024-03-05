@@ -786,7 +786,7 @@ EOF
     if [[ "$GNB_ONLY" = "false" ]]; then
 	start-cn
     else
-	echo "start-upf"
+	start-upf
     fi
 
     start-gnb 
