@@ -39,7 +39,7 @@ OAI5G_RRU_TAG = 'develop-r2lab-demo-local-upf'
 #OAI5G_RRU_TAG = 'master'
 #OAI5G_RRU_TAG = 'v1.5.1-1.3-1.0'
 OAI_CN5G_FED_REPO = 'https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git'
-OAI_CN5G_FED_TAG = 'develop-r2lab-demo'
+OAI_CN5G_FED_TAG = 'develop-r2lab-demo-local-upf'
 #OAI_CN5G_FED_TAG = 'r2-helm-charts-r2lab'
 #OAI_CN5G_FED_TAG = 'v1.5.1-1.3'
 ##########################################################################################
