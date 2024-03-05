@@ -254,7 +254,7 @@ if [[ $GNB_ONLY = "true" ]]; then
     ROUTES_GNB_N2="[{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
     NODE_AMF=$NODE_AMF_UPF
     NODE_UPF=$NODE_AMF_UPF
-    MULTUS_UPF_N3="false"
+    MULTUS_UPF_N3="true"
     echo "************************* MULTUS_UPF_N3=$MULTUS_UPF_N3"
     IP_UPF_N3="192.168.128.131" 
     NETMASK_UPF_N3="27"
@@ -437,7 +437,7 @@ s|@MAC_UPF_N6@|$(gener-mac)|
 s|@GW_UPF_N6@|$GW_UPF_N6|
 s|#@ROUTES_UPF_N6@|$ROUTES_UPF_N6|
 s|@IF_NAME_UPF_N6@|$IF_NAME_UPF_N6|
-s|#@NODE_UPF@|"$NODE_UPF"|
+s|@NODE_UPF@|"$NODE_UPF"|
 EOF
     cp "$OAI5G_CORE"/oai-upf/values.yaml /tmp/upf_values.yaml-orig
     echo "(Over)writing $OAI5G_CORE/oai-upf/values.yaml"
