@@ -254,6 +254,12 @@ if [[ $GNB_ONLY = "true" ]]; then
     ROUTES_GNB_N2="[{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
     NODE_AMF=$NODE_AMF_UPF
     NODE_UPF=$NODE_AMF_UPF
+    IP_UPF_N3="192.168.128.131" 
+    NETMASK_UPF_N3="27"
+    GW_UPF_N3=""
+    ROUTES_UPF_N3=""
+    IF_NAME_UPF_N3="eth2"
+    
 fi
 
 ##################################################################################
