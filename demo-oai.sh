@@ -327,9 +327,13 @@ function configure-oai-5g-@mode@() {
     # if $PCAP is true, start tcpdump and create a shared volume to store pcap
     echo "Configuring chart $OAI5G_@MODE@/values.yaml for R2lab"
     cat > /tmp/@mode@-values.sed <<EOF
+s|#@PRIVILEGED@|$LOGS|
 s|@PRIVILEGED@|$LOGS|
+s|#@TCPDUMP_CONTAINER@|$LOGS|
 s|@TCPDUMP_CONTAINER@|$LOGS|
+s|#@START_TCPDUMP@|$PCAP|
 s|@START_TCPDUMP@|$PCAP|
+s|#@SHAREDVOLUME@|$PCAP|
 s|@SHAREDVOLUME@|$PCAP|
 s|@CN_DEFAULT_GW@|$CN_DEFAULT_GW|
 s|@MULTUS_AMF_N2@|$MULTUS_AMF_N2|
@@ -340,28 +344,28 @@ s|@GW_AMF_N2@|$GW_AMF_N2|
 s|@ROUTES_AMF_N2@|$ROUTES_AMF_N2|
 s|@IF_NAME_AMF_N2@|$IF_NAME_AMF_N2|
 s|@NODE_AMF@|"$NODE_AMF"|
-s|@MULTUS_UPF_N3@|$MULTUS_UPF_N3|
+s|#@MULTUS_UPF_N3@|$MULTUS_UPF_N3|
 s|@IP_UPF_N3@|$IP_UPF_N3|
 s|@NETMASK_UPF_N3@|$NETMASK_UPF_N3|
 s|@MAC_UPF_N3@|$(gener-mac)|
 s|@GW_UPF_N3@|$GW_UPF_N3|
-s|@ROUTES_UPF_N3@|$ROUTES_UPF_N3|
+s|#@ROUTES_UPF_N3@|$ROUTES_UPF_N3|
 s|@IF_NAME_UPF_N3@|$IF_NAME_UPF_N3|
-s|@MULTUS_UPF_N4@|$MULTUS_UPF_N4|
+s|#@MULTUS_UPF_N4@|$MULTUS_UPF_N4|
 s|@IP_UPF_N4@|$IP_UPF_N4|
 s|@NETMASK_UPF_N4@|$NETMASK_UPF_N4|
 s|@MAC_UPF_N4@|$(gener-mac)|
 s|@GW_UPF_N4@|$GW_UPF_N4|
-s|@ROUTES_UPF_N4@|$ROUTES_UPF_N4|
+s|#@ROUTES_UPF_N4@|$ROUTES_UPF_N4|
 s|@IF_NAME_UPF_N4@|$IF_NAME_UPF_N4|
-s|@MULTUS_UPF_N6@|$MULTUS_UPF_N6|
+s|#@MULTUS_UPF_N6@|$MULTUS_UPF_N6|
 s|@IP_UPF_N6@|$IP_UPF_N6|
 s|@NETMASK_UPF_N6@|$NETMASK_UPF_N6|
 s|@MAC_UPF_N6@|$(gener-mac)|
 s|@GW_UPF_N6@|$GW_UPF_N6|
-s|@ROUTES_UPF_N6@|$ROUTES_UPF_N6|
+s|#@ROUTES_UPF_N6@|$ROUTES_UPF_N6|
 s|@IF_NAME_UPF_N6@|$IF_NAME_UPF_N6|
-s|@NODE_UPF@|"$NODE_UPF"|
+s|#@NODE_UPF@|"$NODE_UPF"|
 s|@MULTUS_SMF_N4@|$MULTUS_SMF_N4|
 s|@IP_SMF_N4@|$IP_SMF_N4|
 s|@NETMASK_SMF_N4@|$NETMASK_SMF_N4|
@@ -407,33 +411,33 @@ function configure-upf() {
     # if $PCAP is true, start tcpdump and create a shared volume to store pcap
     echo "Configuring chart $OAI5G_CORE/oai-upf/values.yaml for R2lab"
     cat > /tmp/upf-values.sed <<EOF
-s|@PRIVILEGED@|$LOGS|
-s|@TCPDUMP_CONTAINER@|$LOGS|
-s|@START_TCPDUMP@|$PCAP|
-s|@SHAREDVOLUME@|$PCAP|
+s|#@PRIVILEGED@|$LOGS|
+s|#@TCPDUMP_CONTAINER@|$LOGS|
+s|#@START_TCPDUMP@|$PCAP|
+s|#@SHAREDVOLUME@|$PCAP|
 s|@CN_DEFAULT_GW@|$CN_DEFAULT_GW|
-s|@MULTUS_UPF_N3@|$MULTUS_UPF_N3|
+s|#@MULTUS_UPF_N3@|$MULTUS_UPF_N3|
 s|@IP_UPF_N3@|$IP_UPF_N3|
 s|@NETMASK_UPF_N3@|$NETMASK_UPF_N3|
 s|@MAC_UPF_N3@|$(gener-mac)|
 s|@GW_UPF_N3@|$GW_UPF_N3|
-s|@ROUTES_UPF_N3@|$ROUTES_UPF_N3|
+s|#@ROUTES_UPF_N3@|$ROUTES_UPF_N3|
 s|@IF_NAME_UPF_N3@|$IF_NAME_UPF_N3|
-s|@MULTUS_UPF_N4@|$MULTUS_UPF_N4|
+s|#@MULTUS_UPF_N4@|$MULTUS_UPF_N4|
 s|@IP_UPF_N4@|$IP_UPF_N4|
 s|@NETMASK_UPF_N4@|$NETMASK_UPF_N4|
 s|@MAC_UPF_N4@|$(gener-mac)|
 s|@GW_UPF_N4@|$GW_UPF_N4|
-s|@ROUTES_UPF_N4@|$ROUTES_UPF_N4|
+s|#@ROUTES_UPF_N4@|$ROUTES_UPF_N4|
 s|@IF_NAME_UPF_N4@|$IF_NAME_UPF_N4|
-s|@MULTUS_UPF_N6@|$MULTUS_UPF_N6|
+s|#@MULTUS_UPF_N6@|$MULTUS_UPF_N6|
 s|@IP_UPF_N6@|$IP_UPF_N6|
 s|@NETMASK_UPF_N6@|$NETMASK_UPF_N6|
 s|@MAC_UPF_N6@|$(gener-mac)|
 s|@GW_UPF_N6@|$GW_UPF_N6|
-s|@ROUTES_UPF_N6@|$ROUTES_UPF_N6|
+s|#@ROUTES_UPF_N6@|$ROUTES_UPF_N6|
 s|@IF_NAME_UPF_N6@|$IF_NAME_UPF_N6|
-s|@NODE_UPF@|"$NODE_UPF"|
+s|#@NODE_UPF@|"$NODE_UPF"|
 EOF
     cp "$OAI5G_CORE"/oai-upf/values.yaml /tmp/upf_values.yaml-orig
     echo "(Over)writing $OAI5G_CORE/oai-upf/values.yaml"
