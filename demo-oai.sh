@@ -658,10 +658,13 @@ function start-cn() {
     kubectl wait pod -n $NS --for=condition=Ready --all
 }
 
+#################################################################################
+
+
 function start-upf() {
     echo "Running start-upf() with namespace=$NS, NODE_AMF=$NODE_AMF, NODE_UPF=$NODE_UPF"
-    echo "cd $OAI5G_@MODE@"
-    cd "$OAI5G_@MODE@"
+    echo "cd $OAI5G_@MODE@'; cd .."
+    cd "$OAI5G_@MODE@"; cd ..
 
     echo "helm --create-namespace --namespace=$NS install oai-upf oai-upf/"
     helm --create-namespace --namespace=$NS install oai-upf oai-upf/
@@ -782,6 +785,8 @@ EOF
 
     if [[ "$GNB_ONLY" = "false" ]]; then
 	start-cn
+    else
+	start-upf
     fi
 
     start-gnb 
