@@ -261,6 +261,9 @@ if [[ $GNB_ONLY = "true" ]]; then
     GW_UPF_N3=""
     ROUTES_UPF_N3=""
     IF_NAME_UPF_N3="eth2"
+    NFS_SMF_HOST="192.168.128.196" # was "oai-smf"
+    NFS_UPF_HOST="oai-upf" # was "oai-upf"
+    NFS_NRF_HOST="oai-nrf" # was "oai-nrf"
     
 fi
 
@@ -442,6 +445,9 @@ EOF
 
     echo "Configuring chart $OAI5G_CORE/oai-upf/config.yaml for R2lab"
     cat > /tmp/upf-config.sed <<EOF
+s|@NFS_SMF_HOST@|$NFS_SMF_HOST|
+s|@NFS_UPF_HOST@|$NFS_UPF_HOST|
+s|@NFS_NRF_HOST@|$NFS_NRF_HOST|
 s|@IF_N3@|$IF_N3|
 s|@IF_N4@|$IF_N4|
 s|@IF_N6@|$IF_N6|
