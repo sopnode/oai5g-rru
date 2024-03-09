@@ -41,7 +41,9 @@ PREFIX_DEMO="@DEF_PREFIX_DEMO@" # Directory in which all scripts will be copied 
 #
 #################################################################################
 ##################################################################################
-PREFIX_STATS="/tmp/oai5g-stats"
+TMP="/tmp.$USER"
+mkdir -p $TMP
+PREFIX_STATS="$TMP/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance"
 P99="192.168.99"
 P100="192.168.100"
@@ -252,8 +254,8 @@ fi
 # Generate unique MAC addresses for multus interfaces in oai5g pods
 function gener-mac()
 {
-    CPTfile="/tmp/cpt-$$.dat"
-    PREFIXfile="/tmp/prefix-$$.dat"
+    CPTfile="$TMP/cpt-$$.dat"
+    PREFIXfile="$TMP/prefix-$$.dat"
     if [ ! -f "$CPTfile" ]; then
 	CPT=0
     else
@@ -309,7 +311,7 @@ function configure-oai-5g-@mode@() {
     # if $LOGS is true, create a tcpdump container with privileges
     # if $PCAP is true, start tcpdump and create a shared volume to store pcap
     echo "Configuring chart $OAI5G_@MODE@/values.yaml for R2lab"
-    cat > /tmp/@mode@-values.sed <<EOF
+    cat > $TMP/@mode@-values.sed <<EOF
 s|@PRIVILEGED@|$LOGS|
 s|@TCPDUMP_CONTAINER@|$LOGS|
 s|@START_TCPDUMP@|$PCAP|
@@ -354,13 +356,13 @@ s|@ROUTES_SMF_N4@|$ROUTES_SMF_N4|
 s|@IF_NAME_SMF_N4@|$IF_NAME_SMF_N4|
 s|@NODE_SMF@||
 EOF
-    cp "$OAI5G_@MODE@"/values.yaml /tmp/@mode@_values.yaml-orig
+    cp "$OAI5G_@MODE@"/values.yaml $TMP/@mode@_values.yaml-orig
     echo "(Over)writing $OAI5G_@MODE@/values.yaml"
-    sed -f /tmp/@mode@-values.sed < /tmp/@mode@_values.yaml-orig > "$OAI5G_@MODE@"/values.yaml
-    diff /tmp/@mode@_values.yaml-orig "$OAI5G_@MODE@"/values.yaml
+    sed -f $TMP/@mode@-values.sed < $TMP/@mode@_values.yaml-orig > "$OAI5G_@MODE@"/values.yaml
+    diff $TMP/@mode@_values.yaml-orig "$OAI5G_@MODE@"/values.yaml
 
     echo "Configuring chart $OAI5G_@MODE@/config.yaml for R2lab"
-    cat > /tmp/@mode@-config.sed <<EOF
+    cat > $TMP/@mode@-config.sed <<EOF
 s|@IF_N2@|$IF_N2|
 s|@IF_N3@|$IF_N3|
 s|@IF_N4@|$IF_N4|
@@ -372,10 +374,10 @@ s|@DNN0@|$DNN|
 s|@IP_DNS1@|$IP_DNS1|
 s|@IP_DNS2@|$IP_DNS2|
 EOF
-    cp "$OAI5G_@MODE@"/config.yaml /tmp/@mode@_config.yaml-orig
+    cp "$OAI5G_@MODE@"/config.yaml $TMP/@mode@_config.yaml-orig
     echo "(Over)writing $OAI5G_@MODE@/config.yaml"
-    sed -f /tmp/@mode@-config.sed < /tmp/@mode@_config.yaml-orig > "$OAI5G_@MODE@"/config.yaml
-    diff /tmp/@mode@_config.yaml-orig "$OAI5G_@MODE@"/config.yaml
+    sed -f $TMP/@mode@-config.sed < $TMP/@mode@_config.yaml-orig > "$OAI5G_@MODE@"/config.yaml
+    diff $TMP/@mode@_config.yaml-orig "$OAI5G_@MODE@"/config.yaml
     
     cd "$OAI5G_@MODE@"
     echo "helm dependency update"
@@ -408,8 +410,8 @@ function configure-gnb() {
     DIR_GNB_DEST="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
     DIR_TEMPLATES="$DIR_GNB_DEST/templates"
 
-    SED_CONF_FILE="/tmp/gnb_conf.sed"
-    SED_VALUES_FILE="/tmp/oai-gnb-values.sed"
+    SED_CONF_FILE="$TMP/gnb_conf.sed"
+    SED_VALUES_FILE="$TMP/oai-gnb-values.sed"
 
     # Configure general parameters for values.yaml
     MULTUS_GNB_N2="$MULTUS_CREATE"
@@ -479,12 +481,12 @@ function configure-gnb() {
 
     echo "Insert gNB conf file $CONF_ORIG in configmap.yaml"
     # Keep the 8 first lines of configmap.yaml
-    head -8  "$DIR_TEMPLATES"/configmap.yaml > /tmp/configmap.yaml
+    head -8  "$DIR_TEMPLATES"/configmap.yaml > $TMP/configmap.yaml
     # Add a 6-characters margin to gnb.conf
-    awk '$0="      "$0' "$CONF_ORIG" > /tmp/gnb.conf
-    # Append the modified gnb.conf to /tmp/configmap.yaml
-    cat /tmp/gnb.conf >> /tmp/configmap.yaml
-    mv /tmp/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+    awk '$0="      "$0' "$CONF_ORIG" > $TMP/gnb.conf
+    # Append the modified gnb.conf to $TMP/configmap.yaml
+    cat $TMP/gnb.conf >> $TMP/configmap.yaml
+    mv $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
     echo "First configure gnb.conf within configmap.yaml"
     # remove NSSAI sd info for PLMN and add other parameters for RUs
@@ -503,8 +505,8 @@ s|@GNB_AW2S_IP_ADDRESS@|$IP_GNB_aw2s|
 s|@GNB_AW2S_LOCAL_IF_NAME@|$GNB_aw2s_LOCAL_IF_NAME|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
 EOF
-    cp "$DIR_TEMPLATES"/configmap.yaml /tmp/configmap.yaml
-    sed -f "$SED_CONF_FILE" < /tmp/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
+    cp "$DIR_TEMPLATES"/configmap.yaml $TMP/configmap.yaml
+    sed -f "$SED_CONF_FILE" < $TMP/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
     echo "Display new $DIR_TEMPLATES/configmap.yaml"
     cat "$DIR_TEMPLATES"/configmap.yaml
 
@@ -561,10 +563,10 @@ s|@QOS_GNB_DEF@|$QOS_GNB_DEF|
 s|@NODE_GNB@|$NODE_GNB|
 EOF
     ORIG_CHART="$DIR"/values.yaml
-    cp "$ORIG_CHART" /tmp/oai-gnb_values.yaml-orig
+    cp "$ORIG_CHART" $TMP/oai-gnb_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_VALUES_FILE" < /tmp/oai-gnb_values.yaml-orig > "$ORIG_CHART"
-    diff /tmp/oai-gnb_values.yaml-orig "$ORIG_CHART" 
+    sed -f "$SED_VALUES_FILE" < $TMP/oai-gnb_values.yaml-orig > "$ORIG_CHART"
+    diff $TMP/oai-gnb_values.yaml-orig "$ORIG_CHART" 
 }
 
 #################################################################################
@@ -575,7 +577,7 @@ function configure-nr-ue() {
     # However, a tcpdump container created e.g., to run iperf client"
     DIR="$OAI5G_RAN/oai-nr-ue"
     ORIG_CHART="$DIR"/values.yaml
-    SED_FILE="/tmp/oai-nr-ue-values.sed"
+    SED_FILE="$TMP/oai-nr-ue-values.sed"
     echo "configure-nr-ue: $ORIG_CHART configuration"
     ADD_OPTIONS_NRUE="$OPTIONS_NRUE"
     cat > "$SED_FILE" <<EOF
@@ -600,10 +602,10 @@ s|@QOS_NRUE_DEF@|false|
 s|@SHAREDVOLUME@|false|
 s|@NODE_NRUE@||
 EOF
-    cp "$ORIG_CHART" /tmp/oai-nr-ue_values.yaml-orig
+    cp "$ORIG_CHART" $TMP/oai-nr-ue_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_FILE" < /tmp/oai-nr-ue_values.yaml-orig > "$ORIG_CHART"
-    diff /tmp/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
+    sed -f "$SED_FILE" < $TMP/oai-nr-ue_values.yaml-orig > "$ORIG_CHART"
+    diff $TMP/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
 }
 
 
@@ -689,7 +691,7 @@ function start() {
 
     if [[ $LOGS = "true" ]]; then
 	echo "start: Create a k8s persistence volume for generation of RAN logs files"
-	cat << \EOF >> /tmp/oai5g-pv.yaml
+	cat << \EOF >> $TMP/oai5g-pv.yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -702,10 +704,10 @@ spec:
   hostPath:
     path: /var/oai5g-volume
 EOF
-	kubectl apply -f /tmp/oai5g-pv.yaml
+	kubectl apply -f $TMP/oai5g-pv.yaml
 
 	echo "start: Create a k8s persistence volume for generation of CN logs files"
-	cat << \EOF >> /tmp/cn5g-pv.yaml
+	cat << \EOF >> $TMP/cn5g-pv.yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -718,11 +720,11 @@ spec:
   hostPath:
     path: /var/cn5g-volume
 EOF
-	kubectl apply -f /tmp/cn5g-pv.yaml
+	kubectl apply -f $TMP/cn5g-pv.yaml
 
 	
 	echo "start: Create a k8s persistent volume claim for RAN logs files"
-    cat << \EOF >> /tmp/oai5g-pvc.yaml
+    cat << \EOF >> $TMP/oai5g-pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -736,11 +738,11 @@ spec:
   storageClassName: ""
   volumeName: oai5g-pv
 EOF
-    echo "kubectl -n $NS apply -f /tmp/oai5g-pvc.yaml"
-    kubectl -n $NS apply -f /tmp/oai5g-pvc.yaml
+    echo "kubectl -n $NS apply -f $TMP/oai5g-pvc.yaml"
+    kubectl -n $NS apply -f $TMP/oai5g-pvc.yaml
 
 	echo "start: Create a k8s persistent volume claim for CN logs files"
-    cat << \EOF >> /tmp/cn5g-pvc.yaml
+    cat << \EOF >> $TMP/cn5g-pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -754,8 +756,8 @@ spec:
   storageClassName: ""
   volumeName: cn5g-pv
 EOF
-    echo "kubectl -n $NS apply -f /tmp/cn5g-pvc.yaml"
-    kubectl -n $NS apply -f /tmp/cn5g-pvc.yaml
+    echo "kubectl -n $NS apply -f $TMP/cn5g-pvc.yaml"
+    kubectl -n $NS apply -f $TMP/cn5g-pvc.yaml
     fi
 
     if [[ "$GNB_ONLY" = "false" ]]; then
@@ -803,7 +805,7 @@ function stop() {
     echo "Running stop() on $NS namespace, logs=$LOGS"
 
     if [[ "$LOGS" = "true" ]]; then
-	dir_stats=${PREFIX_STATS-"/tmp/oai5g-stats"}
+	dir_stats=${PREFIX_STATS-"$TMP/oai5g-stats"}
 	echo "First retrieve all pcap and logs files in $dir_stats and compressed it"
 	mkdir -p $dir_stats
 	echo "cleanup $dir_stats before including new logs/pcap files"
@@ -812,7 +814,7 @@ function stop() {
 	    get-all-pcap $dir_stats
 	fi
 	get-all-logs $dir_stats
-	cd /tmp; dirname=$(basename $dir_stats)
+	cd $TMP; dirname=$(basename $dir_stats)
 	echo tar cfz "$dirname".tgz $dirname
 	tar cfz "$dirname".tgz $dirname
     fi
@@ -901,7 +903,7 @@ kubectl --namespace $NS -c nr-ue logs $NRUE_POD_NAME > "$prefix"/nr-ue-"$DATE".l
 fi
 
 echo "Retrieve gnb config from the pod"
-kubectl -c gnb cp $NS/$GNB_POD_NAME:/tmp/gnb.conf $prefix/gnb.conf || true
+kubectl -c gnb cp $NS/$GNB_POD_NAME:$TMP/gnb.conf $prefix/gnb.conf || true
 
 echo "Retrieve nrL1_stats.log, nrMAC_stats.log and nrRRC_stats.log from gnb pod"
 kubectl -c gnb cp $NS/$GNB_POD_NAME:nrL1_stats.log $prefix/nrL1_stats.log"$DATE" || true
