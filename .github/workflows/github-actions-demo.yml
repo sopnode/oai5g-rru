@@ -35,7 +35,7 @@ jobs:
           $OAI5G/run.sh init-rru
           echo "UE setup"
           $OAI5G/run.sh init-ue
-          echo "Run the oai5g-rru demo"
+          echo "Run the oai5g-rru demo "
           $OAI5G/demo-oai.sh start
           echo "Sleep 10s"; sleep 10
           echo "Trigger UE cx"
