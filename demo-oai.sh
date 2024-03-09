@@ -903,10 +903,7 @@ kubectl --namespace $NS -c nr-ue logs $NRUE_POD_NAME > "$prefix"/nr-ue-"$DATE".l
 fi
 
 echo "Retrieve gnb config from the pod"
-echo "*****************"
-echo "--> kubectl -c gnb cp $NS/$GNB_POD_NAME:$TMP/gnb.conf $prefix/gnb.conf"
-echo "*****************"
-kubectl -c gnb cp $NS/$GNB_POD_NAME:$TMP/gnb.conf $prefix/gnb.conf || true
+kubectl -c gnb cp $NS/$GNB_POD_NAME:/tmp/gnb.conf $prefix/gnb.conf || true
 
 echo "Retrieve nrL1_stats.log, nrMAC_stats.log and nrRRC_stats.log from gnb pod"
 kubectl -c gnb cp $NS/$GNB_POD_NAME:nrL1_stats.log $prefix/nrL1_stats.log"$DATE" || true
