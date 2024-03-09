@@ -27,8 +27,8 @@ jobs:
           chmod a+x $OAI5G/prepare-demo-oai.sh
           echo "configure oai5g-rru demo script"
           $OAI5G/prepare-demo-oai.sh $BRANCH
-          echo "retrieve local r2lab-setup.sh script"
-          cp $WORK/local-scripts/run.sh .
+          echo "retrieve local run.sh script"
+          cp $WORK/local-scripts/run.sh $OAI5G/
           echo "Check/book R2lab slice"
           $OAI5G/run.sh get-slice
           echo "RRU setup"
