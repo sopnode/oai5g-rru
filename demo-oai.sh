@@ -41,7 +41,7 @@ PREFIX_DEMO="@DEF_PREFIX_DEMO@" # Directory in which all scripts will be copied 
 #
 #################################################################################
 ##################################################################################
-TMP="/tmp.$USER"
+TMP="/tmp/tmp.$USER"
 mkdir -p $TMP
 PREFIX_STATS="$TMP/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance"
