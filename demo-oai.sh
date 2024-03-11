@@ -466,7 +466,7 @@ function configure-gnb() {
 	MULTUS_GNB_RU1="false"
 	MULTUS_GNB_RU2="false"
 	RRU_TYPE="rfsim"
-	ADD_OPTIONS_GNB="$OPTIONS_RFSIM"
+	ADD_OPTIONS_GNB="$OPTIONS_rfsim"
 	QOS_GNB_DEF="false"
 
     else
