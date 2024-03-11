@@ -44,11 +44,12 @@ PREFIX_DEMO="@DEF_PREFIX_DEMO@" # Directory in which all scripts will be copied 
 ##################################################################################
 PREFIX_STATS="/tmp/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance"
-P99="192.168.99"
 P100="192.168.100"
-SUBNET_N2N3="$P99"
-IF_NAME_N2N3="net-100"
-#IF_NAME_N2N3="eth4"
+SUBNET_N2N3="192.168.128"
+NETMASK_N2N3="27"
+IF_NAME_N2N3="eth2"
+#IF_NAME_N2N3="net-100"
+
 
 # Interfaces names of VLANs in sopnode servers
 IF_NAME_VLAN100="net-100"
@@ -109,8 +110,8 @@ CN_DEFAULT_GW=""
 #
 MULTUS_AMF_N2="$MULTUS_CREATE"
 #IP_AMF_N2="$P100.241"
-IP_AMF_N2="$SUBNET_N2N3.1"
-NETMASK_AMF_N2="24"
+IP_AMF_N2="$SUBNET_N2N3.135"
+NETMASK_AMF_N2="$NETMASK_N2N3"
 GW_AMF_N2=""
 ROUTES_AMF_N2=""
 IF_NAME_AMF_N2="$IF_NAME_N2N3" 
@@ -124,8 +125,8 @@ IF_NAME_AMF_N2="$IF_NAME_N2N3"
 #
 MULTUS_UPF_N3="$MULTUS_CREATE"
 #IP_UPF_N3="$P100.242" 
-IP_UPF_N3="$SUBNET_N2N3.2" 
-NETMASK_UPF_N3="24"
+IP_UPF_N3="$SUBNET_N2N3.136" 
+NETMASK_UPF_N3="$NETMASK_N2N3"
 GW_UPF_N3=""
 ROUTES_UPF_N3=""
 IF_NAME_UPF_N3="$IF_NAME_N2N3"
@@ -167,11 +168,10 @@ R2LAB_REPO="docker.io/r2labuser"
 #RAN_TAG="2023.w02-ci"
 RAN_TAG="2024.w06"
 GNB_NAME="gNB-r2lab"
-#IP_GNB_N2N3="$P100.243"
-IP_GNB_N2N3="$SUBNET_N2N3.3"
+IP_GNB_N2N3="$SUBNET_N2N3.131"
 IF_NAME_GNB_N2="$IF_NAME_N2N3"
 IF_NAME_GNB_N3="" # unused for current scenario with same PHY network interface for N2/N3
-NETMASK_GNB_N2="24"
+NETMASK_GNB_N2="$NETMASK_N2N3"
 NETMASK_GNB_N3=""
 NETMASK_GNB_RU="24"
 
@@ -231,8 +231,8 @@ OAI5G_NRUE="$OAI5G_CORE/oai-nr-ue"
 NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
 NRUE_TAG="${RAN_TAG}"
 OPTIONS_NRUE="--sa -E --rfsim -r 106 --numerology 1 -C 3319680000 --nokrnmod --log_config.global_log_options level,nocolor,time"
-IP_NRUE="$SUBNET_N2N3.4"
-NETMASK_NRUE="24"
+IP_NRUE="$SUBNET_N2N3.138"
+NETMASK_NRUE="$NETMASK_N2N3"
 IF_NAME_NRUE="$IF_NAME_N2N3"
 NRUE_USRP="rfsim"
 
@@ -491,10 +491,10 @@ function configure-gnb() {
     # Configure general parameters for values.yaml
     MULTUS_GNB_N2="$MULTUS_CREATE"
     GNB_N2_IF_NAME="n2"
-    GNB_N2_IP_ADDRESS="$IP_GNB_N2N3/24"
+    GNB_N2_IP_ADDRESS="$IP_GNB_N2N3/$NETMASK_N2N3"
     MULTUS_GNB_N3="false"
     GNB_N3_IF_NAME="n2"
-    GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/24"
+    GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/$NETMASK_N2N3"
     
     # Configure RRU specific parameters for values.yaml chart
     if [[ "$RRU" = "b210" ]]; then
