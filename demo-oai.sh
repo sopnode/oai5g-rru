@@ -48,7 +48,6 @@ P100="192.168.100"
 SUBNET_N2N3="192.168.128"
 NETMASK_N2N3="27"
 IF_NAME_N2N3="eth2"
-#IF_NAME_N2N3="net-100"
 
 
 # Interfaces names of VLANs in sopnode servers
