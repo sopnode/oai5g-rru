@@ -259,6 +259,7 @@ else
     GW_UPF_N3=""
     ROUTES_UPF_N3="[{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
     IF_NAME_UPF_N3="eth2"
+    IF_N4="n3"
     NFS_AMF_HOST="172.20.124.129" # was "oai-amf"
     NFS_SMF_HOST="172.20.132.147" # was "oai-smf"
     NFS_UPF_HOST="oai-upf" # was "oai-upf"
