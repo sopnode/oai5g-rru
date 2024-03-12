@@ -257,7 +257,7 @@ else
     IP_UPF_N3="192.168.128.132" 
     NETMASK_UPF_N3="27"
     GW_UPF_N3=""
-    ROUTES_UPF_N3=""
+    ROUTES_UPF_N3="[{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
     IF_NAME_UPF_N3="eth2"
     NFS_AMF_HOST="172.20.124.129" # was "oai-amf"
     NFS_SMF_HOST="172.20.132.147" # was "oai-smf"
@@ -267,7 +267,7 @@ else
     NFS_AUSF_HOST="172.20.209.107" # was "oai-ausf"
     NFS_NRF_HOST="172.20.246.224" # was "oai-nrf"
 
-    ROUTES_GNB_N2="[{'dst': '172.20.0.0/16','gw': '192.168.128.129'}]"
+    ROUTES_GNB_N2="[{'dst': '172.20.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
 
     IP_AMF_N2="$NFS_AMF_HOST"    
 fi
