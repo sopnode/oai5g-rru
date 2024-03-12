@@ -265,7 +265,7 @@ else
     NFS_UDM_HOST="172.20.133.136" # was "oai-udm"
     NFS_UDR_HOST="172.20.170.17" # was "oai-udr"
     NFS_AUSF_HOST="172.20.209.107" # was "oai-ausf"
-    NFS_NRF_HOST="172.20.246.244" # was "oai-nrf"
+    NFS_NRF_HOST="172.20.246.224" # was "oai-nrf"
 
     ROUTES_GNB_N2="[{'dst': '172.20.0.0/16','gw': '192.168.128.129'}]"
 
