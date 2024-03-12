@@ -254,7 +254,7 @@ if [[ $GNB_ONLY = "true" ]]; then
 else
     echo "********* Configuring CN parameters for external CN"
     MULTUS_UPF_N3="true"
-    IP_UPF_N3="192.168.128.131" 
+    IP_UPF_N3="192.168.128.132" 
     NETMASK_UPF_N3="27"
     GW_UPF_N3=""
     ROUTES_UPF_N3=""
