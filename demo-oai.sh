@@ -251,23 +251,24 @@ if [[ $GNB_ONLY = "true" ]]; then
     NETMASK_GNB_N2="27"
     # Set the route to reach AMF/UPF
     ROUTES_GNB_N2="[{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
-    echo "************************* MULTUS_UPF_N3=$MULTUS_UPF_N3"
-    NODE_AMF=$NODE_AMF_UPF
-    NODE_UPF=$NODE_AMF_UPF
-    MULTUS_UPF_N3="true"
-    IP_UPF_N3="192.168.128.131" 
-    NETMASK_UPF_N3="27"
-    GW_UPF_N3=""
-    ROUTES_UPF_N3=""
-    IF_NAME_UPF_N3="eth2"
-    NFS_AMF_HOST="172.20.124.129" # was "oai-amf"
-    NFS_SMF_HOST="172.20.132.147" # was "oai-smf"
-    NFS_UPF_HOST="oai-upf" # was "oai-upf"
-    NFS_UDM_HOST="172.20.133.136" # was "oai-udm"
-    NFS_UDR_HOST="172.20.170.17" # was "oai-udr"
-    NFS_AUSF_HOST="172.20.209.107" # was "oai-ausf"
-    NFS_NRF_HOST="172.20.246.244" # was "oai-nrf"
 fi
+echo "********* Configuring CN parameters for external CN"
+NODE_AMF=$NODE_AMF_UPF
+NODE_UPF=$NODE_AMF_UPF
+MULTUS_UPF_N3="true"
+IP_UPF_N3="192.168.128.131" 
+NETMASK_UPF_N3="27"
+GW_UPF_N3=""
+ROUTES_UPF_N3=""
+IF_NAME_UPF_N3="eth2"
+NFS_AMF_HOST="172.20.124.129" # was "oai-amf"
+NFS_SMF_HOST="172.20.132.147" # was "oai-smf"
+NFS_UPF_HOST="oai-upf" # was "oai-upf"
+NFS_UDM_HOST="172.20.133.136" # was "oai-udm"
+NFS_UDR_HOST="172.20.170.17" # was "oai-udr"
+NFS_AUSF_HOST="172.20.209.107" # was "oai-ausf"
+NFS_NRF_HOST="172.20.246.244" # was "oai-nrf"
+
 
 ##################################################################################
 
