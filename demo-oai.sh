@@ -251,19 +251,22 @@ if [[ $GNB_ONLY = "true" ]]; then
     NETMASK_GNB_N2="27"
     # Set the route to reach AMF/UPF
     ROUTES_GNB_N2="[{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
+    echo "************************* MULTUS_UPF_N3=$MULTUS_UPF_N3"
     NODE_AMF=$NODE_AMF_UPF
     NODE_UPF=$NODE_AMF_UPF
     MULTUS_UPF_N3="true"
-    echo "************************* MULTUS_UPF_N3=$MULTUS_UPF_N3"
     IP_UPF_N3="192.168.128.131" 
     NETMASK_UPF_N3="27"
     GW_UPF_N3=""
     ROUTES_UPF_N3=""
     IF_NAME_UPF_N3="eth2"
-    NFS_SMF_HOST="192.168.128.196" # was "oai-smf"
+    NFS_AMF_HOST="172.20.170.117" # was "oai-amf"
+    NFS_SMF_HOST="172.20.14.36" # was "oai-smf"
     NFS_UPF_HOST="oai-upf" # was "oai-upf"
-    NFS_NRF_HOST="oai-nrf" # was "oai-nrf"
-    
+    NFS_UDM_HOST="172.20.27.179" # was "oai-udm"
+    NFS_UDR_HOST="172.20.17.165" # was "oai-udr"
+    NFS_AUSF_HOST="172.20.27.52" # was "oai-ausf"
+    NFS_NRF_HOST="172.20.29.78" # was "oai-nrf"
 fi
 
 ##################################################################################
@@ -380,6 +383,13 @@ EOF
 
     echo "Configuring chart $OAI5G_@MODE@/config.yaml for R2lab"
     cat > /tmp/@mode@-config.sed <<EOF
+s|@NFS_AMF_HOST@|$NFS_AMF_HOST|
+s|@NFS_SMF_HOST@|$NFS_SMF_HOST|
+s|@NFS_UPF_HOST@|$NFS_UPF_HOST|
+s|@NFS_UDM_HOST@|$NFS_UDM_HOST|
+s|@NFS_UDR_HOST@|$NFS_UDR_HOST|
+s|@NFS_AUSF_HOST@|$NFS_AUSF_HOST|
+s|@NFS_NRF_HOST@|$NFS_NRF_HOST|
 s|@IF_N2@|$IF_N2|
 s|@IF_N3@|$IF_N3|
 s|@IF_N4@|$IF_N4|
@@ -703,8 +713,7 @@ function configure-all() {
 	configure-oai-5g-@mode@
 	configure-mysql
     else
-	echo "*** Demo mode with R2lab gNB and UPF and external CN"
-	configure-upf
+	echo "*** Demo mode with R2lab gNB local only and the rest is external"
     fi
     configure-gnb
     if [[ "$RRU" = "rfsim" ]]; then
