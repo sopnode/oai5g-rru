@@ -22,7 +22,7 @@ function usage() {
 # Following parameters automatically set by configure-demo-oai.sh script
 # do not change them here !
 NS="@DEF_NS@" # k8s namespace
-NODE_AMF_UPF="@DEF_NODE_AMF_UPF@" # node in wich run amf and upf pods
+NODE_AMF_UPF="@DEF_NODE_AMF_UPF@" # node in which run amf and upf pods# in this demo, AMF is external, not used
 NODE_GNB="@DEF_NODE_GNB@" # node in which gnb pod runs
 RRU="@DEF_RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
 GNB_ONLY="@DEF_GNB_ONLY@" # boolean, true if only RAN pods are launched
@@ -64,8 +64,8 @@ OAI5G_CORE="$OAI5G_CHARTS/oai-5g-core"
 OAI5G_BASIC="$OAI5G_CORE/oai-5g-basic"
 OAI5G_ADVANCE="$OAI5G_CORE/oai-5g-advance"
 
-# DEMO: NODE_AMF is different from NODE_UPF
-NODE_AMF=$NODE_AMF_UPF
+# DEMO: NODE_AMF is external, and NODE_UPF is local
+NODE_AMF=""
 NODE_UPF=$NODE_AMF_UPF
 
 # Multus is now used whatever RRU selected
@@ -251,24 +251,24 @@ if [[ $GNB_ONLY = "true" ]]; then
     NETMASK_GNB_N2="27"
     # Set the route to reach AMF/UPF
     ROUTES_GNB_N2="[{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
-fi
-echo "********* Configuring CN parameters for external CN"
-NODE_AMF=$NODE_AMF_UPF
-NODE_UPF=$NODE_AMF_UPF
-MULTUS_UPF_N3="true"
-IP_UPF_N3="192.168.128.131" 
-NETMASK_UPF_N3="27"
-GW_UPF_N3=""
-ROUTES_UPF_N3=""
-IF_NAME_UPF_N3="eth2"
-NFS_AMF_HOST="172.20.124.129" # was "oai-amf"
-NFS_SMF_HOST="172.20.132.147" # was "oai-smf"
-NFS_UPF_HOST="oai-upf" # was "oai-upf"
-NFS_UDM_HOST="172.20.133.136" # was "oai-udm"
-NFS_UDR_HOST="172.20.170.17" # was "oai-udr"
-NFS_AUSF_HOST="172.20.209.107" # was "oai-ausf"
-NFS_NRF_HOST="172.20.246.244" # was "oai-nrf"
+else
+    echo "********* Configuring CN parameters for external CN"
+    MULTUS_UPF_N3="true"
+    IP_UPF_N3="192.168.128.131" 
+    NETMASK_UPF_N3="27"
+    GW_UPF_N3=""
+    ROUTES_UPF_N3=""
+    IF_NAME_UPF_N3="eth2"
+    NFS_AMF_HOST="172.20.124.129" # was "oai-amf"
+    NFS_SMF_HOST="172.20.132.147" # was "oai-smf"
+    NFS_UPF_HOST="oai-upf" # was "oai-upf"
+    NFS_UDM_HOST="172.20.133.136" # was "oai-udm"
+    NFS_UDR_HOST="172.20.170.17" # was "oai-udr"
+    NFS_AUSF_HOST="172.20.209.107" # was "oai-ausf"
+    NFS_NRF_HOST="172.20.246.244" # was "oai-nrf"
 
+    IP_AMF_N2="$NFS_AMF_HOST"    
+fi
 
 ##################################################################################
 
@@ -289,7 +289,7 @@ function gener-mac()
 		PREFIX=$PREFIX"00:";;
 	    *)  PREFIX=$PREFIX"01:";;
 	esac
-	case $NODE_AMF_SGPWU in
+	case $NODE_UPF in
 	    "sopnode-l1-v100")
 		PREFIX=$PREFIX"00:";;
 	    "sopnode-w1-v100")
