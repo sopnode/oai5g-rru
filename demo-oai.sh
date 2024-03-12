@@ -267,6 +267,8 @@ else
     NFS_AUSF_HOST="172.20.209.107" # was "oai-ausf"
     NFS_NRF_HOST="172.20.246.244" # was "oai-nrf"
 
+    ROUTES_GNB_N2="[{'dst': '172.20.0.0/16','gw': '192.168.128.129'}]"
+
     IP_AMF_N2="$NFS_AMF_HOST"    
 fi
 
