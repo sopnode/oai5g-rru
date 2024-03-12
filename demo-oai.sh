@@ -260,13 +260,13 @@ if [[ $GNB_ONLY = "true" ]]; then
     GW_UPF_N3=""
     ROUTES_UPF_N3=""
     IF_NAME_UPF_N3="eth2"
-    NFS_AMF_HOST="172.20.170.117" # was "oai-amf"
-    NFS_SMF_HOST="172.20.14.36" # was "oai-smf"
+    NFS_AMF_HOST="172.20.124.129" # was "oai-amf"
+    NFS_SMF_HOST="172.20.132.147" # was "oai-smf"
     NFS_UPF_HOST="oai-upf" # was "oai-upf"
-    NFS_UDM_HOST="172.20.27.179" # was "oai-udm"
-    NFS_UDR_HOST="172.20.17.165" # was "oai-udr"
-    NFS_AUSF_HOST="172.20.27.52" # was "oai-ausf"
-    NFS_NRF_HOST="172.20.29.78" # was "oai-nrf"
+    NFS_UDM_HOST="172.20.133.136" # was "oai-udm"
+    NFS_UDR_HOST="172.20.170.17" # was "oai-udr"
+    NFS_AUSF_HOST="172.20.209.107" # was "oai-ausf"
+    NFS_NRF_HOST="172.20.246.244" # was "oai-nrf"
 fi
 
 ##################################################################################
