@@ -874,11 +874,11 @@ EOF
 	echo "********************************** START start-upf"
 	start-upf
     fi
-    echo "sleep 10s"; sleep 10
+    echo "sleep 5s before starting gNB"; sleep 5
     start-gnb 
 
     if [[ "$RRU" = "rfsim" ]]; then
-	echo "sleep 10s"; sleep 10
+	echo "sleep 5s before starting nr-ue"; sleep 5
 	start-nr-ue 
     fi
 
