@@ -72,7 +72,8 @@ NODE_UPF=$NODE_AMF_UPF
 MULTUS_CREATE="true"
 IF_N2="n2"
 IF_N3="n3"
-IF_N4="eth0" # should be "n4" but not, still work to be done
+IF_N4="n3"
+#IF_N4="eth0" # should be "n4" but not, still work to be done
 IF_N6="eth0" # should be "n6" but not, still work to be done
 #IF_N6="n3" # test with raphael
 
@@ -108,8 +109,7 @@ CN_DEFAULT_GW=""
 #AMF_TAG="${CN_TAG}"
 #
 MULTUS_AMF_N2="$MULTUS_CREATE"
-#IP_AMF_N2="$P100.241"
-IP_AMF_N2="$SUBNET_N2N3.135"
+IP_AMF_N2="$P100.241"
 NETMASK_AMF_N2="$NETMASK_N2N3"
 GW_AMF_N2=""
 ROUTES_AMF_N2=""
@@ -124,10 +124,10 @@ IF_NAME_AMF_N2="$IF_NAME_N2N3"
 #
 MULTUS_UPF_N3="$MULTUS_CREATE"
 #IP_UPF_N3="$P100.242" 
-IP_UPF_N3="$SUBNET_N2N3.136" 
+IP_UPF_N3="$SUBNET_N2N3.145" 
 NETMASK_UPF_N3="$NETMASK_N2N3"
 GW_UPF_N3=""
-ROUTES_UPF_N3=""
+ROUTES_UPF_N3="[{'dst': '172.20.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
 IF_NAME_UPF_N3="$IF_NAME_N2N3"
 #
 MULTUS_UPF_N4="false"
@@ -162,15 +162,13 @@ IP_CSCF="127.0.0.1" # unused but without setting an IP, the SMF pod crashes!
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 #
 R2LAB_REPO="docker.io/r2labuser"
-#RAN_TAG="2023.w37"
-#RAN_TAG="2024.w02-rocky9.3"
-#RAN_TAG="2023.w02-ci"
 RAN_TAG="2024.w06"
 GNB_NAME="gNB-r2lab"
-IP_GNB_N2N3="$SUBNET_N2N3.131"
+IP_GNB_N2N3="$SUBNET_N2N3.146"
 IF_NAME_GNB_N2="$IF_NAME_N2N3"
 IF_NAME_GNB_N3="" # unused for current scenario with same PHY network interface for N2/N3
 NETMASK_GNB_N2="$NETMASK_N2N3"
+ROUTES_GNB_N2="[{'dst': '172.20.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
 NETMASK_GNB_N3=""
 NETMASK_GNB_RU="24"
 
@@ -230,7 +228,7 @@ OAI5G_NRUE="$OAI5G_CORE/oai-nr-ue"
 NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
 NRUE_TAG="${RAN_TAG}"
 OPTIONS_NRUE="--sa -E --rfsim -r 106 --numerology 1 -C 3319680000 --nokrnmod --log_config.global_log_options level,nocolor,time"
-IP_NRUE="$SUBNET_N2N3.138"
+IP_NRUE="$SUBNET_N2N3.147"
 NETMASK_NRUE="$NETMASK_N2N3"
 IF_NAME_NRUE="$IF_NAME_N2N3"
 NRUE_USRP="rfsim"
@@ -253,13 +251,6 @@ if [[ $GNB_ONLY = "true" ]]; then
     ROUTES_GNB_N2="[{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
 else
     echo "********* Configuring CN parameters for external CN"
-    MULTUS_UPF_N3="true"
-    IP_UPF_N3="192.168.128.132" 
-    NETMASK_UPF_N3="27"
-    GW_UPF_N3=""
-    ROUTES_UPF_N3="[{'dst': '172.20.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
-    IF_NAME_UPF_N3="eth2"
-    IF_N4="n3"
     NFS_AMF_HOST="172.20.79.74" # was "oai-amf"
     NFS_SMF_HOST="172.20.196.106" # was "oai-smf"
     NFS_UPF_HOST="oai-upf" # was "oai-upf"
@@ -267,8 +258,6 @@ else
     NFS_UDR_HOST="172.20.51.238" # was "oai-udr"
     NFS_AUSF_HOST="172.20.129.247" # was "oai-ausf"
     NFS_NRF_HOST="172.20.4.253" # was "oai-nrf"
-
-    ROUTES_GNB_N2="[{'dst': '172.20.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
 
     IP_AMF_N2="192.168.128.195"    
 fi
