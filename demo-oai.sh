@@ -268,7 +268,7 @@ function gener-mac()
 		PREFIX=$PREFIX"00:";;
 	    *)  PREFIX=$PREFIX"01:";;
 	esac
-	case $NODE_AMF_SGPWU in
+	case $NODE_AMF_UPF in
 	    "sopnode-l1-v100")
 		PREFIX=$PREFIX"00:";;
 	    "sopnode-w1-v100")
