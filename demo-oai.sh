@@ -162,7 +162,6 @@ IP_CSCF="127.0.0.1" # unused but without setting an IP, the SMF pod crashes!
 
 ################################ oai-gnb chart parameters ########################
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
-echo "********************************1 OAI5G_RAN is $OAI5G_RAN"
 #
 R2LAB_REPO="docker.io/r2labuser"
 RAN_TAG="2024.w06"
@@ -594,7 +593,6 @@ EOF
 
     # Configure gnb values.yaml chart
     DIR="$OAI5G_RAN/oai-gnb"
-    echo "********************************2 OAI5G_RAN is $OAI5G_RAN"
 
     echo "Then configure oai-gnb charts"
     cat > "$SED_VALUES_FILE" <<EOF
@@ -657,7 +655,6 @@ function configure-nr-ue() {
 
     # will NOT generate PCAP file to avoid wasting all memory resources
     # However, a tcpdump container created e.g., to run iperf client"
-    echo "********************************3 OAI5G_RAN is $OAI5G_RAN"
     DIR="$OAI5G_RAN/oai-nr-ue"
     ORIG_CHART="$DIR"/values.yaml
     SED_FILE="/tmp/oai-nr-ue-values.sed"
@@ -685,9 +682,6 @@ s|@QOS_NRUE_DEF@|false|
 s|@SHAREDVOLUME@|false|
 s|@NODE_NRUE@||
 EOF
-    echo "*********"
-    echo "ORIG_CHART is $ORIG_CHART"
-    echo "DIR is $DIR"
     cp "$ORIG_CHART" /tmp/oai-nr-ue_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
     sed -f "$SED_FILE" < /tmp/oai-nr-ue_values.yaml-orig > "$ORIG_CHART"
