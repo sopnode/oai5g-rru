@@ -71,6 +71,7 @@ NODE_UPF=$NODE_AMF_UPF
 
 # Multus is now used whatever RRU selected
 MULTUS_CREATE="true"
+IF_SBI="n3"
 IF_N2="n2"
 IF_N3="n3"
 IF_N4="n3"
@@ -386,6 +387,7 @@ s|@NFS_UDM_HOST@|$NFS_UDM_HOST|
 s|@NFS_UDR_HOST@|$NFS_UDR_HOST|
 s|@NFS_AUSF_HOST@|$NFS_AUSF_HOST|
 s|@NFS_NRF_HOST@|$NFS_NRF_HOST|
+s|@IF_SBI@|$IF_N3|
 s|@IF_N2@|$IF_N2|
 s|@IF_N3@|$IF_N3|
 s|@IF_N4@|$IF_N4|
