@@ -680,6 +680,9 @@ s|@QOS_NRUE_DEF@|false|
 s|@SHAREDVOLUME@|false|
 s|@NODE_NRUE@||
 EOF
+    echo "*********"
+    echo "ORIG_CHART is $ORIG_CHART"
+    echo "DIR is $DIR"
     cp "$ORIG_CHART" /tmp/oai-nr-ue_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
     sed -f "$SED_FILE" < /tmp/oai-nr-ue_values.yaml-orig > "$ORIG_CHART"
