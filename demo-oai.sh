@@ -261,7 +261,7 @@ else
     NFS_UDM_HOST="oai-udm" # was "oai-udm" #fake
     NFS_UDR_HOST="oai-udr" # was "oai-udr" #fake
     NFS_AUSF_HOST="oai-ausf" # was "oai-ausf" #fake
-    NFS_NRF_HOST="172.20.10.14" # was "oai-nrf"
+    NFS_NRF_HOST="172.21.10.14" # was "oai-nrf"
 
     IP_AMF_N2="172.21.10.35"    
 fi
