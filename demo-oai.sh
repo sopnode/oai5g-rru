@@ -255,15 +255,15 @@ if [[ $GNB_ONLY = "true" ]]; then
     ROUTES_GNB_N2="[{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
 else
     echo "********* Configuring CN parameters for external CN"
-    NFS_AMF_HOST="172.20.79.74" # was "oai-amf"
-    NFS_SMF_HOST="172.20.196.106" # was "oai-smf"
+    NFS_AMF_HOST="oai-amf" # was "oai-amf"
+    NFS_SMF_HOST="172.21.10.37" # was "oai-smf"
     NFS_UPF_HOST="oai-upf" # was "oai-upf"
-    NFS_UDM_HOST="172.20.158.70" # was "oai-udm"
-    NFS_UDR_HOST="172.20.51.238" # was "oai-udr"
-    NFS_AUSF_HOST="172.20.129.247" # was "oai-ausf"
-    NFS_NRF_HOST="172.20.4.253" # was "oai-nrf"
+    NFS_UDM_HOST="oai-udm" # was "oai-udm" #fake
+    NFS_UDR_HOST="oai-udr" # was "oai-udr" #fake
+    NFS_AUSF_HOST="oai-ausf" # was "oai-ausf" #fake
+    NFS_NRF_HOST="172.20.10.14" # was "oai-nrf"
 
-    IP_AMF_N2="192.168.128.195"    
+    IP_AMF_N2="172.21.10.35"    
 fi
 
 ##################################################################################

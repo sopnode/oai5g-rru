@@ -16,7 +16,7 @@ gNBs =
 
     // Tracking area code, 0x0000 and 0xfffe are reserved values
     tracking_area_code  =  @TAC@;
-    plmn_list = ({ mcc = @MCC@; mnc = @MNC@; mnc_length = 2; snssaiList = ({ sst = @SST@; }) });
+    plmn_list = ({ mcc = @MCC@; mnc = @MNC@; mnc_length = 2; snssaiList = ({ sst = @SST@; sd = 132 }) });
 
     nr_cellid = 12345678L
 
