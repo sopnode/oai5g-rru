@@ -53,12 +53,12 @@ IF_NAME_VLAN20="net-20"
 
 P100="192.168.100"
 
-SUBNET_N2N3="172.21.92"
-#SUBNET_N2N3="192.168.128"
-NETMASK_N2N3="16"
-#NETMASK_N2N3="27"
-IF_NAME_N2N3="eth2.422"
-#IF_NAME_N2N3="eth2"
+#SUBNET_N2N3="172.21.92"
+SUBNET_N2N3="192.168.128"
+#NETMASK_N2N3="16"
+NETMASK_N2N3="27"
+#IF_NAME_N2N3="eth2.422"
+IF_NAME_N2N3="eth2"
 
 
 ############################### oai-cn5g chart parameters ########################
