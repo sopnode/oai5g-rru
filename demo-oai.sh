@@ -44,17 +44,22 @@ PREFIX_DEMO="@DEF_PREFIX_DEMO@" # Directory in which all scripts will be copied 
 ##################################################################################
 PREFIX_STATS="/tmp/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance"
-P100="192.168.100"
-SUBNET_N2N3="192.168.128"
-NETMASK_N2N3="27"
-#IF_NAME_N2N3="pepr-ran3"
-IF_NAME_N2N3="eth2"
 
 
 # Interfaces names of VLANs in sopnode servers
 IF_NAME_VLAN100="net-100"
 IF_NAME_VLAN10="net-10"
 IF_NAME_VLAN20="net-20"
+
+P100="192.168.100"
+
+SUBNET_N2N3="172.21.92"
+#SUBNET_N2N3="192.168.128"
+NETMASK_N2N3="16"
+#NETMASK_N2N3="27"
+IF_NAME_N2N3="net-100"
+#IF_NAME_N2N3="eth2"
+
 
 ############################### oai-cn5g chart parameters ########################
 #CN_TAG="v1.5.1"
@@ -82,51 +87,20 @@ IF_N6="eth0" # should be "n6" but not, still work to be done
 
 CN_DEFAULT_GW=""
 
-####################################### TO REMOVE FROM HERE...
-#### mysql chart definitions ####
-#MYSQL_REPO="docker.io/mysql"
-#MYSQL_TAG="8.0" #previous 5.7 has issues on Rocky sopnode-w1 cluster with docker runtime
-
-#### nrf-amf chart definitions ####
-#NRF_REPO="${OAISA_REPO}/oai-nrf"
-#NRF_TAG="${CN_TAG}"
-
-#### oai-udr chart definitions ####
-#UDR_REPO="${OAISA_REPO}/oai-udr"
-#UDR_TAG="${CN_TAG}"
-
-#### oai-udm chart definitions ####
-#UDM_REPO="${OAISA_REPO}/oai-udm"
-#UDM_TAG="${CN_TAG}"
-
-#### nrf-ausf chart definitions ####
-#OAI5G_AUSF="$OAI5G_CORE/oai-ausf"
-#AUSF_REPO="${OAISA_REPO}/oai-ausf"
-#AUSF_TAG="${CN_TAG}"
-
-
 #### oai-amf chart definitions ####
-#OAI5G_AMF="$OAI5G_CORE/oai-amf"
-#AMF_REPO="${OAISA_REPO}/oai-amf"
-#AMF_TAG="${CN_TAG}"
 #
 MULTUS_AMF_N2="$MULTUS_CREATE"
-IP_AMF_N2="$P100.241"
+IP_AMF_N2="172.21.10.35"
+#IP_AMF_N2="$SUBNET_N2N3.1"
 NETMASK_AMF_N2="$NETMASK_N2N3"
 GW_AMF_N2=""
 ROUTES_AMF_N2=""
 IF_NAME_AMF_N2="$IF_NAME_N2N3" 
 
 #### oai-upf chart definitions ####
-#OAI5G_UPF="$OAI5G_CORE/oai-upf"
-#UPF_REPO="docker.io/r2labuser/oai-upf"
-#UPF_TAG="rocky-test90"
-#UPF_REPO="${OAISA_REPO}/oai-upf"
-#UPF_TAG="${CN_TAG}"
 #
 MULTUS_UPF_N3="$MULTUS_CREATE"
-#IP_UPF_N3="$P100.242" 
-IP_UPF_N3="$SUBNET_N2N3.145" 
+IP_UPF_N3="$SUBNET_N2N3.2" 
 NETMASK_UPF_N3="$NETMASK_N2N3"
 GW_UPF_N3=""
 ROUTES_UPF_N3=""
@@ -148,9 +122,6 @@ ROUTES_UPF_N6=""
 IF_NAME_UPF_N6="" 
 
 #### oai-smf chart definitions ####
-#OAI5G_SMF="$OAI5G_CORE/oai-smf"
-#SMF_REPO="${OAISA_REPO}/oai-smf"
-#SMF_TAG="${CN_TAG}"
 MULTUS_SMF_N4="false"
 IP_SMF_N4="" 
 NETMASK_SMF_N4=""
@@ -167,7 +138,7 @@ OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 RAN_TAG="2024.w06"
 GNB_NAME="gNB-r2lab"
-IP_GNB_N2N3="$SUBNET_N2N3.146"
+IP_GNB_N2N3="$SUBNET_N2N3.3"
 IF_NAME_GNB_N2="$IF_NAME_N2N3"
 IF_NAME_GNB_N3="" # unused for current scenario with same PHY network interface for N2/N3
 NETMASK_GNB_N2="$NETMASK_N2N3"
