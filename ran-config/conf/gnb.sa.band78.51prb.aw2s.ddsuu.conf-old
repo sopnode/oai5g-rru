@@ -198,7 +198,7 @@ MACRLCs = (
     tr_n_preference  = "local_RRC";
     pusch_TargetSNRx10 = 200;
     pucch_TargetSNRx10 = 200;
-    ulsch_max_frame_inactivity = 10;
+    ulsch_max_frame_inactivity = 0;
     ul_max_mcs         = 25; # was set to 15
   }
 );
@@ -210,6 +210,8 @@ L1s = (
         prach_dtx_threshold = 120;
         pucch0_dtx_threshold = 50;
         pusch_dtx_threshold = 10;
+	L1_rx_thread_core = 14;
+	L1_tx_thread_core = 16;
         }
 );
 
