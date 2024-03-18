@@ -53,9 +53,9 @@ IF_NAME_VLAN20="net-20"
 
 P100="192.168.100"
 
-SUBNET_N2N3="172.21.92"
+SUBNET_N2N3="172.21.11"
 #SUBNET_N2N3="192.168.128"
-NETMASK_N2N3="24"
+NETMASK_N2N3="22"
 #NETMASK_N2N3="27"
 IF_NAME_N2N3="eth2.422"
 #IF_NAME_N2N3="eth2"
@@ -90,7 +90,7 @@ CN_DEFAULT_GW=""
 #### oai-amf chart definitions ####
 #
 MULTUS_AMF_N2="$MULTUS_CREATE"
-IP_AMF_N2="172.21.10.35"
+IP_AMF_N2="172.21.10.200"
 #IP_AMF_N2="$SUBNET_N2N3.1"
 NETMASK_AMF_N2="$NETMASK_N2N3"
 GW_AMF_N2=""
@@ -100,7 +100,7 @@ IF_NAME_AMF_N2="$IF_NAME_N2N3"
 #### oai-upf chart definitions ####
 #
 MULTUS_UPF_N3="$MULTUS_CREATE"
-IP_UPF_N3="$SUBNET_N2N3.145" 
+IP_UPF_N3="$SUBNET_N2N3.2" 
 NETMASK_UPF_N3="$NETMASK_N2N3"
 GW_UPF_N3=""
 ROUTES_UPF_N3=""
@@ -139,7 +139,7 @@ OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 RAN_TAG="2024.w06"
 GNB_NAME="gNB-r2lab"
-IP_GNB_N2N3="$SUBNET_N2N3.146"
+IP_GNB_N2N3="$SUBNET_N2N3.3"
 IF_NAME_GNB_N2="$IF_NAME_N2N3"
 IF_NAME_GNB_N3="" # unused for current scenario with same PHY network interface for N2/N3
 NETMASK_GNB_N2="$NETMASK_N2N3"
@@ -205,7 +205,7 @@ OAI5G_NRUE="$OAI5G_CORE/oai-nr-ue"
 NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
 NRUE_TAG="${RAN_TAG}"
 OPTIONS_NRUE="--sa -E --rfsim -r 106 --numerology 1 -C 3319680000 --nokrnmod --log_config.global_log_options level,nocolor,time"
-IP_NRUE="$SUBNET_N2N3.147"
+IP_NRUE="$SUBNET_N2N3.4"
 NETMASK_NRUE="$NETMASK_N2N3"
 IF_NAME_NRUE="$IF_NAME_N2N3"
 NRUE_USRP="rfsim"
@@ -229,14 +229,14 @@ if [[ $GNB_ONLY = "true" ]]; then
 else
     echo "********* Configuring CN parameters for external CN"
     NFS_AMF_HOST="oai-amf" # was "oai-amf"
-    NFS_SMF_HOST="172.21.10.37" # was "oai-smf"
+    NFS_SMF_HOST="172.21.10.202" # was "oai-smf"
     NFS_UPF_HOST="oai-upf" # was "oai-upf"
     NFS_UDM_HOST="oai-udm" # was "oai-udm" #fake
     NFS_UDR_HOST="oai-udr" # was "oai-udr" #fake
     NFS_AUSF_HOST="oai-ausf" # was "oai-ausf" #fake
-    NFS_NRF_HOST="172.21.10.14" # was "oai-nrf"
+    NFS_NRF_HOST="172.21.10.203" # was "oai-nrf"
 
-    IP_AMF_N2="172.21.10.35"    
+    IP_AMF_N2="172.21.10.200"    
 fi
 
 ##################################################################################
