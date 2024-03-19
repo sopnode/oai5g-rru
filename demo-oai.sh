@@ -76,7 +76,6 @@ IF_N6="eth0" # should be "n6" but not, still work to be done
 
 CN_DEFAULT_GW=""
 
-####################################### TO REMOVE FROM HERE...
 #### mysql chart definitions ####
 #MYSQL_REPO="docker.io/mysql"
 #MYSQL_TAG="8.0" #previous 5.7 has issues on Rocky sopnode-w1 cluster with docker runtime
@@ -94,18 +93,15 @@ CN_DEFAULT_GW=""
 #UDM_TAG="${CN_TAG}"
 
 #### nrf-ausf chart definitions ####
-#OAI5G_AUSF="$OAI5G_CORE/oai-ausf"
 #AUSF_REPO="${OAISA_REPO}/oai-ausf"
 #AUSF_TAG="${CN_TAG}"
 
 
 #### oai-amf chart definitions ####
-#OAI5G_AMF="$OAI5G_CORE/oai-amf"
 #AMF_REPO="${OAISA_REPO}/oai-amf"
 #AMF_TAG="${CN_TAG}"
 #
 MULTUS_AMF_N2="$MULTUS_CREATE"
-#IP_AMF_N2="$P100.241"
 IP_AMF_N2="$SUBNET_N2N3.1"
 NETMASK_AMF_N2="24"
 GW_AMF_N2=""
@@ -113,14 +109,10 @@ ROUTES_AMF_N2=""
 IF_NAME_AMF_N2="$IF_NAME_N2N3" 
 
 #### oai-upf chart definitions ####
-#OAI5G_UPF="$OAI5G_CORE/oai-upf"
-#UPF_REPO="docker.io/r2labuser/oai-upf"
-#UPF_TAG="rocky-test90"
 #UPF_REPO="${OAISA_REPO}/oai-upf"
 #UPF_TAG="${CN_TAG}"
 #
 MULTUS_UPF_N3="$MULTUS_CREATE"
-#IP_UPF_N3="$P100.242" 
 IP_UPF_N3="$SUBNET_N2N3.2" 
 NETMASK_UPF_N3="24"
 GW_UPF_N3=""
@@ -142,7 +134,6 @@ ROUTES_UPF_N6=""
 IF_NAME_UPF_N6="" 
 
 #### oai-smf chart definitions ####
-#OAI5G_SMF="$OAI5G_CORE/oai-smf"
 #SMF_REPO="${OAISA_REPO}/oai-smf"
 #SMF_TAG="${CN_TAG}"
 MULTUS_SMF_N4="false"
@@ -157,19 +148,19 @@ IP_CSCF="127.0.0.1" # unused but without setting an IP, the SMF pod crashes!
 
 ################################ oai-gnb chart parameters ########################
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
-#
 R2LAB_REPO="docker.io/r2labuser"
-#RAN_TAG="2023.w37"
-#RAN_TAG="2024.w02-rocky9.3"
-#RAN_TAG="2023.w02-ci"
+#
 RAN_TAG="2024.w06"
 GNB_NAME="gNB-r2lab"
-#IP_GNB_N2N3="$P100.243"
+GNB_ID="0xe020" # new to handle
+#
 IP_GNB_N2N3="$SUBNET_N2N3.3"
 IF_NAME_GNB_N2="$IF_NAME_N2N3"
-IF_NAME_GNB_N3="" # unused for current scenario with same PHY network interface for N2/N3
 NETMASK_GNB_N2="24"
+#
+IF_NAME_GNB_N3="" # unused for current scenario with same PHY network interface for N2/N3
 NETMASK_GNB_N3=""
+#
 NETMASK_GNB_RU="24"
 
 #### rfsim RU case ####
@@ -182,7 +173,6 @@ OPTIONS_rfsim="--sa -E --rfsim --log_config.global_log_options level,nocolor,tim
 #### b2xx RU case ####
 #GNB_REPO_b2xx="${OAISA_REPO}/oai-gnb"
 GNB_REPO_b2xx="${R2LAB_REPO}/oai-gnb"
-#GNB_TAG_b2xx="2023.w37"
 GNB_TAG_b2xx="${RAN_TAG}"
 #CONF_b210="gnb.sa.band78.51prb.usrpb200.conf"
 CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
@@ -193,11 +183,12 @@ OPTIONS_b2xx="--sa -E --tune-offset 30000000 --log_config.global_log_options lev
 #GNB_REPO_n3xx="${OAISA_REPO}/oai-gnb"
 GNB_REPO_n3xx="${R2LAB_REPO}/oai-gnb"
 GNB_TAG_n3xx="${RAN_TAG}"
-#CONF_n3xx="gnb.band78.sa.fr1.106PRB.2x2.usrpn310.conf"
+#
 CONF_n320="gnb.sa.band78.106prb.usrpn310.ddsuu-2x2.conf"
 CONF_n300="gnb.sa.band78.106prb.usrpn310.ddsuu-2x2.conf"
 #OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 0,2,4,6,8,10,12,14,16 --log_config.global_log_options level,nocolor,time"
 OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
+#
 IP_GNB_SFP1="192.168.10.132"
 IP_GNB_SFP2="192.168.20.132"
 MTU_n3xx="9000"
@@ -207,14 +198,11 @@ ADDRS_n300="addr=192.168.10.129,second_addr=192.168.20.129"
 ADDRS_n320="addr=192.168.10.130,second_addr=192.168.20.130"
 
 #### aw2s RU case ####
-#GNB_REPO_aw2s="docker.io/oaisoftwarealliance/oai-gnb"
+#GNB_REPO_aw2s="${OAISA_REPO}/oai-gnb"
 GNB_REPO_aw2s="${R2LAB_REPO}/oai-gnb-aw2s"
-#GNB_TAG_aw2s="2023.w49"
 GNB_TAG_aw2s="${RAN_TAG}"
-#CONF_jaguar="oai-gNB-n78_50M_DDDSU.conf"
-#CONF_jaguar="gnb.sa.band78.51prb.aw2s.ddsuu.conf"
+#
 CONF_jaguar="gnb.sa.band78.51prb.aw2s.ddsuu.conf-old"
-#CONF_panther="oai-gNB-n78_50M_DDDSU.conf"
 CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.conf"
 OPTIONS_aw2s="--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
 IP_GNB_aw2s="$P100.243" 
@@ -233,7 +221,7 @@ NETMASK_NRUE="24"
 IF_NAME_NRUE="$IF_NAME_N2N3"
 NRUE_USRP="rfsim"
 
-###################### Scenario with External Core Network #######################
+############# Scenario with Full external Core Network through VPN ###############
 
 
 # If an external Core Network is used (i.e., GNB_ONLY is "true")
@@ -492,6 +480,7 @@ function configure-gnb() {
     # remove NSSAI sd info for PLMN and add other parameters for RUs
     cat > "$SED_CONF_FILE" <<EOF
 s|@GNB_NAME@|$GNB_NAME|
+s|@GNB_ID@|$GNB_ID|
 s|@TAC@|$TAC|
 s|@MCC@|$MCC|
 s|@MNC@|$MNC|
@@ -766,6 +755,7 @@ EOF
     start-gnb 
 
     if [[ "$RRU" = "rfsim" ]]; then
+	echo "sleep 5s before starting nr-ue"; sleep 5
 	start-nr-ue 
     fi
 
