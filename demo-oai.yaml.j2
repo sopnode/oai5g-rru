@@ -15,8 +15,8 @@
 # {{gnb_only}} - typically 'True' or 'False'
 # {{rru}} - typically 'n300' or 'n320' or 'jaguar' or 'panther'
 # {{cn_mode}} - typically 'basic' or 'advance'
-# {{DNN0}} -  typically 'oai.ipv4'
-# {{DNN1}} -  typically 'ims'
+# {{dnn0}} -  typically 'oai.ipv4'
+# {{dnn1}} -  typically 'ims' or 'none'
 # {{regcred}} - typically {'name': 'jdoe', 'password': 'XX', 'email': 'jdoe@yahoo.fr'}
 # {{quectel_image}} - typically 'quectel-mbim'
 # {{oai5g_rru_repo}} - typically 'https://github.com/sopnode/oai5g-rru.git'
@@ -298,7 +298,11 @@ jobs:
       - type: Run
         command: >
           sleep 60;
-          start.sh -F {{DNN0}};
+        {% if dnn1 == "none" %}    
+          start.sh -F {{dnn0}};
+        {% else %}
+          start.sh -F {{dnn0}} -S {{dnn1}};
+        {% endif %}
           sleep 20
       - type: RunScript
         command: >

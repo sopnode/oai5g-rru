@@ -81,13 +81,14 @@ default_regcred_name = 'r2labuser'
 default_regcred_password = 'r2labuser-pwd'
 default_regcred_email = 'r2labuser@turletti.com'
 
-DNN0 = 'oai.ipv4'
-DNN1 = ''
+default_dnn0 = 'oai.ipv4'
+default_dnn1 = 'none'
+
 
 def run(*, mode, gateway, slicename, master, namespace, logs,
         pcap, auto_start, gnb_only, load_images, 
         k8s_fit, amf_spgwu, gnb, phones, quectel_nodes, qhat_nodes, rru, 
-        cn_mode, regcred_name, regcred_password, regcred_email,
+        cn_mode, dnn0, dnn1, regcred_name, regcred_password, regcred_email,
         image, quectel_image, verbose, dry_run, demo_tag, charts_tag):
     """
     run the OAI5G demo on the k8s cluster
@@ -157,8 +158,8 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         gnb_only=gnb_only,
         rru=rru,
         cn_mode=cn_mode,
-        DNN0=DNN0,
-        DNN1=DNN1,
+        dnn0=dnn0,
+        dnn1=dnn1,
         regcred=dict(
             name=regcred_name,
             password=regcred_password,
@@ -400,6 +401,14 @@ def main():
         help="slicename used to book FIT nodes")
 
     parser.add_argument(
+        "--dnn0", default=default_dnn0,
+        help="Data Network Name DNN0")
+
+    parser.add_argument(
+        "--dnn1", default=default_dnn1,
+        help="Data Network Name DNN1")
+
+    parser.add_argument(
         "--regcred_name", default=default_regcred_name,
         help=f"registry credential name for docker pull")
 
@@ -477,6 +486,11 @@ def main():
         cn_mode="basic"
     print(f"Running tag {args.demo_tag} of demo-oai and tag {args.charts_tag} of OAI5G charts with {cn_mode} CN mode")
 
+    if args.dnn1 == "none":
+        print(f"\t with DDN0={args.dnn0}")
+    else:
+        print(f"\t with DDN0={args.dnn0} and DNN1={args.dnn1}")
+        
     if args.rru == "b210":
         if args.gnb == default_master:
             args.gnb = r2lab_hostname(default_b210_node)
@@ -548,6 +562,7 @@ def main():
         k8s_fit=args.k8s_fit, amf_spgwu=args.amf_spgwu, gnb=args.gnb,
         phones=args.phones, quectel_nodes=args.quectel_nodes,
         qhat_nodes=args.qhat_nodes, rru=args.rru, cn_mode=cn_mode,
+        dnn0=args.dnn0, dnn1=args.dnn1,
         regcred_name=args.regcred_name,
         regcred_password=args.regcred_password,
         regcred_email=args.regcred_email,
