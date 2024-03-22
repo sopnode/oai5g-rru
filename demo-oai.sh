@@ -30,7 +30,8 @@ PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
 #
 MCC="@DEF_MCC@"
 MNC="@DEF_MNC@"
-DNN="@DEF_DNN@"
+DNN0="@DEF_DNN0@"
+DNN1="@DEF_DNN1@"
 TAC="@DEF_TAC@"
 ################SST0="@DEF_SST0@"
 FULL_KEY="@DEF_FULL_KEY@"
@@ -358,7 +359,7 @@ s|@IF_N6@|$IF_N6|
 s|@MCC@|$MCC|
 s|@MNC@|$MNC|
 s|@TAC@|0x0001|
-s|@DNN0@|$DNN|
+s|@DNN0@|$DNN0|
 s|@IP_DNS1@|$IP_DNS1|
 s|@IP_DNS2@|$IP_DNS2|
 EOF
@@ -582,7 +583,7 @@ s|@IP_GNB@|$IP_GNB_N2N3|
 s|@RFSIM_IMSI@|$RFSIM_IMSI|
 s|@FULL_KEY@|$FULL_KEY|
 s|@OPC@|$OPC|
-s|@DNN@|$DNN|
+s|@DNN@|$DNN0|
 s|@NRUE_USRP@|$NRUE_USRP|
 s|@ADD_OPTIONS_NRUE@|$ADD_OPTIONS_NRUE|
 s|@START_TCPDUMP@|false|

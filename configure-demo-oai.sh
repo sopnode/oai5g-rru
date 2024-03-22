@@ -6,7 +6,8 @@
 MCC="001" # default is "208"
 MNC="01" # default is "95"
 TAC="1" # default is "1"
-DNN="oai.ipv4" # default is "oai.ipv4"
+DNN0="oai.ipv4" # default is "oai.ipv4"
+#DNN1="ims" # default is "ims"
 FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f" # default is "8baf473f2f8fd09487cccbd7097c6862"
 OPC="C42449363BBAD02B66D16BC975D77CC1" # default is "8E27B6AF0E692E750F32667A3B14605D"
 RFSIM_IMSI="001010000001121" # default is "208950000001121"
@@ -51,7 +52,8 @@ s|@DEF_PCAP@|$PCAP|
 s|@DEF_MCC@|${MCC}|g
 s|@DEF_MNC@|${MNC}|g
 s|@DEF_TAC@|${TAC}|g
-s|@DEF_DNN@|${DNN}|g
+s|@DEF_DNN0@|${DNN0}|g
+s|@DEF_DNN1@|${DNN1}|g
 s|@DEF_FULL_KEY@|${FULL_KEY}|g
 s|@DEF_OPC@|${OPC}|g
 s|@DEF_RFSIM_IMSI@|${RFSIM_IMSI}|g
@@ -73,6 +75,16 @@ EOF
     echo "Patching oai_db-basic.sql generic database with input parameters"
     sed -f /tmp/demo-oai.sed < /tmp/oai_db-basic-generic.sql > $DIR_GENERIC_DB/oai_db-basic.sql
     diff $DIR_GENERIC_DB/oai_db-basic-generic.sql $DIR_GENERIC_DB/oai_db-basic.sql
+
+    cat > /tmp/jinja.sed <<EOF
+s|@DNN0@|${DNN0}|
+s|@DNN1@|${DNN1}|
+EOF
+    DIR_JINJA="$PREFIX_DEMO/oai5g-rru"
+    cp $DIR_JINJA/demo-oai.yaml.j2 /tmp/
+    echo "Patching jinja script with right DNN"
+    sed -f /tmp/jinja.sed < /tmp/demo-oai.yaml.j2 > $DIR_JINJA/demo-oai.yaml.j2
+    diff /tmp/demo-oai.yaml.j2 $DIR_JINJA/demo-oai.yaml.j2
 }
 
 if test $# -ne 13; then

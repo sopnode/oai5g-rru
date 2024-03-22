@@ -294,13 +294,10 @@ jobs:
       sleep 60s, attach qhat0{{n}} UE; sleep 20s and test cx
     commands:
       - type: Run
-        command: sleep 60
-      - type: RunScript
         command: >
-          {{nodes_sh}} start-quectel
-        includes: {{INCLUDES}}
-      - type: Run
-        command: sleep 20
+          sleep 60;
+          start.sh -F @DNN0@;
+          sleep 20
       - type: RunScript
         command: >
           {{nodes_sh}} check-quectel-cx
