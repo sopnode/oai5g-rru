@@ -87,7 +87,7 @@ EOF
 #    echo "Patching jinja script with right DNN"
 #    sed -f /tmp/jinja.sed < /tmp/demo-oai.yaml.j2 > $DIR_JINJA/demo-oai.yaml.j2
 #    diff /tmp/demo-oai.yaml.j2 $DIR_JINJA/demo-oai.yaml.j2
-#}
+}
 
 if test $# -ne 15; then
     echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap prefix_demo cn_mode DNN0 DNN1 regcred_name regcred_password regcred_email "
