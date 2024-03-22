@@ -81,6 +81,8 @@ default_regcred_name = 'r2labuser'
 default_regcred_password = 'r2labuser-pwd'
 default_regcred_email = 'r2labuser@turletti.com'
 
+DNN0 = 'oai.ipv4'
+DNN1 = ''
 
 def run(*, mode, gateway, slicename, master, namespace, logs,
         pcap, auto_start, gnb_only, load_images, 
@@ -155,6 +157,8 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         gnb_only=gnb_only,
         rru=rru,
         cn_mode=cn_mode,
+        DNN0=DNN0,
+        DNN1=DNN1,
         regcred=dict(
             name=regcred_name,
             password=regcred_password,

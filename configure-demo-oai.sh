@@ -23,6 +23,8 @@ function update() {
     PCAP=$1; shift # boolean in [true, false]
     PREFIX_DEMO=$1; shift
     CN_MODE=$1; shift
+    DNN0=$1; shift
+    DNN1=$1; shift
     REGCRED_NAME=$1; shift
     REGCRED_PWD=$1; shift
     REGCRED_EMAIL=$1; shift
@@ -76,19 +78,19 @@ EOF
     sed -f /tmp/demo-oai.sed < /tmp/oai_db-basic-generic.sql > $DIR_GENERIC_DB/oai_db-basic.sql
     diff $DIR_GENERIC_DB/oai_db-basic-generic.sql $DIR_GENERIC_DB/oai_db-basic.sql
 
-    cat > /tmp/jinja.sed <<EOF
-s|@DNN0@|${DNN0}|
-s|@DNN1@|${DNN1}|
-EOF
-    DIR_JINJA="$PREFIX_DEMO/oai5g-rru"
-    cp $DIR_JINJA/demo-oai.yaml.j2 /tmp/
-    echo "Patching jinja script with right DNN"
-    sed -f /tmp/jinja.sed < /tmp/demo-oai.yaml.j2 > $DIR_JINJA/demo-oai.yaml.j2
-    diff /tmp/demo-oai.yaml.j2 $DIR_JINJA/demo-oai.yaml.j2
-}
+#    cat > /tmp/jinja.sed <<EOF
+#s|@DNN0@|${DNN0}|
+#s|@DNN1@|${DNN1}|
+#EOF
+#    DIR_JINJA="$PREFIX_DEMO/oai5g-rru"
+#    cp $DIR_JINJA/demo-oai.yaml.j2 /tmp/
+#    echo "Patching jinja script with right DNN"
+#    sed -f /tmp/jinja.sed < /tmp/demo-oai.yaml.j2 > $DIR_JINJA/demo-oai.yaml.j2
+#    diff /tmp/demo-oai.yaml.j2 $DIR_JINJA/demo-oai.yaml.j2
+#}
 
-if test $# -ne 13; then
-    echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap prefix_demo cn_mode regcred_name regcred_password regcred_email "
+if test $# -ne 15; then
+    echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap prefix_demo cn_mode DNN0 DNN1 regcred_name regcred_password regcred_email "
     exit 1
 else
     shift
