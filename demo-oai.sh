@@ -151,7 +151,7 @@ IP_CSCF="127.0.0.1" # unused but without setting an IP, the SMF pod crashes!
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 #
-RAN_TAG="2024.w06"
+RAN_TAG="2024.w11"
 GNB_NAME="gNB-r2lab"
 GNB_ID="0xe020" # new to handle
 #
@@ -360,6 +360,7 @@ s|@MCC@|$MCC|
 s|@MNC@|$MNC|
 s|@TAC@|0x0001|
 s|@DNN0@|$DNN0|
+s|@DNN1@|$DNN1|
 s|@IP_DNS1@|$IP_DNS1|
 s|@IP_DNS2@|$IP_DNS2|
 EOF
