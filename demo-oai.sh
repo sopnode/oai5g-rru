@@ -360,6 +360,7 @@ s|@MCC@|$MCC|
 s|@MNC@|$MNC|
 s|@TAC@|0x0001|
 s|@DNN0@|$DNN0|
+s|@DNN1@|$DNN1|
 s|@IP_DNS1@|$IP_DNS1|
 s|@IP_DNS2@|$IP_DNS2|
 EOF
