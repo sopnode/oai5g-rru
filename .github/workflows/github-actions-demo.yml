@@ -37,10 +37,10 @@ jobs:
           $OAI5G/run.sh init-ue
           echo "Run the oai5g-rru demo"
           $OAI5G/demo-oai.sh start
-          echo "Sleep 10s"; sleep 10
+          echo "Sleep 30s"; sleep 30
           echo "Trigger UE cx"
           $OAI5G/run.sh start-ue || true
-          echo "Sleep 1mn"; sleep 60
+          echo "Sleep 30s"; sleep 30
           echo "Run IPERF Tests..."
           $OAI5G/run.sh run-iperf || true
           echo "Stop the oai5g-rru demo"
