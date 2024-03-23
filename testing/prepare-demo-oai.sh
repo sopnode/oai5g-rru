@@ -36,6 +36,8 @@ RRU="jaguar"
 GNB_ONLY="false"
 #CN_MODE="advance"
 CN_MODE="basic"
+DNN0="oai.ipv4"
+DNN1="none"
 LOGS="true"
 PCAP="false"
 RC_NAME="r2labuser"
@@ -53,8 +55,8 @@ git clone -b $TAG_OAI_CN5G_FED $REPO_OAI_CN5G_FED
 cp oai5g-rru/configure-demo-oai.sh .
 cp oai5g-rru/demo-oai.sh .
 chmod a+x demo-oai.sh
-echo "./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $GNB_ONLY $LOGS $PCAP $DIR $CN_MODE $RC_NAME $RC_PWD $RC_MAIL"
-./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $GNB_ONLY $LOGS $PCAP $DIR $CN_MODE $RC_NAME $RC_PWD $RC_MAIL
+echo "./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $GNB_ONLY $LOGS $PCAP $DIR $CN_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL"
+./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $GNB_ONLY $LOGS $PCAP $DIR $CN_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL
 echo "run init"
 ./demo-oai.sh init
 echo "./demo-oai.sh configure-all"
