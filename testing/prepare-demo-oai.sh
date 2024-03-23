@@ -56,7 +56,7 @@ cp oai5g-rru/configure-demo-oai.sh .
 cp oai5g-rru/demo-oai.sh .
 chmod a+x demo-oai.sh
 echo "./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $GNB_ONLY $LOGS $PCAP $DIR $CN_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL"
-./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $GNB_ONLY $LOGS $PCAP $DIR $DNN0 $DNN1 $CN_MODE $RC_NAME $RC_PWD $RC_MAIL
+./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $GNB_ONLY $LOGS $PCAP $DIR $CN_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL
 echo "run init"
 ./demo-oai.sh init
 echo "./demo-oai.sh configure-all"
