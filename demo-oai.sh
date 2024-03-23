@@ -24,15 +24,23 @@ NS="@DEF_NS@" # k8s namespace
 NODE_AMF_UPF="@DEF_NODE_AMF_UPF@" # node in wich run amf and upf pods
 NODE_GNB="@DEF_NODE_GNB@" # node in which gnb pod runs
 RRU="@DEF_RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
-GNB_ONLY="@DEF_GNB_ONLY@" # boolean, true if only RAN pods are launched
+RUN_MODE="@DEF_RUN_MODE@" # in ['full', 'gnb-only', 'gnb-upf']
 LOGS="@DEF_LOGS@" # boolean, true if logs are retrieved on pods
 PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
 #
 MCC="@DEF_MCC@"
 MNC="@DEF_MNC@"
+TAC="@DEF_TAC@"
 DNN0="@DEF_DNN0@"
 DNN1="@DEF_DNN1@"
-TAC="@DEF_TAC@"
+SLICE1_SST="@DEF_SLICE1_SST@"
+SLICE1_SD="@DEF_SLICE1_SD@"
+SLICE1_5QI="@DEF_SLICE1_5QI@"
+SLICE2_SST="@DEF_SLICE2_SST@"
+SLICE2_SD="@DEF_SLICE2_SD@"
+SLICE2_5QI="@DEF_SLICE2_5QI@"
+GNB_ID="@GNB_ID@"
+#
 ################SST0="@DEF_SST0@"
 FULL_KEY="@DEF_FULL_KEY@"
 OPC="@DEF_OPC@"
@@ -57,10 +65,69 @@ IF_NAME_VLAN100="net-100"
 IF_NAME_VLAN10="net-10"
 IF_NAME_VLAN20="net-20"
 
-############################### oai-cn5g chart parameters ########################
-#CN_TAG="v1.5.1"
-#CN_TAG="develop"
 
+############# Running-mode dependent parameters configuration ###############
+#
+
+if [[ $RUN_MODE = "full" ]]; then
+    # Local RAN, Local CN
+    ENABLED_MYSQL=true
+    ENABLED_NRF=true
+    ENABLED_UDR=true
+    ENABLED_UDM=true
+    ENABLED_AUSF=true
+    ENABLED_AMF=true
+    ENABLED_UPF=true
+    ENABLED_SMF=true
+    ENABLED_NRF=true
+    SUBNET_N2N3="192.168.128"
+    NETMASK_N2N3="24"
+    IF_NAME_N2N3="net-100"
+    NFS_NRF_HOST="oai-nrf"
+    IF_SBI="eth0"
+    IF_N4="eth0"
+    IF_N6="eth0"
+    IP_AMF_N2="$SUBNET_N2N3.201"
+    IP_UPF_N3="$SUBNET_N2N3.202"
+    IP_GNB_N2N3="$SUBNET_N2N3.203"
+    IP_NRUE="$SUBNET_N2N3.204"
+else
+    # Local RAN, External MYSQL/UDR/UDM/AUSF/AMF/SMF
+    SUBNET_N2N3="172.21.10"
+    NETMASK_N2N3="27"
+    IP_AMF_N2="$SUBNET_N2N3.6" # Set the external AMF IP address for gNB
+    ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
+    #ROUTES_GNB_N2="[{'dst': '172.21.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
+    #ROUTES_GNB_N2="[{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
+
+    if [[ $RUN_MODE = "gnb-upf" ]]; then
+	# Local RAN and UPF
+	ENABLED_MYSQL=false
+	ENABLED_UDR=false
+	ENABLED_UDM=false
+	ENABLED_AUSF=false
+	ENABLED_AMF=false
+	ENABLED_SMF=false
+	ENABLED_NRF=false
+	ENABLED_UPF=true
+	SUBNET_N2N3="172.21.10"
+	NETMASK_N2N3="22"
+	IF_NAME_N2N3="br-pepr"
+	IP_UPF_N3="$SUBNET_N2N3.201"
+	IP_NRF="$SUBNET_N2N3.203" # set here external IP of NRF
+    else 
+	# Local External UPF, i.e., RAN-only mode
+	ENABLED_UPF=false
+	# Set the local IP address of the latter network interface
+	IP_GNB_N2N3="10.0.20.243" # local gNB IP required by AMF/UPF, e.g., "10.0.20.243"
+	# Set the route to reach AMF/UPF
+    fi
+fi
+
+
+
+############################### oai-cn5g chart parameters ########################
+#
 OAI5G_CHARTS="$PREFIX_DEMO/oai-cn5g-fed/charts"
 OAI5G_CORE="$OAI5G_CHARTS/oai-5g-core"
 OAI5G_BASIC="$OAI5G_CORE/oai-5g-basic"
@@ -70,52 +137,22 @@ OAI5G_ADVANCE="$OAI5G_CORE/oai-5g-advance"
 MULTUS_CREATE="true"
 IF_N2="n2"
 IF_N3="n3"
-IF_N4="eth0" # should be "n4" but not, still work to be done
-IF_N6="eth0" # should be "n6" but not, still work to be done
-#IF_N6="n3" # test with raphael
-
 
 CN_DEFAULT_GW=""
 
-#### mysql chart definitions ####
-#MYSQL_REPO="docker.io/mysql"
-#MYSQL_TAG="8.0" #previous 5.7 has issues on Rocky sopnode-w1 cluster with docker runtime
-
-#### nrf-amf chart definitions ####
-#NRF_REPO="${OAISA_REPO}/oai-nrf"
-#NRF_TAG="${CN_TAG}"
-
-#### oai-udr chart definitions ####
-#UDR_REPO="${OAISA_REPO}/oai-udr"
-#UDR_TAG="${CN_TAG}"
-
-#### oai-udm chart definitions ####
-#UDM_REPO="${OAISA_REPO}/oai-udm"
-#UDM_TAG="${CN_TAG}"
-
-#### nrf-ausf chart definitions ####
-#AUSF_REPO="${OAISA_REPO}/oai-ausf"
-#AUSF_TAG="${CN_TAG}"
-
-
 #### oai-amf chart definitions ####
-#AMF_REPO="${OAISA_REPO}/oai-amf"
-#AMF_TAG="${CN_TAG}"
 #
 MULTUS_AMF_N2="$MULTUS_CREATE"
 IP_AMF_N2="$SUBNET_N2N3.1"
-NETMASK_AMF_N2="24"
+NETMASK_AMF_N2="$NETMASK_N2N3"
 GW_AMF_N2=""
 ROUTES_AMF_N2=""
 IF_NAME_AMF_N2="$IF_NAME_N2N3" 
 
 #### oai-upf chart definitions ####
-#UPF_REPO="${OAISA_REPO}/oai-upf"
-#UPF_TAG="${CN_TAG}"
 #
 MULTUS_UPF_N3="$MULTUS_CREATE"
-IP_UPF_N3="$SUBNET_N2N3.2" 
-NETMASK_UPF_N3="24"
+NETMASK_UPF_N3="$SUBNET_N2N3"
 GW_UPF_N3=""
 ROUTES_UPF_N3=""
 IF_NAME_UPF_N3="$IF_NAME_N2N3"
@@ -135,8 +172,6 @@ ROUTES_UPF_N6=""
 IF_NAME_UPF_N6="" 
 
 #### oai-smf chart definitions ####
-#SMF_REPO="${OAISA_REPO}/oai-smf"
-#SMF_TAG="${CN_TAG}"
 MULTUS_SMF_N4="false"
 IP_SMF_N4="" 
 NETMASK_SMF_N4=""
@@ -145,7 +180,7 @@ ROUTES_SMF_N4=""
 IF_NAME_SMF_N4="" 
 IP_DNS1="138.96.0.210"
 IP_DNS2="193.51.196.138"
-IP_CSCF="127.0.0.1" # unused but without setting an IP, the SMF pod crashes!
+
 
 ################################ oai-gnb chart parameters ########################
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
@@ -153,13 +188,11 @@ R2LAB_REPO="docker.io/r2labuser"
 #
 RAN_TAG="2024.w11"
 GNB_NAME="gNB-r2lab"
-GNB_ID="0xe020" # new to handle
 #
-IP_GNB_N2N3="$SUBNET_N2N3.3"
 IF_NAME_GNB_N2="$IF_NAME_N2N3"
-NETMASK_GNB_N2="24"
+NETMASK_GNB_N2="$NETMASK_N2N3"
 #
-IF_NAME_GNB_N3="" # unused for current scenario with same PHY network interface for N2/N3
+IF_NAME_GNB_N3="" # currently unused, same PHY network interface for N2/N3
 NETMASK_GNB_N3=""
 #
 NETMASK_GNB_RU="24"
@@ -217,26 +250,9 @@ OAI5G_NRUE="$OAI5G_CORE/oai-nr-ue"
 NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
 NRUE_TAG="${RAN_TAG}"
 OPTIONS_NRUE="--sa -E --rfsim -r 106 --numerology 1 -C 3319680000 --nokrnmod --log_config.global_log_options level,nocolor,time"
-IP_NRUE="$SUBNET_N2N3.4"
-NETMASK_NRUE="24"
+NETMASK_NRUE="$NETMASK_N2N3"
 IF_NAME_NRUE="$IF_NAME_N2N3"
 NRUE_USRP="rfsim"
-
-############# Scenario with Full external Core Network through VPN ###############
-
-
-# If an external Core Network is used (i.e., GNB_ONLY is "true")
-# then, configure the following parameters
-if [[ $GNB_ONLY = "true" ]]; then
-    # Set the external AMF IP address
-    IP_AMF_N2="172.22.10.6" # external AMF IP address, e.g., "172.22.10.6"
-    # Set the local host network interface to reach AMF/UPF
-    IF_NAME_GNB_N2="ran" # Host network interface to reach AMF/UPF
-    # Set the local IP address of the latter network interface
-    IP_GNB_N2N3="10.0.20.243" # local gNB IP required by AMF/UPF, e.g., "10.0.20.243"
-    # Set the route to reach AMF/UPF
-    ROUTES_GNB_N2="[{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
-fi
 
 ##################################################################################
 
@@ -305,6 +321,13 @@ s|@PRIVILEGED@|$LOGS|
 s|@TCPDUMP_CONTAINER@|$LOGS|
 s|@START_TCPDUMP@|$PCAP|
 s|@SHAREDVOLUME@|$PCAP|
+s|@IP_NRF@|$IP_NRF|
+s|@ENABLED_MYSQL|$ENABLED_MYSQL|
+s|@ENABLED_NRF|$ENABLED_NRF|
+s|@ENABLED_UDR|$ENABLED_UDR|
+s|@ENABLED_UDM|$ENABLED_UDM|
+s|@ENABLED_AUSF|$ENABLED_AUSF|
+s|@ENABLED_AMF|$ENABLED_AMF|
 s|@CN_DEFAULT_GW@|$CN_DEFAULT_GW|
 s|@MULTUS_AMF_N2@|$MULTUS_AMF_N2|
 s|@IP_AMF_N2@|$IP_AMF_N2|
@@ -314,6 +337,7 @@ s|@GW_AMF_N2@|$GW_AMF_N2|
 s|@ROUTES_AMF_N2@|$ROUTES_AMF_N2|
 s|@IF_NAME_AMF_N2@|$IF_NAME_AMF_N2|
 s|@NODE_AMF@|"$NODE_AMF_UPF"|
+s|@ENABLED_UPF|$ENABLED_UPF|
 s|@MULTUS_UPF_N3@|$MULTUS_UPF_N3|
 s|@IP_UPF_N3@|$IP_UPF_N3|
 s|@NETMASK_UPF_N3@|$NETMASK_UPF_N3|
@@ -336,6 +360,7 @@ s|@GW_UPF_N6@|$GW_UPF_N6|
 s|@ROUTES_UPF_N6@|$ROUTES_UPF_N6|
 s|@IF_NAME_UPF_N6@|$IF_NAME_UPF_N6|
 s|@NODE_UPF@|"$NODE_AMF_UPF"|
+s|@ENABLED_SMF|$ENABLED_SMF|
 s|@MULTUS_SMF_N4@|$MULTUS_SMF_N4|
 s|@IP_SMF_N4@|$IP_SMF_N4|
 s|@NETMASK_SMF_N4@|$NETMASK_SMF_N4|
@@ -352,6 +377,7 @@ EOF
 
     echo "Configuring chart $OAI5G_@MODE@/config.yaml for R2lab"
     cat > $TMP/@mode@-config.sed <<EOF
+s|@IF_SBI@|$IF_SBI|
 s|@IF_N2@|$IF_N2|
 s|@IF_N3@|$IF_N3|
 s|@IF_N4@|$IF_N4|
@@ -361,6 +387,13 @@ s|@MNC@|$MNC|
 s|@TAC@|0x0001|
 s|@DNN0@|$DNN0|
 s|@DNN1@|$DNN1|
+s|@SLICE1_SST@|$SLICE1_SST|
+s|@SLICE1_SD@|$SLICE1_SD|
+s|@SLICE1_5QI@|$SLICE1_5QI|
+s|@SLICE2_SST@|$SLICE2_SST|
+s|@SLICE2_SD@|$SLICE2_SD|
+s|@SLICE2_5QI@|$SLICE2_5QI|
+s|@NFS_NRF_HOST@|$IP_NRF|
 s|@IP_DNS1@|$IP_DNS1|
 s|@IP_DNS2@|$IP_DNS2|
 EOF
@@ -406,10 +439,10 @@ function configure-gnb() {
     # Configure general parameters for values.yaml
     MULTUS_GNB_N2="$MULTUS_CREATE"
     GNB_N2_IF_NAME="n2"
-    GNB_N2_IP_ADDRESS="$IP_GNB_N2N3/24"
+    GNB_N2_IP_ADDRESS="$IP_GNB_N2N3/$NETMASK_N2N3"
     MULTUS_GNB_N3="false"
     GNB_N3_IF_NAME="n2"
-    GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/24"
+    GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/$NETMASK_N2N3"
     
     # Configure RRU specific parameters for values.yaml chart
     if [[ "$RRU" = "b210" ]]; then

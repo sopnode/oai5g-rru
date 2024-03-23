@@ -6,8 +6,14 @@
 MCC="001" # default is "208"
 MNC="01" # default is "95"
 TAC="1" # default is "1"
-DNN0="oai.ipv4" # default is "oai.ipv4"
-DNN1="none" # default is none, i.e., "none" or e.g., "ims"
+#DNN0 and DNN1 must be set in demo-oai.py or prepare-demo-oai.sh to configure Quectel UE
+SLICE1_SST="1"
+SLICE1_SD="000002"
+SLICE1_5QI="5"
+SLICE2_SST="1"
+SLICE2_SD="FFFFFF"
+SLICE2_5QI="2"
+GNB_ID="0xe020"
 FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f" # default is "8baf473f2f8fd09487cccbd7097c6862"
 OPC="C42449363BBAD02B66D16BC975D77CC1" # default is "8E27B6AF0E692E750F32667A3B14605D"
 RFSIM_IMSI="001010000001121" # default is "208950000001121"
@@ -18,7 +24,7 @@ function update() {
     NODE_AMF_UPF=$1"-v100"; shift
     NODE_GNB=$1"-v100"; shift
     RRU=$1; shift 
-    GNB_ONLY=$1; shift # boolean in [true, false]
+    RUN_MODE=$1; shift # in ["full", "gnb-only", "gnb-upf"]
     LOGS=$1; shift # boolean in [true, false]
     PCAP=$1; shift # boolean in [true, false]
     PREFIX_DEMO=$1; shift
@@ -48,14 +54,21 @@ s|@DEF_NS@|$NS|
 s|@DEF_NODE_AMF_UPF@|$NODE_AMF_UPF|
 s|@DEF_NODE_GNB@|$NODE_GNB|
 s|@DEF_RRU@|$RRU|
-s|@DEF_GNB_ONLY@|$GNB_ONLY|
+s|@DEF_RUN_MODE@|$RUN_MODE|
 s|@DEF_LOGS@|$LOGS|
 s|@DEF_PCAP@|$PCAP|
 s|@DEF_MCC@|${MCC}|g
 s|@DEF_MNC@|${MNC}|g
 s|@DEF_TAC@|${TAC}|g
-s|@DEF_DNN0@|${DNN0}|g
-s|@DEF_DNN1@|${DNN1}|g
+s|@DEF_DNN0@|${DNN0}|
+s|@DEF_DNN1@|${DNN1}|
+s|@DEF_SLICE1_SST@|${SLICE1_SST}|
+s|@DEF_SLICE1_SD@|${SLICE1_SD}|
+s|@DEF_SLICE1_5QI@|${SLICE1_5QI}|
+s|@DEF_SLICE2_SST@|${SLICE2_SST}|
+s|@DEF_SLICE2_SD@|${SLICE2_SD}|
+s|@DEF_SLICE2_5QI@|${SLICE2_5QI}|
+s|@DEF_GNB_ID@|${GNB_ID}|
 s|@DEF_FULL_KEY@|${FULL_KEY}|g
 s|@DEF_OPC@|${OPC}|g
 s|@DEF_RFSIM_IMSI@|${RFSIM_IMSI}|g
@@ -78,15 +91,6 @@ EOF
     sed -f /tmp/demo-oai.sed < /tmp/oai_db-basic-generic.sql > $DIR_GENERIC_DB/oai_db-basic.sql
     diff $DIR_GENERIC_DB/oai_db-basic-generic.sql $DIR_GENERIC_DB/oai_db-basic.sql
 
-#    cat > /tmp/jinja.sed <<EOF
-#s|@DNN0@|${DNN0}|
-#s|@DNN1@|${DNN1}|
-#EOF
-#    DIR_JINJA="$PREFIX_DEMO/oai5g-rru"
-#    cp $DIR_JINJA/demo-oai.yaml.j2 /tmp/
-#    echo "Patching jinja script with right DNN"
-#    sed -f /tmp/jinja.sed < /tmp/demo-oai.yaml.j2 > $DIR_JINJA/demo-oai.yaml.j2
-#    diff /tmp/demo-oai.yaml.j2 $DIR_JINJA/demo-oai.yaml.j2
 }
 
 if test $# -ne 15; then

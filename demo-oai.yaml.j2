@@ -12,7 +12,7 @@
 # {{wait2_dict}} - typically {1: "echo 'wait for 15s for phone1 before starting tests'; sleep 15"}
 # {{quectel_dict}} - typically  {'7': 'fit07'}
 # {{qhat_dict}} - typically {'1': 'qhat01', '2': 'qhat02'}
-# {{gnb_only}} - typically 'True' or 'False'
+# {{run_mode}} - typically 'full', 'gnb-only' or 'gnb-upf'
 # {{rru}} - typically 'n300' or 'n320' or 'jaguar' or 'panther'
 # {{cn_mode}} - typically 'basic' or 'advance'
 # {{dnn0}} -  typically 'oai.ipv4'
@@ -202,7 +202,7 @@ jobs:
           cp oai5g-rru/configure-demo-oai.sh /root/;
           cp oai5g-rru/testing/logs.sh /root/;
           cp oai5g-rru/testing/run-iperf-server.sh /root/;
-          /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{gnb_only}} {{logs}} {{pcap}} /root {{cn_mode}} {%for x in regcred.values()%}{{x}} {%endfor %};
+          /root/configure-demo-oai.sh update {{namespace}} {{nodes['amf_spgwu']}} {{nodes['gnb']}} {{rru}} {{run_mode}} {{dnn0}} {{dnn1}} {{logs}} {{pcap}} /root {{cn_mode}} {%for x in regcred.values()%}{{x}} {%endfor %};
           rm -rf oai-cn5g-fed;
           git clone --branch {{oai_cn5g_fed_tag}} {{oai_cn5g_fed_repo}}
       - type: Run

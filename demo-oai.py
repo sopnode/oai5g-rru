@@ -34,12 +34,12 @@ from r2lab import r2lab_hostname, ListOfChoices, ListOfChoicesNullReset, find_lo
 ##########################################################################################
 #    Configure here OAI5G_RRU and OAI_CN5G_FED repo and tag
 OAI5G_RRU_REPO = 'https://github.com/sopnode/oai5g-rru.git'
-OAI5G_RRU_TAG = 'develop-r2lab'
+OAI5G_RRU_TAG = 'develop-r2lab-tmp'
 #OAI5G_RRU_TAG = 'r2-helm-charts'
 #OAI5G_RRU_TAG = 'master'
 #OAI5G_RRU_TAG = 'v1.5.1-1.3-1.0'
 OAI_CN5G_FED_REPO = 'https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git'
-OAI_CN5G_FED_TAG = 'develop-r2lab'
+OAI_CN5G_FED_TAG = 'develop-r2lab-tmp'
 #OAI_CN5G_FED_TAG = 'r2-helm-charts-r2lab'
 #OAI_CN5G_FED_TAG = 'v1.5.1-1.3'
 ##########################################################################################
@@ -81,12 +81,13 @@ default_regcred_name = 'r2labuser'
 default_regcred_password = 'r2labuser-pwd'
 default_regcred_email = 'r2labuser@turletti.com'
 
+default_run_mode = 'full'
 default_dnn0 = 'oai.ipv4'
 default_dnn1 = 'none'
 
 
 def run(*, mode, gateway, slicename, master, namespace, logs,
-        pcap, auto_start, gnb_only, load_images, 
+        pcap, auto_start, run_mode, load_images, 
         k8s_fit, amf_spgwu, gnb, phones, quectel_nodes, qhat_nodes, rru, 
         cn_mode, dnn0, dnn1, regcred_name, regcred_password, regcred_email,
         image, quectel_image, verbose, dry_run, demo_tag, charts_tag):
@@ -99,7 +100,7 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         pcap: pcap trace files will be generated
         logs: logs files will be generated
         auto_start: pods will be launched
-        gnb_only: OAI5G cn pods will not be started/stopped
+        run_mode: 'full', 'gnb-only' or 'gnb-upf'
         load_images: FIT images will be deployed
         k8s_fit: FIT node number attached to the k8s cluster as worker node
         amf_spgwu: node name in which amf and spgwu-tiny will be deployed
@@ -155,7 +156,7 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         wait2_dict=wait2_dict,
         quectel_dict=quectel_dict,
         qhat_dict=qhat_dict,
-        gnb_only=gnb_only,
+        run_mode=run_mode,
         rru=rru,
         cn_mode=cn_mode,
         dnn0=dnn0,
@@ -363,9 +364,10 @@ def main():
         help="default is to start the oai-demo after setup")
 
     parser.add_argument(
-        "--gnb-only", default=False,
-        action='store_true', dest='gnb_only',
-        help="default is to manage not only gnb but also CN pods")
+        "-M", "--run-mode", dest='run_mode',
+        default=default_run_mode,
+        choices=("full", "gnb-only", "gnb-upf"),
+	help="specify which running mode to use")
 
     parser.add_argument(
         "-l", "--load-images", default=False, action='store_true',
@@ -540,8 +542,7 @@ def main():
             print("Automatically start the demo after setup")
         else:
             print("Do not start the demo after setup")
-        if args.gnb_only:
-            print("Only start/stop oai-gnb pod")
+        print(f"Scenario running mode is {args.run_mode}")
         mode = "run"
     if args.pcap:
         print(f"configured to generate both pcap and logs files")
@@ -557,7 +558,7 @@ def main():
             logs_str='False'
     run(mode=mode, gateway=default_gateway, slicename=args.slicename,
         master=args.master, namespace=args.namespace, logs=logs_str,
-        pcap=pcap_str, auto_start=args.auto_start, gnb_only=args.gnb_only,
+        pcap=pcap_str, auto_start=args.auto_start, run_mode=args.run_mode,
         load_images=args.load_images,
         k8s_fit=args.k8s_fit, amf_spgwu=args.amf_spgwu, gnb=args.gnb,
         phones=args.phones, quectel_nodes=args.quectel_nodes,
