@@ -784,7 +784,7 @@ EOF
     kubectl -n $NS apply -f $TMP/cn5g-pvc.yaml
     fi
 
-    if [[ "$GNB_ONLY" = "false" ]]; then
+    if [[ "$RUN_MODE" != "gnb-only" ]]; then
 	start-cn 
     fi
     start-gnb 
@@ -847,7 +847,7 @@ function stop() {
     res=$(helm -n $NS ls | wc -l)
     if test $res -gt 1; then
         echo "Remove all 5G OAI pods"
-	if [[ "$GNB_ONLY" = "false" ]]; then
+	if [[ "$RUN_MODE" != "gnb-only" ]]; then
 	    stop-cn
 	fi
 	stop-gnb
