@@ -85,10 +85,12 @@ if [[ $RUN_MODE = "full" ]]; then
     IF_N6="eth0"
     IP_AMF_N2="$SUBNET_N2N3.201"
     IP_UPF_N3="$SUBNET_N2N3.202"
+    ENABLE_SNAT="yes"
     IP_GNB_N2N3="$SUBNET_N2N3.203"
     IP_NRUE="$SUBNET_N2N3.204"
 else
     # Local RAN, External MYSQL/UDR/UDM/AUSF/AMF/SMF
+    ENABLE_SNAT="off" # "yes" or "off"
     if [[ $RUN_MODE = "gnb-upf" ]]; then
 	# Local RAN and local UPF
 	ENABLED_MYSQL=false
@@ -387,6 +389,7 @@ s|@IF_N6@|$IF_N6|
 s|@MCC@|$MCC|
 s|@MNC@|$MNC|
 s|@TAC@|0x0001|
+s|@ENABLE_SNAT@|$ENABLE_SNAT|
 s|@DNN0@|$DNN0|
 s|@DNN1@|$DNN1|
 s|@SLICE1_SST@|$SLICE1_SST|
