@@ -525,14 +525,12 @@ function configure-gnb() {
     mv $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
     echo "First configure gnb.conf within configmap.yaml"
-    # remove NSSAI sd info for PLMN and add other parameters for RUs
+    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = $GNB_SLICE1_SST }) });"
     cat > "$SED_CONF_FILE" <<EOF
 s|@GNB_NAME@|$GNB_NAME|
 s|@GNB_ID@|$GNB_ID|
 s|@TAC@|$TAC|
-s|@MCC@|$MCC|
-s|@MNC@|$MNC|
-s|@SST@|1|
+s|plmn_list.*|plmn_list = $PLMN_LIST|
 s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
 s|@GNB_N2_IP_ADDRESS@|$GNB_N2_IP_ADDRESS|
 s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
