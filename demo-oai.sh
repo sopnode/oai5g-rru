@@ -525,7 +525,7 @@ function configure-gnb() {
     mv $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
     echo "First configure gnb.conf within configmap.yaml"
-    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = $GNB_SLICE1_SST }) });"
+    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = $SLICE1_SST }) });"
     cat > "$SED_CONF_FILE" <<EOF
 s|@GNB_NAME@|$GNB_NAME|
 s|@GNB_ID@|$GNB_ID|
