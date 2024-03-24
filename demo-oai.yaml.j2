@@ -322,7 +322,7 @@ jobs:
         command: /root/demo-oai.sh stop
       {% if logs == 'True' %}
       - type: Pull
-        remotepaths: "/tmp/oai5g-stats.tgz"
+        remotepaths: "/tmp/tmp.root/oai5g-stats.tgz"
         localpath: "./"
       {% endif %}
 
