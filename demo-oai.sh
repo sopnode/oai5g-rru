@@ -54,14 +54,10 @@ TMP="/tmp/tmp.$USER"
 mkdir -p $TMP
 PREFIX_STATS="$TMP/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance"
-P99="192.168.99"
-P100="192.168.100"
-SUBNET_N2N3="$P99"
-IF_NAME_N2N3="net-100"
-#IF_NAME_N2N3="eth4"
 
 # Interfaces names of VLANs in sopnode servers
 IF_NAME_VLAN100="net-100"
+P100="192.168.100"
 IF_NAME_VLAN10="net-10"
 IF_NAME_VLAN20="net-20"
 
@@ -93,15 +89,8 @@ if [[ $RUN_MODE = "full" ]]; then
     IP_NRUE="$SUBNET_N2N3.204"
 else
     # Local RAN, External MYSQL/UDR/UDM/AUSF/AMF/SMF
-    SUBNET_N2N3="172.21.10"
-    NETMASK_N2N3="27"
-    IP_AMF_N2="$SUBNET_N2N3.6" # Set the external AMF IP address for gNB
-    ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
-    #ROUTES_GNB_N2="[{'dst': '172.21.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
-    #ROUTES_GNB_N2="[{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
-
     if [[ $RUN_MODE = "gnb-upf" ]]; then
-	# Local RAN and UPF
+	# Local RAN and local UPF
 	ENABLED_MYSQL=false
 	ENABLED_UDR=false
 	ENABLED_UDM=false
@@ -111,16 +100,29 @@ else
 	ENABLED_NRF=false
 	ENABLED_UPF=true
 	SUBNET_N2N3="172.21.10"
-	NETMASK_N2N3="22"
+	NETMASK_N2N3="27"
 	IF_NAME_N2N3="br-pepr"
-	IP_UPF_N3="$SUBNET_N2N3.201"
+	IP_AMF_N2="$SUBNET_N2N3.204" # Set the external AMF IP address for gNB
+	IP_UPF_N3="$SUBNET_N2N3.221"
 	NFS_NRF_HOST="$SUBNET_N2N3.203" # set here external IP of NRF
-    else 
-	# Local External UPF, i.e., RAN-only mode
-	ENABLED_UPF=false
-	# Set the local IP address of the latter network interface
-	IP_GNB_N2N3="10.0.20.243" # local gNB IP required by AMF/UPF, e.g., "10.0.20.243"
+	IP_GNB_N2N3="$SUBNET_N2N3.222"
+	ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
+	#ROUTES_GNB_N2="[{'dst': '172.21.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
+	IP_NRUE="$SUBNET_N2N3.223"
+    else
+	# Local RAN and external CN
+	ENABLED_UPF=false 
+	# Set the local gNB host network interface to reach AMF/UPF (N2/N3)
+	SUBNET_N2N3="172.21.10" # e.g., "10.0.20"
+	NETMASK_N2N3="27"
+	IF_NAME_GNB_N2N3="br-pepr" # e.g., "ran"
+	# Set the external AMF IP address (N2)
+	IP_AMF_N2="172.22.10.6" # e.g., "172.22.10.6"
+	IP_GNB_N2N3="$SUBNET_N2N3.243" # local gNB IP required by AMF/UPF, e.g., "10.0.20.243"
 	# Set the route to reach AMF/UPF
+	ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"	
+	# Set the local IP address of the latter network interface
+	IP_NRUE="$SUBNET_N2N3.244"
     fi
 fi
 
