@@ -114,7 +114,7 @@ else
 	NETMASK_N2N3="22"
 	IF_NAME_N2N3="br-pepr"
 	IP_UPF_N3="$SUBNET_N2N3.201"
-	NSF_NRF_HOST="$SUBNET_N2N3.203" # set here external IP of NRF
+	NFS_NRF_HOST="$SUBNET_N2N3.203" # set here external IP of NRF
     else 
 	# Local External UPF, i.e., RAN-only mode
 	ENABLED_UPF=false
