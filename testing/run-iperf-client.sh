@@ -6,7 +6,8 @@ quectel_nif="wwan0"
 sim_mode=""
 quectel_node=""
 ns=""
-default_args="-u -b 10M -t 10"
+default_args="--bidir -t 60"
+#default_args="-u -b 10M -t 30"
 iperf3_args=""
 
 usage()
