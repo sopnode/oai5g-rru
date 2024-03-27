@@ -54,7 +54,7 @@ default_quectel_image = 'quectel-mbim-single-dnn'
 
 # This script uses one R2lab FIT node as a k8s worker attached to the cluster
 # in order to launch the scenario 
-default_k8s_fit = 1
+default_k8s_fit = 2
 
 # Default FIT node used to run oai-gnb with USRP B210
 default_b210_node = 2
@@ -404,11 +404,11 @@ def main():
 
     parser.add_argument(
         "--dnn0", default=default_dnn0,
-        help="Data Network Name DNN0")
+        help=f"Data Network Name DNN0, default is {default_dnn0}")
 
     parser.add_argument(
         "--dnn1", default=default_dnn1,
-        help="Data Network Name DNN1")
+        help=f"Data Network Name DNN1, default is {default_dnn1}")
 
     parser.add_argument(
         "--regcred_name", default=default_regcred_name,
