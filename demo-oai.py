@@ -47,8 +47,8 @@ default_master = 'sopnode-w1'
 # Default R2lab FIT node images
 #default_image = 'kubernetes'
 default_image = 'u18-lowlat-kube-uhd'
-#default_quectel_image = 'quectel-mbim'
-default_quectel_image = 'quectel-mbim-single-dnn'
+default_quectel_image = 'mbim-quectel'
+
 
 # This script uses one R2lab FIT node as a k8s worker attached to the cluster
 # in order to launch the scenario 

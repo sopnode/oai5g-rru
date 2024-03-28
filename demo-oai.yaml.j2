@@ -271,13 +271,14 @@ jobs:
       sleep 60s, attach quectel UE on fit node {{n}}; sleep 20s and test cx
     commands:
       - type: Run
-        command: sleep 60
-      - type: RunScript
         command: >
-          {{nodes_sh}} start-quectel
-        includes: {{INCLUDES}}
-      - type: Run
-        command: sleep 20
+          sleep 60;
+        {% if dnn1 == "none" %}    
+          start.sh -F {{dnn0}};
+        {% else %}
+          start.sh -F {{dnn0}} -S {{dnn1}};
+        {% endif %}
+          sleep 20
       - type: RunScript
         command: >
           {{nodes_sh}} check-quectel-cx
@@ -352,10 +353,13 @@ jobs:
     label: >
       detach quectel UE on fit node {{n}}
     commands:
-      - type: RunScript
+      - type: Run
         command: >
-          {{nodes_sh}} stop-quectel
-        includes: {{INCLUDES}}
+        {% if dnn1 == "none" %}    
+          stop.sh
+        {% else %}
+          stop.sh -S {{dnn1}}
+        {% endif %}
   {% endfor %}
 
   {% for n in qhat_dict.keys() %}
@@ -368,10 +372,13 @@ jobs:
     label: >
       detach qhat0{{n}} UE
     commands:
-      - type: RunScript
+      - type: Run
         command: >
-          {{nodes_sh}} stop-quectel
-        includes: {{INCLUDES}}
+        {% if dnn1 == "none" %}    
+          stop.sh
+        {% else %}
+          stop.sh -S {{dnn1}}
+        {% endif %}
   {% endfor %}
 
   - id: cleanup1
