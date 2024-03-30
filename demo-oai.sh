@@ -276,6 +276,12 @@ function gener-mac()
 	CPT=$(cat "$CPTfile")
     fi
     if [ ! -f "$PREFIXfile" ]; then
+	# GNB_ID should be of following format "0x1234", use this as MAC prefix
+	if [[ ${GNB_ID:0:2} == "0x" ]] ; then
+	    PREFIX="${GNB_ID:2:2}:${GNB_ID:4:2}:"
+	else
+	    PREFIX="12:34:"
+	fi
 	PREFIX="12:34:"
 	case $IF_NAME_VLAN100 in
 	    "net-100")
