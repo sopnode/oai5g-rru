@@ -116,19 +116,23 @@ else
 	#ROUTES_GNB_N2="[{'dst': '172.21.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
 	IP_NRUE="$SUBNET_N2N3.223"
     else
-	# Local RAN and external CN
-	ENABLED_UPF=false 
-	# Set the local gNB host network interface to reach AMF/UPF (N2/N3)
-	SUBNET_N2N3="172.21.10" # e.g., "10.0.20"
-	NETMASK_N2N3="27"
-	IF_NAME_GNB_N2N3="br-pepr" # e.g., "ran"
-	# Set the external AMF IP address (N2)
-	IP_AMF_N2="172.22.10.6" # e.g., "172.22.10.6"
-	IP_GNB_N2N3="$SUBNET_N2N3.243" # local gNB IP required by AMF/UPF, e.g., "10.0.20.243"
-	# Set the route to reach AMF/UPF
-	ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"	
-	# Set the local IP address of the latter network interface
-	IP_NRUE="$SUBNET_N2N3.244"
+        # Local RAN and external CN
+        ENABLED_UPF=false
+        # Set the local gNB host network interface to reach AMF/UPF (N2/N3)
+	SUBNET_N2N3="192.168.128" # "172.21.10" # e.g., "10.0.20"
+        #SUBNET_N2N3="172.21.10" # e.g., "10.0.20"
+        NETMASK_N2N3="24"
+        #NETMASK_N2N3="27"
+        IF_NAME_GNB_N2N3="net-100"
+        #IF_NAME_GNB_N2N3="br-pepr" # e.g., "ran"
+        # Set the external AMF IP address (N2)
+        IP_AMF_N2="$SUBNET_N2N3.201"
+        #IP_AMF_N2="172.22.10.6" # e.g., "172.22.10.6"
+	IP_GNB_N2N3="$SUBNET_N2N3.245" # local gNB IP required by AMF/UPF, e.g., "10.0.20.243"
+        # Set the route to reach AMF/UPF
+        ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
+        # Set the local IP address of the latter network interface
+        IP_NRUE="$SUBNET_N2N3.244"
     fi
 fi
 
