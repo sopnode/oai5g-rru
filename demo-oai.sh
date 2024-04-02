@@ -201,6 +201,57 @@ R2LAB_REPO="docker.io/r2labuser"
 RAN_TAG="2024.w11"
 GNB_NAME="gNB-r2lab"
 #
+# DU/CU SPLIT paramaters
+#
+# DU specific part
+NAME_GNB_DU_SA="oai-du-sa"
+MULTUS_GNB_F1="true"
+IP_GNB_DU_F1="172.21.16.100"
+NETMASK_GNB_F1="22"
+GW_GNB_DU_F1=""
+ROUTES_GNB_F1=""
+IF_NAME_GNB_DU_F1="" # to fill!
+GNB_DU_MOUNTCONFIG="true"
+NAME_GNB_DU="oai-du-rfsim"
+GNB_DU_F1IFNAME="f1" # if multus.f1Interface.create is true then use f1 else use "eth0"
+GNB_CU_HOST="oai-cu" ## Ip-address or hostname
+GNB_F1_CU_PORT="2152" #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+GNB_F1_DU_PORT="2152" #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+
+# CU specific part
+NAME_GNB_CU_SA="oai-cu-sa"
+IP_GNB_CU_F1="172.21.16.92"
+GW_GNB_CU_F1="" # "172.21.19.254"
+ROUTES_GNB_CU_F1="" 
+IF_NAME_GNB_CU_F1="" # to fill!
+GNB_CU_MOUNTCONFIG="true"
+ADD_OPTIONS_CU_GNB="--sa --log_config.global_log_options level,nocolor,time"
+NAME_GNB_CU="oai-cu"
+GNB_CU_F1IFNAME="f1" # if multus.f1Interface.create is true then use f1 else use "eth0"
+GNB_CU_N2IFNAME="n2" # if multus.f1Interface.create is true then use f1 else use "eth0"
+GNB_CU_N3IFNAME="n3" # if multus.f1Interface.create is true then use f1 else use "eth0"
+
+# CU-CP specific part
+NAME_GNB_CU_CP_SA="oai-cu-cp-sa"
+MULTUS_GNB_E1="true"
+IP_GNB_CUCP_E1="192.168.18.12"
+NETMASK_GNB_E1="24"
+GW_GNB_CUCP_E1=""
+ROUTES_GNB_CUCP_E1="" # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
+IF_NAME_GNB_CUCP_E1="" # to fill!
+IP_GNB_CUCP_F1="172.21.16.92"
+NAME_GNB_CUCP="oai-cu-cp"
+GNB_CU_E1IFNAME="e1"
+# CU-UP specific part
+GNB_CUUP_REPO="docker.io/oaisoftwarealliance/oai-nr-cuup" # check if we need to rebuild for rockylinux
+GNB_CUUP_TAG=${GNB_TAG}
+NAME_GNB_CU_UP_SA="oai-cu-up-sa"
+IP_GNB_CUUP_E1="192.168.18.13"
+GW_GNB_CUUP_E1=""
+ROUTES_GNB_CU_E1="" # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
+IF_NAME_GNB_CUUP_E1="" # to fill!
+IP_GNB_CUUP_F1="172.21.16.93"
+#
 IF_NAME_GNB_N2="$IF_NAME_N2N3"
 NETMASK_GNB_N2="$NETMASK_N2N3"
 #
