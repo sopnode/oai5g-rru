@@ -80,6 +80,7 @@ default_regcred_password = 'r2labuser-pwd'
 default_regcred_email = 'r2labuser@turletti.com'
 
 default_run_mode = 'full'
+default_gnb_mode = 'monolithic'
 default_dnn0 = 'oai.ipv4'
 default_dnn1 = 'none'
 
@@ -87,7 +88,8 @@ default_dnn1 = 'none'
 def run(*, mode, gateway, slicename, master, namespace, logs,
         pcap, auto_start, run_mode, load_images, 
         k8s_fit, amf_spgwu, gnb, phones, quectel_nodes, qhat_nodes, rru, 
-        cn_mode, dnn0, dnn1, regcred_name, regcred_password, regcred_email,
+        cn_mode, gnb_mode, dnn0, dnn1,
+        regcred_name, regcred_password, regcred_email,
         image, quectel_image, verbose, dry_run, demo_tag, charts_tag):
     """
     run the OAI5G demo on the k8s cluster
@@ -108,6 +110,7 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         qhat_nodes: list of indices of qhat UE nodes to use
         rru: hardware device attached to gNB
         cn_mode: basic or advance
+        gnb_mode: monolithic or cudu or cucpup
         image: R2lab k8s image name
         demo_tag: this demo script tag
         charts_tag: oai_cn5g_fed charts tag
@@ -157,6 +160,7 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         run_mode=run_mode,
         rru=rru,
         cn_mode=cn_mode,
+        gnb_mode=gnb_mode,
         dnn0=dnn0,
         dnn1=dnn1,
         regcred=dict(
@@ -438,12 +442,18 @@ def main():
         choices=["1", "2", "3"],
 	action=ListOfChoices,
 	help="specify as many node ids with Quectel UEs as you want.")
-
+    
     parser.add_argument(
         "-R", "--rru", dest='rru',
         default=default_rru,
         choices=("b210", "n300", "n320", "jaguar", "panther", "rfsim"),
 	help="specify the hardware RRU to use for gNB or rfsim if simulation")
+
+    parser.add_argument(
+        "-G", "--gnb-mode", dest='gnb_mode',
+        default=default_gnb_mode,
+        choices=("monolithic", "cudu", "cucpup"),
+	help=f"specify the gNB mode, default is {default_gnb_mode}")
 
     parser.add_argument("-A", "--advance-cn", default=False,
                         action='store_true', dest='advance_mode',
@@ -485,6 +495,7 @@ def main():
     else:
         cn_mode="basic"
     print(f"Running tag {args.demo_tag} of demo-oai and tag {args.charts_tag} of OAI5G charts with {cn_mode} CN mode")
+    print(f"gNB mode is {args.gnb_mode}")
 
     if args.dnn1 == "none":
         print(f"\t with DDN0={args.dnn0}")
@@ -561,7 +572,7 @@ def main():
         k8s_fit=args.k8s_fit, amf_spgwu=args.amf_spgwu, gnb=args.gnb,
         phones=args.phones, quectel_nodes=args.quectel_nodes,
         qhat_nodes=args.qhat_nodes, rru=args.rru, cn_mode=cn_mode,
-        dnn0=args.dnn0, dnn1=args.dnn1,
+        gnb_mode=args.gnb_mode, dnn0=args.dnn0, dnn1=args.dnn1,
         regcred_name=args.regcred_name,
         regcred_password=args.regcred_password,
         regcred_email=args.regcred_email,

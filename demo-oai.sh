@@ -25,6 +25,7 @@ NODE_AMF_UPF="@DEF_NODE_AMF_UPF@" # node in wich run amf and upf pods
 NODE_GNB="@DEF_NODE_GNB@" # node in which gnb pod runs
 RRU="@DEF_RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
 RUN_MODE="@DEF_RUN_MODE@" # in ['full', 'gnb-only', 'gnb-upf']
+GNB_MODE="@DEF_GNB_MODE@" # in ['monolithic', 'cudu', 'cucp']
 LOGS="@DEF_LOGS@" # boolean, true if logs are retrieved on pods
 PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
 #
@@ -210,7 +211,7 @@ IP_GNB_DU_F1="172.21.16.100"
 NETMASK_GNB_F1="22"
 GW_GNB_DU_F1=""
 ROUTES_GNB_F1=""
-IF_NAME_GNB_DU_F1="" # to fill!
+IF_NAME_GNB_DU_F1="$IF_NAME_N2N3" 
 GNB_DU_MOUNTCONFIG="true"
 NAME_GNB_DU="oai-du-rfsim"
 GNB_DU_F1IFNAME="f1" # if multus.f1Interface.create is true then use f1 else use "eth0"
@@ -223,7 +224,7 @@ NAME_GNB_CU_SA="oai-cu-sa"
 IP_GNB_CU_F1="172.21.16.92"
 GW_GNB_CU_F1="" # "172.21.19.254"
 ROUTES_GNB_CU_F1="" 
-IF_NAME_GNB_CU_F1="" # to fill!
+IF_NAME_GNB_CU_F1="$IF_NAME_N2N3" 
 GNB_CU_MOUNTCONFIG="true"
 ADD_OPTIONS_CU_GNB="--sa --log_config.global_log_options level,nocolor,time"
 NAME_GNB_CU="oai-cu"
@@ -238,7 +239,7 @@ IP_GNB_CUCP_E1="192.168.18.12"
 NETMASK_GNB_E1="24"
 GW_GNB_CUCP_E1=""
 ROUTES_GNB_CUCP_E1="" # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
-IF_NAME_GNB_CUCP_E1="" # to fill!
+IF_NAME_GNB_CUCP_E1="$IF_NAME_N2N3" 
 IP_GNB_CUCP_F1="172.21.16.92"
 NAME_GNB_CUCP="oai-cu-cp"
 GNB_CU_E1IFNAME="e1"
@@ -249,8 +250,16 @@ NAME_GNB_CU_UP_SA="oai-cu-up-sa"
 IP_GNB_CUUP_E1="192.168.18.13"
 GW_GNB_CUUP_E1=""
 ROUTES_GNB_CU_E1="" # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
-IF_NAME_GNB_CUUP_E1="" # to fill!
+IF_NAME_GNB_CUUP_E1="$IF_NAME_N2N3" 
+#
 IP_GNB_CUUP_F1="172.21.16.93"
+GW_GNB_CUUP_F1="" # "172.21.19.254"
+ROUTES_GNB_CUUP_F1=""
+IF_NAME_GNB_CUUP_F1="$IF_NAME_N2N3"  
+#
+ADD_OPTIONS_CUUP_GNB="--sa"
+NAME_GNB_CUUP="oai-cuup"
+
 #
 IF_NAME_GNB_N2="$IF_NAME_N2N3"
 NETMASK_GNB_N2="$NETMASK_N2N3"
@@ -608,10 +617,9 @@ EOF
     cat "$DIR_TEMPLATES"/configmap.yaml
 
 
-    # Configure gnb values.yaml chart
-    DIR="$OAI5G_RAN/oai-gnb"
+    # Configure gNB values.yaml charts
 
-    echo "Then configure oai-gnb charts"
+    echo "Then configure gNB charts"
     cat > "$SED_VALUES_FILE" <<EOF
 s|@GNB_REPO@|$GNB_REPO|
 s|@GNB_TAG@|$GNB_TAG|
@@ -658,12 +666,69 @@ s|@TCPDUMP_CONTAINER@|$LOGS|
 s|@SHAREDVOLUME@|$PCAP|
 s|@QOS_GNB_DEF@|$QOS_GNB_DEF|
 s|@NODE_GNB@|$NODE_GNB|
+s|@NAME_GNB_DU_SA@|$NAME_GNB_DU_SA|
+s|@MULTUS_GNB_F1@|$MULTUS_GNB_F1|
+s|@IP_GNB_DU_F1@|$IP_GNB_DU_F1|
+s|@NETMASK_GNB_F1@|$NETMASK_GNB_F1|
+s|@MAC_GNB_DU_F1@|$(gener-mac)|
+s|@GW_GNB_DU_F1@|$GW_GNB_DU_F1|
+s|@ROUTES_GNB_F1@|$ROUTES_GNB_F1|
+s|@IF_NAME_GNB_DU_F1@|$IF_NAME_GNB_DU_F1|
+s|@GNB_DU_MOUNTCONFIG@|$GNB_DU_MOUNTCONFIG|
+s|@NAME_GNB_DU@|$NAME_GNB_DU|
+s|@GNB_DU_F1IFNAME@|$GNB_DU_F1IFNAME|
+s|@GNB_CU_HOST@|$GNB_CU_HOST|
+s|@GNB_F1_CU_PORT@|$GNB_F1_CU_PORT|
+s|@GNB_F1_DU_PORT@|$GNB_F1_DU_PORT|
+s|@NAME_GNB_CU_SA@|$NAME_GNB_CU_SA|
+s|@IP_GNB_CU_F1@|$IP_GNB_CU_F1|
+s|@MAC_GNB_CU_F1@|$(gener-mac)|
+s|@GW_GNB_CU_F1@|$GW_GNB_CU_F1|
+s|@ROUTES_GNB_CU_F1@|$ROUTES_GNB_CU_F1|
+s|@IF_NAME_GNB_CU_F1@|$IF_NAME_GNB_CU_F1|
+s|@GNB_CU_MOUNTCONFIG@|$GNB_CU_MOUNTCONFIG|
+s|@ADD_OPTIONS_CU_GNB@|$ADD_OPTIONS_CU_GNB|
+s|@NAME_GNB_CU@|$NAME_GNB_CU|
+s|@GNB_CU_F1IFNAME@|$GNB_CU_F1IFNAME|
+s|@GNB_CU_N2IFNAME@|$GNB_CU_N2IFNAME|
+s|@GNB_CU_N3IFNAME@|$GNB_CU_N3IFNAME|
+s|@NAME_GNB_CU_CP_SA@|$NAME_GNB_CU_CP_SA|
+s|@MULTUS_GNB_E1@|$MULTUS_GNB_E1|
+s|@IP_GNB_CUCP_E1@|$IP_GNB_CUCP_E1|
+s|@NETMASK_GNB_E1@|$NETMASK_GNB_E1|
+s|@MAC_GNB_CUCP_E1@|$(gener-mac)|
+s|@GW_GNB_CUCP_E1@|$GW_GNB_CUCP_E1|
+s|@ROUTES_GNB_CUCP_E1@|$ROUTES_GNB_CUCP_E1|
+s|@IF_NAME_GNB_CUCP_E1@|$IF_NAME_GNB_CUCP_E1|
+s|@IP_GNB_CUCP_F1@|$IP_GNB_CUCP_F1|
+s|@MAC_GNB_CUCP_F1@|$(gener-mac)|
+s|@NAME_GNB_CUCP@|$NAME_GNB_CUCP|
+s|@GNB_CU_E1IFNAME@|$GNB_CU_E1IFNAME|
+s|@GNB_CUUP_REPO@|$GNB_CUUP_REPO|
+s|@GNB_CUUP_TAG@|$GNB_CUUP_TAG|
+s|@NAME_GNB_CU_UP_SA@|$NAME_GNB_CU_UP_SA|
+s|@IP_GNB_CUUP_E1@|$IP_GNB_CUUP_E1|
+s|@MAC_GNB_CUUP_E1@|$(gener-mac)|
+s|@GW_GNB_CUUP_E1@|$GW_GNB_CUUP_E1|
+s|@ROUTES_GNB_CU_E1@|$ROUTES_GNB_CU_E1|
+s|@IF_NAME_GNB_CUUP_E1@|$IF_NAME_GNB_CUUP_E1|
+s|@IP_GNB_CUUP_F1@|$IP_GNB_CUUP_F1|
+s|@MAC_GNB_CUUP_F1@|$(gener-mac)|
+s|@GW_GNB_CUUP_F1@|$GW_GNB_CUUP_F1|
+s|@ROUTES_GNB_CUUP_F1@|$ROUTES_GNB_CUUP_F1|
+s|@IF_NAME_GNB_CUUP_F1@|$IF_NAME_GNB_CUUP_F1|
+s|@ADD_OPTIONS_CUUP_GNB@|$ADD_OPTIONS_CUUP_GNB|
+s|@NAME_GNB_CUUP@|$NAME_GNB_CUUP|
+s|@@|$|
+s|@@|$|
 EOF
-    ORIG_CHART="$DIR"/values.yaml
-    cp "$ORIG_CHART" $TMP/oai-gnb_values.yaml-orig
-    echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_VALUES_FILE" < $TMP/oai-gnb_values.yaml-orig > "$ORIG_CHART"
-    diff $TMP/oai-gnb_values.yaml-orig "$ORIG_CHART" 
+    for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
+	ORIG_CHART="${OAI5G_RAN}/${nf}/values.yaml"
+	cp ${ORIG_CHART} $TMP/${nf}_values.yaml-orig
+	echo "(Over)writing ${DIR}${nf}/values.yaml"
+	sed -f "$SED_VALUES_FILE" < $TMP/${nf}_values.yaml-orig > ${ORIG_CHART}
+	diff $TMP/${nf}_values.yaml-orig ${ORIG_CHART}
+    done
 }
 
 #################################################################################
@@ -752,15 +817,35 @@ function start-cn() {
 
 
 function start-gnb() {
-    echo "Running start-gnb() on $NS namespace with NODE_GNB=$NODE_GNB and rru=$RRU"
+    echo "Running gNB on $NS namespace with GNB_MODE=$GNB_MODE, NODE_GNB=$NODE_GNB and rru=$RRU"
 
     echo "cd $OAI5G_RAN"
     cd "$OAI5G_RAN"
 
-    echo "helm -n $NS install oai-gnb oai-gnb/"
-    helm -n $NS install oai-gnb oai-gnb/
-
-    echo "Wait until the gNB pod is READY"
+    if [[ $GNB_MODE = 'monolithic' ]]; then
+	echo "helm -n $NS install oai-gnb oai-gnb/"
+	helm -n $NS install oai-gnb oai-gnb/
+	echo "Wait until the gNB pod is READY"
+    elif [[ $GNB_MODE = 'cudu' ]]; then
+	echo "helm -n $NS install oai-cu oai-cu/"
+	helm -n $NS install oai-cu oai-cu/
+	echo "kubectl -n $NS wait pod --for=condition=Ready oai-cu"
+	kubectl -n $NS wait pod --for=condition=Ready oai-cu
+	echo "helm install oai-du oai-du/"
+	helm install oai-du oai-du/
+    else
+	# $GNB_MODE = 'cucpup'
+	echo "helm -n $NS install oai-gnb-cu oai-gnb-cu/"
+	helm -n $NS install oai-cu-cp oai-cu-cp/
+	echo "kubectl -n $NS wait pod --for=condition=Ready oai-cu-cp"
+	kubectl -n $NS wait pod --for=condition=Ready oai-cu-cp
+	echo "helm -n $NS install oai-cu-up oai-cu-up/"
+	helm -n $NS install oai-cu-up oai-cu-up/
+	echo "kubectl -n $NS wait pod --for=condition=Ready oai-cu-up"
+	kubectl -n $NS wait pod --for=condition=Ready oai-cu-up
+	echo "helm install oai-du oai-du/"
+	helm install oai-du oai-du/
+    fi
     echo "kubectl -n $NS wait pod --for=condition=Ready --all"
     kubectl -n $NS wait pod --for=condition=Ready --all
 }
@@ -888,8 +973,23 @@ function stop-cn(){
 
 
 function stop-gnb(){
-    echo "helm -n $NS uninstall oai-gnb"
-    helm -n $NS uninstall oai-gnb
+    if [[ $GNB_MODE = 'monolithic' ]]; then
+	echo "helm -n $NS uninstall oai-gnb"
+	helm -n $NS uninstall oai-gnb
+    else
+	echo "helm -n $NS uninstall oai-du"
+	helm -n $NS uninstall oai-du
+	if [[ $GNB_MODE = 'cudu' ]]; then
+	    echo "helm -n $NS uninstall oai-cu"
+	    helm -n $NS uninstall oai-cu
+	else
+	    # $GNB_MODE = 'cucpup'
+	    echo "helm -n $NS uninstall oai-cu-up"
+	    helm -n $NS uninstall oai-cu-up
+	    echo "helm -n $NS uninstall oai-cu-cp"
+	    helm -n $NS uninstall oai-cu-cp
+	fi
+    fi
 }
 
 
