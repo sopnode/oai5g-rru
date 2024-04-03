@@ -711,6 +711,7 @@ s|@MAC_GNB_CUCP_F1@|$(gener-mac)|
 s|@NAME_GNB_CUCP@|$NAME_GNB_CUCP|
 s|@GNB_CU_E1IFNAME@|$GNB_CU_E1IFNAME|
 s|@CUUP_REPO@|$CUUP_REPO|
+s|@CUUP_TAG@|$RAN_TAG|
 s|@NAME_GNB_CU_UP_SA@|$NAME_GNB_CU_UP_SA|
 s|@IP_GNB_CUUP_E1@|$IP_GNB_CUUP_E1|
 s|@MAC_GNB_CUUP_E1@|$(gener-mac)|
@@ -724,13 +725,11 @@ s|@ROUTES_GNB_CUUP_F1@|$ROUTES_GNB_CUUP_F1|
 s|@IF_NAME_GNB_CUUP_F1@|$IF_NAME_GNB_CUUP_F1|
 s|@ADD_OPTIONS_CUUP_GNB@|$ADD_OPTIONS_CUUP_GNB|
 s|@NAME_GNB_CUUP@|$NAME_GNB_CUUP|
-s|@@|$|
-s|@@|$|
 EOF
     for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
 	ORIG_CHART="${OAI5G_RAN}/${nf}/values.yaml"
 	cp ${ORIG_CHART} $TMP/${nf}_values.yaml-orig
-	echo "(Over)writing ${DIR}${nf}/values.yaml"
+	echo "(Over)writing $ORIG_CHART"
 	sed -f "$SED_VALUES_FILE" < $TMP/${nf}_values.yaml-orig > ${ORIG_CHART}
 	diff $TMP/${nf}_values.yaml-orig ${ORIG_CHART}
     done
