@@ -614,9 +614,9 @@ s|@GNB_AW2S_LOCAL_IF_NAME@|$GNB_aw2s_LOCAL_IF_NAME|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
 EOF
     for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
-	ORIG_CHART="${OAI5G_RAN}/${nf}/configmap.yaml"
+	ORIG_CHART="${OAI5G_RAN}/${nf}/templates/configmap.yaml"
 	cp ${ORIG_CHART} $TMP/${nf}_configmap.yaml-orig
-	echo "(Over)writing ${DIR}${nf}/configmap.yaml"
+	echo "(Over)writing $ORIG_CHART"
 	sed -f "$SED_CONF_FILE" < $TMP/${nf}_configmap.yaml-orig > ${ORIG_CHART}
 	echo "Display new ${ORIG_CHART}"
 	cat ${ORIG_CHART}
