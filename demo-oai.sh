@@ -232,8 +232,8 @@ GNB_CU_MOUNTCONFIG="true"
 ADD_OPTIONS_CU_GNB="--sa --log_config.global_log_options level,nocolor,time"
 NAME_GNB_CU="oai-cu"
 GNB_CU_F1IFNAME="f1" # if multus.f1Interface.create is true then use f1 else use "eth0"
-GNB_CU_N2IFNAME="n2" # if multus.f1Interface.create is true then use f1 else use "eth0"
-GNB_CU_N3IFNAME="n3" # if multus.f1Interface.create is true then use f1 else use "eth0"
+GNB_CU_N2IFNAME="n2" # if multus.n2Interface.create is true then use f1 else use "eth0"
+GNB_CU_N3IFNAME="n2" # if multus.n3Interface.create is true then use f1 else use same as for n2
 
 # CU-CP specific part
 CUCP_REPO="${R2LAB_REPO}/oai-gnb" 
