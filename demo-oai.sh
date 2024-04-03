@@ -221,6 +221,8 @@ GNB_F1_CU_PORT="2152" #2153 if using same interface for f1 and n3 else standard 
 GNB_F1_DU_PORT="2152" #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
 
 # CU specific part
+CU_REPO="${R2LAB_REPO}/oai-gnb" 
+CU_TAG=${RAN_TAG}
 NAME_GNB_CU_SA="oai-cu-sa"
 IP_GNB_CU_F1="172.21.16.92"
 GW_GNB_CU_F1="" # "172.21.19.254"
@@ -234,7 +236,7 @@ GNB_CU_N2IFNAME="n2" # if multus.f1Interface.create is true then use f1 else use
 GNB_CU_N3IFNAME="n3" # if multus.f1Interface.create is true then use f1 else use "eth0"
 
 # CU-CP specific part
-CUCP_REPO="${R2LAB_REPO}/oai-gnb" # check if we need to rebuild for rockylinux
+CUCP_REPO="${R2LAB_REPO}/oai-gnb" 
 CUCP_TAG=${RAN_TAG}
 NAME_GNB_CU_CP_SA="oai-cu-cp-sa"
 MULTUS_GNB_E1="true"
@@ -632,6 +634,8 @@ EOF
     cat > "$SED_VALUES_FILE" <<EOF
 s|@GNB_REPO@|$GNB_REPO|
 s|@GNB_TAG@|$GNB_TAG|
+s|@CU_REPO@|$CU_REPO|
+s|@CU_TAG@|$CU_TAG|
 s|@CUCP_REPO@|$CUCP_REPO|
 s|@CUCP_TAG@|$CUCP_TAG|
 s|@CUUP_REPO@|$CUUP_REPO|
