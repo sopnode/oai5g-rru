@@ -214,7 +214,7 @@ GW_GNB_DU_F1=""
 ROUTES_GNB_F1=""
 IF_NAME_GNB_DU_F1="$IF_NAME_N2N3" 
 GNB_DU_MOUNTCONFIG="true"
-NAME_GNB_DU="oai-du-rfsim"
+NAME_GNB_DU="oai-du"
 GNB_DU_F1IFNAME="f1" # if multus.f1Interface.create is true then use f1 else use "eth0"
 GNB_CU_HOST="oai-cu" ## Ip-address or hostname
 GNB_F1_CU_PORT="2152" #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
@@ -588,6 +588,7 @@ function configure-gnb() {
     GNB_REPO=$(eval echo \"\${GNB_REPO_$RRU_TYPE}\")
     GNB_TAG=$(eval echo \"\${GNB_TAG_$RRU_TYPE}\")
     GNB_NAME="${GNB_NAME}_${RRU}"
+    NAME_GNB_DU="${NAME_GNB_DU}/-${RRU}"
 
     echo "Insert gNB conf file $CONF_ORIG in configmap.yaml"
     # Keep the 8 first lines of configmap.yaml
