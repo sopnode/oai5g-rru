@@ -601,6 +601,7 @@ function configure-gnb() {
     cat > "$SED_CONF_FILE" <<EOF
 s|@GNB_NAME@|$GNB_NAME|
 s|@GNB_ID@|$GNB_ID|
+s|@GNB_CU_UP_ID@|$GNB_ID|
 s|@TAC@|$TAC|
 s|plmn_list.*|plmn_list = $PLMN_LIST|
 s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
@@ -612,10 +613,14 @@ s|@GNB_AW2S_IP_ADDRESS@|$IP_GNB_aw2s|
 s|@GNB_AW2S_LOCAL_IF_NAME@|$GNB_aw2s_LOCAL_IF_NAME|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
 EOF
-    cp "$DIR_TEMPLATES"/configmap.yaml $TMP/configmap.yaml
-    sed -f "$SED_CONF_FILE" < $TMP/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
-    echo "Display new $DIR_TEMPLATES/configmap.yaml"
-    cat "$DIR_TEMPLATES"/configmap.yaml
+    for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
+	ORIG_CHART="${OAI5G_RAN}/${nf}/configmap.yaml"
+	cp ${ORIG_CHART} $TMP/${nf}_configmap.yaml-orig
+	echo "(Over)writing ${DIR}${nf}/configmap.yaml"
+	sed -f "$SED_CONF_FILE" < $TMP/${nf}_configmap.yaml-orig > ${ORIG_CHART}
+	echo "Display new ${ORIG_CHART}"
+	cat ${ORIG_CHART}
+    done
 
 
     # Configure gNB values.yaml charts
