@@ -234,7 +234,7 @@ GNB_CU_N2IFNAME="n2" # if multus.f1Interface.create is true then use f1 else use
 GNB_CU_N3IFNAME="n3" # if multus.f1Interface.create is true then use f1 else use "eth0"
 
 # CU-CP specific part
-CUCP_REPO="${R2LAB_REPO}/oai-nr-cuup" # check if we need to rebuild for rockylinux
+CUCP_REPO="${R2LAB_REPO}/oai-gnb" # check if we need to rebuild for rockylinux
 CUCP_TAG=${RAN_TAG}
 NAME_GNB_CU_CP_SA="oai-cu-cp-sa"
 MULTUS_GNB_E1="true"
