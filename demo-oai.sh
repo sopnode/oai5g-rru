@@ -199,6 +199,7 @@ IP_DNS2="193.51.196.138"
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 #
+CUUP_REPO="$R2LAB_REPO/oai-nr-cuup"
 RAN_TAG="2024.w12"
 GNB_NAME="gNB-r2lab"
 #
