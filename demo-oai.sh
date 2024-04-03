@@ -838,8 +838,8 @@ function start-gnb() {
     elif [[ $GNB_MODE = 'cudu' ]]; then
 	echo "helm -n $NS install oai-cu oai-cu/"
 	helm -n $NS install oai-cu oai-cu/
-	echo "kubectl -n $NS wait pod --for=condition=Ready oai-cu"
-	kubectl -n $NS wait pod --for=condition=Ready oai-cu
+	echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu"
+	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu
 	echo "helm install oai-du oai-du/"
 	helm install oai-du oai-du/
     else
@@ -847,11 +847,11 @@ function start-gnb() {
 	echo "helm -n $NS install oai-gnb-cu oai-gnb-cu/"
 	helm -n $NS install oai-cu-cp oai-cu-cp/
 	echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp"
-	kubectl -n $NS wait pod --for=condition=Ready  -l app.kubernetes.io/instance=oai-cu-cp
+	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp
 	echo "helm -n $NS install oai-cu-up oai-cu-up/"
 	helm -n $NS install oai-cu-up oai-cu-up/
 	echo "kubectl -n $NS wait pod --for=condition=Ready  -l app.kubernetes.io/instance=oai-cu-up"
-	kubectl -n $NS wait pod --for=condition=Ready  -l app.kubernetes.io/instance=oai-cu-up
+	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-up
 	echo "helm install oai-du oai-du/"
 	helm install oai-du oai-du/
     fi
