@@ -25,7 +25,7 @@ NODE_AMF_UPF="@DEF_NODE_AMF_UPF@" # node in wich run amf and upf pods
 NODE_GNB="@DEF_NODE_GNB@" # node in which gnb pod runs
 RRU="@DEF_RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
 RUN_MODE="@DEF_RUN_MODE@" # in ['full', 'gnb-only', 'gnb-upf']
-GNB_MODE="@DEF_GNB_MODE@" # in ['monolithic', 'cudu', 'cucp']
+GNB_MODE="@DEF_GNB_MODE@" # in ['monolithic', 'cudu', 'cucpup']
 LOGS="@DEF_LOGS@" # boolean, true if logs are retrieved on pods
 PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
 #
@@ -199,7 +199,7 @@ IP_DNS2="193.51.196.138"
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 #
-RAN_TAG="2024.w11"
+RAN_TAG="2024.w12"
 GNB_NAME="gNB-r2lab"
 #
 # DU/CU SPLIT paramaters
@@ -837,12 +837,12 @@ function start-gnb() {
 	# $GNB_MODE = 'cucpup'
 	echo "helm -n $NS install oai-gnb-cu oai-gnb-cu/"
 	helm -n $NS install oai-cu-cp oai-cu-cp/
-	echo "kubectl -n $NS wait pod --for=condition=Ready oai-cu-cp"
-	kubectl -n $NS wait pod --for=condition=Ready oai-cu-cp
+	echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp"
+	kubectl -n $NS wait pod --for=condition=Ready  -l app.kubernetes.io/instance=oai-cu-cp
 	echo "helm -n $NS install oai-cu-up oai-cu-up/"
 	helm -n $NS install oai-cu-up oai-cu-up/
-	echo "kubectl -n $NS wait pod --for=condition=Ready oai-cu-up"
-	kubectl -n $NS wait pod --for=condition=Ready oai-cu-up
+	echo "kubectl -n $NS wait pod --for=condition=Ready  -l app.kubernetes.io/instance=oai-cu-up"
+	kubectl -n $NS wait pod --for=condition=Ready  -l app.kubernetes.io/instance=oai-cu-up
 	echo "helm install oai-du oai-du/"
 	helm install oai-du oai-du/
     fi
