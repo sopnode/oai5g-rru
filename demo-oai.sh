@@ -234,6 +234,8 @@ GNB_CU_N2IFNAME="n2" # if multus.f1Interface.create is true then use f1 else use
 GNB_CU_N3IFNAME="n3" # if multus.f1Interface.create is true then use f1 else use "eth0"
 
 # CU-CP specific part
+CUCP_REPO="${R2LAB_REPO}/oai-nr-cuup" # check if we need to rebuild for rockylinux
+CUCP_TAG=${RAN_TAG}
 NAME_GNB_CU_CP_SA="oai-cu-cp-sa"
 MULTUS_GNB_E1="true"
 IP_GNB_CUCP_E1="192.168.18.12"
@@ -245,8 +247,8 @@ IP_GNB_CUCP_F1="172.21.16.92"
 NAME_GNB_CUCP="oai-cu-cp"
 GNB_CU_E1IFNAME="e1"
 # CU-UP specific part
-GNB_CUUP_REPO="docker.io/oaisoftwarealliance/oai-nr-cuup" # check if we need to rebuild for rockylinux
-GNB_CUUP_TAG=${GNB_TAG}
+CUUP_REPO="${R2LAB_REPO}/oai-nr-cuup" # check if we need to rebuild for rockylinux
+CUUP_TAG=${RAN_TAG}
 NAME_GNB_CU_UP_SA="oai-cu-up-sa"
 IP_GNB_CUUP_E1="192.168.18.13"
 GW_GNB_CUUP_E1=""
@@ -629,6 +631,10 @@ EOF
     cat > "$SED_VALUES_FILE" <<EOF
 s|@GNB_REPO@|$GNB_REPO|
 s|@GNB_TAG@|$GNB_TAG|
+s|@CUCP_REPO@|$/oai-gnb|
+s|@CUCP_TAG@|$CUCP_TAG|
+s|@CUUP_REPO@|$CUUP_REPO|
+s|@CUUP_TAG@|$CUUP_TAG|
 s|@DEFAULT_GW_GNB@|$DEFAULT_GW_GNB|
 s|@MULTUS_GNB_N2@|$MULTUS_GNB_N2|
 s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
@@ -710,8 +716,6 @@ s|@IP_GNB_CUCP_F1@|$IP_GNB_CUCP_F1|
 s|@MAC_GNB_CUCP_F1@|$(gener-mac)|
 s|@NAME_GNB_CUCP@|$NAME_GNB_CUCP|
 s|@GNB_CU_E1IFNAME@|$GNB_CU_E1IFNAME|
-s|@CUUP_REPO@|$CUUP_REPO|
-s|@CUUP_TAG@|$RAN_TAG|
 s|@NAME_GNB_CU_UP_SA@|$NAME_GNB_CU_UP_SA|
 s|@IP_GNB_CUUP_E1@|$IP_GNB_CUUP_E1|
 s|@MAC_GNB_CUUP_E1@|$(gener-mac)|
