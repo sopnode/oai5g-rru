@@ -519,8 +519,6 @@ function configure-gnb() {
     DIR_RAN="$PREFIX_DEMO/oai5g-rru/ran-config"
     DIR_CONF="$DIR_RAN/conf"
     DIR_CHARTS="$PREFIX_DEMO/oai-cn5g-fed/charts"
-    DIR_GNB_DEST="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb"
-    DIR_TEMPLATES="$DIR_GNB_DEST/templates"
 
     SED_CONF_FILE="$TMP/gnb_conf.sed"
     SED_VALUES_FILE="$TMP/oai-gnb-values.sed"
@@ -592,7 +590,13 @@ function configure-gnb() {
     GNB_NAME="${GNB_NAME}_${RRU}"
     NAME_GNB_DU="${NAME_GNB_DU}-${RRU}"
 
-    echo "Insert gNB conf file $CONF_ORIG in configmap.yaml"
+    if [[ $GNB_MODE = 'monolithic' ]]; then
+	DIR_TEMPLATES="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates"
+    else
+	DIR_TEMPLATES="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-du/templates"
+    fi
+    
+    echo "Insert the right gNB conf file $CONF_ORIG in the right configmap.yaml"
     # Keep the 8 first lines of configmap.yaml
     head -8  "$DIR_TEMPLATES"/configmap.yaml > $TMP/configmap.yaml
     # Add a 6-characters margin to gnb.conf
