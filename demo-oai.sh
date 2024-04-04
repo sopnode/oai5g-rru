@@ -616,8 +616,6 @@ function configure-gnb() {
 	# - add gNB_DU_ID param
 	gNB_IDs="gNB_ID = @GNB_ID@;\n          gNB_DU_ID = @GNB_DU_ID@;"
 	sed -i "s/gNB_ID.*/$gNB_IDs/" $TMP/configmap.yaml
-	echo "%%%%%%%%%%%%%%%%%%%%"
-	cat $TMP/configmap.yaml
         # - add following MACRLCs parameters
 	cat > "/tmp/du.awk" <<EOF
           num_cc           = 1;
@@ -631,10 +629,8 @@ function configure-gnb() {
           remote_n_portc  = 501;
           remote_n_portd  = {{ .Values.config.f1cuPort}};
 EOF
-	echo "before awk"
 	awk '/num_cc           = 1;/{system("cat /tmp/du.awk");next}1' $TMP/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
 	rm -rf /tmp/du.awk
-	echo "******** $$$$$$$ ********"
 	diff  $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
     fi
 
@@ -660,7 +656,7 @@ EOF
 	cp ${ORIG_CHART} $TMP/${nf}_configmap.yaml-orig
 	echo "(Over)writing $ORIG_CHART"
 	sed -f "$SED_CONF_FILE" < $TMP/${nf}_configmap.yaml-orig > ${ORIG_CHART}
-	echo "Display new ${ORIG_CHART}"
+	echo "************************* Display modified ${ORIG_CHART} *****************************"
 	cat ${ORIG_CHART}
     done
 
