@@ -610,7 +610,7 @@ function configure-gnb() {
 	# Few changes to be done on DU conf files
 	# - add gNB_DU_ID param
 	gNB_IDs="gNB_ID = @GNB_ID@;\n          gNB_DU_ID = @GNB_DU_ID@;"
-	sed -i "s/gNB_IDs="gNB_ID = @GNB_ID@;/$gNB_IDs/" $TMP/configmap.yaml
+	sed -i "s/gNB_ID.*/$gNB_IDs/" $TMP/configmap.yaml
         # - add following MACRLCs parameters
 	cat > "$AWK_DU_FILE" <<EOF
 num_cc           = 1; +++
@@ -628,6 +628,7 @@ EOF
        echo "******** $$$$$$$ ********"
        diff  $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
     fi
+
     cat > "$SED_CONF_FILE" <<EOF
 s|@GNB_NAME@|$GNB_NAME|
 s|@GNB_ID@|$GNB_ID|
