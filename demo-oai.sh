@@ -611,6 +611,8 @@ function configure-gnb() {
 	# - add gNB_DU_ID param
 	gNB_IDs="gNB_ID = @GNB_ID@;\n          gNB_DU_ID = @GNB_DU_ID@;"
 	sed -i "s/gNB_ID.*/$gNB_IDs/" $TMP/configmap.yaml
+	echo "%%%%%%%%%%%%%%%%%%%%"
+	cat achats-diana@inria.fr
         # - add following MACRLCs parameters
 	cat > "$AWK_DU_FILE" <<EOF
 num_cc           = 1; +++
@@ -624,9 +626,10 @@ num_cc           = 1; +++
           remote_n_portc  = 501;
           remote_n_portd  = {{ .Values.config.f1cuPort}};
 EOF
-       awk '/num_cc           = 1;/{system("cat $AWK_DU_FILE ");next}1' $TMP/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
-       echo "******** $$$$$$$ ********"
-       diff  $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+	echo "before awk"
+	awk '/num_cc           = 1;/{system("cat $AWK_DU_FILE ");next}1' $TMP/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
+	echo "******** $$$$$$$ ********"
+	diff  $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
     fi
 
     cat > "$SED_CONF_FILE" <<EOF
