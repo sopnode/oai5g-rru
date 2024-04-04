@@ -524,6 +524,7 @@ function configure-gnb() {
 
     SED_CONF_FILE="$TMP/gnb_conf.sed"
     SED_VALUES_FILE="$TMP/oai-gnb-values.sed"
+    AWK_DU_FILE="$TMP/oai-du-conf.awk"
 
     # Configure general parameters for values.yaml
     MULTUS_GNB_N2="$MULTUS_CREATE"
@@ -599,10 +600,34 @@ function configure-gnb() {
     awk '$0="      "$0' "$CONF_ORIG" > $TMP/gnb.conf
     # Append the modified gnb.conf to $TMP/configmap.yaml
     cat $TMP/gnb.conf >> $TMP/configmap.yaml
-    mv $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
     echo "First configure gnb.conf within configmap.yaml"
     PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = $SLICE1_SD }) });"
+
+    if [[ $GNB_MODE = 'monolithic' ]]; then
+	mv $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+    else
+	# Few changes to be done on DU conf files
+	# - add gNB_DU_ID param
+	gNB_IDs="gNB_ID = @GNB_ID@;\n          gNB_DU_ID = @GNB_DU_ID@;"
+	sed -i "s/gNB_IDs="gNB_ID = @GNB_ID@;/$gNB_IDs/" $TMP/configmap.yaml
+        # - add following MACRLCs parameters
+	cat > "$AWK_DU_FILE" <<EOF
+num_cc           = 1; +++
+          tr_s_preference  = "local_L1";
+          tr_n_preference  = "f1";
+          local_n_if_name = "{{ .Values.config.f1IfName}}";
+          local_n_address = "@F1_DU_IP_ADDRESS@";
+          remote_n_address = "@CU_IP_ADDRESS@";
+          local_n_portc   = 500;
+          local_n_portd   = {{ .Values.config.f1duPort}};
+          remote_n_portc  = 501;
+          remote_n_portd  = {{ .Values.config.f1cuPort}};
+EOF
+       awk '/num_cc           = 1;/{system("cat $AWK_DU_FILE ");next}1' $TMP/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
+       echo "******** $$$$$$$ ********"
+       diff  $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+    fi
     cat > "$SED_CONF_FILE" <<EOF
 s|@GNB_NAME@|$GNB_NAME|
 s|@GNB_ID@|$GNB_ID|
@@ -619,6 +644,7 @@ s|@GNB_AW2S_IP_ADDRESS@|$IP_GNB_aw2s|
 s|@GNB_AW2S_LOCAL_IF_NAME@|$GNB_aw2s_LOCAL_IF_NAME|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
 EOF
+    
     for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
 	ORIG_CHART="${OAI5G_RAN}/${nf}/templates/configmap.yaml"
 	cp ${ORIG_CHART} $TMP/${nf}_configmap.yaml-orig
