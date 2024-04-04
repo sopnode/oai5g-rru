@@ -217,8 +217,8 @@ GNB_DU_MOUNTCONFIG="true"
 NAME_GNB_DU="oai-du"
 GNB_DU_F1IFNAME="f1" # if multus.f1Interface.create is true then use f1 else use "eth0"
 GNB_CU_HOST="oai-cu" ## Ip-address or hostname
-GNB_F1_CU_PORT="2152" #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
-GNB_F1_DU_PORT="2152" #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+GNB_F1_CU_PORT="2153" #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+GNB_F1_DU_PORT="2153" #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
 
 # CU specific part
 CU_REPO="${R2LAB_REPO}/oai-gnb" 
