@@ -614,7 +614,7 @@ function configure-gnb() {
 	cat $TMP/configmap.yaml
         # - add following MACRLCs parameters
 	cat > "/tmp/du.awk" <<EOF
-num_cc           = 1; +++
+          num_cc           = 1;
           tr_s_preference  = "local_L1";
           tr_n_preference  = "f1";
           local_n_if_name = "{{ .Values.config.f1IfName}}";
