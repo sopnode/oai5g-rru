@@ -592,13 +592,15 @@ function configure-gnb() {
 
     if [[ $GNB_MODE = 'monolithic' ]]; then
 	DIR_TEMPLATES="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates"
+	NB_LINES=8
     else
 	DIR_TEMPLATES="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-du/templates"
+	NB_LINES=7
     fi
     
     echo "Insert the right gNB conf file $CONF_ORIG in the right configmap.yaml"
     # Keep the 8 first lines of configmap.yaml
-    head -8  "$DIR_TEMPLATES"/configmap.yaml > $TMP/configmap.yaml
+    head -${NB_LINES}  "$DIR_TEMPLATES"/configmap.yaml > $TMP/configmap.yaml
     # Add a 6-characters margin to gnb.conf
     awk '$0="      "$0' "$CONF_ORIG" > $TMP/gnb.conf
     # Append the modified gnb.conf to $TMP/configmap.yaml
