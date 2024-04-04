@@ -524,7 +524,6 @@ function configure-gnb() {
 
     SED_CONF_FILE="$TMP/gnb_conf.sed"
     SED_VALUES_FILE="$TMP/oai-gnb-values.sed"
-    AWK_DU_FILE="$TMP/oai-du-conf.awk"
 
     # Configure general parameters for values.yaml
     MULTUS_GNB_N2="$MULTUS_CREATE"
@@ -612,9 +611,9 @@ function configure-gnb() {
 	gNB_IDs="gNB_ID = @GNB_ID@;\n          gNB_DU_ID = @GNB_DU_ID@;"
 	sed -i "s/gNB_ID.*/$gNB_IDs/" $TMP/configmap.yaml
 	echo "%%%%%%%%%%%%%%%%%%%%"
-	cat achats-diana@inria.fr
+	cat $TMP/configmap.yaml
         # - add following MACRLCs parameters
-	cat > "$AWK_DU_FILE" <<EOF
+	cat > "/tmp/du.awk" <<EOF
 num_cc           = 1; +++
           tr_s_preference  = "local_L1";
           tr_n_preference  = "f1";
@@ -627,7 +626,8 @@ num_cc           = 1; +++
           remote_n_portd  = {{ .Values.config.f1cuPort}};
 EOF
 	echo "before awk"
-	awk '/num_cc           = 1;/{system("cat $AWK_DU_FILE ");next}1' $TMP/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
+	awk '/num_cc           = 1;/{system("cat /tmp/du.awk");next}1' $TMP/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
+	rm -rf /tmp/du.awk
 	echo "******** $$$$$$$ ********"
 	diff  $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
     fi
