@@ -678,6 +678,7 @@ function configure-gnb() {
     PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = $SLICE1_SD }) });"
 
     if [[ $GNB_MODE = 'monolithic' ]]; then
+	echo "monolithic gNB"
 	mv $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
     else
 	# Few changes to be done on DU conf files
@@ -699,6 +700,7 @@ function configure-gnb() {
 EOF
 	awk '/num_cc           = 1;/{system("cat /tmp/du.awk");next}1' $TMP/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
 	rm -rf /tmp/du.awk
+	echo "showing DU conf added section"
 	diff  $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
     fi
 
