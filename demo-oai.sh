@@ -687,8 +687,10 @@ function configure-gnb() {
 	# add GNB_DU_ID param
 	sed -i "s/gNB_ID.*/$gNB_IDs/" $TMP/configmap.yaml
 	# remove  tr_n_preference  = "local_RRC"
-	sed -i "s/.*tr_n_preference.*local_RRC.*//" $TMP/configmap.yaml
+	sed -i "s/^.*tr_n_preference.*local_RRC.*\n//" $TMP/configmap.yaml
         # - add following MACRLCs parameters
+	echo "after sed"
+	cat $TMP/configmap.yaml
 	cat > "/tmp/du.awk" <<EOF
           tr_s_preference  = "local_L1";
           tr_n_preference  = "f1";
