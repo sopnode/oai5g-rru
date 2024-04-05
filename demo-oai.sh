@@ -227,7 +227,7 @@ IF_NAME_DU_F1="$IF_NAME_N2N3"
 NAME_DU="oai-du"
 CU_HOST="oai-cu"
 QOS_DU_DEF="true"
-NODE_DU="NODE_GNB"
+NODE_DU="$NODE_GNB"
 #
 ########## CU specific part ##############
 CU_REPO="${R2LAB_REPO}/oai-gnb" 
