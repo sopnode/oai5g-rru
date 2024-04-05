@@ -65,3 +65,4 @@ echo "run init"
 ./demo-oai.sh init
 echo "./demo-oai.sh configure-all"
 ./demo-oai.sh configure-all
+echo "configure-demo-oai.sh update, demo-oai.sh init and demo-oai.sh configure-all steps done !"
