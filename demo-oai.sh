@@ -698,6 +698,7 @@ s|@AW2S_IP_ADDRESS@|$ADDR_aw2s|
 s|@GNB_AW2S_IP_ADDRESS@|$IP_GNB_aw2s|
 s|@GNB_AW2S_LOCAL_IF_NAME@|$GNB_aw2s_LOCAL_IF_NAME|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
+s|@CU_IP_ADDRESS@|172.21.16.92|
 EOF
     
     for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
