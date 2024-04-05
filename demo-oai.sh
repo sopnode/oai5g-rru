@@ -698,7 +698,7 @@ function configure-gnb() {
           remote_n_portc  = 501;
           remote_n_portd  = {{ .Values.config.f1cuPort}};
 EOF
-	awk '/num_cc           = 1;/{system("cat /tmp/du.awk");next}1' $TMP/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
+	awk '/num_cc.*= 1;/{system("cat /tmp/du.awk");next}1' $TMP/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
 	rm -rf /tmp/du.awk
 	echo "showing DU conf added section"
 	diff  $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
