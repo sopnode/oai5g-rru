@@ -347,6 +347,7 @@ NETMASK_GNB_RU="24"
 GNB_REPO_rfsim="${R2LAB_REPO}/oai-gnb"
 GNB_TAG_rfsim="${RAN_TAG}"
 CONF_rfsim="gnb.sa.band78.106prb.rfsim.2x2.conf" 
+CONF_DU_rfsim="du.sa.band78.106prb.rfsim.2x2.conf" 
 OPTIONS_rfsim="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
 #
 #### b2xx RU case ####
@@ -652,18 +653,21 @@ function configure-gnb() {
 	usage
     fi
     
-    CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_$RRU}\")
     GNB_REPO=$(eval echo \"\${GNB_REPO_$RRU_TYPE}\")
     GNB_TAG=$(eval echo \"\${GNB_TAG_$RRU_TYPE}\")
     GNB_NAME="${GNB_NAME}_${RRU}"
     NAME_GNB_DU="${NAME_GNB_DU}-${RRU}"
 
     if [[ $GNB_MODE = 'monolithic' ]]; then
+	CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_$RRU}\")
 	DIR_TEMPLATES="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates"
 	NB_LINES=8
+	echo "monolithic gNB, conf is $CONF_ORIG"
     else
+	CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_DU_$RRU}\")
 	DIR_TEMPLATES="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-du/templates"
 	NB_LINES=7
+	echo "DU gNB, conf is $CONF_ORIG"
     fi
     
     echo "Insert the right gNB conf file $CONF_ORIG in the right configmap.yaml"
@@ -674,39 +678,9 @@ function configure-gnb() {
     # Append the modified gnb.conf to $TMP/configmap.yaml
     cat $TMP/gnb.conf >> $TMP/configmap.yaml
 
-    echo "First configure gnb.conf within configmap.yaml"
+    echo "Configure gnb parameters within configmap.yaml"
     PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = $SLICE1_SD }) });"
-
-    if [[ $GNB_MODE = 'monolithic' ]]; then
-	echo "monolithic gNB"
-	mv $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
-    else
-	# Few changes to be done on DU conf files
-	# - add gNB_DU_ID param
-	gNB_IDs="gNB_ID = @GNB_ID@;\n          gNB_DU_ID = @GNB_DU_ID@;"
-	# add GNB_DU_ID param
-	sed -i "s/gNB_ID.*/$gNB_IDs/" $TMP/configmap.yaml
-	# remove  tr_n_preference  = "local_RRC"
-	sed -i "s/.*tr_n_preference.*local_RRC.*$//" $TMP/configmap.yaml
-        # - add following MACRLCs parameters
-	echo "after sed"
-	cat $TMP/configmap.yaml
-	cat > "/tmp/du.awk" <<EOF
-          tr_s_preference  = "local_L1";
-          tr_n_preference  = "f1";
-          local_n_if_name = "{{ .Values.config.f1IfName}}";
-          local_n_address = "@F1_DU_IP_ADDRESS@";
-          remote_n_address = "@CU_IP_ADDRESS@";
-          local_n_portc   = 500;
-          local_n_portd   = {{ .Values.config.f1duPort}};
-          remote_n_portc  = 501;
-          remote_n_portd  = {{ .Values.config.f1cuPort}};
-EOF
-	awk '/^.*tr_s_preference.*local_L1.*$/{system("cat /tmp/du.awk");next}1' $TMP/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
-	rm -rf /tmp/du.awk
-	echo "showing DU conf added section"
-	diff  $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
-    fi
+    mv $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
     cat > "$SED_CONF_FILE" <<EOF
 s|@GNB_NAME@|$GNB_NAME|
