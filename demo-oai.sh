@@ -702,10 +702,12 @@ EOF
 
     if [[ $GNB_MODE != 'monolithic' ]]; then
 	echo "With DU mode, set now AMF_IP_ADDRESS and CU_IP_ADDRESS"
-	cat > "$SED_CONF_FILE" <<EOF
+	cat >> "$SED_CONF_FILE" <<EOF
 s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
 s|@CU_IP_ADDRESS@|$IP_CU_F1|
 EOF
+    else
+	echo "Monolithic mode, do not set AMF_IP_ADDRESS and CU_IP_ADDRESS"
     fi
     
     for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
