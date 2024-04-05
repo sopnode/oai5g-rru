@@ -209,8 +209,8 @@ HOST_AMF="oai-amf"
 
 F1IFNAME="f1"
 E1IFNAME="e1"
-F1CUPORT="2153"
-F1DUPORT="2153"
+F1CUPORT="2152"
+F1DUPORT="2152"
 #
 ########## DU specific part ##############
 #DU_REPO="${R2LAB_REPO}/oai-gnb" DU_REPO must be GNB_REPO to handle aw2s case
