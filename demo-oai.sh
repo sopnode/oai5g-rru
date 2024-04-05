@@ -213,7 +213,7 @@ F1CUPORT="2153"
 F1DUPORT="2153"
 #
 ########## DU specific part ##############
-DU_REPO="${R2LAB_REPO}/oai-gnb" 
+#DU_REPO="${R2LAB_REPO}/oai-gnb" DU_REPO must be GNB_REPO to handle aw2s case
 DU_TAG=${RAN_TAG}
 NAME_DU_SA="oai-du-sa"
 #
@@ -765,7 +765,7 @@ s|@E1IFNAME@|$E1IFNAME|
 s|@F1CUPORT@|$F1CUPORT|
 s|@F1DUPORT@|$F1DUPORT|
 
-s|@DU_REPO@|$DU_REPO|
+s|@DU_REPO@|$GNB_REPO|
 s|@DU_TAG@|$DU_TAG|
 s|@NAME_DU_SA@|$NAME_DU_SA|
 s|@MULTUS_DU_F1@|$MULTUS_DU_F1|
