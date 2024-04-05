@@ -684,10 +684,12 @@ function configure-gnb() {
 	# Few changes to be done on DU conf files
 	# - add gNB_DU_ID param
 	gNB_IDs="gNB_ID = @GNB_ID@;\n          gNB_DU_ID = @GNB_DU_ID@;"
+	# add GNB_DU_ID param
 	sed -i "s/gNB_ID.*/$gNB_IDs/" $TMP/configmap.yaml
+	# remove  tr_n_preference  = "local_RRC"
+	sed -i "s/.*tr_n_preference.*local_RRC.*//" $TMP/configmap.yaml
         # - add following MACRLCs parameters
 	cat > "/tmp/du.awk" <<EOF
-          num_cc           = 1;
           tr_s_preference  = "local_L1";
           tr_n_preference  = "f1";
           local_n_if_name = "{{ .Values.config.f1IfName}}";
@@ -698,7 +700,7 @@ function configure-gnb() {
           remote_n_portc  = 501;
           remote_n_portd  = {{ .Values.config.f1cuPort}};
 EOF
-	awk '/num_cc.*= 1;/{system("cat /tmp/du.awk");next}1' $TMP/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
+	awk '/tr_s_preference  = "local_L1";/{system("cat /tmp/du.awk");next}1' $TMP/configmap.yaml > "$DIR_TEMPLATES"/configmap.yaml
 	rm -rf /tmp/du.awk
 	echo "showing DU conf added section"
 	diff  $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
