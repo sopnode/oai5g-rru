@@ -199,7 +199,7 @@ IP_DNS2="193.51.196.138"
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 #
-RAN_TAG="2024.w12"
+RAN_TAG="2024.w13"
 GNB_NAME="gNB-r2lab"
 
 #
@@ -698,15 +698,22 @@ s|@AW2S_IP_ADDRESS@|$ADDR_aw2s|
 s|@GNB_AW2S_IP_ADDRESS@|$IP_GNB_aw2s|
 s|@GNB_AW2S_LOCAL_IF_NAME@|$GNB_aw2s_LOCAL_IF_NAME|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
-s|@CU_IP_ADDRESS@|172.21.16.92|
 EOF
+
+    if [[ $GNB_MODE != 'monolithic' ]]; then
+	echo "With DU mode, set now AMF_IP_ADDRESS and CU_IP_ADDRESS"
+	cat > "$SED_CONF_FILE" <<EOF
+s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
+s|@CU_IP_ADDRESS@|$IP_CU_F1|
+EOF
+    fi
     
     for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
 	ORIG_CHART="${OAI5G_RAN}/${nf}/templates/configmap.yaml"
 	cp ${ORIG_CHART} $TMP/${nf}_configmap.yaml-orig
 	echo "(Over)writing $ORIG_CHART"
 	sed -f "$SED_CONF_FILE" < $TMP/${nf}_configmap.yaml-orig > ${ORIG_CHART}
-	echo "************************* Display modified ${ORIG_CHART} *****************************"
+	echo "********************* Display modified ${ORIG_CHART} ************************"
 	cat ${ORIG_CHART}
     done
 
