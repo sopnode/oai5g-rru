@@ -1028,7 +1028,6 @@ function start-nr-ue() {
 
     echo "retrieve gNB/DU IP"
     if [[ $GNB_MODE != 'monolithic' ]]; then
-	DU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[0].metadata.name}")
 	GNB_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
     else
 	GNB_IP=${IP_GNB_N2N3} 
