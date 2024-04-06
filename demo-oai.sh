@@ -1033,6 +1033,7 @@ function start-nr-ue() {
     else
 	GNB_IP=${IP_GNB_N2N3} 
     fi
+    echo "sed -i "s/@IP_GNB@/$IP_GNB/" ${OAI5G_RAN}/oai-nr-ue/values.yaml"
     sed -i "s/@IP_GNB@/$IP_GNB/" ${OAI5G_RAN}/oai-nr-ue/values.yaml
 
     echo "helm -n $NS install oai-nr-ue oai-nr-ue/" 
