@@ -1116,7 +1116,7 @@ EOF
     fi
     start-gnb 
 
-    if [[ "$RRU" = "rfsim" ]]; then
+    if [[ "$RRU" == "rfsim" ]]; then
 	echo "sleep 5s before starting nr-ue"; sleep 5
 	start-nr-ue 
     fi
