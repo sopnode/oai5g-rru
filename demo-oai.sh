@@ -914,7 +914,6 @@ s|@NETMASK_NRUE@|$NETMASK_NRUE|
 s|@MAC_NRUE@|$(gener-mac)|
 s|@DEFAULT_GW_NRUE@|$DEFAULT_GW_NRUE|
 s|@IF_NAME_NRUE@|$IF_NAME_NRUE|
-s|@IP_GNB@|$IP_GNB_N2N3|
 s|@RFSIM_IMSI@|$RFSIM_IMSI|
 s|@FULL_KEY@|$FULL_KEY|
 s|@OPC@|$OPC|
@@ -1027,7 +1026,16 @@ function start-nr-ue() {
     echo "cd $OAI5G_RAN"
     cd "$OAI5G_RAN"
 
-    echo "helm -n $NS install oai-nr-ue oai-nr-ue/"
+    echo "retrieve gNB/DU IP"
+    if [[ $GNB_MODE != 'monolithic' ]]; then
+	DU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[0].metadata.name}")
+	GNB_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
+    else
+	GNB_IP=${IP_GNB_N2N3} 
+    fi
+    sed -i "s/@IP_GNB@/$IP_GNB/" ${OAI5G_RAN}/oai-nr-ue/values.yaml
+
+    echo "helm -n $NS install oai-nr-ue oai-nr-ue/" 
     helm -n $NS install oai-nr-ue oai-nr-ue/
 
     echo "Wait until oai-nr-ue pod is READY"
