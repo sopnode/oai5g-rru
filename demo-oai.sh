@@ -201,6 +201,7 @@ R2LAB_REPO="docker.io/r2labuser"
 #
 RAN_TAG="2024.w13"
 GNB_NAME="gNB-r2lab"
+NODE_CU="sopnode-w1-v100"
 
 #
 # DU/CU SPLIT parameters
@@ -227,7 +228,7 @@ IF_NAME_DU_F1="$IF_NAME_N2N3"
 NAME_DU="oai-du"
 CU_HOST="oai-cu"
 QOS_DU_DEF="true"
-NODE_DU="sopnode-w1-v100"
+NODE_DU="$NODE_GNB"
 #
 ########## CU specific part ##############
 CU_REPO="${R2LAB_REPO}/oai-gnb" 
@@ -262,7 +263,7 @@ F1IFNAME="f1"
 N2IFNAME_CU="n2" 
 N3IFNAME_CU="n2"
 QOS_CU_DEF="true"
-NODE_CU="$NODE_GNB"
+NODE_CU="$NODE_CU"
 #
 ########## CU-CP specific part ##############
 CUCP_REPO="${R2LAB_REPO}/oai-gnb" 
@@ -294,7 +295,7 @@ ADD_OPTIONS_CUCP="--sa --log_config.global_log_options level,nocolor,time"
 NAME_CUCP="oai-cu-cp"
 N2IFNAME_CUCP="n2"
 QOS_CUCP_DEF="true"
-NODE_CUCP="$NODE_GNB"
+NODE_CUCP="$NODE_CU"
 #
 ########## CU-UP specific part ##############
 CUUP_REPO="$R2LAB_REPO/oai-nr-cuup"
@@ -328,7 +329,7 @@ HOST_CUCP="oai-cu"
 N2IFNAME_CUUP="n2"
 N3IFNAME_CUUP="n3"
 QOS_CUUP_DEF="true"
-NODE_CUUP="$NODE_GNB"
+NODE_CUUP="$NODE_CU"
 #
 ########## GNB Monolithic specific part ################
 #
