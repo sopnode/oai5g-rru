@@ -327,7 +327,7 @@ IF_NAME_CUUP_F1="$IF_NAME_N2N3"
 ADD_OPTIONS_CUUP="--sa"
 NAME_CUUP="oai-cuup"
 HOST_CUCP="oai-cu"
-N2IFNAME_CUUP="n2"
+N2IFNAME_CUUP="n3"
 N3IFNAME_CUUP="n3"
 QOS_CUUP_DEF="true"
 NODE_CUUP="$NODE_CU"
@@ -1288,13 +1288,13 @@ elif [[ $GNB_MODE = 'cudu' ]]; then
     kubectl -c gnbdu cp $NS/$DU_POD_NAME:/tmp/gnb.conf $prefix/du.conf || true
 else
     # $GNB_MODE = 'cucpup'
-    CUCP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cucp" -o jsonpath="{.items[0].metadata.name}")
-    CUCP_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cucp" -o jsonpath="{.items[*].status.podIP}")
-    echo -e "\t - Retrieving logs for oai-cucp $CUCP_POD_NAME running with IP $CUCP_eth0_IP"
+    CUCP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-cp" -o jsonpath="{.items[0].metadata.name}")
+    CUCP_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-cp" -o jsonpath="{.items[*].status.podIP}")
+    echo -e "\t - Retrieving logs for oai-cu-cp $CUCP_POD_NAME running with IP $CUCP_eth0_IP"
     kubectl --namespace $NS -c gnbcucp logs $CUCP_POD_NAME > "$prefix"/cucp-"$DATE".logs
-    CUUP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cuup" -o jsonpath="{.items[0].metadata.name}")
-    CUUP_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cuup" -o jsonpath="{.items[*].status.podIP}")
-    echo -e "\t - Retrieving logs for oai-cuup $CUUP_POD_NAME running with IP $CUUP_eth0_IP"
+    CUUP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-up" -o jsonpath="{.items[0].metadata.name}")
+    CUUP_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-up" -o jsonpath="{.items[*].status.podIP}")
+    echo -e "\t - Retrieving logs for oai-cu-up $CUUP_POD_NAME running with IP $CUUP_eth0_IP"
     kubectl --namespace $NS -c gnbcuup logs $CUUP_POD_NAME > "$prefix"/cuup-"$DATE".logs
     DU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[0].metadata.name}")
     DU_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
