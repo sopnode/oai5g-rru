@@ -1288,8 +1288,8 @@ elif [[ $GNB_MODE = 'cudu' ]]; then
     echo -e "\t - Retrieving logs for oai-du $DU_POD_NAME running with IP $DU_eth0_IP"
     kubectl --namespace $NS -c gnbdu logs $DU_POD_NAME > "$prefix"/du-"$DATE".logs
     echo "Retrieve cu/du configs from the pods"
-    kubectl -c gnbcu cp $NS/$CU_POD_NAME:/tmp/gnb.conf $prefix/cu.conf || true
-    kubectl -c gnbdu cp $NS/$DU_POD_NAME:/tmp/gnb.conf $prefix/du.conf || true
+    kubectl -c gnbcu cp $NS/$CU_POD_NAME:/tmp/cu.conf $prefix/cu.conf || true
+    kubectl -c gnbdu cp $NS/$DU_POD_NAME:/tmp/du.conf $prefix/du.conf || true
 else
     # $GNB_MODE = 'cucpup'
     CUCP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-cp" -o jsonpath="{.items[0].metadata.name}")
@@ -1305,9 +1305,9 @@ else
     echo -e "\t - Retrieving logs for oai-du $DU_POD_NAME running with IP $DU_eth0_IP"
     kubectl --namespace $NS -c gnbdu logs $DU_POD_NAME > "$prefix"/du-"$DATE".logs
     echo "Retrieve cucp/cuup/du configs from the pods"
-    kubectl -c gnbcucp cp $NS/$CUCP_POD_NAME:/tmp/gnb.conf $prefix/cucp.conf || true
-    kubectl -c gnbcuup cp $NS/$CUUP_POD_NAME:/tmp/gnb.conf $prefix/cuup.conf || true
-    kubectl -c gnbdu cp $NS/$DU_POD_NAME:/tmp/gnb.conf $prefix/du.conf || true
+    kubectl -c gnbcucp cp $NS/$CUCP_POD_NAME:/tmp/cucp.conf $prefix/cucp.conf || true
+    kubectl -c gnbcuup cp $NS/$CUUP_POD_NAME:/tmp/cuup.conf $prefix/cuup.conf || true
+    kubectl -c gnbdu cp $NS/$DU_POD_NAME:/tmp/du.conf $prefix/du.conf || true
 fi
 
 if [[ "$RRU" = "rfsim" ]]; then
