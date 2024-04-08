@@ -994,7 +994,7 @@ function start-gnb() {
 	echo "helm -n $NS install oai-cu oai-cu/"
 	helm -n $NS install oai-cu oai-cu/
 
-	echo "sleep 30s"; sleep 30
+	echo "sleep 5s"; sleep 5
 	echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu"
 	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu
 	echo "helm install -n $NS oai-du oai-du/"
@@ -1004,11 +1004,10 @@ function start-gnb() {
 	echo "helm -n $NS install oai-gnb-cu oai-gnb-cu/"
 	helm -n $NS install oai-cu-cp oai-cu-cp/
 	echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp"
-	echo "sleep 30s"; sleep 30
 	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp
 	echo "helm -n $NS install oai-cu-up oai-cu-up/"
 	helm -n $NS install oai-cu-up oai-cu-up/
-	echo "sleep 30s"; sleep 30
+	echo "sleep 5s"; sleep 5
 	echo "kubectl -n $NS wait pod --for=condition=Ready  -l app.kubernetes.io/instance=oai-cu-up"
 	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-up
 	echo "helm install -n $NS oai-du oai-du/"
