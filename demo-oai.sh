@@ -703,10 +703,11 @@ s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
 EOF
 
     if [[ $GNB_MODE != 'monolithic' ]]; then
-	echo "With DU mode, set now AMF_IP_ADDRESS and CU_IP_ADDRESS"
+	echo "With cudu/cucpup modes, set here AMF_IP_ADDRESS, CUCP_IP_ADDRESS and CU_IP_ADDRESS"
 	cat >> "$SED_CONF_FILE" <<EOF
 s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
 s|@CU_IP_ADDRESS@|$IP_CU_F1|
+s|@CUCP_IP_ADDRESS@|$IP_CUCP_F1|
 EOF
     else
 	echo "Monolithic mode, do not set AMF_IP_ADDRESS and CU_IP_ADDRESS"
