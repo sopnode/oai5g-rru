@@ -707,7 +707,7 @@ EOF
 	cat >> "$SED_CONF_FILE" <<EOF
 s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
 s|@CU_IP_ADDRESS@|$IP_CU_F1|
-s|@CUCP_IP_ADDRESS@|$IP_CUCP_F1|
+s|@CU_UP_IP_ADDRESS@|$IP_CUCP_F1|
 EOF
     else
 	echo "Monolithic mode, do not set AMF_IP_ADDRESS and CU_IP_ADDRESS"
