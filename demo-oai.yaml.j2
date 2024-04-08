@@ -269,17 +269,17 @@ jobs:
     critical: False
     verbose: {{verbose}}
     label: >
-      sleep 60s, attach quectel UE on fit node {{n}}; sleep 20s and test cx
+      sleep 10s, attach quectel UE on fit node {{n}}; sleep 10s and test cx
     commands:
       - type: Run
         command: >
-          sleep 60;
+          sleep 10;
         {% if dnn1 == "none" %}    
           start.sh -F {{dnn0}};
         {% else %}
           start.sh -F {{dnn0}} -S {{dnn1}};
         {% endif %}
-          sleep 20
+          sleep 10
       - type: RunScript
         command: >
           {{nodes_sh}} check-quectel-cx
@@ -295,17 +295,17 @@ jobs:
     critical: False
     verbose: {{verbose}}
     label: >
-      sleep 60s, attach qhat0{{n}} UE; sleep 20s and test cx
+      sleep 10s, attach qhat0{{n}} UE; sleep 10s and test cx
     commands:
       - type: Run
         command: >
-          sleep 60;
+          sleep 10;
         {% if dnn1 == "none" %}    
           start.sh -F {{dnn0}};
         {% else %}
           start.sh -F {{dnn0}} -S {{dnn1}};
         {% endif %}
-          sleep 20
+          sleep 10
       - type: RunScript
         command: >
           {{nodes_sh}} check-quectel-cx
