@@ -1292,7 +1292,7 @@ elif [[ $GNB_MODE = 'cudu' ]]; then
     DU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[0].metadata.name}")
     kubectl -c gnbdu cp $NS/$DU_POD_NAME:nrL1_stats.log $prefix/nrL1_stats.log"$DATE" || true
     kubectl -c gnbdu cp $NS/$DU_POD_NAME:nrMAC_stats.log $prefix/nrMAC_stats.log"$DATE" || true
-    kubectl -c gnbdu cp $NS/$DU_POD_NAME:nrRRC_stats.log $prefix/nrRRC_stats.log"$DATE" || true
+    kubectl -c gnbcu cp $NS/$CU_POD_NAME:nrRRC_stats.log $prefix/nrRRC_stats.log"$DATE" || true
     DU_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
     echo -e "\t - Retrieving logs for oai-du $DU_POD_NAME running with IP $DU_eth0_IP"
     kubectl --namespace $NS -c gnbdu logs $DU_POD_NAME > "$prefix"/du-"$DATE".logs
@@ -1312,7 +1312,7 @@ else
     DU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[0].metadata.name}")
     kubectl -c gnbdu cp $NS/$DU_POD_NAME:nrL1_stats.log $prefix/nrL1_stats.log"$DATE" || true
     kubectl -c gnbdu cp $NS/$DU_POD_NAME:nrMAC_stats.log $prefix/nrMAC_stats.log"$DATE" || true
-    kubectl -c gnbdu cp $NS/$DU_POD_NAME:nrRRC_stats.log $prefix/nrRRC_stats.log"$DATE" || true
+    kubectl -c gnbcucp cp $NS/$CUCP_POD_NAME:nrRRC_stats.log $prefix/nrRRC_stats.log"$DATE" || true
     DU_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
     echo -e "\t - Retrieving logs for oai-du $DU_POD_NAME running with IP $DU_eth0_IP"
     kubectl --namespace $NS -c gnbdu logs $DU_POD_NAME > "$prefix"/du-"$DATE".logs
