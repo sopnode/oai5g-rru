@@ -74,13 +74,13 @@ if [[ $RUN_MODE = "full" ]]; then
     # Local RAN, Local CN
     ENABLED_MYSQL=true
     ENABLED_NRF=true
+    ENABLED_NSSF=true
     ENABLED_UDR=true
     ENABLED_UDM=true
     ENABLED_AUSF=true
     ENABLED_AMF=true
     ENABLED_UPF=true
     ENABLED_SMF=true
-    ENABLED_NRF=true
     SUBNET_N2N3="192.168.128"
     NETMASK_N2N3="24"
     IF_NAME_N2N3="net-100"
@@ -99,12 +99,13 @@ else
     if [[ $RUN_MODE = "gnb-upf" ]]; then
 	# Local RAN and local UPF
 	ENABLED_MYSQL=false
+	ENABLED_NRF=false
+	ENABLED_NSSF=false
 	ENABLED_UDR=false
 	ENABLED_UDM=false
 	ENABLED_AUSF=false
 	ENABLED_AMF=false
 	ENABLED_SMF=false
-	ENABLED_NRF=false
 	ENABLED_UPF=true
 	SUBNET_N2N3="172.21.10"
 	NETMASK_N2N3="27"
@@ -480,6 +481,7 @@ s|@SHAREDVOLUME@|$PCAP|
 s|@IP_NRF@|$NFS_NRF_HOST|
 s|@ENABLED_MYSQL@|$ENABLED_MYSQL|
 s|@ENABLED_NRF@|$ENABLED_NRF|
+s|@ENABLED_NSSF@|$ENABLED_NSSF|
 s|@ENABLED_UDR@|$ENABLED_UDR|
 s|@ENABLED_UDM@|$ENABLED_UDM|
 s|@ENABLED_AUSF@|$ENABLED_AUSF|
