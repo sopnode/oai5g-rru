@@ -200,7 +200,7 @@ IP_DNS2="193.51.196.138"
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 #
-RAN_TAG="2024.w13"
+RAN_TAG="2024.w14"
 GNB_NAME="gNB-r2lab"
 NODE_CU="sopnode-w1-v100"
 
