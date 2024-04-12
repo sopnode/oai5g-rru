@@ -17,13 +17,11 @@ if [ $# -eq 1 ]
 then
     TAG_OAI5G_RRU="$1"
 else
-    #TAG_OAI5G_RRU="develop-r2lab"
-    TAG_OAI5G_RRU="v2.0.1-1.0-1.0"
+    TAG_OAI5G_RRU="develop-r2lab"
 fi
 echo "***** Testing demo oai5g-rru, TAG: $1"
 REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git"
-#TAG_OAI_CN5G_FED="develop-r2lab"
-TAG_OAI_CN5G_FED="v2.0.1-1.0"
+TAG_OAI_CN5G_FED="develop-r2lab"
 NS="oaiw1-ci"
 HOST_AMF_UPF="sopnode-w1"
 HOST_GNB="sopnode-w1"
@@ -59,8 +57,8 @@ git clone -b $TAG_OAI_CN5G_FED $REPO_OAI_CN5G_FED
 cp oai5g-rru/configure-demo-oai.sh .
 cp oai5g-rru/demo-oai.sh .
 chmod a+x demo-oai.sh
-echo "./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $DIR $CN_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL"
-./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $DIR $CN_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL
+echo "./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $DIR $CN_MODE $GNB_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL"
+./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $DIR $CN_MODE $GNB_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL
 echo "run init"
 ./demo-oai.sh init
 echo "./demo-oai.sh configure-all"
