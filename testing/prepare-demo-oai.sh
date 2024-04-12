@@ -17,13 +17,13 @@ if [ $# -eq 1 ]
 then
     TAG_OAI5G_RRU="$1"
 else
-    #TAG_OAI5G_RRU="develop-r2lab"
-    TAG_OAI5G_RRU="v2.0.1-1.0-1.0"
+    TAG_OAI5G_RRU="develop-r2lab"
+    #TAG_OAI5G_RRU="v2.0.1-1.0-1.0"
 fi
 echo "***** Testing demo oai5g-rru, TAG: $1"
 REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git"
-#TAG_OAI_CN5G_FED="develop-r2lab"
-TAG_OAI_CN5G_FED="v2.0.1-1.0"
+TAG_OAI_CN5G_FED="develop-r2lab"
+#TAG_OAI_CN5G_FED="v2.0.1-1.0"
 NS="oaiw1-ci"
 HOST_AMF_UPF="sopnode-w1"
 HOST_GNB="sopnode-w1"
