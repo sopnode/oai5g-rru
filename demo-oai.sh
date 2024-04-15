@@ -370,7 +370,7 @@ GNB_TAG_n3xx="${RAN_TAG}"
 CONF_n320="gnb.sa.band78.106prb.usrpn310.ddsuu-2x2.conf"
 CONF_n300="gnb.sa.band78.106prb.usrpn310.ddsuu-2x2.conf"
 #OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 0,2,4,6,8,10,12,14,16 --log_config.global_log_options level,nocolor,time"
-OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
+OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --MACRLCs.[0].ul_max_mcs 14 --L1s.[0].max_ldpc_iterations 4 --log_config.global_log_options level,nocolor,time"
 #
 IP_GNB_SFP1="192.168.10.132"
 IP_GNB_SFP2="192.168.20.132"
