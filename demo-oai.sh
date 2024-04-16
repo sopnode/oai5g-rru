@@ -288,7 +288,7 @@ F1IFNAME="f1"
 N2IFNAME_CU="n2" 
 N3IFNAME_CU="n2"
 QOS_CU_DEF="true"
-NODE_CU="$NODE_CU"
+# NODE_CU is defined above and also the same for CUCP/CUUP
 #
 ########## CU-CP specific part ##############
 CUCP_REPO="${R2LAB_REPO}/oai-gnb" 
@@ -619,14 +619,6 @@ function configure-gnb() {
     SED_CONF_FILE="$TMP/gnb_conf.sed"
     SED_VALUES_FILE="$TMP/oai-gnb-values.sed"
 
-    # Configure general parameters for values.yaml
-    MULTUS_GNB_N2="$MULTUS_CREATE"
-    GNB_N2_IF_NAME="n2"
-    GNB_N2_IP_ADDRESS="$IP_GNB_N2/$NETMASK_N2N3"
-    MULTUS_GNB_N3="false"
-    GNB_N3_IF_NAME="n2"
-    GNB_N3_IP_ADDRESS="$IP_GNB_N2/$NETMASK_N2N3"
-    
     # Configure RRU specific parameters for values.yaml chart
     if [[ "$RRU" = "b210" ]]; then
 	MULTUS_GNB_RU1="false"
