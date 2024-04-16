@@ -91,8 +91,19 @@ if [[ $RUN_MODE = "full" ]]; then
     IP_AMF_N2="$SUBNET_N2N3.201"
     IP_UPF_N3="$SUBNET_N2N3.202"
     ENABLE_SNAT="yes"
-    IP_GNB_N2N3="$SUBNET_N2N3.203"
-    IP_NRUE="$SUBNET_N2N3.204"
+    MULTUS_GNB_N2="true"
+    IP_GNB_N2="$SUBNET_N2N3.203"
+    GNB_N2_IF_NAME="n2"
+    MULTUS_GNB_N3="false"
+    if [[ $GNB_MODE = 'cucpup' ]]; then
+	IP_GNB_N3="$SUBNET_N2N3.204"
+	IP_NRUE="$SUBNET_N2N3.205"
+    else
+	IP_GNB_N3="$IP_GNB_N2"
+	IP_NRUE="$SUBNET_N2N3.204"
+    fi
+    GNB_N3_IF_NAME="n2"
+    
 else
     # Local RAN, External MYSQL/UDR/UDM/AUSF/AMF/SMF
     ENABLE_SNAT="off" # "yes" or "off"
@@ -113,28 +124,46 @@ else
 	IP_AMF_N2="$SUBNET_N2N3.204" # Set the external AMF IP address for gNB
 	IP_UPF_N3="$SUBNET_N2N3.221"
 	NFS_NRF_HOST="$SUBNET_N2N3.203" # set here external IP of NRF
-	IP_GNB_N2N3="$SUBNET_N2N3.222"
+	MULTUS_GNB_N2="true"
+	IP_GNB_N2="$SUBNET_N2N3.222"
+	GNB_N2_IF_NAME="n2"
+	MULTUS_GNB_N3="false"
+	if [[ $GNB_MODE = 'cucpup' ]]; then
+	    IP_GNB_N3="$SUBNET_N2N3.223"
+	    IP_NRUE="$SUBNET_N2N3.224"
+	else
+	    IP_GNB_N3="$IP_GNB_N2"
+	    IP_NRUE="$SUBNET_N2N3.223"
+	fi
+	GNB_N3_IF_NAME="n2"
 	ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
 	#ROUTES_GNB_N2="[{'dst': '172.21.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
-	IP_NRUE="$SUBNET_N2N3.223"
     else
-        # Local RAN and external CN
+        # RUN_MODE=gnb-only -- Local RAN and external CN
         ENABLED_UPF=false
         # Set the local gNB host network interface to reach AMF/UPF (N2/N3)
-	SUBNET_N2N3="192.168.128" # "172.21.10" # e.g., "10.0.20"
-        #SUBNET_N2N3="172.21.10" # e.g., "10.0.20"
-        NETMASK_N2N3="24"
-        #NETMASK_N2N3="27"
-        IF_NAME_GNB_N2N3="net-100"
-        #IF_NAME_GNB_N2N3="br-pepr" # e.g., "ran"
+	#SUBNET_N2N3="192.168.128" # "172.21.10" # e.g., "10.0.20"
+        SUBNET_N2N3="172.21.10" # e.g., "10.0.20"
+        #NETMASK_N2N3="24"
+        NETMASK_N2N3="27"
+        #IF_NAME_N2N3="net-100"
+        IF_NAME_N2N3="br-pepr" # e.g., "ran"
         # Set the external AMF IP address (N2)
-        IP_AMF_N2="$SUBNET_N2N3.201"
-        #IP_AMF_N2="172.22.10.6" # e.g., "172.22.10.6"
-	IP_GNB_N2N3="$SUBNET_N2N3.245" # local gNB IP required by AMF/UPF, e.g., "10.0.20.243"
+        IP_AMF_N2="$SUBNET_N2N3.201" 
+	MULTUS_GNB_N2="true"
+	IP_GNB_N2="$SUBNET_N2N3.244"
+	GNB_N2_IF_NAME="n2"
         # Set the route to reach AMF/UPF
         ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
-        # Set the local IP address of the latter network interface
-        IP_NRUE="$SUBNET_N2N3.244"
+	MULTUS_GNB_N3="false"
+	if [[ $GNB_MODE = 'cucpup' ]]; then
+	    IP_GNB_N3="$SUBNET_N2N3.245"
+	    IP_NRUE="$SUBNET_N2N3.246"
+	else
+	    IP_GNB_N3="$IP_GNB_N2"
+	    IP_NRUE="$SUBNET_N2N3.245"
+	fi
+	GNB_N3_IF_NAME="n2"
     fi
 fi
 
@@ -147,16 +176,11 @@ OAI5G_CORE="$OAI5G_CHARTS/oai-5g-core"
 OAI5G_BASIC="$OAI5G_CORE/oai-5g-basic"
 OAI5G_ADVANCE="$OAI5G_CORE/oai-5g-advance"
 
-# Multus is now used whatever RRU selected
-MULTUS_CREATE="true"
-IF_N2="n2"
-IF_N3="n3"
-
 CN_DEFAULT_GW=""
 
 #### oai-amf chart definitions ####
 #
-MULTUS_AMF_N2="$MULTUS_CREATE"
+MULTUS_AMF_N2="true"
 IP_AMF_N2="$SUBNET_N2N3.1"
 NETMASK_AMF_N2="$NETMASK_N2N3"
 GW_AMF_N2=""
@@ -165,7 +189,7 @@ IF_NAME_AMF_N2="$IF_NAME_N2N3"
 
 #### oai-upf chart definitions ####
 #
-MULTUS_UPF_N3="$MULTUS_CREATE"
+MULTUS_UPF_N3="true"
 NETMASK_UPF_N3="$NETMASK_N2N3"
 GW_UPF_N3=""
 ROUTES_UPF_N3=""
@@ -244,8 +268,8 @@ ROUTES_CU_F1=""
 IF_NAME_CU_F1="$IF_NAME_N2N3"
 #
 MULTUS_CU_N2="true"
-IP_CU_N2="$SUBNET_N2N3.203" 
-NETMASK_CU_N2="24"
+IP_CU_N2="$IP_GNB_N2"  # "$SUBNET_N2N3.203" 
+NETMASK_CU_N2="$NETMASK_N2N3"  # "24"
 GW_CU_N2="" 
 ROUTES_CU_N2=""
 IF_NAME_CU_N2="$IF_NAME_N2N3"
@@ -276,11 +300,11 @@ IP_CUCP_E1="192.168.18.12"
 NETMASK_CUCP_E1="24"
 GW_CUCP_E1=""
 ROUTES_CUCP_E1=""
-IF_NAME_CUCP_E1="$IF_NAME_N2N3"
+IF_NAME_CUCP_E1=  # "$IF_NAME_N2N3"
 #
 MULTUS_CUCP_N2="true"
-IP_CUCP_N2="$SUBNET_N2N3.203"
-NETMASK_CUCP_N2="24"
+IP_CUCP_N2="$IP_GNB_N2" # "$SUBNET_N2N3.203"
+NETMASK_CUCP_N2="$NETMASK_N2N3" # "24"
 GW_CUCP_N2=""
 ROUTES_CUCP_N2=""
 IF_NAME_CUCP_N2="$IF_NAME_N2N3"
@@ -312,8 +336,8 @@ ROUTES_CUUP_E1=""
 IF_NAME_CUUP_E1="$IF_NAME_N2N3"
 #
 MULTUS_CUUP_N3="true"
-IP_CUUP_N3="$SUBNET_N2N3.204"
-NETMASK_CUUP_N3="24"
+IP_CUUP_N3="$IP_GNB_N3"
+NETMASK_CUUP_N3="$NETMASK_N2N3" # "24"
 GW_CUUP_N3="" 
 ROUTES_CUUP_N3=""
 IF_NAME_CUUP_N3="$IF_NAME_N2N3"  
@@ -335,10 +359,8 @@ NODE_CUUP="$NODE_CU"
 #
 ########## GNB Monolithic specific part ################
 #
-IF_NAME_GNB_N2="$IF_NAME_N2N3"
 NETMASK_GNB_N2="$NETMASK_N2N3"
 #
-IF_NAME_GNB_N3="" 
 NETMASK_GNB_N3=""
 #
 NETMASK_GNB_RU="24"
@@ -536,8 +558,8 @@ EOF
     echo "Configuring chart $OAI5G_@MODE@/config.yaml for R2lab"
     cat > $TMP/@mode@-config.sed <<EOF
 s|@IF_SBI@|$IF_SBI|
-s|@IF_N2@|$IF_N2|
-s|@IF_N3@|$IF_N3|
+s|@IF_N2@|"n2"|
+s|@IF_N3@|"n3"|
 s|@IF_N4@|$IF_N4|
 s|@IF_N6@|$IF_N6|
 s|@MCC@|$MCC|
@@ -600,10 +622,10 @@ function configure-gnb() {
     # Configure general parameters for values.yaml
     MULTUS_GNB_N2="$MULTUS_CREATE"
     GNB_N2_IF_NAME="n2"
-    GNB_N2_IP_ADDRESS="$IP_GNB_N2N3/$NETMASK_N2N3"
+    GNB_N2_IP_ADDRESS="$IP_GNB_N2/$NETMASK_N2N3"
     MULTUS_GNB_N3="false"
     GNB_N3_IF_NAME="n2"
-    GNB_N3_IP_ADDRESS="$IP_GNB_N2N3/$NETMASK_N2N3"
+    GNB_N3_IP_ADDRESS="$IP_GNB_N2/$NETMASK_N2N3"
     
     # Configure RRU specific parameters for values.yaml chart
     if [[ "$RRU" = "b210" ]]; then
@@ -695,10 +717,10 @@ s|@GNB_DU_ID@|$GNB_ID|
 s|@TAC@|$TAC|
 s|plmn_list.*|plmn_list = $PLMN_LIST|
 s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
-s|@GNB_N2_IP_ADDRESS@|$GNB_N2_IP_ADDRESS|
+s|@GNB_N2_IP_ADDRESS@|$IP_GNB_N2/$NETMASK_N2N3|
 s|@CU_UP_N2_IP_ADDRESS@|$IP_CUUP_N3|
 s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
-s|@GNB_N3_IP_ADDRESS@|$GNB_N3_IP_ADDRESS|
+s|@GNB_N3_IP_ADDRESS@|$IP_GNB_N3/$NETMASK_N2N3|
 s|@CU_UP_N3_IP_ADDRESS@|$IP_CUUP_N3|
 s|@AW2S_IP_ADDRESS@|$ADDR_aw2s|
 s|@GNB_AW2S_IP_ADDRESS@|$IP_GNB_aw2s|
@@ -736,19 +758,19 @@ s|@GNB_TAG@|$GNB_TAG|
 s|@DEFAULT_GW_GNB@|$DEFAULT_GW_GNB|
 s|@MULTUS_GNB_N2@|$MULTUS_GNB_N2|
 s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
-s|@IP_GNB_N2@|$IP_GNB_N2N3|
+s|@IP_GNB_N2@|$IP_GNB_N2|
 s|@NETMASK_GNB_N2@|$NETMASK_GNB_N2|
 s|@MAC_GNB_N2@|$(gener-mac)|
 s|@GW_GNB_N2@|$GW_GNB_N2|
 s|@ROUTES_GNB_N2@|$ROUTES_GNB_N2|
-s|@IF_NAME_GNB_N2@|$IF_NAME_GNB_N2|
+s|@IF_NAME_GNB_N2@|$GNB_N2_IF_NAME|
 s|@MULTUS_GNB_N3@|$MULTUS_GNB_N3|
 s|@IP_GNB_N3@|$IP_GNB_N3|
 s|@NETMASK_GNB_N3@|$NETMASK_GNB_N3|
 s|@MAC_GNB_N3@|$(gener-mac)|
 s|@GW_GNB_N3@|$GW_GNB_N3|
 s|@ROUTES_GNB_N3@|$ROUTES_GNB_N3|
-s|@IF_NAME_GNB_N3@|$IF_NAME_GNB_N3|
+s|@IF_NAME_GNB_N3@|$GNB_N3_IF_NAME|
 s|@MULTUS_GNB_RU1@|$MULTUS_GNB_RU1|
 s|@IP_GNB_RU1@|$IP_GNB_RU1|
 s|@NETMASK_GNB_RU1@|$NETMASK_GNB_RU|
@@ -1038,7 +1060,7 @@ function start-nr-ue() {
     if [[ $GNB_MODE != 'monolithic' ]]; then
 	GNB_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
     else
-	GNB_IP=${IP_GNB_N2N3} 
+	GNB_IP=${IP_GNB_N2} 
     fi
     echo "sed -i "s/@IP_GNB@/$GNB_IP/" ${OAI5G_RAN}/oai-nr-ue/values.yaml"
     sed -i "s/@IP_GNB@/$GNB_IP/" ${OAI5G_RAN}/oai-nr-ue/values.yaml
