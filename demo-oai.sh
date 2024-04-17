@@ -631,11 +631,7 @@ function configure-gnb() {
 	QOS_GNB_DEF="false"
 
     elif [[ "$RRU" = "n300" || "$RRU" = "n320" ]]; then
-	if [[ "$RRU" = "n300" ]]; then
-	    SDR_ADDRS="$ADDRS_n300"
-	elif [[ "$RRU" = "n320" ]]; then
-	    SDR_ADDRS="$ADDRS_n320"
-	fi
+	SDR_ADDRS=$(eval echo \"\${ADDRS_$RRU}\")
 	MULTUS_GNB_RU1="true"
 	IP_GNB_RU1="$IP_GNB_SFP1"
 	MTU_GNB_RU1="$MTU_n3xx"
@@ -649,11 +645,7 @@ function configure-gnb() {
 	QOS_GNB_DEF="true"
 
     elif [[ "$RRU" = "jaguar" || "$RRU" = "panther" ]]; then
-	if [[ "$RRU" = "jaguar" ]]; then
-	    ADDR_aw2s="$ADDR_jaguar"
-	else
-	    ADDR_aw2s="$ADDR_panther"
-	fi
+	ADDR_aw2s=$(eval echo \"\${ADDR_$RRU}\")
 	GNB_aw2s_LOCAL_IF_NAME="ru1"
 	MULTUS_GNB_RU1="true"
 	IP_GNB_RU1="$IP_GNB_aw2s"
