@@ -130,7 +130,13 @@ else
 	IF_NAME_N2N3="br-slices"
 	IP_AMF_N2="$SUBNET_N2N3.200" # Set the external AMF IP address for gNB
 	IP_UPF_N3="$SUBNET_N2N3.222"
-	NFS_NRF_HOST="$SUBNET_N2N3.203" # set here external IP of NRF
+	NFS_AMF_HOST="$SUBNET_N2N3.200" # was "oai-amf"
+	NFS_SMF_HOST="$SUBNET_N2N3.202" # was "oai-smf"
+	NFS_UPF_HOST="oai-upf" # was "oai-upf"
+	NFS_UDM_HOST="oai-udm" # was "oai-udm" #fake
+	NFS_UDR_HOST="oai-udr" # was "oai-udr" #fake
+	NFS_AUSF_HOST="oai-ausf" # was "oai-ausf" #fake
+	NFS_NRF_HOST="$SUBNET_N2N3.203" # was "oai-nrf"	
 	MULTUS_GNB_N2="true"
 	IP_GNB_N2="$SUBNET_N2N3.223"
 	GNB_N2_IF_NAME="n2"
