@@ -126,7 +126,7 @@ else
 	IF_N4="n3"
 	IF_N6="eth0"
 	SUBNET_N2N3="172.21.10"
-	NETMASK_N2N3="27"
+	NETMASK_N2N3="26"
 	IF_NAME_N2N3="br-slices"
 	IP_AMF_N2="$SUBNET_N2N3.200" # Set the external AMF IP address for gNB
 	IP_UPF_N3="$SUBNET_N2N3.222"
