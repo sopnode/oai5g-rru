@@ -86,6 +86,8 @@ if [[ $RUN_MODE = "full" ]]; then
     IF_NAME_N2N3="net-100"
     NFS_NRF_HOST="oai-nrf"
     IF_SBI="eth0"
+    IF_N2="n2"
+    IF_N3="n3"
     IF_N4="eth0"
     IF_N6="eth0"
     IP_AMF_N2="$SUBNET_N2N3.201"
@@ -118,6 +120,11 @@ else
 	ENABLED_AMF=false
 	ENABLED_SMF=false
 	ENABLED_UPF=true
+	IF_SBI="n3"
+	IF_N2="n2"
+	IF_N3="n3"
+	IF_N4="n3"
+	IF_N6="eth0"
 	SUBNET_N2N3="172.21.10"
 	NETMASK_N2N3="27"
 	IF_NAME_N2N3="br-slices"
@@ -560,9 +567,16 @@ EOF
 
     echo "Configuring chart $OAI5G_@MODE@/config.yaml for R2lab"
     cat > $TMP/@mode@-config.sed <<EOF
+s|@NFS_AMF_HOST@|$NFS_AMF_HOST|
+s|@NFS_SMF_HOST@|$NFS_SMF_HOST|
+s|@NFS_UPF_HOST@|$NFS_UPF_HOST|
+s|@NFS_UDM_HOST@|$NFS_UDM_HOST|
+s|@NFS_UDR_HOST@|$NFS_UDR_HOST|
+s|@NFS_AUSF_HOST@|$NFS_AUSF_HOST|
+s|@NFS_NRF_HOST@|$NFS_NRF_HOST|
 s|@IF_SBI@|$IF_SBI|
-s|@IF_N2@|"n2"|
-s|@IF_N3@|"n3"|
+s|@IF_N2@|$IF_N2|
+s|@IF_N3@|$IF_N3|
 s|@IF_N4@|$IF_N4|
 s|@IF_N6@|$IF_N6|
 s|@MCC@|$MCC|
@@ -581,7 +595,6 @@ s|@SLICE2_SD@|$SLICE2_SD|
 s|@SLICE2_5QI@|$SLICE2_5QI|
 s|@SLICE2_UPLINK@|$SLICE2_UPLINK|
 s|@SLICE2_DOWNLINK@|$SLICE2_DOWNLINK|
-s|@NFS_NRF_HOST@|$NFS_NRF_HOST|
 s|@IP_DNS1@|$IP_DNS1|
 s|@IP_DNS2@|$IP_DNS2|
 EOF
