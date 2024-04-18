@@ -121,7 +121,7 @@ else
 	SUBNET_N2N3="172.21.10"
 	NETMASK_N2N3="27"
 	IF_NAME_N2N3="br-slices"
-	IP_AMF_N2="$SUBNET_N2N3.202" # Set the external AMF IP address for gNB
+	IP_AMF_N2="$SUBNET_N2N3.200" # Set the external AMF IP address for gNB
 	IP_UPF_N3="$SUBNET_N2N3.222"
 	NFS_NRF_HOST="$SUBNET_N2N3.203" # set here external IP of NRF
 	MULTUS_GNB_N2="true"
