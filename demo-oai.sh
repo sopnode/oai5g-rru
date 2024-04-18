@@ -194,7 +194,7 @@ CN_DEFAULT_GW=""
 #### oai-amf chart definitions ####
 #
 MULTUS_AMF_N2="true"
-IP_AMF_N2="$SUBNET_N2N3.1"
+#IP_AMF_N2="$SUBNET_N2N3.1"
 NETMASK_AMF_N2="$NETMASK_N2N3"
 GW_AMF_N2=""
 ROUTES_AMF_N2=""
