@@ -122,10 +122,10 @@ else
 	NETMASK_N2N3="27"
 	IF_NAME_N2N3="br-slices"
 	IP_AMF_N2="$SUBNET_N2N3.204" # Set the external AMF IP address for gNB
-	IP_UPF_N3="$SUBNET_N2N3.221"
+	IP_UPF_N3="$SUBNET_N2N3.222"
 	NFS_NRF_HOST="$SUBNET_N2N3.203" # set here external IP of NRF
 	MULTUS_GNB_N2="true"
-	IP_GNB_N2="$SUBNET_N2N3.222"
+	IP_GNB_N2="$SUBNET_N2N3.223"
 	GNB_N2_IF_NAME="n2"
 	MULTUS_GNB_N3="false"
 	if [[ $GNB_MODE = 'cucpup' ]]; then
