@@ -142,11 +142,11 @@ else
 	GNB_N2_IF_NAME="n2"
 	MULTUS_GNB_N3="false"
 	if [[ $GNB_MODE = 'cucpup' ]]; then
-	    IP_GNB_N3="$SUBNET_N2N3.223"
-	    IP_NRUE="$SUBNET_N2N3.224"
+	    IP_GNB_N3="$SUBNET_N2N3.224"
+	    IP_NRUE="$SUBNET_N2N3.225"
 	else
 	    IP_GNB_N3="$IP_GNB_N2"
-	    IP_NRUE="$SUBNET_N2N3.223"
+	    IP_NRUE="$SUBNET_N2N3.224"
 	fi
 	GNB_N3_IF_NAME="n2"
 	ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
