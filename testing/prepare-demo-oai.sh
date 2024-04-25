@@ -17,11 +17,11 @@ if [ $# -eq 1 ]
 then
     TAG_OAI5G_RRU="$1"
 else
-    TAG_OAI5G_RRU="develop-r2lab"
+    TAG_OAI5G_RRU="develop-r2lab-slicing"
 fi
-echo "***** Testing demo oai5g-rru, TAG: $1"
+echo "***** Testing demo oai5g-rru, TAG: $TAG_OAI5G_RRU"
 REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git"
-TAG_OAI_CN5G_FED="develop-r2lab"
+TAG_OAI_CN5G_FED="develop-r2lab-slicing"
 NS="oaiw1-ci"
 HOST_AMF_UPF="sopnode-w1"
 HOST_GNB="sopnode-w1"
@@ -39,7 +39,7 @@ GNB_MODE="monolithic"
 #GNB_MODE="cudu"
 #GNB_MODE="cucpup"
 DNN0="oai"
-DNN1="none"
+DNN1="oai2"
 LOGS="true"
 PCAP="false"
 RC_NAME="r2labuser"

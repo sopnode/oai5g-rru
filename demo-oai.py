@@ -81,8 +81,8 @@ default_regcred_email = 'r2labuser@turletti.com'
 
 default_run_mode = 'full'
 default_gnb_mode = 'monolithic'
-default_dnn0 = 'oai.ipv4'
-default_dnn1 = 'none'
+default_dnn0 = 'oai'
+default_dnn1 = 'oai2'
 
 
 def run(*, mode, gateway, slicename, master, namespace, logs,
