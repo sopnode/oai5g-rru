@@ -1056,7 +1056,7 @@ function start-gnb() {
 	helm install -n $NS oai-du oai-du/
     else
 	# $GNB_MODE = 'cucpup'
-	echo "helm -n $NS install oai-gnb-cu oai-gnb-cu/"
+	echo "helm -n $NS install oai-cu-cp oai-cu-cp/"
 	helm -n $NS install oai-cu-cp oai-cu-cp/
 	echo "sleep 10s"; sleep 10
 	echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp"
