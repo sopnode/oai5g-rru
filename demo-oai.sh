@@ -259,7 +259,7 @@ CN_DEFAULT_GW=""
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 #
-RAN_TAG="2024.w13"
+RAN_TAG="2024.w18"
 GNB_NAME="gNB-r2lab"
 
 #
@@ -404,8 +404,8 @@ NETMASK_GNB_RU="24"
 #GNB_REPO_rfsim="${OAISA_REPO}/oai-gnb"
 GNB_REPO_rfsim="${R2LAB_REPO}/oai-gnb"
 GNB_TAG_rfsim="${RAN_TAG}"
-CONF_rfsim="gnb.sa.band78.106prb.rfsim.2x2.conf" 
-CONF_DU_rfsim="du.sa.band78.106prb.rfsim.2x2.conf" 
+CONF_rfsim="gnb.sa.band78.106prb.rfsim.conf" 
+CONF_DU_rfsim="du.sa.band78.106prb.rfsim.conf" 
 OPTIONS_rfsim="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
 #
 #### b2xx RU case ####
@@ -1056,7 +1056,7 @@ function start-gnb() {
 	helm install -n $NS oai-du oai-du/
     else
 	# $GNB_MODE = 'cucpup'
-	echo "helm -n $NS install oai-gnb-cu oai-gnb-cu/"
+	echo "helm -n $NS install oai-cu-cp oai-cu-cp/"
 	helm -n $NS install oai-cu-cp oai-cu-cp/
 	echo "sleep 10s"; sleep 10
 	echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp"
