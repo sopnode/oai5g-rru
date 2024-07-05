@@ -60,11 +60,14 @@ mkdir -p $TMP
 PREFIX_STATS="$TMP/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance"
 
-# Interfaces names of VLANs in sopnode servers
-IF_NAME_VLAN100="net-100"
-P100="192.168.100"
-IF_NAME_VLAN10="net-10"
-IF_NAME_VLAN20="net-20"
+# VLAN Interfaces names of sopnode servers to reach RRUs and corresponding subnets
+IF_NAME_AW2S="net-100"
+IF_NAME_n3xx_1="net-10"
+IF_NAME_n3xx_2="net-20"
+SUBNET_AW2S="192.168.100"
+SUBNET_n3xx_1="192.168.10"
+SUBNET_n3xx_2="192.168.20"
+
 
 
 ############# Running-mode dependent parameters configuration ###############
@@ -429,13 +432,11 @@ CONF_DU_n300="$CONF_DU_n320"
 #OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 0,2,4,6,8,10,12,14,16 --log_config.global_log_options level,nocolor,time"
 OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --MACRLCs.[0].ul_max_mcs 14 --L1s.[0].max_ldpc_iterations 4 --log_config.global_log_options level,nocolor,time"
 #
-IP_GNB_SFP1="192.168.10.132"
-IP_GNB_SFP2="192.168.20.132"
+IP_GNB_SFP1="$SUBNET_n3xx_1.132"
+IP_GNB_SFP2="$SUBNET_n3xx_2.132"
 MTU_n3xx="9000"
-IF_NAME_n3xx_1="$IF_NAME_VLAN10"
-IF_NAME_n3xx_2="$IF_NAME_VLAN20"
-ADDRS_n300="addr=192.168.10.129,second_addr=192.168.20.129"
-ADDRS_n320="addr=192.168.10.130,second_addr=192.168.20.130"
+ADDRS_n300="addr=$SUBNET_n3xx_1.129,second_addr=$SUBNET_n3xx_2.129"
+ADDRS_n320="addr=$SUBNET_n3xx_1.130,second_addr=$SUBNET_n3xx_2.130"
 
 #### aw2s RU case ####
 #GNB_REPO_aw2s="${OAISA_REPO}/oai-gnb"
@@ -448,10 +449,10 @@ CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.conf"
 CONF_DU_panther="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 OPTIONS_aw2s="--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
-IP_GNB_aw2s="$P100.243" 
-IF_NAME_GNB_aw2s="$IF_NAME_VLAN100"
-ADDR_jaguar="$P100.48" 
-ADDR_panther="$P100.51"
+IP_GNB_aw2s="$SUBNET_AW2S.243" 
+IF_NAME_GNB_aw2s="$IF_NAME_AW2S"
+ADDR_jaguar="$SUBNET_AW2S.48" 
+ADDR_panther="$SUBNET_AW2S.51"
 
 ########################### oai-nr-ue rfsim chart parameters #####################
 OAI5G_NRUE="$OAI5G_CORE/oai-nr-ue"
@@ -482,7 +483,7 @@ function gener-mac()
 	    PREFIX="12:34:"
 	fi
 	PREFIX="12:34:"
-	case $IF_NAME_VLAN100 in
+	case $IF_NAME_AW2S in
 	    "net-100")
 		PREFIX=$PREFIX"00:";;
 	    *)  PREFIX=$PREFIX"01:";;
