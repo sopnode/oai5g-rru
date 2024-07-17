@@ -61,10 +61,12 @@ PREFIX_STATS="$TMP/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance"
 
 # Interfaces names of VLANs in sopnode servers
-IF_NAME_VLAN100="net-100"
-P100="192.168.100"
-IF_NAME_VLAN10="net-10"
-IF_NAME_VLAN20="net-20"
+#IF_NAME_VLAN100="net-100"
+#P100="192.168.100"
+IF_NAME_VLAN30="net-30"
+IF_NAME_VLAN31="net-31"
+#IF_NAME_VLAN30="net-10"
+#IF_NAME_VLAN31="net-20"
 
 
 ############# Running-mode dependent parameters configuration ###############
@@ -263,6 +265,10 @@ RAN_TAG="2024.w25"
 GNB_NAME="gNB-r2lab"
 
 #
+MAC_GNB_RU1="12:34:00:00:01:f1"
+MAC_GNB_RU2="12:34:00:00:01:f2"
+#
+
 # DU/CU SPLIT parameters
 #
 HOST_AMF="oai-amf"
@@ -396,7 +402,8 @@ NODE_CUUP="$NODE_CU"
 #
 NETMASK_GNB_N2="$NETMASK_N2N3"
 NETMASK_GNB_N3=""
-NETMASK_GNB_RU="24"
+NETMASK_GNB_RU="25"
+#NETMASK_GNB_RU="24"
 #
 ################## RRU-dependent part ###################
 #
@@ -429,13 +436,17 @@ CONF_DU_n300="$CONF_DU_n320"
 #OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 0,2,4,6,8,10,12,14,16 --log_config.global_log_options level,nocolor,time"
 OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --MACRLCs.[0].ul_max_mcs 14 --L1s.[0].max_ldpc_iterations 4 --log_config.global_log_options level,nocolor,time"
 #
-IP_GNB_SFP1="192.168.10.132"
-IP_GNB_SFP2="192.168.20.132"
+IP_GNB_SFP1="172.28.3.98" # temporary
+IP_GNB_SFP2="172.28.3.198" # temporary
+#IP_GNB_SFP1="192.168.10.132"
+#IP_GNB_SFP2="192.168.20.132"
 MTU_n3xx="9000"
-IF_NAME_n3xx_1="$IF_NAME_VLAN10"
-IF_NAME_n3xx_2="$IF_NAME_VLAN20"
-ADDRS_n300="addr=192.168.10.129,second_addr=192.168.20.129"
-ADDRS_n320="addr=192.168.10.130,second_addr=192.168.20.130"
+IF_NAME_n3xx_1="$IF_NAME_VLAN30"
+IF_NAME_n3xx_2="$IF_NAME_VLAN31"
+ADDRS_n300="addr=172.28.3.3,second_addr=172.28.3.131"
+ADDRS_n320="addr=172.28.3.7,second_addr=172.28.3.135"
+#ADDRS_n300="addr=192.168.10.129,second_addr=192.168.20.129"
+#ADDRS_n320="addr=192.168.10.130,second_addr=192.168.20.130"
 
 #### aw2s RU case ####
 #GNB_REPO_aw2s="${OAISA_REPO}/oai-gnb"
@@ -448,10 +459,13 @@ CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.conf"
 CONF_DU_panther="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 OPTIONS_aw2s="--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
-IP_GNB_aw2s="$P100.243" 
-IF_NAME_GNB_aw2s="$IF_NAME_VLAN100"
-ADDR_jaguar="$P100.48" 
-ADDR_panther="$P100.51"
+IP_GNB_aw2s="172.28.3.98" # temporary
+#IP_GNB_aw2s="$P100.243" 
+IF_NAME_GNB_aw2s="$IF_NAME_VLAN30"
+#IF_NAME_GNB_aw2s="$IF_NAME_VLAN100"
+ADDR_jaguar="172.28.3.8" 
+#ADDR_jaguar="$P100.48" 
+#ADDR_panther="$P100.51" #panther no more accessible in the new setup
 
 ########################### oai-nr-ue rfsim chart parameters #####################
 OAI5G_NRUE="$OAI5G_CORE/oai-nr-ue"
@@ -481,12 +495,7 @@ function gener-mac()
 	else
 	    PREFIX="12:34:"
 	fi
-	PREFIX="12:34:"
-	case $IF_NAME_VLAN100 in
-	    "net-100")
-		PREFIX=$PREFIX"00:";;
-	    *)  PREFIX=$PREFIX"01:";;
-	esac
+	PREFIX="12:34:00:"
 	case $NODE_AMF_UPF in
 	    "sopnode-l1-v100")
 		PREFIX=$PREFIX"00:";;
@@ -799,14 +808,14 @@ s|@IF_NAME_GNB_N3@|$IF_NAME_N2N3|
 s|@MULTUS_GNB_RU1@|$MULTUS_GNB_RU1|
 s|@IP_GNB_RU1@|$IP_GNB_RU1|
 s|@NETMASK_GNB_RU1@|$NETMASK_GNB_RU|
-s|@MAC_GNB_RU1@|$(gener-mac)|
+s|@MAC_GNB_RU1@|$MAC_GNB_RU1|
 s|@GW_GNB_RU1@|$GW_GNB_RU1|
 s|@MTU_GNB_RU1@|$MTU_GNB_RU1|
 s|@IF_NAME_GNB_RU1@|$IF_NAME_GNB_RU1|
 s|@MULTUS_GNB_RU2@|$MULTUS_GNB_RU2|
 s|@IP_GNB_RU2@|$IP_GNB_RU2|
 s|@NETMASK_GNB_RU2@|$NETMASK_GNB_RU|
-s|@MAC_GNB_RU2@|$(gener-mac)|
+s|@MAC_GNB_RU2@|$MAC_GNB_RU2|
 s|@GW_GNB_RU2@|$GW_GNB_RU2|
 s|@MTU_GNB_RU2@|$MTU_GNB_RU2|
 s|@IF_NAME_GNB_RU2@|$IF_NAME_GNB_RU2|
