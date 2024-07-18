@@ -61,8 +61,6 @@ PREFIX_STATS="$TMP/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance"
 
 # Interfaces names of VLANs in sopnode servers
-#IF_NAME_VLAN100="net-100"
-#P100="192.168.100"
 IF_NAME_VLAN_N300_1="net-n300.1"
 IF_NAME_VLAN_N300_2="net-n300.2"
 IF_NAME_VLAN_N320_1="net-n320.1"
@@ -678,13 +676,13 @@ function configure-gnb() {
 	ADD_OPTIONS_GNB="$OPTIONS_n3xx"
 	QOS_GNB_DEF="true"
 	if [[ "$RRU" = "n300" ]]; then
-	    IF_NAME_GNB_RU1="$IF_NAME_N300_1"
-	    IF_NAME_GNB_RU2="$IF_NAME_N300_2"
+	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_N300_1"
+	    IF_NAME_GNB_RU2="$IF_NAME_VLAN_N300_2"
 	    IP_GNB_RU1="$IP_GNB_N300_1"
 	    IP_GNB_RU2="$IP_GNB_N300_2"
 	else
-	    IF_NAME_GNB_RU1="$IF_NAME_N320_1"
-	    IF_NAME_GNB_RU2="$IF_NAME_N320_2"
+	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_N320_1"
+	    IF_NAME_GNB_RU2="$IF_NAME_VLAN_N320_2"
 	    IP_GNB_RU1="$IP_GNB_N320_1"
 	    IP_GNB_RU2="$IP_GNB_N320_2"
 	fi
@@ -698,10 +696,10 @@ function configure-gnb() {
 	ADD_OPTIONS_GNB="$OPTIONS_aw2s"
 	QOS_GNB_DEF="true"
 	if [[ "$RRU" = "jaguar" ]]; then
-	    IF_NAME_GNB_RU1="$IF_NAME_GNB_JAGUAR"
+	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_JAGUAR"
 	    IP_GNB_RU1="$IP_GNB_JAGUAR"
 	else
-	    IF_NAME_GNB_RU1="$IF_NAME_GNB_PANTHER"
+	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_PANTHER"
 	    IP_GNB_RU1="$IP_GNB_PANTHER"
 	fi
 	
