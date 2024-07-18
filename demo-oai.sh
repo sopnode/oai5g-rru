@@ -450,8 +450,8 @@ CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.conf"
 CONF_DU_panther="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 OPTIONS_aw2s="--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
-IP_GNB_JAGUAR="172.28.4.132" 
-IP_GNB_PANTHER="172.28.4.196" 
+IP_GNB_JAGUAR="172.28.4.132" # @IP ADDR_jaguar + 3
+IP_GNB_PANTHER="172.28.4.196" # @IP ADDR_panther + 3
 ADDR_jaguar="172.28.4.129" 
 ADDR_panther="172.28.4.193" 
 
