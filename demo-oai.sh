@@ -63,10 +63,13 @@ OAISA_REPO="docker.io/oaisoftwarealliance"
 # Interfaces names of VLANs in sopnode servers
 #IF_NAME_VLAN100="net-100"
 #P100="192.168.100"
-IF_NAME_VLAN30="net-30"
-IF_NAME_VLAN31="net-31"
-#IF_NAME_VLAN30="net-10"
-#IF_NAME_VLAN31="net-20"
+IF_NAME_VLAN_N300_1="net-n300.1"
+IF_NAME_VLAN_N300_2="net-n300.2"
+IF_NAME_VLAN_N320_1="net-n320.1"
+IF_NAME_VLAN_N320_2="net-n320.2"
+IF_NAME_VLAN_JAGUAR="net-jaguar"
+IF_NAME_VLAN_PANTHER="net-panther"
+
 
 
 ############# Running-mode dependent parameters configuration ###############
@@ -264,11 +267,6 @@ R2LAB_REPO="docker.io/r2labuser"
 RAN_TAG="2024.w25"
 GNB_NAME="gNB-r2lab"
 
-#
-MAC_GNB_RU1="12:34:00:00:01:f1"
-MAC_GNB_RU2="12:34:00:00:01:f2"
-#
-
 # DU/CU SPLIT parameters
 #
 HOST_AMF="oai-amf"
@@ -436,17 +434,13 @@ CONF_DU_n300="$CONF_DU_n320"
 #OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 0,2,4,6,8,10,12,14,16 --log_config.global_log_options level,nocolor,time"
 OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --MACRLCs.[0].ul_max_mcs 14 --L1s.[0].max_ldpc_iterations 4 --log_config.global_log_options level,nocolor,time"
 #
-IP_GNB_SFP1="172.28.3.98" # temporary
-IP_GNB_SFP2="172.28.3.198" # temporary
-#IP_GNB_SFP1="192.168.10.132"
-#IP_GNB_SFP2="192.168.20.132"
+IP_GNB_N300_1="172.28.4.4" # @IP N300.1 + 3
+IP_GNB_N300_2="172.28.4.36" # @IP N300.2 + 3
+IP_GNB_N320_1="172.28.4.68" # @IP N320.1 + 3
+IP_GNB_N320_2="172.28.4.100" # @IP N320.2 + 3
 MTU_n3xx="9000"
-IF_NAME_n3xx_1="$IF_NAME_VLAN30"
-IF_NAME_n3xx_2="$IF_NAME_VLAN31"
-ADDRS_n300="addr=172.28.3.3,second_addr=172.28.3.131"
-ADDRS_n320="addr=172.28.3.7,second_addr=172.28.3.135"
-#ADDRS_n300="addr=192.168.10.129,second_addr=192.168.20.129"
-#ADDRS_n320="addr=192.168.10.130,second_addr=192.168.20.130"
+ADDRS_n300="addr=172.28.4.1,second_addr=172.28.4.33"
+ADDRS_n320="addr=172.28.4.65,second_addr=172.28.4.97"
 
 #### aw2s RU case ####
 #GNB_REPO_aw2s="${OAISA_REPO}/oai-gnb"
@@ -459,13 +453,11 @@ CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.conf"
 CONF_DU_panther="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 OPTIONS_aw2s="--sa --thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
-IP_GNB_aw2s="172.28.3.98" # temporary
-#IP_GNB_aw2s="$P100.243" 
-IF_NAME_GNB_aw2s="$IF_NAME_VLAN30"
-#IF_NAME_GNB_aw2s="$IF_NAME_VLAN100"
-ADDR_jaguar="172.28.3.8" 
-#ADDR_jaguar="$P100.48" 
-#ADDR_panther="$P100.51" #panther no more accessible in the new setup
+IP_GNB_JAGUAR="172.28.4.132" 
+IP_GNB_PANTHER="172.28.4.196" 
+ADDR_jaguar="172.28.4.129" 
+ADDR_panther="172.28.4.193" 
+
 
 ########################### oai-nr-ue rfsim chart parameters #####################
 OAI5G_NRUE="$OAI5G_CORE/oai-nr-ue"
@@ -680,27 +672,39 @@ function configure-gnb() {
     elif [[ "$RRU" = "n300" || "$RRU" = "n320" ]]; then
 	SDR_ADDRS=$(eval echo \"\${ADDRS_$RRU}\")
 	MULTUS_GNB_RU1="true"
-	IP_GNB_RU1="$IP_GNB_SFP1"
 	MTU_GNB_RU1="$MTU_n3xx"
-	IF_NAME_GNB_RU1="$IF_NAME_n3xx_1"
 	MULTUS_GNB_RU2="true"
-	IP_GNB_RU2="$IP_GNB_SFP2"
 	MTU_GNB_RU2="$MTU_n3xx"
-	IF_NAME_GNB_RU2="$IF_NAME_n3xx_2"
 	RRU_TYPE="n3xx"
 	ADD_OPTIONS_GNB="$OPTIONS_n3xx"
 	QOS_GNB_DEF="true"
+	if [[ "$RRU" = "n300" ]]; then
+	    IF_NAME_GNB_RU1="$IF_NAME_N300_1"
+	    IF_NAME_GNB_RU2="$IF_NAME_N300_2"
+	    IP_GNB_RU1="$IP_GNB_N300_1"
+	    IP_GNB_RU2="$IP_GNB_N300_2"
+	else
+	    IF_NAME_GNB_RU1="$IF_NAME_N320_1"
+	    IF_NAME_GNB_RU2="$IF_NAME_N320_2"
+	    IP_GNB_RU1="$IP_GNB_N320_1"
+	    IP_GNB_RU2="$IP_GNB_N320_2"
+	fi
 
     elif [[ "$RRU" = "jaguar" || "$RRU" = "panther" ]]; then
 	ADDR_aw2s=$(eval echo \"\${ADDR_$RRU}\")
 	GNB_aw2s_LOCAL_IF_NAME="ru1"
 	MULTUS_GNB_RU1="true"
-	IP_GNB_RU1="$IP_GNB_aw2s"
-	IF_NAME_GNB_RU1="$IF_NAME_GNB_aw2s"
 	MULTUS_GNB_RU2="false"
 	RRU_TYPE="aw2s"
 	ADD_OPTIONS_GNB="$OPTIONS_aw2s"
 	QOS_GNB_DEF="true"
+	if [[ "$RRU" = "jaguar" ]]; then
+	    IF_NAME_GNB_RU1="$IF_NAME_GNB_JAGUAR"
+	    IP_GNB_RU1="$IP_GNB_JAGUAR"
+	else
+	    IF_NAME_GNB_RU1="$IF_NAME_GNB_PANTHER"
+	    IP_GNB_RU1="$IP_GNB_PANTHER"
+	fi
 	
     elif [[ "$RRU" = "rfsim" ]]; then
 	MULTUS_GNB_RU1="false"
@@ -808,14 +812,14 @@ s|@IF_NAME_GNB_N3@|$IF_NAME_N2N3|
 s|@MULTUS_GNB_RU1@|$MULTUS_GNB_RU1|
 s|@IP_GNB_RU1@|$IP_GNB_RU1|
 s|@NETMASK_GNB_RU1@|$NETMASK_GNB_RU|
-s|@MAC_GNB_RU1@|$MAC_GNB_RU1|
+s|@MAC_GNB_RU1@|$(gener-mac)|
 s|@GW_GNB_RU1@|$GW_GNB_RU1|
 s|@MTU_GNB_RU1@|$MTU_GNB_RU1|
 s|@IF_NAME_GNB_RU1@|$IF_NAME_GNB_RU1|
 s|@MULTUS_GNB_RU2@|$MULTUS_GNB_RU2|
 s|@IP_GNB_RU2@|$IP_GNB_RU2|
 s|@NETMASK_GNB_RU2@|$NETMASK_GNB_RU|
-s|@MAC_GNB_RU2@|$MAC_GNB_RU2|
+s|@MAC_GNB_RU2@|$(gener-mac)|
 s|@GW_GNB_RU2@|$GW_GNB_RU2|
 s|@MTU_GNB_RU2@|$MTU_GNB_RU2|
 s|@IF_NAME_GNB_RU2@|$IF_NAME_GNB_RU2|
