@@ -61,6 +61,7 @@ PREFIX_STATS="$TMP/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance"
 
 # Interfaces names of VLANs in sopnode servers
+IF_NAME_N2N3_DEFAULT="eth1"
 IF_NAME_VLAN_N300_1="net-n300.1"
 IF_NAME_VLAN_N300_2="net-n300.2"
 IF_NAME_VLAN_N320_1="net-n320.1"
@@ -77,7 +78,7 @@ if [[ $RUN_MODE = "full" ]]; then
     # Local RAN, Local CN
     SUBNET_N2N3="192.168.128"
     NETMASK_N2N3="24"
-    IF_NAME_N2N3="net-100"
+    IF_NAME_N2N3="$IF_NAME_N2N3_DEFAULT"
     #
     ENABLED_MYSQL=true
     #
