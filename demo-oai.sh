@@ -696,9 +696,11 @@ function configure-gnb() {
 	RRU_TYPE="aw2s"
 	ADD_OPTIONS_GNB="$OPTIONS_aw2s"
 	QOS_GNB_DEF="true"
+	echo "%%%%%%%%%%%%%%%%%%%%%%%%%%% before jaguar setting, RRU=$RRU"
 	if [[ "$RRU" = "jaguar" ]]; then
 	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_JAGUAR"
 	    IP_GNB_RU1="$IP_GNB_jaguar"
+	    echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% jaguar setting: IP GNB is $IP_GNB_jaguar"
 	else
 	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_PANTHER"
 	    IP_GNB_RU1="$IP_GNB_panther"
