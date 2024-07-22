@@ -690,7 +690,6 @@ function configure-gnb() {
 
     elif [[ "$RRU" = "jaguar" || "$RRU" = "panther" ]]; then
 	ADDR_aw2s=$(eval echo \"\${ADDR_$RRU}\")
-	GNB_aw2s_LOCAL_IF_NAME="ru1"
 	MULTUS_GNB_RU1="true"
 	MULTUS_GNB_RU2="false"
 	RRU_TYPE="aw2s"
