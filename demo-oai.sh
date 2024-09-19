@@ -1108,14 +1108,14 @@ function start-nr-ue() {
     echo "cd $OAI5G_RAN"
     cd "$OAI5G_RAN"
 
-    echo "retrieve gNB/DU IP"
-    if [[ $GNB_MODE == 'monolithic' ]]; then
-	GNB_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
-    else
-	GNB_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
-    fi
-    echo "sed set rfSimServer to $GNB_SIM in ${OAI5G_RAN}/oai-nr-ue/values.yaml"
-    sed -i "s/rfSimServer:.*/rfSimServer: \"$GNB_IP\"/" ${OAI5G_RAN}/oai-nr-ue/values.yaml
+    #echo "retrieve gNB/DU IP"
+    #if [[ $GNB_MODE == 'monolithic' ]]; then
+	#GNB_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[*].status.podIP}")
+    #else
+	#GNB_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
+    #fi
+    #echo "sed set rfSimServer to $GNB_IP in ${OAI5G_RAN}/oai-nr-ue/values.yaml"
+    #sed -i "s/rfSimServer:.*/rfSimServer: \"$GNB_IP\"/" ${OAI5G_RAN}/oai-nr-ue/values.yaml
 
     echo "helm -n $NS install oai-nr-ue oai-nr-ue/" 
     helm -n $NS install oai-nr-ue oai-nr-ue/
