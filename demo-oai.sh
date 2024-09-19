@@ -129,6 +129,14 @@ if [[ $RUN_MODE = "full" ]]; then
     GW_UPF_N6=""
     ROUTES_UPF_N6=""
     IF_NAME_UPF_N6=""
+    # TS chart
+    ENABLED_TS=true
+    MULTUS_TS="$MULTUS_UPF_N6"
+    NETMASK_TS=""
+    IP_TS=""
+    GW_TS=""
+    IF_NAME_TS=""
+    NODE_TS="$NODE_AMF_UPF"
     # smf chart
     ENABLED_SMF=true
     NFS_SMF_HOST="oai-smf"
@@ -206,7 +214,8 @@ else
 	GW_UPF_N6=""
 	ROUTES_UPF_N6=""
 	IF_NAME_UPF_N6=""
-	
+	# TS
+	ENABLED_TS=false
 	# ran charts
 	MULTUS_GNB_N2="true"
 	IP_GNB_N2="$SUBNET_N2N3.223"
@@ -574,6 +583,14 @@ s|@GW_UPF_N6@|$GW_UPF_N6|
 s|@ROUTES_UPF_N6@|$ROUTES_UPF_N6|
 s|@IF_NAME_UPF_N6@|$IF_NAME_UPF_N6|
 s|@NODE_UPF@|"$NODE_AMF_UPF"|
+s|@ENABLED_TS@|$ENABLED_TS|
+s|@MULTUS_TS@|$MULTUS_TS|
+s|@IP_TS@|$IP_TS|
+s|@NETMASK_TS@|$NETMASK_TS|
+s|@MAC_TS|$(gener-mac)|
+s|@GW_TS@|$GW_TS|
+s|@IF_NAME_TS@|$IF_NAME_TS|
+s|@NODE_TS@|"$NODE_TS"|
 s|@ENABLED_SMF@|$ENABLED_SMF|
 s|@MULTUS_SMF_N4@|$MULTUS_SMF_N4|
 s|@IP_SMF_N4@|$IP_SMF_N4|
