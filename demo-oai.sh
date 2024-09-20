@@ -597,7 +597,7 @@ s|@ENABLED_TS@|$ENABLED_TS|
 s|@MULTUS_TS@|$MULTUS_TS|
 s|@IP_TS@|$IP_TS|
 s|@NETMASK_TS@|$NETMASK_TS|
-s|@MAC_TS|$(gener-mac)|
+s|@MAC_TS@|$(gener-mac)|
 s|@GW_TS@|$GW_TS|
 s|@IF_NAME_TS@|$IF_NAME_TS|
 s|@NODE_TS@|"$NODE_TS"|
