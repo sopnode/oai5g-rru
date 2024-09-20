@@ -1388,7 +1388,7 @@ function get-all-logs() {
 	kubectl --namespace $NS -c gnbdu logs $DU_POD_NAME > "$prefix"/du-"$DATE".logs
 	echo "Retrieve cu/du configs from the pods"
 	kubectl -c oai-cu cp $NS/$CU_POD_NAME:/tmp/cu.conf $prefix/cu.conf || true
-	kubectl -c oaidu cp $NS/$DU_POD_NAME:/tmp/du.conf $prefix/du.conf || true
+	kubectl -c gnbdu cp $NS/$DU_POD_NAME:/tmp/du.conf $prefix/du.conf || true
     else
 	# $GNB_MODE = 'cucpup'
 	CUCP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oaicucp" -o jsonpath="{.items[0].metadata.name}")
