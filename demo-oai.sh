@@ -140,7 +140,7 @@ if [[ $RUN_MODE = "full" ]]; then
     NETMASK_TS="$NETMASK_N6"
     GW_TS=""
     IF_NAME_TS="$IF_NAME_N6"
-    UPF_HOST="$IP_UPF_N6"
+    UPF_HOST="$NFS_UPF_HOST"
     NODE_TS="$NODE_AMF_UPF"
     # smf chart
     ENABLED_SMF=true
