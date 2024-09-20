@@ -8,7 +8,7 @@ MNC="01" # default is "95"
 TAC="1" # default is "1"
 #DNN0 and DNN1 must be set in demo-oai.py or prepare-demo-oai.sh to configure Quectel UE
 SLICE1_SST="1"
-SLICE1_SD="2"; MYSQL_SLICE1_SD="2"
+SLICE1_SD="16777215"; MYSQL_SLICE1_SD="1"
 #SLICE1_SD="000002"; MYSQL_SLICE1_SD="2"
 SLICE1_5QI="5" # non-GBR
 SLICE1_UPLINK="20Mbps"
