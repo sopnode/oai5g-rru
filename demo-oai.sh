@@ -62,6 +62,7 @@ OAISA_REPO="docker.io/oaisoftwarealliance"
 
 # Interfaces names of VLANs in sopnode servers
 IF_NAME_N2N3_DEFAULT="net-100"
+IF_NAME_N6_DEFAULT="net-100"
 IF_NAME_VLAN_N300_1="net-n300.1"
 IF_NAME_VLAN_N300_2="net-n300.2"
 IF_NAME_VLAN_N320_1="net-n320.1"
@@ -77,8 +78,11 @@ IF_NAME_VLAN_PANTHER="net-panther"
 if [[ $RUN_MODE = "full" ]]; then
     # Local RAN, Local CN
     SUBNET_N2N3="192.168.128"
+    SUBNET_N6="192.168.130"
     NETMASK_N2N3="24"
+    NETMASK_N6="24"
     IF_NAME_N2N3="$IF_NAME_N2N3_DEFAULT"
+    IF_NAME_N6="$IF_NAME_N6_DEFAULT"
     #
     ENABLED_MYSQL=true
     #
@@ -123,19 +127,19 @@ if [[ $RUN_MODE = "full" ]]; then
     GW_UPF_N4=""
     ROUTES_UPF_N4=""
     IF_NAME_UPF_N4=""
-    MULTUS_UPF_N6="false"
-    IP_UPF_N6="" 
-    NETMASK_UPF_N6=""
+    MULTUS_UPF_N6="true"
+    IP_UPF_N6="$SUBNET_N6.2" 
+    NETMASK_UPF_N6="$NETMASK_N6"
     GW_UPF_N6=""
     ROUTES_UPF_N6=""
-    IF_NAME_UPF_N6=""
+    IF_NAME_UPF_N6="$IF_NAME_N6"
     # TS chart
     ENABLED_TS=true
     MULTUS_TS="$MULTUS_UPF_N6"
-    NETMASK_TS=""
-    IP_TS=""
+    IP_TS="$SUBNET_N6.3"
+    NETMASK_TS="$NETMASK_N6"
     GW_TS=""
-    IF_NAME_TS=""
+    IF_NAME_TS="$IF_NAME_N6"
     NODE_TS="$NODE_AMF_UPF"
     # smf chart
     ENABLED_SMF=true
