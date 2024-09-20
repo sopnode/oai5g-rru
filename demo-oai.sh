@@ -299,7 +299,7 @@ ROUTES_DU_F1=""
 IF_NAME_DU_F1="$IF_NAME_N2N3"
 #
 NAME_DU="oai-du"
-CU_HOST="oai-cu"
+CU_HOST_FROM_DU="oai-cu"
 QOS_DU_DEF="true"
 NODE_DU="$NODE_GNB"
 #
@@ -873,7 +873,7 @@ s|@GW_DU_F1@|$GW_DU_F1|
 s|@ROUTES_DU_F1@|$ROUTES_DU_F1|
 s|@IF_NAME_DU_F1@|$IF_NAME_DU_F1|
 s|@NAME_DU@|$NAME_DU|
-s|@CU_HOST@|$CU_HOST|
+s|@CU_HOST_FROM_DU@|$CU_HOST_FROM_DU|
 s|@QOS_DU_DEF@|$QOS_DU_DEF|
 s|@NODE_DU@|$NODE_DU|
 
@@ -970,6 +970,7 @@ s|@HOST_CUCP@|$HOST_CUCP|
 s|@N2IFNAME_CUUP@|$N2IFNAME_CUUP|
 s|@N3IFNAME_CUUP@|$N3IFNAME_CUUP|
 s|@QOS_CUUP_DEF@|$QOS_CUUP_DEF|
+s|@CU_HOST@|$CU_HOST|
 s|@NODE_CUUP@|$NODE_CUUP|
 EOF
     for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
