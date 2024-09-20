@@ -154,9 +154,11 @@ if [[ $RUN_MODE = "full" ]]; then
     GNB_N2_IF_NAME="n2"
     MULTUS_GNB_N3="false"
     if [[ $GNB_MODE = 'cucpup' ]]; then
+	F1IFNAME="f1c"
 	IP_GNB_N3="$SUBNET_N2N3.204"
 	IP_NRUE="$SUBNET_N2N3.205"
     else
+	F1IFNAME="f1"
 	IP_GNB_N3="$IP_GNB_N2"
 	IP_NRUE="$SUBNET_N2N3.204"
     fi
@@ -280,7 +282,6 @@ GNB_NAME="gNB-r2lab"
 HOST_AMF="oai-amf"
 NODE_CU="sopnode-w1-v100" # same node used for cu/cu-cp/cu-up
 
-F1IFNAME="f1"
 E1IFNAME="e1"
 F1CUPORT="2152"
 F1DUPORT="2152"
@@ -331,7 +332,6 @@ IF_NAME_CU_N3=""
 ADD_OPTIONS_CU="--sa --log_config.global_log_options level,nocolor,time"
 NAME_CU="oai-cu"
 HOST_CU="oai-cu"
-F1IFNAME="f1" 
 N2IFNAME_CU="n2" 
 N3IFNAME_CU="n2"
 QOS_CU_DEF="true"
