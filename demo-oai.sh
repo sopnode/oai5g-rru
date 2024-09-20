@@ -331,7 +331,7 @@ IF_NAME_CU_N3=""
 #
 ADD_OPTIONS_CU="--sa --log_config.global_log_options level,nocolor,time"
 NAME_CU="oai-cu"
-HOST_CU="oai-cu"
+HOST_CU="$"
 N2IFNAME_CU="n2" 
 N3IFNAME_CU="n2"
 QOS_CU_DEF="true"
@@ -398,11 +398,17 @@ IF_NAME_CUUP_F1="$IF_NAME_N2N3"
 #
 ADD_OPTIONS_CUUP="--sa"
 NAME_CUUP="oai-cuup"
-HOST_CUCP="oai-cu"
+HOST_CUCP="$IP_CUCP_E1"   #"oai-cu"
 N2IFNAME_CUUP="n3"
 N3IFNAME_CUUP="n3"
 QOS_CUUP_DEF="true"
 NODE_CUUP="$NODE_CU"
+
+if [[ $GNB_MODE = 'cucpup' ]]; then
+    CU_HOST="$IP_CUCP_E1"
+else
+    CU_HOST="oai-cu"
+fi
 #
 ########## GNB Monolithic specific part ################
 #
@@ -898,7 +904,6 @@ s|@IF_NAME_CU_N3@|$IF_NAME_CU_N3|
 s|@ADD_OPTIONS_CU@|$ADD_OPTIONS_CU|
 s|@NAME_CU@|$NAME_CU|
 s|@HOST_AMF@|$HOST_AMF|
-s|@HOST_CU@|$HOST_CU|
 s|@N2IFNAME_CU@|$N2IFNAME_CU|
 s|@N3IFNAME_CU@|$N3IFNAME_CU|
 s|@QOS_CU_DEF@|$QOS_CU_DEF|
