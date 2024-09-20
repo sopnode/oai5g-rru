@@ -407,7 +407,7 @@ if [[ $GNB_MODE = 'cucpup' ]]; then
     CU_HOST_FROM_DU="$IP_CUCP_F1"
 else
     CU_HOST="oai-cu"
-    CU_HOST_FROM_DU="oai-cu"
+    CU_HOST_FROM_DU="$IP_CU_F1"
 fi
 #
 ########## GNB Monolithic specific part ################
