@@ -299,7 +299,6 @@ ROUTES_DU_F1=""
 IF_NAME_DU_F1="$IF_NAME_N2N3"
 #
 NAME_DU="oai-du"
-CU_HOST_FROM_DU="oai-cu"
 QOS_DU_DEF="true"
 NODE_DU="$NODE_GNB"
 #
@@ -406,8 +405,10 @@ NODE_CUUP="$NODE_CU"
 
 if [[ $GNB_MODE = 'cucpup' ]]; then
     CU_HOST="$IP_CUCP_E1"
+    CU_HOST_FROM_DU="$IP_CUCP_F1"
 else
     CU_HOST="oai-cu"
+    CU_HOST_FROM_DU="oai-cu"
 fi
 #
 ########## GNB Monolithic specific part ################
