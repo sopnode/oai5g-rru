@@ -770,7 +770,7 @@ function configure-gnb() {
     cat $TMP/gnb.conf >> $TMP/configmap.yaml
 
     echo "Configure gnb parameters within configmap.yaml"
-    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = $SLICE1_SD }) });"
+    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = 0x$SLICE1_SD }) });"
     mv $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
     cat > "$SED_CONF_FILE" <<EOF
