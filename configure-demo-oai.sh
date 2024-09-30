@@ -8,13 +8,19 @@ MNC="01" # default is "95"
 TAC="1" # default is "1"
 #DNN0 and DNN1 must be set in demo-oai.py or prepare-demo-oai.sh to configure Quectel UE
 SLICE1_SST="1"
-#SLICE1_SD="000002"; MYSQL_SLICE1_SD="000002"
-SLICE1_SD="FFFFFF"; MYSQL_SLICE1_SD="FFFFFF"
+#SLICE1_SD="000002"
+#
+# NOTA on SD format encoding in the charts
+# - in mysql database, SD field is a string/hexadecimal without 0x prefix,
+#    and encoded with the format: \"ABCDEF\"
+# - in gNB configmaps sd format should include 0x prexix or use the decimal form
+# - in core/config.yaml and ue/values.yaml, it is in hex form without 0x prefix
+SLICE1_SD="ABCDEF"
 SLICE1_5QI="5" # non-GBR
 SLICE1_UPLINK="20Mbps"
 SLICE1_DOWNLINK="40Mbps"
 SLICE2_SST="1"
-SLICE2_SD="FFFFFF"; MYSQL_SLICE2_SD="16777215"
+SLICE2_SD="FFFFFF"
 SLICE2_5QI="6" # non-GBR
 SLICE2_UPLINK="100Mbps"
 SLICE2_DOWNLINK="200Mbps"
@@ -71,13 +77,11 @@ s|@DEF_DNN0@|${DNN0}|
 s|@DEF_DNN1@|${DNN1}|
 s|@DEF_SLICE1_SST@|${SLICE1_SST}|
 s|@DEF_SLICE1_SD@|${SLICE1_SD}|
-s|@DEF_MYSQL_SLICE1_SD@|${MYSQL_SLICE1_SD}|
 s|@DEF_SLICE1_5QI@|${SLICE1_5QI}|
 s|@DEF_SLICE1_UPLINK@|${SLICE1_UPLINK}|
 s|@DEF_SLICE1_DOWNLINK@|${SLICE1_DOWNLINK}|
 s|@DEF_SLICE2_SST@|${SLICE2_SST}|
 s|@DEF_SLICE2_SD@|${SLICE2_SD}|
-s|@DEF_MYSQL_SLICE2_SD@|${MYSQL_SLICE2_SD}|
 s|@DEF_SLICE2_5QI@|${SLICE2_5QI}|
 s|@DEF_SLICE2_UPLINK@|${SLICE2_UPLINK}|
 s|@DEF_SLICE2_DOWNLINK@|${SLICE2_DOWNLINK}|

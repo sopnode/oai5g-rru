@@ -762,15 +762,27 @@ function configure-gnb() {
     fi
     
     echo "Insert the right gNB conf file $CONF_ORIG in the right configmap.yaml"
-    # Keep the 8 first lines of configmap.yaml
+    # Keep the first ${NB_LINES} lines of configmap.yaml
     head -${NB_LINES}  "$DIR_TEMPLATES"/configmap.yaml > $TMP/configmap.yaml
     # Add a 6-characters margin to gnb.conf
     awk '$0="      "$0' "$CONF_ORIG" > $TMP/gnb.conf
     # Append the modified gnb.conf to $TMP/configmap.yaml
     cat $TMP/gnb.conf >> $TMP/configmap.yaml
 
-    echo "Configure gnb parameters within configmap.yaml"
-    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = 0x$SLICE1_SD }) });"
+    echo "Configure configmap.yaml of oai-gnb/oai-du"
+    if [[ ! -z $SLICE1_SD ]]; then
+	if [[ ! -z $SLICE2_SD ]]; then
+	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = 0x$SLICE1_SD }, { sst = $SLICE2_SST; sd = 0x$SLICE2_SD }) });"
+	else
+	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = 0x$SLICE1_SD }, { sst = $SLICE2_SST }) });"
+	fi
+    else
+	if [[ ! -z $SLICE2_SD ]]; then
+	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST }, { sst = $SLICE2_SST; sd = 0x$SLICE2_SD }) });"
+	else
+	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST }, { sst = $SLICE2_SST }) });"
+	fi
+    fi
     mv $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
 
     cat > "$SED_CONF_FILE" <<EOF
@@ -815,7 +827,14 @@ EOF
 
     # Configure gNB values.yaml charts
 
-    echo "Then configure gNB charts"
+    if [[ ! -z $SLICE1_SD ]]; then
+	SED_SD1="s|@SD1@|0x$SLICE1_SD|"
+    fi
+    if [[ ! -z $SLICE2_SD ]]; then
+	SED_SD2="s|@SD2@|0x$SLICE2_SD|"
+    fi
+    
+    echo "Then configure oai-gnb, oai-du, oai-cu, oai-cu-cp, oai-cu-up values charts"
     cat > "$SED_VALUES_FILE" <<EOF
 s|@GNB_REPO@|$GNB_REPO|
 s|@GNB_TAG@|$GNB_TAG|
@@ -849,6 +868,10 @@ s|@MAC_GNB_RU2@|$(gener-mac)|
 s|@GW_GNB_RU2@|$GW_GNB_RU2|
 s|@MTU_GNB_RU2@|$MTU_GNB_RU2|
 s|@IF_NAME_GNB_RU2@|$IF_NAME_GNB_RU2|
+s|@SST1@|$SLICE1_SST|
+${SED_SD1}
+s|@SST2@|$SLICE2_SST|
+${SED_SD2}
 s|@RRU_TYPE@|$RRU_TYPE|
 s|@ADD_OPTIONS_GNB@|$ADD_OPTIONS_GNB|
 s|@GNB_NAME@|$GNB_NAME|
