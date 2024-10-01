@@ -1414,12 +1414,12 @@ function get-all-logs() {
 	kubectl -c gnbdu cp $NS/$DU_POD_NAME:/tmp/du.conf $prefix/du.conf || true
     else
 	# $GNB_MODE = 'cucpup'
-	CUCP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oaicucp" -o jsonpath="{.items[0].metadata.name}")
-	CUCP_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oaicucp" -o jsonpath="{.items[*].status.podIP}")
+	CUCP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-cp" -o jsonpath="{.items[0].metadata.name}")
+	CUCP_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-cp" -o jsonpath="{.items[*].status.podIP}")
 	echo -e "\t - Retrieving logs for oaicucp $CUCP_POD_NAME running with IP $CUCP_eth0_IP"
 	kubectl --namespace $NS -c oaicucp logs $CUCP_POD_NAME > "$prefix"/cucp-"$DATE".logs
-	CUUP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oaicuup" -o jsonpath="{.items[0].metadata.name}")
-	CUUP_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oaicuup" -o jsonpath="{.items[*].status.podIP}")
+	CUUP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-up" -o jsonpath="{.items[0].metadata.name}")
+	CUUP_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-up" -o jsonpath="{.items[*].status.podIP}")
 	echo -e "\t - Retrieving logs for oaicuup $CUUP_POD_NAME running with IP $CUUP_eth0_IP"
 	kubectl --namespace $NS -c oaicuup logs $CUUP_POD_NAME > "$prefix"/cuup-"$DATE".logs
 	DU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[0].metadata.name}")
