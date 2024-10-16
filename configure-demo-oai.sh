@@ -130,14 +130,14 @@ EOF
     DIR_GENERIC_DB="$PREFIX_DEMO/oai5g-rru/patch-mysql"
     if [[ "$DNN1" = "none" ]]; then
 	echo "Patching oai_db-basic.sql generic database for R2lab UEs with DNN0 only"
-	oai_db-basic-template="oai_db-basic-generic.sql"
+	oai_db_basic_template="oai_db-basic-generic.sql"
     else
 	echo "Patching oai_db-basic.sql generic database for R2lab UEs with both DNN0 and DNN1"
-	oai_db-basic-template="oai_db-basic-generic-2dnn.sql"
+	oai_db_basic_template="oai_db-basic-generic-2dnn.sql"
     fi
-    cp $DIR_GENERIC_DB/${oai_db-basic-template} /tmp/${oai_db-basic-template}
-    sed -f /tmp/demo-oai.sed < /tmp/${oai_db-basic-template} > $DIR_GENERIC_DB/oai_db-basic.sql
-    diff $DIR_GENERIC_DB/${oai_db-basic-template} $DIR_GENERIC_DB/oai_db-basic.sql
+    cp $DIR_GENERIC_DB/${oai_db_basic_template} /tmp/${oai_db_basic_template}
+    sed -f /tmp/demo-oai.sed < /tmp/${oai_db_basic_template} > $DIR_GENERIC_DB/oai_db-basic.sql
+    diff $DIR_GENERIC_DB/${oai_db_basic_template} $DIR_GENERIC_DB/oai_db-basic.sql
 
 }
 
