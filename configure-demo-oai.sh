@@ -12,14 +12,15 @@ TAC="1"
 DNN0_PDU_TYPE="IPV4" # "IPV4" or "IPV4V6"
 DNN1_PDU_TYPE="IPV4" # "IPV4" or "IPV4V6"
 
-SLICE1_SST="1"
+# NSSAI (SST,SD) Configuration
 #
 # NOTA on SD format encoding in the charts
 # - in mysql database, SD field is a string/hexadecimal without 0x prefix,
 #    and encoded with the format: \"ABCDEF\"
 # - in gNB configmaps sd format should include 0x prexix or use the decimal form
 # - in core/config.yaml and ue/values.yaml, it is in hex form without 0x prefix
-SLICE1_SD="ABCDEF"
+SLICE1_SST="1"
+SLICE1_SD="000002"
 SLICE1_5QI="5" # non-GBR
 SLICE1_ARP_PRIORITY_LEVEL="15"
 SLICE1_ARP_PREEMPT_CAP="NOT_PREEMPT" # "NOT_PREEMPT" or "MAY_PREEMPT" # to trigger preemption
@@ -29,7 +30,7 @@ SLICE1_UPLINK="20Mbps"
 SLICE1_DOWNLINK="40Mbps"
 
 SLICE2_SST="1"
-SLICE2_SD="FFFFFF"
+SLICE2_SD="000003"
 SLICE2_5QI="6" # non-GBR
 SLICE2_ARP_PRIORITY_LEVEL="15"
 SLICE2_ARP_PREEMPT_CAP="NOT_PREEMPT" # "NOT_PREEMPT" or "MAY_PREEMPT" # to trigger preemption
