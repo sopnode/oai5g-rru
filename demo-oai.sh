@@ -1470,12 +1470,42 @@ function get-ran-pcap(){
 
     DATE=`date +"%Y-%m-%dT%H.%M.%S"`
 
-    GNB_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-gnb,app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[0].metadata.name}")
-    echo "Retrieve OAI5G gnb pcap file from the oai-gnb pod on ns $NS"
-    echo "kubectl -c tcpdump -n $NS exec -i $GNB_POD_NAME -- /bin/tar cfz gnb-pcap.tgz pcap"
-    kubectl -c tcpdump -n $NS exec -i $GNB_POD_NAME -- /bin/tar cfz gnb-pcap.tgz pcap || true
-    echo "kubectl -c tcpdump cp $NS/$GNB_POD_NAME:gnb-pcap.tgz $prefix/gnb-pcap-"$DATE".tgz"
-    kubectl -c tcpdump cp $NS/$GNB_POD_NAME:gnb-pcap.tgz $prefix/gnb-pcap-"$DATE".tgz || true
+    if [[ $GNB_MODE = 'monolithic' ]]; then
+	GNB_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-gnb,app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[0].metadata.name}")
+	echo "Retrieve OAI5G gnb pcap file from the oai-gnb pod on ns $NS"
+	echo "kubectl -c tcpdump -n $NS exec -i $GNB_POD_NAME -- /bin/tar cfz gnb-pcap.tgz -C tmp pcap"
+	kubectl -c tcpdump -n $NS exec -i $GNB_POD_NAME -- /bin/tar cfz gnb-pcap.tgz -C tmp pcap || true
+	echo "kubectl -c tcpdump cp $NS/$GNB_POD_NAME:gnb-pcap.tgz $prefix/gnb-pcap-"$DATE".tgz"
+	kubectl -c tcpdump cp $NS/$GNB_POD_NAME:gnb-pcap.tgz $prefix/gnb-pcap-"$DATE".tgz || true
+    else
+	DU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[0].metadata.name}")
+	echo "Retrieve OAI5G du pcap file from the oai-du pod on ns $NS"
+	echo "kubectl -c tcpdump -n $NS exec -i $DU_POD_NAME -- /bin/tar cfz du-pcap.tgz -C tmp pcap"
+	kubectl -c tcpdump -n $NS exec -i $DU_POD_NAME -- /bin/tar cfz du-pcap.tgz -C tmp pcap || true
+	echo "kubectl -c tcpdump cp $NS/$DU_POD_NAME:du-pcap.tgz $prefix/du-pcap-"$DATE".tgz"
+	kubectl -c tcpdump cp $NS/$GNB_POD_NAME:du-pcap.tgz $prefix/du-pcap-"$DATE".tgz || true
+	if [[ $GNB_MODE = 'cudu' ]]; then
+	    CU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu" -o jsonpath="{.items[0].metadata.name}")
+	    echo "Retrieve OAI5G cu pcap file from the oai-cu pod on ns $NS"
+	    echo "kubectl -c tcpdump -n $NS exec -i $CU_POD_NAME -- /bin/tar cfz cu-pcap.tgz -C tmp pcap"
+	    kubectl -c tcpdump -n $NS exec -i $CU_POD_NAME -- /bin/tar cfz cu-pcap.tgz -C tmp pcap || true
+	    echo "kubectl -c tcpdump cp $NS/$CU_POD_NAME:cu-pcap.tgz $prefix/cu-pcap-"$DATE".tgz"
+	    kubectl -c tcpdump cp $NS/$CU_POD_NAME:cu-pcap.tgz $prefix/cu-pcap-"$DATE".tgz || true
+	else
+	    CUCP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-cp" -o jsonpath="{.items[0].metadata.name}")
+	    echo "Retrieve OAI5G cucp pcap file from the oai-cu-cp pod on ns $NS"
+	    echo "kubectl -c tcpdump -n $NS exec -i $CUCP_POD_NAME -- /bin/tar cfz cucp-pcap.tgz -C tmp pcap"
+	    kubectl -c tcpdump -n $NS exec -i $CUCP_POD_NAME -- /bin/tar cfz cucp-pcap.tgz -C tmp pcap || true
+	    echo "kubectl -c tcpdump cp $NS/$CUCP_POD_NAME:cucp-pcap.tgz $prefix/cucp-pcap-"$DATE".tgz"
+	    kubectl -c tcpdump cp $NS/$CUCP_POD_NAME:cucp-pcap.tgz $prefix/cucp-pcap-"$DATE".tgz || true
+	    CUUP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-up" -o jsonpath="{.items[0].metadata.name}")
+	    echo "Retrieve OAI5G cuup pcap file from the oai-cu-up pod on ns $NS"
+	    echo "kubectl -c tcpdump -n $NS exec -i $CUUP_POD_NAME -- /bin/tar cfz cuup-pcap.tgz -C tmp pcap"
+	    kubectl -c tcpdump -n $NS exec -i $CUUP_POD_NAME -- /bin/tar cfz cuup-pcap.tgz -C tmp pcap || true
+	    echo "kubectl -c tcpdump cp $NS/$CUUP_POD_NAME:cuup-pcap.tgz $prefix/cuup-pcap-"$DATE".tgz"
+	    kubectl -c tcpdump cp $NS/$CUUP_POD_NAME:cuup-pcap.tgz $prefix/cuup-pcap-"$DATE".tgz || true
+	fi
+    fi
 }
 
 #################################################################################
