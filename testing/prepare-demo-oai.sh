@@ -45,6 +45,8 @@ DNN1="internet"
 #DNN1="none"
 
 # logs configuration
+# logs and pcap are automatically retrieved when running demo-oai.sh stop in /tmp/tmp.root/oai5g-stats.tgz
+# you should manually erase /tmp/tmp.root/oai5g-stats directory before running another scenario to prevent retrieving old logs/pcaps
 LOGS="true"
 PCAP="false"
 #PCAP="true"
