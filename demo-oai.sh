@@ -288,7 +288,7 @@ GNB_NAME="gNB-r2lab"
 # DU/CU SPLIT parameters
 #
 HOST_AMF="oai-amf"
-NODE_CU="sopnode-w1-v100" # same node used for cu/cu-cp/cu-up
+NODE_CU="$NODE_GNB" # same node used for cu/cu-cp/cu-up and du
 
 E1IFNAME="e1"
 F1CUPORT="2152"
