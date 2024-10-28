@@ -190,6 +190,16 @@ The latter command will take into account your changes to reconfigure the charts
 
 Note that we don't use "--start" option in this case as this option skips the reconfiguration step. 
 
+The demo-oai.sh script automatically configure the UE devices selected with the options of the demo-oai.sh script. You can also decide to manually manage UE to/from the gNB. For instance, the qhat01 UE can be controlled using the following commands:
+
+* To switch on qhat01, you should run from the faraday gateway:
+``` rhubarbe pdu on qhat01 ```
+* In less than 30s you should be able to ssh to qhat01 from the faraday gateway:
+``` ssh root@qhat01 ```
+* Then you should configure the qhat01 UE using the command ``` root@qhat03:~# prepare-ue ```. This operation takes about 2 minutes and it is recommended to run it before starting the gNB.
+* After that, you can run the gNB and use on the qhat01 UE the command ```start.sh or stop.sh``` to connect and disconnect to/from the 5G network. Regarding the start.sh command, the default DNN is "oai.ipv4", you can specify another one using the -F option, e.g., ``` root@qhat03:~# start.sh -F oai ``` will specify the "oai" DNN.
+* Then run ``` root@qhat03:~# stop.sh ``` to disconnect from the 5G network.
+* Once you are done, use the following command to switch off the qhat01 UE from the faraday gateway: ``` rhubarbe pdu off qhat01 ```
 
 ### Cleanup
 
