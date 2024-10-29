@@ -1,4 +1,4 @@
-ag#!/bin/bash
+#!/bin/bash
 
 function usage() {
     echo "USAGE:"
