@@ -1,4 +1,4 @@
-#!/bin/bash
+ag#!/bin/bash
 
 function usage() {
     echo "USAGE:"
@@ -282,7 +282,7 @@ OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 #
 #RAN_TAG="2024.w25"
-RAN_TAG="2024.w41"
+RAN_TAG="2024.w43"
 GNB_NAME="gNB-r2lab"
 
 # DU/CU SPLIT parameters
