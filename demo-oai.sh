@@ -1247,7 +1247,7 @@ EOF
     if [[ "$RUN_MODE" != "gnb-only" ]]; then
 	start-cn 
     fi
-    echo "sleep 8s before running RAN pods"; sleep 8
+    echo "sleep 20s before running RAN pods"; sleep 20
     start-gnb 
 
     if [[ "$RRU" == "rfsim" ]]; then
