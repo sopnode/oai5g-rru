@@ -26,7 +26,7 @@ jobs:
           wget https://raw.githubusercontent.com/sopnode/oai5g-rru/$BRANCH/testing/prepare-demo-oai.sh -O $OAI5G/prepare-demo-oai.sh
           chmod a+x $OAI5G/prepare-demo-oai.sh
           echo "configure oai5g-rru demo script"
-          $OAI5G/prepare-demo-oai.sh $BRANCH
+          $OAI5G/prepare-demo-oai.sh -a -B $BRANCH
           echo "retrieve local run.sh script"
           cp $WORK/local-scripts/run.sh $OAI5G/
           echo "Check/book R2lab slice"
