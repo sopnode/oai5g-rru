@@ -29,11 +29,11 @@ RUN_MODE="full"
 #RUN_MODE="gnb-only"
 
 # RAN options
-RRU="jaguar"
+#RRU="jaguar"
 #RRU="panther"
 #RRU="rfsim"
 #RRU="b210"
-#RRU="n300"
+RRU="n300"
 #RRU="n320"
 GNB_MODE="cudu"
 #GNB_MODE="cucpup"
