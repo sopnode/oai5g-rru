@@ -60,23 +60,15 @@ RC_MAIL="r2labuser@turletti.com"
 DIR="$(pwd)"
 COMMAND=$(basename $0)
 
-function usage() {
-    echo "USAGE:"
-    echo "$(basename $0): Invalid option"
-    echo "$COMMAND all: git pull the latest code and configure the OAI5G charts for the target scenario"
-    echo "$COMMAND pull: git pull the latest code. If necessary, you can manually modify the scripts before running configure."
-    echo "$COMMAND configure: configure the OAI5G charts for the target scenario, configure must only be run after a fresh pull, i.e., 2 consecutive configure will fail."
-    exit 1
-}
-
 function git_pull(){
 
     echo "Step 1: clean up previous oai5g-rru and oai-cn5g-fed.git local directories if any"
     cd $DIR
     rm -rf oai5g-rru oai-cn5g-fed
     echo "$0: Clone oai5g-rru and oai-cn5g-fed.git and configure charts and scripts"
-    echo "git clone -b $TAG_OAI5G_RRU $REPO_OAI5G_RRU"
-    git clone -b $TAG_OAI5G_RRU $REPO_OAI5G_RRU
+    TAG=${OAI_BRANCH:-TAG_OAI5G_RRU}
+    echo "git clone -b $TAG $REPO_OAI5G_RRU"
+    git clone -b $TAG $REPO_OAI5G_RRU
     echo "git clone -b $TAG_OAI_CN5G_FED $REPO_OAI_CN5G_FED"
     git clone -b $TAG_OAI_CN5G_FED $REPO_OAI_CN5G_FED
     echo "Step 2: retrieve latest configure-demo-oai.sh and demo-oai.sh scripts"
@@ -99,15 +91,36 @@ function configure_all_scripts(){
     echo "OAI5G charts are now configured for your scenario, you can use the start.sh script to launch your scenario."
 }
 
-if test $# -ne 1
-        then usage
-fi
-if [[ $1 = 'all' ]]; then
+function usage() {
+    echo "$COMMAND: Invalid option"
+    echo "USAGE: $COMMAND [-B OAI_BRANCH] -a|-p|-c"
+    echo "$COMMAND -a: git pull the latest code and configure the OAI5G charts for the target scenario"
+    echo "$COMMAND -p: git pull the latest code. If necessary, you can manually modify the scripts before running configure."
+    echo "$COMMAND -c: configure the OAI5G charts for the target scenario, configure must only be run after a fresh pull, i.e., 2 consecutive configure will fail."
+    exit 1
+}
+
+while getopts "apcB:" opt; do
+  case "$opt" in
+    a) action='all'
+      ;;
+    p) action='pull'
+      ;;
+    c) action='configure'
+      ;;
+    B) OAI_BRANCH=$OPTARG
+      ;;
+    *) usage
+      ;;
+  esac
+done
+
+if [[ "$action" = 'all' ]]; then
     git_pull
     configure_all_scripts
-elif [[ $1 = 'pull' ]]; then
+elif [[ "$action" = 'pull' ]]; then
     git_pull
-elif [[ $1 = 'configure' ]]; then
+elif [[ "$action" = 'configure' ]]; then
     configure_all_scripts
 else
     usage
