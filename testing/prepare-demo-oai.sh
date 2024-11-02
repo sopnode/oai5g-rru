@@ -14,10 +14,10 @@ NS="oaiw1"
 # Repo/Branch/TAG for code
 REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
 #TAG_OAI5G_RRU="2024.w31"
-TAG_OAI5G_RRU="develop-r2lab-2dnn"
+TAG_OAI5G_RRU="develop-r2lab"
 REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git"
 #TAG_OAI_CN5G_FED="develop-r2lab"
-TAG_OAI_CN5G_FED="develop-r2lab-2dnn"
+TAG_OAI_CN5G_FED="develop-r2lab"
 
 # CN mode
 CN_MODE="advance"
@@ -30,10 +30,10 @@ RUN_MODE="full"
 
 # RAN options
 RRU="jaguar"
-#HOST_GNB="fit02"
-#HOST_GNB="up02"
+#RRU="panther"
 #RRU="rfsim"
 #RRU="b210"
+#RRU="n300"
 #RRU="n320"
 GNB_MODE="cudu"
 #GNB_MODE="cucpup"
@@ -62,6 +62,7 @@ COMMAND=$(basename $0)
 
 function usage() {
     echo "USAGE:"
+    echo "$(basename $0): Invalid option"
     echo "$COMMAND all: git pull the latest code and configure the OAI5G charts for the target scenario"
     echo "$COMMAND pull: git pull the latest code. If necessary, you can manually modify the scripts before running configure."
     echo "$COMMAND configure: configure the OAI5G charts for the target scenario, configure must only be run after a fresh pull, i.e., 2 consecutive configure will fail."
