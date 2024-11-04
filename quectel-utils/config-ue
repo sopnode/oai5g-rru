@@ -46,22 +46,57 @@ try:
     parser = argparse.ArgumentParser()
     parser.add_argument('--dnn', dest='dnn', type=str, help='Change default oai.ipv4 APN',
                         default="oai.ipv4")
+    parser.add_argument('--dnn2', dest='dnn2', type=str, help='Set a second APN with new DNN',
+                        default="")
+    parser.add_argument('--nssai', dest='nssai', type=str, help='Set NSSAI for DNN0, format is "01.000001"',
+                        default="")
+    parser.add_argument('--nssai2', dest='nssai2', type=str, help='Set NSSAI for DNN1, format is "01.000001"',
+                        default="")
     parser.add_argument('--mode', dest='mode', type=str, choices=["mbim","qmi"],
                         help='Set mode to either mbim or qmi',
                         default='mbim')
     args = parser.parse_args()
 
+    if args.dnn2 == "" and args.nssai2 != "":
+        print(f"*** Cannot set NSSAI {args.nssai2} with an empty DNN, use option --dnn2 to set new DNN")
+        phone.close()
+        sys.exit() 
+
     print(f"*** Running config-ue with DNN {args.dnn}, {args.mode} mode")
+    if args.nssai != "":
+        print(f"*** NSSAI for DNN {args.dnn} is {args.nssai}")
+    if args.nssai2 != "":
+        print(f"*** NSSAI for DNN {args.dnn2} is {args.nssai2}")
 
     print("Check current APN")
     send_msg("AT+CGDCONT?\r", delay)
-    print(f"Set new APN with DNN {args.dnn}")
+    # First APN cannot include NSSAI information
+    print(f"Set a single APN with DNN {args.dnn}")
     command=f"AT+CGDCONT=1,\"IP\",\"{args.dnn}\"\r"
     send_msg(command, delay)
-    send_msg("AT+CGDCONT=2\r", delay)
-    send_msg("AT+CGDCONT=3\r", delay)
+    if args.nssai == "" and args.nssai2 == "":
+        print(f"No specific NSSAI set and single DNN")
+        send_msg("AT+CGDCONT=2\r", delay)
+        send_msg("AT+CGDCONT=3\r", delay)
+    else:
+        if args.nssai != "":
+            print(f"Set new APN with DNN {args.dnn} and NSSAI {args.nssai}")
+            command=f"AT+CGDCONT=2,\"IP\",\"{args.dnn}\",,,,,,,,,,,,,,1,\"{args.nssai}\",\r"
+        send_msg(command, delay)
+        if args.nssai2 == "":
+            print(f"Set new APN with DNN {args.dnn2} and no specific NSSAI")
+            command=f"AT+CGDCONT=3,\"IP\",\"{args.dnn2}\"\r"
+        else:
+            print(f"Set first new APN with DNN {args.dnn2} without its NSSAI")
+            command=f"AT+CGDCONT=3,\"IP\",\"{args.dnn2}\"\r"
+            send_msg(command, delay)
+            print(f"Then set new APN with DNN {args.dnn2} with NSSAI {args.nssai2}")
+            command=f"AT+CGDCONT=4,\"IP\",\"{args.dnn2}\",,,,,,,,,,,,,,1,\"{args.nssai2}\",\r"
+        send_msg(command, delay)
     print("Check new APN")
     send_msg("AT+CGDCONT?\r", delay)
+    print("Set mode_pref mode to LTE:NR5G instead of AUTO")
+    send_msg("at+qnwprefcfg=\"mode_pref\",LTE:NR5G\r", delay)
     print("Check 4G/5G mode")
     send_msg("at+qnwprefcfg=\"mode_pref\"\r", delay)
     print("Check LTE bands")
@@ -80,3 +115,4 @@ try:
 
 finally:
     phone.close()
+
