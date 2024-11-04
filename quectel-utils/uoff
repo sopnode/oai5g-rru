@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "power off local USB3 ports"
+uhubctl -l 2 -p 1-4 -a off

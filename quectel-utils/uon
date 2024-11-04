@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "power on local USB3 ports"
+uhubctl -l 2 -p 1-4 -a on
