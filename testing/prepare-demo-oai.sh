@@ -66,7 +66,7 @@ function git_pull(){
     cd $DIR
     rm -rf oai5g-rru oai-cn5g-fed
     echo "$0: Clone oai5g-rru and oai-cn5g-fed.git and configure charts and scripts"
-    TAG=${OAI_BRANCH:-TAG_OAI5G_RRU}
+    TAG=${OAI_BRANCH:-$TAG_OAI5G_RRU}
     echo "git clone -b $TAG $REPO_OAI5G_RRU"
     git clone -b $TAG $REPO_OAI5G_RRU
     echo "git clone -b $TAG_OAI_CN5G_FED $REPO_OAI_CN5G_FED"
