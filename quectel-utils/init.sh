@@ -5,7 +5,6 @@
 
 
 DEVICE=/dev/cdc-wdm0
-HOME=/root
 
 # First, switch off the radio
 echo "---- mbimcli -p -d ${DEVICE} --set-radio-state=off"
@@ -16,7 +15,7 @@ sleep 5
 
 # Second, set UE minimal functionality with AT+CFUN=0
 echo "---- send command AT+CFUN=0"
-$HOME/reset-ue
+reset-ue
 
 echo "sleep 5s"
 sleep 5

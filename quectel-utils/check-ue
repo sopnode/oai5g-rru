@@ -50,6 +50,8 @@ try:
     send_msg("at+qnwprefcfg=\"nr5g_band\"\r", delay)
     print("Check MBIM/QMI mode")
     send_msg("at+qcfg=\"usbnet\"\r", delay)
+    print("Check NSSAI")
+    send_msg("at+cgdcont?\r", delay)
 
 finally:
     phone.close()
