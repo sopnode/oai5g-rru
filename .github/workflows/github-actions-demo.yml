@@ -20,8 +20,8 @@ jobs:
           BRANCH="${{ github.ref }}" 
           BRANCH=$(basename $BRANCH)
           echo "recreate empty directory test-oai5g-rru "
-          rm -rf $OAI5G/test-oai5g-rru; mkdir $OAI5G/test-oai5g-rru
-          cd $OAI5G/test-oai5g-rru
+          rm -rf $OAI5G; mkdir $OAI5G
+          cd $OAI5G
           echo "retrieve prepare-demo-oai.sh script"
           wget https://raw.githubusercontent.com/sopnode/oai5g-rru/$BRANCH/testing/prepare-demo-oai.sh -O $OAI5G/prepare-demo-oai.sh
           chmod a+x $OAI5G/prepare-demo-oai.sh
