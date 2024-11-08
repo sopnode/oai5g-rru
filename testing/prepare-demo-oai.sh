@@ -9,7 +9,7 @@ HOST_AMF_UPF="sopnode-w1"
 HOST_GNB="sopnode-w1"
 
 # k8s namespace
-NS="oaiw1"
+NS="oaiw1-ci"
 
 # Repo/Branch/TAG for code
 REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
@@ -29,11 +29,11 @@ RUN_MODE="full"
 #RUN_MODE="gnb-only"
 
 # RAN options
-#RRU="jaguar"
+RRU="jaguar"
 #RRU="panther"
 #RRU="rfsim"
 #RRU="b210"
-RRU="n300"
+#RRU="n300"
 #RRU="n320"
 GNB_MODE="cudu"
 #GNB_MODE="cucpup"
