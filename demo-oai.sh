@@ -1307,7 +1307,8 @@ function stop() {
     echo "Running stop() on $NS namespace, logs=$LOGS"
 
     if [[ "$LOGS" = "true" ]]; then
-	dir_stats=${PREFIX_STATS-"$TMP/oai5g-stats"}
+	DATE=`date +"%Y-%m-%dT%H.%M"`
+	dir_stats=${PREFIX_STATS-"$TMP/oai5g-stats"}-"$DATE"
 	echo "First retrieve all pcap and logs files in $dir_stats and compressed it"
 	mkdir -p $dir_stats
 	echo "cleanup $dir_stats before including new logs/pcap files"
