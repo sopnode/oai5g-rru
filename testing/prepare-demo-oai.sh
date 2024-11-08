@@ -93,14 +93,16 @@ function configure_all_scripts(){
 
 function usage() {
     echo "$COMMAND: Invalid option"
-    echo "USAGE: $COMMAND [-B OAI_BRANCH] -a|-p|-c"
-    echo "$COMMAND -a: git pull the latest code and configure the OAI5G charts for the target scenario"
+    echo "USAGE: $COMMAND [-B OAI_BRANCH] [-R RRU] -a|-p|-c"
+    echo "$COMMAND -B: select the oai5g-rru tag or branch to pull, default is develop-r2lab."
+    echo "$COMMAND -R: select the RRU to use, default is jaguar."
+    echo "$COMMAND -a: git pull the latest code and configure the OAI5G charts for the target scenario."
     echo "$COMMAND -p: git pull the latest code. If necessary, you can manually modify the scripts before running configure."
     echo "$COMMAND -c: configure the OAI5G charts for the target scenario, configure must only be run after a fresh pull, i.e., 2 consecutive configure will fail."
     exit 1
 }
 
-while getopts "apcB:" opt; do
+while getopts "apcB:R:" opt; do
   case "$opt" in
     a) action='all'
       ;;
