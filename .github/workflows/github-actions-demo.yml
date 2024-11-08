@@ -25,14 +25,34 @@ jobs:
           echo "retrieve prepare-demo-oai.sh script"
           wget https://raw.githubusercontent.com/sopnode/oai5g-rru/$BRANCH/testing/prepare-demo-oai.sh -O $OAI5G/prepare-demo-oai.sh
           chmod a+x $OAI5G/prepare-demo-oai.sh
-          echo "configure oai5g-rru demo script"
-          $OAI5G/prepare-demo-oai.sh -a -B $BRANCH
+          echo "configure oai5g-rru demo script for RRU=jaguar"
+          $OAI5G/prepare-demo-oai.sh -a -B $BRANCH -R jaguar
           echo "retrieve local run.sh script"
           cp $WORK/local-scripts/run.sh $OAI5G/
           echo "Check/book R2lab slice"
           $OAI5G/run.sh get-slice
           echo "RRU setup"
-          $OAI5G/run.sh init-rru
+          $OAI5G/run.sh init-rru jaguar
+          echo "UE setup"
+          $OAI5G/run.sh init-ue
+          echo "Run the oai5g-rru demo"
+          $OAI5G/demo-oai.sh start
+          echo "Sleep 10s"; sleep 10
+          echo "Trigger UE cx"
+          $OAI5G/run.sh start-ue || true
+          echo "Sleep 1mn"; sleep 60
+          echo "Run IPERF Tests..."
+          $OAI5G/run.sh run-iperf || true
+          echo "Stop the oai5g-rru demo"
+          $OAI5G/demo-oai.sh stop
+          echo "configure oai5g-rru demo script for RRU=n300"
+          $OAI5G/prepare-demo-oai.sh -a -B $BRANCH -R n300
+          echo "retrieve local run.sh script"
+          cp $WORK/local-scripts/run.sh $OAI5G/
+          echo "Check/book R2lab slice"
+          $OAI5G/run.sh get-slice
+          echo "RRU setup"
+          $OAI5G/run.sh init-rru n300
           echo "UE setup"
           $OAI5G/run.sh init-ue
           echo "Run the oai5g-rru demo"
