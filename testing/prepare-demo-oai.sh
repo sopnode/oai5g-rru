@@ -110,10 +110,19 @@ while getopts "apcB:" opt; do
       ;;
     B) OAI_BRANCH=$OPTARG
       ;;
+    R) RRU_OPT=$OPTARG
+      ;;
     *) usage
       ;;
   esac
 done
+
+if [ -z "${RRU_OPT}" ]; then
+    echo "OAI5G scenario will use default $RRU RRU"
+else
+    RRU="$RRU_OPT"
+    echo "OAI5G scenario will use $RRU RRU"
+fi
 
 if [[ "$action" = 'all' ]]; then
     git_pull
