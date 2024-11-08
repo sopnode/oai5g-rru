@@ -21,21 +21,22 @@ jobs:
           BRANCH=$(basename $BRANCH)
           echo "recreate empty directory test-oai5g-rru "
           rm -rf $OAI5G; mkdir $OAI5G
-          cd $OAI5G
-          echo "retrieve prepare-demo-oai.sh script"
-          wget https://raw.githubusercontent.com/sopnode/oai5g-rru/$BRANCH/testing/prepare-demo-oai.sh -O $OAI5G/prepare-demo-oai.sh
-          chmod a+x $OAI5G/prepare-demo-oai.sh
-          echo "configure oai5g-rru demo script for RRU=jaguar"
-          $OAI5G/prepare-demo-oai.sh -a -B $BRANCH -R jaguar
+          cd $OAI5G       
           echo "retrieve local run.sh script"
           cp $WORK/local-scripts/run.sh $OAI5G/
           echo "Check/book R2lab slice"
           $OAI5G/run.sh get-slice
-          echo "RRU setup"
+          echo "Switch on jaguar and n300 RRUs"
           $OAI5G/run.sh init-rru jaguar
+          $OAI5G/run.sh init-rru n300
           echo "UE setup"
-          $OAI5G/run.sh init-ue
-          echo "Run the oai5g-rru demo"
+          $OAI5G/run.sh init-ue          
+          echo "retrieve prepare-demo-oai.sh script"
+          wget https://raw.githubusercontent.com/sopnode/oai5g-rru/$BRANCH/testing/prepare-demo-oai.sh -O $OAI5G/prepare-demo-oai.sh
+          chmod a+x $OAI5G/prepare-demo-oai.sh
+          echo "configure oai5g-rru demo, branch $BRANCH for RRU=jaguar"
+          $OAI5G/prepare-demo-oai.sh -a -B $BRANCH -R jaguar
+          echo "Run the oai5g-rru demo with jaguar RRU"
           $OAI5G/demo-oai.sh start
           echo "Sleep 10s"; sleep 10
           echo "Trigger UE cx"
@@ -43,14 +44,12 @@ jobs:
           echo "Sleep 1mn"; sleep 60
           echo "Run IPERF Tests..."
           $OAI5G/run.sh run-iperf || true
-          echo "Stop the oai5g-rru demo"
+          echo "Now disconnect UE"
+          $OAI5G/run.sh stop-ue || true
+          echo "Abort the oai5g-rru demo with jaguar"
           $OAI5G/demo-oai.sh stop
-          echo "configure oai5g-rru demo script for RRU=n300"
+          echo "configure oai5g-rru demo script with the n300 RRU"
           $OAI5G/prepare-demo-oai.sh -a -B $BRANCH -R n300
-          echo "retrieve local run.sh script"
-          cp $WORK/local-scripts/run.sh $OAI5G/
-          echo "Check/book R2lab slice"
-          $OAI5G/run.sh get-slice
           echo "RRU setup"
           $OAI5G/run.sh init-rru n300
           echo "UE setup"
@@ -63,9 +62,11 @@ jobs:
           echo "Sleep 1mn"; sleep 60
           echo "Run IPERF Tests..."
           $OAI5G/run.sh run-iperf || true
-          echo "Stop the oai5g-rru demo"
+          echo "Now disconnect UE"
+          $OAI5G/run.sh stop-ue || true
+          echo "Abort the oai5g-rru demo with n300"
           $OAI5G/demo-oai.sh stop
-          echo "Free R2lab resources"
+          echo "Test finished, free up R2lab resources"
           $OAI5G/run.sh all-off
       - run: echo "🍏 This job's status is ${{ job.status }}."
       
