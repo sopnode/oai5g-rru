@@ -1359,8 +1359,15 @@ function get-all-logs() {
     DATE=`date +"%Y-%m-%dT%H.%M.%S"`
 
     echo "get-all-logs: saving charts"
-    tar -C "$PREFIX_DEMO/oai-cn5g-fed" -cf "$prefix"/charts.tar charts
+    tar -C "$PREFIX_DEMO"/oai-cn5g-fed -cf "$prefix"/charts.tar charts
 
+    echo "get-all-logs: saving demo-oai.sh script"
+    cp "$PREFIX_DEMO"/demo-oai.sh "$prefix"/
+
+    if [[ -f "$PREFIX_DEMO"/prepare-demo-oai.sh ]]; then
+        echo "get-all-logs: saving prepare-demo-oai.sh script"
+    	cp "$PREFIX_DEMO"/prepare-demo-oai.sh "$prefix"/
+    fi
 
     AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
     AMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
