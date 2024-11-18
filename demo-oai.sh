@@ -470,13 +470,13 @@ ADDRS_n320="addr=172.28.4.65,second_addr=172.28.4.97"
 GNB_REPO_aw2s="${R2LAB_REPO}/oai-gnb-aw2s"
 GNB_TAG_aw2s="${RAN_TAG}"
 #
-CONF_jaguar="gnb.sa.band78.133prb.aw2s.dddsu.50MHz.conf"
-#CONF_jaguar="gnb.sa.band78.51prb.aw2s.ddsuu.conf"
-#CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
-CONF_DU_jaguar="du.sa.band78.133prb.aw2s.dddsu.50MHz.conf"
+CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
+#CONF_jaguar="gnb.sa.band78.51prb.aw2s.dddsuu.conf"
+#CONF_DU_jaguar="du.sa.band78.133prb.aw2s.dddsuu.50MHz.conf"
+CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.conf"
 CONF_DU_panther="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
-OPTIONS_aw2s="--sa --thread-pool 14,16,18,20,22,24,26,28 --log_config.global_log_options level,nocolor,time"
+OPTIONS_aw2s="--sa --thread-pool 7,9,11,13,15,17,19,21 --log_config.global_log_options level,nocolor,time"
 IP_GNB_jaguar="172.28.4.132" # @IP ADDR_jaguar + 3
 IP_GNB_panther="172.28.4.196" # @IP ADDR_panther + 3
 ADDR_jaguar="172.28.4.129" 
