@@ -781,15 +781,15 @@ function configure-gnb() {
     echo "Configure configmap.yaml of oai-gnb/oai-du"
     if [[ ! -z $SLICE1_SD ]]; then
 	if [[ ! -z $SLICE2_SD ]]; then
-	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = 0x$SLICE1_SD }, { sst = $SLICE2_SST; sd = 0x$SLICE2_SD }) });"
+	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = 0x$SLICE1_SD; }, { sst = $SLICE2_SST; sd = 0x$SLICE2_SD; }) });"
 	else
-	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = 0x$SLICE1_SD }, { sst = $SLICE2_SST }) });"
+	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = 0x$SLICE1_SD; }, { sst = $SLICE2_SST; }) });"
 	fi
     else
 	if [[ ! -z $SLICE2_SD ]]; then
-	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST }, { sst = $SLICE2_SST; sd = 0x$SLICE2_SD }) });"
+	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; }, { sst = $SLICE2_SST; sd = 0x$SLICE2_SD; }) });"
 	else
-	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST }, { sst = $SLICE2_SST }) });"
+	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; }, { sst = $SLICE2_SST; }) });"
 	fi
     fi
     mv $TMP/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
