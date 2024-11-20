@@ -448,7 +448,8 @@ OPTIONS_b2xx="--sa -E --tune-offset 30000000 --log_config.global_log_options lev
 GNB_REPO_n3xx="${R2LAB_REPO}/oai-gnb"
 GNB_TAG_n3xx="${RAN_TAG}"
 #
-CONF_n320="gnb.sa.band78.106prb.n310.7ds2u.conf"
+CONF_n320="gnb.sa.band78.162prb.usrpn310.2x2-r2lab.conf"
+#CONF_n320="gnb.sa.band78.106prb.n310.7ds2u.conf"
 #CONF_n320="gnb.sa.band78.106prb.usrpn310.ddsuu-2x2.conf"
 #CONF_DU_n320="du.sa.band78.106prb.usrpn310.ddsuu-2x2-new.conf"
 CONF_DU_n320="du.sa.band78.106prb.n310.7ds2u.conf"
