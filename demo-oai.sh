@@ -664,8 +664,9 @@ EOF
     cp "$OAI5G_@MODE@"/config.yaml $TMP/@mode@_config.yaml-orig
     echo "(Over)writing $OAI5G_@MODE@/config.yaml"
     sed -f $TMP/@mode@-config.sed < $TMP/@mode@_config.yaml-orig > "$OAI5G_@MODE@"/config.yaml
+    # if SD NSSAI field is set to "NULL", erase the sd line
+    awk '!/EMPTY/' "$OAI5G_@MODE@"/config.yaml > /tmp/temp && mv /tmp/temp "$OAI5G_@MODE@"/config.yaml
     diff $TMP/@mode@_config.yaml-orig "$OAI5G_@MODE@"/config.yaml
-    
     cd "$OAI5G_@MODE@"
     echo "helm dependency update"
     helm dependency update
@@ -681,6 +682,8 @@ function configure-mysql() {
     echo "configure-mysql: mysql database already patched by configure-demo-oai.sh script, just copy it"
     echo "cp $DIR_PATCHED_CHART/oai_db-basic.sql $DIR_ORIG_CHART/"
     cp $DIR_PATCHED_CHART/oai_db-basic.sql $DIR_ORIG_CHART/
+    # if SD NSSAI field is set to "NULL", replace it by "FFFFFF" in the mysql database
+    awk '!/EMPTY/' $DIR_ORIG_CHART/oai_db-basic.sql > /tmp/temp && mv /tmp/temp $DIR_ORIG_CHART/oai_db-basic.sql
 }
 
 #################################################################################
@@ -780,14 +783,14 @@ function configure-gnb() {
     cat $TMP/gnb.conf >> $TMP/configmap.yaml
 
     echo "Configure configmap.yaml of oai-gnb/oai-du"
-    if [[ ! -z $SLICE1_SD ]]; then
-	if [[ ! -z $SLICE2_SD ]]; then
+    if [[ "$SLICE1_SD" != "EMPTY" ]]; then
+	if [[ "$SLICE2_SD" != "EMPTY" ]]; then
 	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = 0x$SLICE1_SD; }, { sst = $SLICE2_SST; sd = 0x$SLICE2_SD; }) });"
 	else
 	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = 0x$SLICE1_SD; }, { sst = $SLICE2_SST; }) });"
 	fi
     else
-	if [[ ! -z $SLICE2_SD ]]; then
+	if [[ "$SLICE2_SD" != "EMPTY" ]]; then
 	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; }, { sst = $SLICE2_SST; sd = 0x$SLICE2_SD; }) });"
 	else
 	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; }, { sst = $SLICE2_SST; }) });"
