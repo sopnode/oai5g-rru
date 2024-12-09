@@ -24,6 +24,8 @@ DNN1_PDU_TYPE="IPV4" # "IPV4" or "IPV4V6"
 # - \"FFFFFF\" in mysql database
 # - only sst field defined in nssai within config.yaml of the CN
 # - only sst field defined in gnb.conf
+# - "16777215" in nr-ue rfsim scenario
+#
 SLICE1_SST="1"
 SLICE1_SD="EMPTY"
 SLICE1_5QI="5" # non-GBR
