@@ -683,7 +683,7 @@ function configure-mysql() {
     echo "cp $DIR_PATCHED_CHART/oai_db-basic.sql $DIR_ORIG_CHART/"
     cp $DIR_PATCHED_CHART/oai_db-basic.sql $DIR_ORIG_CHART/
     # if SD NSSAI field is set to "NULL", replace it by "FFFFFF" in the mysql database
-    awk '!/EMPTY/' $DIR_ORIG_CHART/oai_db-basic.sql > /tmp/temp && mv /tmp/temp $DIR_ORIG_CHART/oai_db-basic.sql
+    sed -i 's/EMPTY/FFFFFF/g' $DIR_ORIG_CHART/oai_db-basic.sql
 }
 
 #################################################################################
