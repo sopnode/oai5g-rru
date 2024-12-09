@@ -1062,7 +1062,7 @@ EOF
     echo "(Over)writing $DIR/values.yaml"
     sed -f "$SED_FILE" < $TMP/oai-nr-ue_values.yaml-orig > "$ORIG_CHART"
     # if SD NSSAI field is set to "NULL", replace it by "16777215"
-    sed -i 's/EMPTY/16777215/g' "$ORIG_CHART"
+    sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
     diff $TMP/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
 }
 
