@@ -282,7 +282,7 @@ OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 #
 #RAN_TAG="2024.w25"
-RAN_TAG="2024.w43"
+RAN_TAG="2024.w48"
 GNB_NAME="gNB-r2lab"
 
 # DU/CU SPLIT parameters
@@ -336,7 +336,7 @@ GW_CU_N3=""
 ROUTES_CU_N3=""
 IF_NAME_CU_N3=""
 #
-ADD_OPTIONS_CU="--sa --log_config.global_log_options level,nocolor,time"
+ADD_OPTIONS_CU="--log_config.global_log_options level,nocolor,time"
 NAME_CU="oai-cu"
 HOST_CU="$"
 N2IFNAME_CU="n2" 
@@ -370,7 +370,7 @@ GW_CUCP_F1=""
 ROUTES_CUCP_F1=""
 IF_NAME_CUCP_F1="$IF_NAME_N2N3"
 #
-ADD_OPTIONS_CUCP="--sa --log_config.global_log_options level,nocolor,time"
+ADD_OPTIONS_CUCP="--log_config.global_log_options level,nocolor,time"
 NAME_CUCP="oai-cu-cp"
 N2IFNAME_CUCP="n2"
 N3IFNAME_CUCP="n2"
@@ -403,7 +403,7 @@ GW_CUUP_F1="" # "172.21.19.254"
 ROUTES_CUUP_F1=""
 IF_NAME_CUUP_F1="$IF_NAME_N2N3"  
 #
-ADD_OPTIONS_CUUP="--sa"
+ADD_OPTIONS_CUUP=""
 NAME_CUUP="oai-cuup"
 HOST_CUCP="$IP_CUCP_E1"   #"oai-cu"
 N3IFNAME_CUUP="n3"
@@ -442,7 +442,7 @@ GNB_TAG_b2xx="${RAN_TAG}"
 CONF_b210="gnb.sa.band78.fr1.106PRB.usrpb210.conf"
 #CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
 #OPTIONS_b2xx="--sa --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
-OPTIONS_b2xx="--sa -E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
+OPTIONS_b2xx="-E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 
 #### n3xx RU case ####
 #GNB_REPO_n3xx="${OAISA_REPO}/oai-gnb"
@@ -457,7 +457,7 @@ CONF_DU_n320="du.sa.band78.106prb.n310.7ds2u.conf"
 CONF_n300="$CONF_n320"
 CONF_DU_n300="$CONF_DU_n320"
 #OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 0,2,4,6,8,10,12,14,16 --log_config.global_log_options level,nocolor,time"
-OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --MACRLCs.[0].ul_max_mcs 14 --L1s.[0].max_ldpc_iterations 4 --log_config.global_log_options level,nocolor,time"
+OPTIONS_n3xx="--usrp-tx-thread-config 1 --tune-offset 30000000 --MACRLCs.[0].ul_max_mcs 14 --L1s.[0].max_ldpc_iterations 4 --log_config.global_log_options level,nocolor,time"
 #
 IP_GNB_N300_1="172.28.4.4" # @IP N300.1 + 3
 IP_GNB_N300_2="172.28.4.36" # @IP N300.2 + 3
@@ -478,7 +478,7 @@ CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 #CONF_DU_jaguar="du.sa.band78.133prb.aw2s.dddsuu.50MHz.conf"
 CONF_panther="${CONF_jaguar}"
 CONF_DU_panther="${CONF_DU_jaguar}"
-OPTIONS_aw2s="--sa --thread-pool 9,11,13,15,17,19,21,23 --log_config.global_log_options level,nocolor,time"
+OPTIONS_aw2s="--thread-pool 9,11,13,15,17,19,21,23 --log_config.global_log_options level,nocolor,time"
 IP_GNB_jaguar="172.28.4.132" # @IP ADDR_jaguar + 3
 IP_GNB_panther="172.28.4.196" # @IP ADDR_panther + 3
 ADDR_jaguar="172.28.4.129" 
