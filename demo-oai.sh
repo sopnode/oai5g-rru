@@ -432,7 +432,8 @@ GNB_REPO_rfsim="${R2LAB_REPO}/oai-gnb"
 GNB_TAG_rfsim="${RAN_TAG}"
 CONF_rfsim="gnb.sa.band78.106prb.rfsim.conf" 
 CONF_DU_rfsim="du.sa.band78.106prb.rfsim.conf" 
-OPTIONS_rfsim="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
+OPTIONS_rfsim="-E --rfsim --log_config.global_log_options level,nocolor,time"
+#OPTIONS_rfsim="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
 #
 #### b2xx RU case ####
 #GNB_REPO_b2xx="${OAISA_REPO}/oai-gnb"
@@ -485,11 +486,11 @@ ADDR_panther="172.28.4.193"
 
 
 ########################### oai-nr-ue rfsim chart parameters #####################
-OAI5G_NRUE="$OAI5G_CORE/oai-nr-ue"
-NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
+NRUE_REPO="${R2LAB_REPO}/oai-nr-ue"
+#NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
 NRUE_TAG="${RAN_TAG}"
-#OPTIONS_NRUE="--sa --rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E 
-OPTIONS_NRUE="--sa --rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time" 
+OPTIONS_NRUE="--rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time" 
+#OPTIONS_NRUE="--sa --rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time" 
 NETMASK_NRUE="$NETMASK_N2N3"
 IF_NAME_NRUE="$IF_NAME_N2N3"
 NRUE_USRP="rfsim"
