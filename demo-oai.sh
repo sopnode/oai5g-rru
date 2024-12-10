@@ -665,8 +665,9 @@ EOF
     cp "$OAI5G_@MODE@"/config.yaml $TMP/@mode@_config.yaml-orig
     echo "(Over)writing $OAI5G_@MODE@/config.yaml"
     sed -f $TMP/@mode@-config.sed < $TMP/@mode@_config.yaml-orig > "$OAI5G_@MODE@"/config.yaml
+    # if SD NSSAI field is set to "NULL", erase the sd line
+    awk '!/EMPTY/' "$OAI5G_@MODE@"/config.yaml > /tmp/temp && mv /tmp/temp "$OAI5G_@MODE@"/config.yaml
     diff $TMP/@mode@_config.yaml-orig "$OAI5G_@MODE@"/config.yaml
-    
     cd "$OAI5G_@MODE@"
     echo "helm dependency update"
     helm dependency update
@@ -682,6 +683,8 @@ function configure-mysql() {
     echo "configure-mysql: mysql database already patched by configure-demo-oai.sh script, just copy it"
     echo "cp $DIR_PATCHED_CHART/oai_db-basic.sql $DIR_ORIG_CHART/"
     cp $DIR_PATCHED_CHART/oai_db-basic.sql $DIR_ORIG_CHART/
+    # if SD NSSAI field is set to "NULL", replace it by "FFFFFF" in the mysql database
+    sed -i 's/EMPTY/FFFFFF/g' $DIR_ORIG_CHART/oai_db-basic.sql
 }
 
 #################################################################################
@@ -781,14 +784,14 @@ function configure-gnb() {
     cat $TMP/gnb.conf >> $TMP/configmap.yaml
 
     echo "Configure configmap.yaml of oai-gnb/oai-du"
-    if [[ ! -z $SLICE1_SD ]]; then
-	if [[ ! -z $SLICE2_SD ]]; then
+    if [[ "$SLICE1_SD" != "EMPTY" ]]; then
+	if [[ "$SLICE2_SD" != "EMPTY" ]]; then
 	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = 0x$SLICE1_SD; }, { sst = $SLICE2_SST; sd = 0x$SLICE2_SD; }) });"
 	else
 	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = 0x$SLICE1_SD; }, { sst = $SLICE2_SST; }) });"
 	fi
     else
-	if [[ ! -z $SLICE2_SD ]]; then
+	if [[ "$SLICE2_SD" != "EMPTY" ]]; then
 	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; }, { sst = $SLICE2_SST; sd = 0x$SLICE2_SD; }) });"
 	else
 	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; }, { sst = $SLICE2_SST; }) });"
@@ -1059,6 +1062,8 @@ EOF
     cp "$ORIG_CHART" $TMP/oai-nr-ue_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
     sed -f "$SED_FILE" < $TMP/oai-nr-ue_values.yaml-orig > "$ORIG_CHART"
+    # if SD NSSAI field is set to "NULL", replace it by "16777215"
+    sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
     diff $TMP/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
 }
 
