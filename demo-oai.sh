@@ -461,7 +461,7 @@ CONF_DU_n300="$CONF_DU_n320"
 #OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 0,2,4,6,8,10,12,14,16 --log_config.global_log_options level,nocolor,time"
 OPTIONS_n3xx="--usrp-tx-thread-config 1 --tune-offset 30000000 --MACRLCs.[0].ul_max_mcs 14 --L1s.[0].max_ldpc_iterations 4 --log_config.global_log_options level,nocolor,time"
 #
-if [[ RU_MODE = "dhcp" ]]; then
+if [[ $RU_MODE = "dhcp" ]]; then
     IP_GNB_N300_1="dhcp"
     IP_GNB_N300_2="dhcp"
     IP_GNB_N320_1="dhcp"
@@ -488,7 +488,7 @@ CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 CONF_panther="${CONF_jaguar}"
 CONF_DU_panther="${CONF_DU_jaguar}"
 OPTIONS_aw2s="--thread-pool 9,11,13,15,17,19,21,23 --log_config.global_log_options level,nocolor,time"
-if [[ RU_MODE = "dhcp" ]]; then
+if [[ $RU_MODE = "dhcp" ]]; then
     IP_GNB_jaguar="dhcp"
     IP_GNB_panther="dhcp"
 else
