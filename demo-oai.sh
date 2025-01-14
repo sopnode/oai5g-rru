@@ -827,39 +827,42 @@ s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
 s|@GNB_N3_IP_ADDRESS@|$IP_GNB_N3/$NETMASK_N2N3|
 s|@CU_UP_N3_IP_ADDRESS@|$IP_CUUP_N3|
 s|@AW2S_IP_ADDRESS@|$ADDR_aw2s|
-s|@GNB_AW2S_IP_ADDRESS@|$IP_GNB_RU1|
 s|@GNB_AW2S_LOCAL_IF_NAME@|$IF_NAME_GNB_RU1|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
 EOF
-
+    if [[ $RU_MODE != "dhcp" ]]; then  
+        cat >> "$SED_CONF_FILE" <<EOF
+s|@RU1_IP_ADDRESS@|$IP_GNB_RU1|
+EOF
+    fi  
     if [[ $GNB_MODE != 'monolithic' ]]; then
-	echo "With cudu/cucpup modes, set here AMF_IP_ADDRESS, CUCP_IP_ADDRESS and CU_IP_ADDRESS"
-	cat >> "$SED_CONF_FILE" <<EOF
+	    echo "With cudu/cucpup modes, set here AMF_IP_ADDRESS, CUCP_IP_ADDRESS and CU_IP_ADDRESS"
+	    cat >> "$SED_CONF_FILE" <<EOF
 s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
 s|@CU_IP_ADDRESS@|$IP_CU_F1|
 s|@CU_CP_IP_ADDRESS@|$IP_CUCP_E1|
 EOF
     else
-	echo "Monolithic mode, do not set AMF_IP_ADDRESS and CU_IP_ADDRESS"
+	    echo "Monolithic mode, do not set AMF_IP_ADDRESS and CU_IP_ADDRESS"
     fi
     
     for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
-	ORIG_CHART="${OAI5G_RAN}/${nf}/templates/configmap.yaml"
-	cp ${ORIG_CHART} $TMP/${nf}_configmap.yaml-orig
-	echo "(Over)writing $ORIG_CHART"
-	sed -f "$SED_CONF_FILE" < $TMP/${nf}_configmap.yaml-orig > ${ORIG_CHART}
-	echo "********************* Display modified ${ORIG_CHART} ************************"
-	cat ${ORIG_CHART}
+	    ORIG_CHART="${OAI5G_RAN}/${nf}/templates/configmap.yaml"
+	    cp ${ORIG_CHART} $TMP/${nf}_configmap.yaml-orig
+	    echo "(Over)writing $ORIG_CHART"
+	    sed -f "$SED_CONF_FILE" < $TMP/${nf}_configmap.yaml-orig > ${ORIG_CHART}
+	    echo "********************* Display modified ${ORIG_CHART} ************************"
+	    cat ${ORIG_CHART}
     done
 
 
     # Configure gNB values.yaml charts
 
     if [[ ! -z $SLICE1_SD ]]; then
-	SED_SD1="s|@SD1@|0x$SLICE1_SD|"
+	    SED_SD1="s|@SD1@|0x$SLICE1_SD|"
     fi
     if [[ ! -z $SLICE2_SD ]]; then
-	SED_SD2="s|@SD2@|0x$SLICE2_SD|"
+	    SED_SD2="s|@SD2@|0x$SLICE2_SD|"
     fi
     
     echo "Then configure oai-gnb, oai-du, oai-cu, oai-cu-cp, oai-cu-up values charts"
