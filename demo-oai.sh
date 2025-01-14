@@ -426,6 +426,8 @@ NETMASK_GNB_RU="28"
 #
 ################## RRU-dependent part ###################
 #
+RU_MODE="dhcp" # in ['static', 'dhcp']
+#
 #### rfsim RU case ####
 #GNB_REPO_rfsim="${OAISA_REPO}/oai-gnb"
 GNB_REPO_rfsim="${R2LAB_REPO}/oai-gnb"
@@ -459,10 +461,17 @@ CONF_DU_n300="$CONF_DU_n320"
 #OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 0,2,4,6,8,10,12,14,16 --log_config.global_log_options level,nocolor,time"
 OPTIONS_n3xx="--usrp-tx-thread-config 1 --tune-offset 30000000 --MACRLCs.[0].ul_max_mcs 14 --L1s.[0].max_ldpc_iterations 4 --log_config.global_log_options level,nocolor,time"
 #
-IP_GNB_N300_1="172.28.4.4" # @IP N300.1 + 3
-IP_GNB_N300_2="172.28.4.36" # @IP N300.2 + 3
-IP_GNB_N320_1="172.28.4.68" # @IP N320.1 + 3
-IP_GNB_N320_2="172.28.4.100" # @IP N320.2 + 3
+if [[ RU_MODE = "dhcp" ]]; then
+    IP_GNB_N300_1="dhcp"
+    IP_GNB_N300_2="dhcp"
+    IP_GNB_N320_1="dhcp"
+    IP_GNB_N320_2="dhcp"
+else
+    IP_GNB_N300_1="172.28.4.4" # @IP N300.1 + 3
+    IP_GNB_N300_2="172.28.4.36" # @IP N300.2 + 3
+    IP_GNB_N320_1="172.28.4.68" # @IP N320.1 + 3
+    IP_GNB_N320_2="172.28.4.100" # @IP N320.2 + 3
+fi
 MTU_n3xx="9000"
 ADDRS_n300="addr=172.28.4.1,second_addr=172.28.4.33"
 ADDRS_n320="addr=172.28.4.65,second_addr=172.28.4.97"
@@ -479,8 +488,13 @@ CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 CONF_panther="${CONF_jaguar}"
 CONF_DU_panther="${CONF_DU_jaguar}"
 OPTIONS_aw2s="--thread-pool 9,11,13,15,17,19,21,23 --log_config.global_log_options level,nocolor,time"
-IP_GNB_jaguar="172.28.4.132" # @IP ADDR_jaguar + 3
-IP_GNB_panther="172.28.4.196" # @IP ADDR_panther + 3
+if [[ RU_MODE = "dhcp" ]]; then
+    IP_GNB_jaguar="dhcp"
+    IP_GNB_panther="dhcp"
+else
+    IP_GNB_jaguar="172.28.4.132" # @IP ADDR_jaguar + 3
+    IP_GNB_panther="172.28.4.196" # @IP ADDR_panther + 3
+fi
 ADDR_jaguar="172.28.4.129" 
 ADDR_panther="172.28.4.193" 
 
