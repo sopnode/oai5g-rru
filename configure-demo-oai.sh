@@ -52,6 +52,8 @@ OPC="C42449363BBAD02B66D16BC975D77CC1" # default is "8E27B6AF0E692E750F32667A3B1
 RFSIM_IMSI="001010000001121"
 
 ##########################################################################################
+TMP="/tmp/tmp.$USER"
+mkdir -p $TMP
 
 function update() {
     NS=$1; shift
@@ -84,7 +86,7 @@ function update() {
     fi
     
     echo "Configuring demo-oai.sh script"
-    cat > /tmp/demo-oai.sed <<EOF
+    cat > "$TMP"/demo-oai.sed <<EOF
 s|@DEF_NS@|$NS|
 s|@DEF_NODE_AMF_UPF@|$NODE_AMF_UPF|
 s|@DEF_NODE_GNB@|$NODE_GNB|
@@ -130,10 +132,10 @@ s|@DEF_REGCRED_PWD@|$REGCRED_PWD|
 s|@DEF_REGCRED_EMAIL@|$REGCRED_EMAIL|
 EOF
 
-    cp "$PREFIX_DEMO"/demo-oai.sh /tmp/demo-oai-orig.sh
+    cp "$PREFIX_DEMO"/demo-oai.sh "$TMP"/demo-oai-orig.sh
     echo "Configuring demo-oai.sh script with possible new R2lab FIT nodes and registry credentials"
-    sed -f /tmp/demo-oai.sed < /tmp/demo-oai-orig.sh > $PREFIX_DEMO/demo-oai.sh
-    diff /tmp/demo-oai-orig.sh $PREFIX_DEMO/demo-oai.sh
+    sed -f "$TMP"/demo-oai.sed < "$TMP"/demo-oai-orig.sh > $PREFIX_DEMO/demo-oai.sh
+    diff "$TMP"/demo-oai-orig.sh $PREFIX_DEMO/demo-oai.sh
 
     DIR_GENERIC_DB="$PREFIX_DEMO/oai5g-rru/patch-mysql"
     if [[ "$DNN1" = "none" ]]; then
@@ -143,8 +145,8 @@ EOF
 	echo "Patching oai_db-basic.sql generic database for R2lab UEs with both DNN0 and DNN1"
 	oai_db_basic_template="oai_db-basic-generic-2dnn.sql"
     fi
-    cp $DIR_GENERIC_DB/${oai_db_basic_template} /tmp/${oai_db_basic_template}
-    sed -f /tmp/demo-oai.sed < /tmp/${oai_db_basic_template} > $DIR_GENERIC_DB/oai_db-basic.sql
+    cp $DIR_GENERIC_DB/${oai_db_basic_template} "$TMP"/${oai_db_basic_template}
+    sed -f "$TMP"/demo-oai.sed < "$TMP"/${oai_db_basic_template} > $DIR_GENERIC_DB/oai_db-basic.sql
     diff $DIR_GENERIC_DB/${oai_db_basic_template} $DIR_GENERIC_DB/oai_db-basic.sql
 
 }
