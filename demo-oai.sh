@@ -1088,17 +1088,21 @@ EOF
 #################################################################################
 
 function configure-all() {
-    echo "configure-all: Applying SophiaNode patches to OAI5G charts located on "$PREFIX_DEMO"/oai-cn5g-fed"
-    echo -e "\t with oai-upf running on $NODE_AMF_UPF"
-    echo -e "\t with oai-gnb running on $NODE_GNB"
-    echo -e "\t with generate-logs: $LOGS"
-    echo -e "\t with generate-pcap: $PCAP"
+    echo "configure-all: Applying SophiaNode patches to OAI5G charts located on \"$PREFIX_DEMO/oai-cn5g-fed\""
+    echo -e "\t with oai-upf running on \"$NODE_AMF_UPF\""
+    echo -e "\t with oai-gnb running on \"$NODE_GNB\""
+    echo -e "\t with generate-logs: \"$LOGS\""
+    echo -e "\t with generate-pcap: \"$PCAP\""
 
     # Remove pulling limitations from docker-hub with anonymous account
     echo "Create $NS if not present and regcred secret"	     
-    kubectl create namespace $NS || true
-    kubectl -n $NS delete secret regcred || true
-    kubectl -n $NS create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=@DEF_REGCRED_NAME@ --docker-password=@DEF_REGCRED_PWD@ --docker-email=@DEF_REGCRED_EMAIL@ || true
+    kubectl create namespace "$NS" || true
+    kubectl -n "$NS" delete secret regcred || true
+    kubectl -n "$NS" create secret docker-registry regcred \
+        --docker-server=https://index.docker.io/v1/ \
+        --docker-username="@DEF_REGCRED_NAME@" \
+        --docker-password="@DEF_REGCRED_PWD@" \
+        --docker-email="@DEF_REGCRED_EMAIL@" || true
 
     # Ensure that helm spray plugin is installed
     configure-oai-5g-@mode@ 
@@ -1115,16 +1119,25 @@ function configure-all() {
 function start-cn() {
     echo "Running start-cn() with namespace=$NS, NODE_AMF_UPF=$NODE_AMF_UPF"
     echo "cd $OAI5G_@MODE@"
-    cd "$OAI5G_@MODE@"
+    cd "$OAI5G_@MODE@" || { echo "Error: Failed to change directory"; exit 1; }
 
     echo "helm dependency update"
-    helm dependency update
+    if ! helm dependency update; then
+        echo "Error: Failed to update helm dependencies"
+        exit 1
+    fi
 
     echo "helm --namespace=$NS install oai-5g-@mode@ ."
-    helm --create-namespace --namespace=$NS install oai-5g-@mode@ .
+    if ! helm --create-namespace --namespace="$NS" install oai-5g-@mode@ .; then
+        echo "Error: Failed to install helm chart"
+        exit 1
+    fi
 
     echo "Wait until all 5G Core pods are READY"
-    kubectl wait pod -n $NS --for=condition=Ready --all
+    if ! kubectl wait pod -n "$NS" --for=condition=Ready --all --timeout=300s; then
+        echo "Error: Pods did not become ready within timeout"
+        exit 1
+    fi
 }
 
 #################################################################################
@@ -1195,12 +1208,23 @@ function start-nr-ue() {
 
 #################################################################################
 
+# Add logging function
+function log() {
+    local level="$1"
+    shift
+    local message="$*"
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] [$level] $message"
+}
+
+# Update logging calls
 function start() {
-    echo "start: run all oai5g pods on namespace=$NS"
+    log "INFO" "Starting all oai5g pods on namespace=$NS"
 
     if [[ $LOGS = "true" ]]; then
-	echo "start: Create a k8s persistence volume for generation of RAN logs files"
-	cat << \EOF >> $TMP/oai5g-pv.yaml
+        log "INFO" "Creating k8s persistence volume for generation of RAN logs files"
+        cat << \EOF >> $TMP/oai5g-pv.yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
