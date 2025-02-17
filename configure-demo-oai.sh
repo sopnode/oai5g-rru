@@ -9,8 +9,8 @@ TAC="1"
 
 # DNN0 and DNN1 must be set in demo-oai.py or in prepare-demo-oai.sh scripts to configure Quectel UE
 #  if DNN1=="none", configure a single DNN will be configured in the mysql database
-DNN0_PDU_TYPE="IPV4" # "IPV4" or "IPV4V6"
-DNN1_PDU_TYPE="IPV4" # "IPV4" or "IPV4V6"
+DNN0_PDU_TYPE="IPV4V6" # XXX "IPV4" or "IPV4V6" ==> In open5gs DNN is internet
+DNN1_PDU_TYPE="IPV4V6" # XXX "IPV4" or "IPV4V6"
 
 # NSSAI (SST,SD) Configuration
 #
@@ -27,8 +27,8 @@ DNN1_PDU_TYPE="IPV4" # "IPV4" or "IPV4V6"
 # - "16777215" in nr-ue rfsim scenario
 #
 SLICE1_SST="1"
-SLICE1_SD="EMPTY" # "EMPTY"
-SLICE1_5QI="5" # non-GBR
+SLICE1_SD="01b207" # "EMPTY"
+SLICE1_5QI="9" # non-GBR
 SLICE1_ARP_PRIORITY_LEVEL="15"
 SLICE1_ARP_PREEMPT_CAP="NOT_PREEMPT" # "NOT_PREEMPT" or "MAY_PREEMPT" # to trigger preemption
 SLICE1_ARP_PREEMPT_VULN="PREEMPTABLE" # "PREEMPTABLE" or "NOT_PREEMPT" # preemption vulnerability
@@ -38,7 +38,7 @@ SLICE1_DOWNLINK="40Mbps"
 
 SLICE2_SST="1"
 SLICE2_SD="000003"
-SLICE2_5QI="6" # non-GBR
+SLICE2_5QI="9" # non-GBR
 SLICE2_ARP_PRIORITY_LEVEL="15"
 SLICE2_ARP_PREEMPT_CAP="NOT_PREEMPT" # "NOT_PREEMPT" or "MAY_PREEMPT" # to trigger preemption
 SLICE2_ARP_PREEMPT_VULN="PREEMPTABLE" # "PREEMPTABLE" or "NOT_PREEMPT" # preemption vulnerability
@@ -47,7 +47,7 @@ SLICE2_UPLINK="100Mbps"
 SLICE2_DOWNLINK="200Mbps"
 
 GNB_ID="0xe020"
-FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f" # default is "8baf473f2f8fd09487cccbd7097c6862"
+FULL_KEY="fec86ba6eb707ed08905757b1bb44b8fc" # default is "8baf473f2f8fd09487cccbd7097c6862"
 OPC="C42449363BBAD02B66D16BC975D77CC1" # default is "8E27B6AF0E692E750F32667A3B14605D"
 RFSIM_IMSI="001010000001121"
 

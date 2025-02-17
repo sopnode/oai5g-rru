@@ -247,9 +247,9 @@ else
         NETMASK_N2N3="26"
         IF_NAME_N2N3="br-pepr" # e.g., "ran"
         # Set the external AMF IP address (N2)
-        IP_AMF_N2="$SUBNET_N2N3.201"
+        IP_AMF_N2="open5gs-amf" # XXX "$SUBNET_N2N3.201"
         # Set the local gNB host network interface to reach AMF/UPF (N2/N3)
-	MULTUS_GNB_N2="true"
+	MULTUS_GNB_N2="false" # XXX
 	IP_GNB_N2="$SUBNET_N2N3.223"
 	GNB_N2_IF_NAME="n2"
         # Set the route to reach AMF/UPF
