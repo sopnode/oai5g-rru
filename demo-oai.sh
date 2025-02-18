@@ -156,6 +156,7 @@ if [[ $RUN_MODE = "full" ]]; then
     IP_DNS1="138.96.0.210"
     IP_DNS2="193.51.196.138"
     # ran charts
+    HOST_AMF="$NFS_AMF_HOST"
     MULTUS_GNB_N2="true"
     IP_GNB_N2="$SUBNET_N2N3.203"
     GNB_N2_IF_NAME="n2"
@@ -193,7 +194,7 @@ else
 	# amf 
 	ENABLED_AMF=false
 	NFS_AMF_HOST="$SUBNET_N2N3.200"
-	IP_AMF_N2="$SUBNET_N2N3.200"
+	IP_AMF_N2=""
 	IF_N2="" # unused
 	# smf
 	ENABLED_SMF=false
@@ -226,6 +227,7 @@ else
 	# TS
 	ENABLED_TS=false
 	# ran charts
+	HOST_AMF="oai-amf"
 	MULTUS_GNB_N2="true"
 	IP_GNB_N2="$SUBNET_N2N3.223"
 	GNB_N2_IF_NAME="n2"
@@ -247,7 +249,7 @@ else
         NETMASK_N2N3="26" # only used if multus on N2/N3
         IF_NAME_N2N3="br-pepr" # host interface only used if multus on N2/N3
         # Set the external AMF IP address (N2)
-        IP_AMF_N2=${NODE_AMF_UPF%"-v100"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
+        HOST_AMF=${NODE_AMF_UPF%"-v100"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
         # Set the local gNB host network interface to reach AMF/UPF (N2/N3)
 	MULTUS_GNB_N2="false" # XXX # only used if multus on N2/N3
 	IP_GNB_N2="$SUBNET_N2N3.223" # only used if multus on N2/N3
@@ -288,7 +290,6 @@ GNB_NAME="gNB-r2lab"
 
 # DU/CU SPLIT parameters
 #
-HOST_AMF="oai-amf"
 NODE_CU="$NODE_GNB" # same node used for cu/cu-cp/cu-up and du
 
 E1IFNAME="e1"
@@ -340,8 +341,6 @@ IF_NAME_CU_N3=""
 ADD_OPTIONS_CU="--log_config.global_log_options level,nocolor,time"
 NAME_CU="oai-cu"
 HOST_CU="$"
-N2IFNAME_CU="n2" 
-N3IFNAME_CU="n2"
 QOS_CU_DEF="true"
 # NODE_CU is defined above and also the same for CUCP/CUUP
 #
@@ -373,8 +372,6 @@ IF_NAME_CUCP_F1="$IF_NAME_N2N3"
 #
 ADD_OPTIONS_CUCP="--log_config.global_log_options level,nocolor,time"
 NAME_CUCP="oai-cu-cp"
-N2IFNAME_CUCP="n2"
-N3IFNAME_CUCP="n2"
 QOS_CUCP_DEF="true"
 NODE_CUCP="$NODE_CU"
 #
@@ -407,7 +404,6 @@ IF_NAME_CUUP_F1="$IF_NAME_N2N3"
 ADD_OPTIONS_CUUP=""
 NAME_CUUP="oai-cuup"
 HOST_CUCP="$IP_CUCP_E1"   #"oai-cu"
-N3IFNAME_CUUP="n3"
 QOS_CUUP_DEF="true"
 NODE_CUUP="$NODE_CU"
 
@@ -822,7 +818,6 @@ s|@GNB_DU_ID@|$GNB_ID|
 s|@TAC@|$TAC|
 s|plmn_list.*|plmn_list = $PLMN_LIST|
 s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
-s|@CU_UP_N2_IP_ADDRESS@|$IP_CUUP_N3|
 s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
 s|@AW2S_IP_ADDRESS@|$ADDR_aw2s|
 s|@GNB_AW2S_LOCAL_IF_NAME@|$IF_NAME_GNB_RU1|
@@ -836,7 +831,6 @@ EOF
     if [[ $GNB_MODE != 'monolithic' ]]; then
 	    echo "With cudu/cucpup modes, set here AMF_IP_ADDRESS, CUCP_IP_ADDRESS and CU_IP_ADDRESS"
 	    cat >> "$SED_CONF_FILE" <<EOF
-s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
 s|@CU_IP_ADDRESS@|$IP_CU_F1|
 s|@CU_CP_IP_ADDRESS@|$IP_CUCP_E1|
 EOF
@@ -869,7 +863,6 @@ s|@GNB_REPO@|$GNB_REPO|
 s|@GNB_TAG@|$GNB_TAG|
 s|@DEFAULT_GW_GNB@|$DEFAULT_GW_GNB|
 s|@MULTUS_GNB_N2@|$MULTUS_GNB_N2|
-s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
 s|@IP_GNB_N2@|$IP_GNB_N2|
 s|@NETMASK_GNB_N2@|$NETMASK_GNB_N2|
 s|@MAC_GNB_N2@|$(gener-mac)|
@@ -909,6 +902,7 @@ s|@MNC@|$MNC|
 s|@TAC@|$TAC|
 s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
 s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
+s|@HOST_AMF@|$HOST_AMF|
 s|@START_TCPDUMP@|$PCAP|
 s|@TCPDUMP_CONTAINER@|$LOGS|
 s|@SHAREDVOLUME@|$PCAP|
@@ -961,9 +955,6 @@ s|@ROUTES_CU_N3@|$ROUTES_CU_N3|
 s|@IF_NAME_CU_N3@|$IF_NAME_CU_N3|
 s|@ADD_OPTIONS_CU@|$ADD_OPTIONS_CU|
 s|@NAME_CU@|$NAME_CU|
-s|@HOST_AMF@|$HOST_AMF|
-s|@N2IFNAME_CU@|$N2IFNAME_CU|
-s|@N3IFNAME_CU@|$N3IFNAME_CU|
 s|@QOS_CU_DEF@|$QOS_CU_DEF|
 s|@NODE_CU@|$NODE_CU|
 
@@ -993,8 +984,6 @@ s|@ROUTES_CUCP_F1@|$ROUTES_CUCP_F1|
 s|@IF_NAME_CUCP_F1@|$IF_NAME_CUCP_F1|
 s|@ADD_OPTIONS_CUCP@|$ADD_OPTIONS_CUCP|
 s|@NAME_CUCP@|$NAME_CUCP|
-s|@N2IFNAME_CUCP@|$N2IFNAME_CUCP|
-s|@N3IFNAME_CUCP@|$N3IFNAME_CUCP|
 s|@QOS_CUCP_DEF@|$QOS_CUCP_DEF|
 s|@NODE_CUCP@|$NODE_CUCP|
 
@@ -1025,8 +1014,6 @@ s|@IF_NAME_CUUP_F1@|$IF_NAME_CUUP_F1|
 s|@ADD_OPTIONS_CUUP@|$ADD_OPTIONS_CUUP|
 s|@NAME_CUUP@|$NAME_CUUP|
 s|@HOST_CUCP@|$HOST_CUCP|
-s|@N2IFNAME_CUUP@|$N2IFNAME_CUUP|
-s|@N3IFNAME_CUUP@|$N3IFNAME_CUUP|
 s|@QOS_CUUP_DEF@|$QOS_CUUP_DEF|
 s|@CU_HOST@|$CU_HOST|
 s|@NODE_CUUP@|$NODE_CUUP|
