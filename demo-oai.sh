@@ -243,15 +243,15 @@ else
     else
         # RUN_MODE=gnb-only
 	# -- Local RAN and external CN
-        SUBNET_N2N3="172.21.10" # e.g., "10.0.20"
-        NETMASK_N2N3="26"
-        IF_NAME_N2N3="br-pepr" # e.g., "ran"
+        SUBNET_N2N3="172.21.10" # e.g., "10.0.20" # only used if multus on N2/N3
+        NETMASK_N2N3="26" # only used if multus on N2/N3
+        IF_NAME_N2N3="br-pepr" # host interface only used if multus on N2/N3
         # Set the external AMF IP address (N2)
         IP_AMF_N2="open5gs-amf" # XXX "$SUBNET_N2N3.201"
         # Set the local gNB host network interface to reach AMF/UPF (N2/N3)
-	MULTUS_GNB_N2="false" # XXX
-	IP_GNB_N2="$SUBNET_N2N3.223"
-	GNB_N2_IF_NAME="n2"
+	MULTUS_GNB_N2="false" # XXX # only used if multus on N2/N3
+	IP_GNB_N2="$SUBNET_N2N3.223" # only used if multus on N2/N3
+	GNB_N2_IF_NAME="eth0" # pod network interface name for N2 (eth0 or n2)
         # Set the route to reach AMF/UPF
         ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
 	MULTUS_GNB_N3="false"
@@ -262,7 +262,7 @@ else
 	    IP_GNB_N3="$IP_GNB_N2"
 	    IP_NRUE="$SUBNET_N2N3.224"
 	fi
-	GNB_N3_IF_NAME="n2"
+	GNB_N3_IF_NAME="$GNB_N2_IF_NAME" # pod network interface name for N3 (eth0 or n2/n3)
     fi
 fi
 
@@ -821,11 +821,9 @@ s|@GNB_DU_ID@|$GNB_ID|
 s|@TAC@|$TAC|
 s|plmn_list.*|plmn_list = $PLMN_LIST|
 s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
-s|@GNB_N2_IP_ADDRESS@|$IP_GNB_N2/$NETMASK_N2N3|
 s|@CU_UP_N2_IP_ADDRESS@|$IP_CUUP_N3|
 s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
 s|@GNB_N3_IP_ADDRESS@|$IP_GNB_N3/$NETMASK_N2N3|
-s|@CU_UP_N3_IP_ADDRESS@|$IP_CUUP_N3|
 s|@AW2S_IP_ADDRESS@|$ADDR_aw2s|
 s|@GNB_AW2S_LOCAL_IF_NAME@|$IF_NAME_GNB_RU1|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
