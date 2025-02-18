@@ -247,7 +247,7 @@ else
 	# -- Local RAN and external CN
         SUBNET_N2N3="172.21.10" # e.g., "10.0.20" # only used if multus on N2/N3
         NETMASK_N2N3="26" # only used if multus on N2/N3
-        IF_NAME_N2N3="br-pepr" # host interface only used if multus on N2/N3
+        IF_NAME_N2N3="$IF_NAME_N2N3" # host interface used for multus on N2/N3 and also on e1/f1 network interfaces if not monolithic mode
         # Set the external AMF IP address (N2)
         HOST_AMF=${NODE_AMF_UPF%"-v100"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
         # Set the local gNB host network interface to reach AMF/UPF (N2/N3)
