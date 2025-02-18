@@ -823,7 +823,6 @@ s|plmn_list.*|plmn_list = $PLMN_LIST|
 s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
 s|@CU_UP_N2_IP_ADDRESS@|$IP_CUUP_N3|
 s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
-s|@GNB_N3_IP_ADDRESS@|$IP_GNB_N3/$NETMASK_N2N3|
 s|@AW2S_IP_ADDRESS@|$ADDR_aw2s|
 s|@GNB_AW2S_LOCAL_IF_NAME@|$IF_NAME_GNB_RU1|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
