@@ -263,6 +263,7 @@ else
 	    IP_NRUE="$SUBNET_N2N3.224"
 	fi
 	GNB_N3_IF_NAME="$GNB_N2_IF_NAME" # pod network interface name for N3 (eth0 or n2/n3)
+	MULTUS_NRUE="false"
     fi
 fi
 
@@ -1053,7 +1054,7 @@ function configure-nr-ue() {
     cat > "$SED_FILE" <<EOF
 s|@NRUE_REPO@|$NRUE_REPO|
 s|@NRUE_TAG@|$NRUE_TAG|
-s|@MULTUS_NRUE@|true|
+s|@MULTUS_NRUE@|$MULTUS_NRUE|
 s|@IP_NRUE@|$IP_NRUE|
 s|@NETMASK_NRUE@|$NETMASK_NRUE|
 s|@MAC_NRUE@|$(gener-mac)|
