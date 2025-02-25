@@ -257,7 +257,6 @@ else
         # Set the route to reach AMF/UPF
         ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
 	MULTUS_GNB_N3="true"
-	IP_GNB_N3="10.10.3.205"
 	if [[ $GNB_MODE = 'cucpup' ]]; then
 	    IP_GNB_N3="$SUBNET_N2N3.224"
 	    IP_NRUE="$SUBNET_N2N3.225"
@@ -265,6 +264,7 @@ else
 	    IP_GNB_N3="$IP_GNB_N2"
 	    IP_NRUE="$SUBNET_N2N3.224"
 	fi
+	IP_GNB_N3="10.10.3.205"
 	GNB_N3_IF_NAME="$GNB_N2_IF_NAME" # pod network interface name for N3 (eth0 or n2/n3)
 	MULTUS_NRUE="false"
     fi
