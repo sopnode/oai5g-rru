@@ -161,7 +161,6 @@ if [[ $RUN_MODE = "full" ]]; then
     HOST_AMF="$NFS_AMF_HOST"
     MULTUS_GNB_N2="true"
     IP_GNB_N2="$SUBNET_N2N3.203"
-    GNB_N2_IF_NAME="n2"
     MULTUS_GNB_N3="false"
     if [[ $GNB_MODE = 'cucpup' ]]; then
 	F1IFNAME="f1c"
@@ -172,7 +171,6 @@ if [[ $RUN_MODE = "full" ]]; then
 	IP_GNB_N3="$IP_GNB_N2"
 	IP_NRUE="$SUBNET_N2N3.204"
     fi
-    GNB_N3_IF_NAME="n2"
     
 else
     # Local RAN, External MYSQL/UDR/UDM/AUSF/AMF/SMF
@@ -232,7 +230,6 @@ else
 	HOST_AMF="oai-amf"
 	MULTUS_GNB_N2="true"
 	IP_GNB_N2="$SUBNET_N2N3.223"
-	GNB_N2_IF_NAME="n2"
 	MULTUS_GNB_N3="false"
 	if [[ $GNB_MODE = 'cucpup' ]]; then
 	    IP_GNB_N3="$SUBNET_N2N3.224"
@@ -241,7 +238,6 @@ else
 	    IP_GNB_N3="$IP_GNB_N2"
 	    IP_NRUE="$SUBNET_N2N3.224"
 	fi
-	GNB_N3_IF_NAME="n2"
 	ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
 	#ROUTES_GNB_N2="[{'dst': '172.21.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
     else
@@ -257,11 +253,9 @@ else
 	IP_GNB_N2="$SUBNET_N2N3.205" # "$SUBNET_N2N3.223" 
         # Set the route to reach AMF
         ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
-	GNB_N2_IF_NAME="n3" # local pod network interface name for N2 (eth0 or n2 or n3)
 	#
 	MULTUS_GNB_N3="true"
 	IP_GNB_N3="$IP_GNB_N2" # "$SUBNET_N2N3.224"
-	GNB_N3_IF_NAME="$GNB_N2_IF_NAME" # pod network interface name for N3 (eth0 or n2/n3)
 	NETMASK_N2N3="24"
         IF_NAME_N2N3="n3br" # host interface used for multus on N2/N3 
 	#
@@ -836,8 +830,6 @@ s|@GNB_CU_UP_ID@|$GNB_ID|
 s|@GNB_DU_ID@|$GNB_ID|
 s|@TAC@|$TAC|
 s|plmn_list.*|plmn_list = $PLMN_LIST|
-s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
-s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
 s|@AW2S_IP_ADDRESS@|$ADDR_aw2s|
 s|@GNB_AW2S_LOCAL_IF_NAME@|$IF_NAME_GNB_RU1|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
@@ -919,8 +911,6 @@ s|@GNB_NAME@|$GNB_NAME|
 s|@MCC@|$MCC|
 s|@MNC@|$MNC|
 s|@TAC@|$TAC|
-s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
-s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
 s|@HOST_AMF@|$HOST_AMF|
 s|@START_TCPDUMP@|$PCAP|
 s|@TCPDUMP_CONTAINER@|$LOGS|
