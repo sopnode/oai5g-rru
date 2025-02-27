@@ -65,6 +65,8 @@ OAISA_REPO="docker.io/oaisoftwarealliance"
 # Interfaces names of VLANs in sopnode servers
 IF_NAME_N2N3_DEFAULT="net-100"
 IF_NAME_N6_DEFAULT="net-100"
+IF_NAME_E1_DEFAULT="net-100"
+IF_NAME_F1_DEFAULT="net-100"
 IF_NAME_VLAN_N300_1="net-n300.1"
 IF_NAME_VLAN_N300_2="net-n300.2"
 IF_NAME_VLAN_N320_1="net-n320.1"
@@ -245,35 +247,44 @@ else
     else
         # RUN_MODE=gnb-only
 	# -- Local RAN and external CN
-        HOST_AMF="10.10.3.200" #${NODE_AMF_UPF%"-v100"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
-	if [[ $GNB_MODE = 'monolithic' ]]; then
-	    NETMASK_N2N3="24" # only used if multus on N2/N3
-	elif [[ $GNB_MODE = 'cudu' ]]; then
-	    NETMASK_N2N3="24" # only used if multus on N2/N3
-	else
-	    NETMASK_N2N3="24" # only used if multus on N2/N3
-	fi
-	
-        SUBNET_N2N3="10.10.3" # "172.21.10" # e.g., "10.0.20" # only used if multus on N2/N3
-        
-        IF_NAME_N2N3="n3br" #"$IF_NAME_N2N3" # host interface used for multus on N2/N3 and also on e1/f1 network interfaces if not monolithic mode
-        # Set the external AMF IP address (N2)
-        # Set the local gNB host network interface to reach AMF/UPF (N2/N3)
-	MULTUS_GNB_N2="false" # XXX # only used if multus on N2/N3
-	IP_GNB_N2="$SUBNET_N2N3.223" # only used if multus on N2/N3
-	GNB_N2_IF_NAME="n3" # pod network interface name for N2 (eth0 or n2)
-        # Set the route to reach AMF/UPF
+	#
+        SUBNET_N2N3="10.10.3" # "172.21.10"
+        HOST_AMF="$SUBNET_N2N3.200" #${NODE_AMF_UPF%"-v100"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
+	#
+	# ** GNB specific part (also used for CU) **
+	#
+	MULTUS_GNB_N2="false"
+	IP_GNB_N2="$SUBNET_N2N3.205" # "$SUBNET_N2N3.223" 
+        # Set the route to reach AMF
         ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
+	GNB_N2_IF_NAME="n3" # local pod network interface name for N2 (eth0 or n2 or n3)
+	#
 	MULTUS_GNB_N3="true"
-	if [[ $GNB_MODE = 'cucpup' ]]; then
-	    IP_GNB_N3="$SUBNET_N2N3.224"
-	    IP_NRUE="$SUBNET_N2N3.225"
-	else
-	    IP_GNB_N3="$IP_GNB_N2"
-	    IP_NRUE="$SUBNET_N2N3.224"
-	fi
-	IP_GNB_N3="10.10.3.205"
+	IP_GNB_N3="$IP_GNB_N2" # "$SUBNET_N2N3.224"
 	GNB_N3_IF_NAME="$GNB_N2_IF_NAME" # pod network interface name for N3 (eth0 or n2/n3)
+	NETMASK_N2N3="24"
+        IF_NAME_N2N3="n3br" # host interface used for multus on N2/N3 
+	#
+	#if [[ $GNB_MODE = 'cucpup' ]]; then
+	#    IP_GNB_N3="$SUBNET_N2N3.224"
+	#    IP_NRUE="$SUBNET_N2N3.225"
+	#else
+	#    IP_GNB_N3="$IP_GNB_N2"
+	#    IP_NRUE="$SUBNET_N2N3.224"
+	#fi
+	#
+	# ** CU-CP specific part **
+	#
+	MULTUS_CUCP_N2="true"
+	IP_CUCP_N2="$IP_GNB_N2"
+	#
+	# ** CU-UP specific part **
+	#
+	MULTUS_CUUP_N3="true"
+	IP_CUUP_N3="$SUBNET_N2N3.206"
+	#
+	# ** NRUE specific part **
+	#
 	MULTUS_NRUE="false"
     fi
 fi
@@ -315,7 +326,7 @@ IP_DU_F1="172.21.16.100"
 NETMASK_DU_F1="22"
 GW_DU_F1=""
 ROUTES_DU_F1=""
-IF_NAME_DU_F1="$IF_NAME_N2N3"
+IF_NAME_DU_F1="$IF_NAME_F1_DEFAULT"
 #
 NAME_DU="oai-du"
 QOS_DU_DEF="true"
@@ -331,7 +342,7 @@ IP_CU_F1="172.21.16.92"
 NETMASK_CU_F1="22"
 GW_CU_F1="" 
 ROUTES_CU_F1="" 
-IF_NAME_CU_F1="$IF_NAME_N2N3"
+IF_NAME_CU_F1="$IF_NAME_F1_DEFAULT"
 #
 MULTUS_CU_N2=${MULTUS_CU_N2:=$MULTUS_GNB_N2}
 IP_CU_N2=${IP_CU_N2:=$IP_GNB_N2}
@@ -342,7 +353,7 @@ IF_NAME_CU_N2=${IF_NAME_CU_N2:=$IF_NAME_N2N3}
 #
 MULTUS_CU_N3=${MULTUS_CU_N3:=$MULTUS_GNB_N3}
 IP_CU_N3=${IP_CU_N3:=""}
-NETMASK_CU_N3=${NETMASK_CU_N3:=""}
+NETMASK_CU_N3=${NETMASK_CU_N3:=$NETMASK_N2N3}
 GW_CU_N3=${GW_CU_N3:=""}
 ROUTES_CU_N3=${ROUTES_CU_N3:=""}
 IF_NAME_CU_N3=${IF_NAME_CU_N3:=""}
@@ -362,7 +373,7 @@ IP_CUCP_E1="192.168.18.12"
 NETMASK_CUCP_E1="24"
 GW_CUCP_E1=""
 ROUTES_CUCP_E1=""
-IF_NAME_CUCP_E1="$IF_NAME_N2N3"
+IF_NAME_CUCP_E1="$IF_NAME_E1_DEFAULT"
 #
 MULTUS_CUCP_N2=${MULTUS_CUCP_N2:=$MULTUS_GNB_N2}
 IP_CUCP_N2=${IP_CUCP_N2:=$IP_GNB_N2} 
@@ -376,7 +387,7 @@ IP_CUCP_F1="172.21.16.92"
 NETMASK_CUCP_F1="24"
 GW_CUCP_F1=""
 ROUTES_CUCP_F1=""
-IF_NAME_CUCP_F1="$IF_NAME_N2N3"
+IF_NAME_CUCP_F1="$IF_NAME_F1_DEFAULT"
 #
 ADD_OPTIONS_CUCP="--log_config.global_log_options level,nocolor,time"
 NAME_CUCP="oai-cu-cp"
@@ -393,7 +404,7 @@ IP_CUUP_E1="192.168.18.13"
 NETMASK_CUUP_E1="24"
 GW_CUUP_E1=""
 ROUTES_CUUP_E1="" 
-IF_NAME_CUUP_E1="$IF_NAME_N2N3"
+IF_NAME_CUUP_E1="$IF_NAME_E1_DEFAULT"
 #
 MULTUS_CUUP_N3=${MULTUS_CUUP_N3:=$MULTUS_GNB_N3}
 IP_CUUP_N3=${IP_CUUP_N3:=$IP_GNB_N3}
@@ -407,7 +418,7 @@ IP_CUUP_F1="172.21.16.93"
 NETMASK_CUUP_F1="22"
 GW_CUUP_F1="" # "172.21.19.254"
 ROUTES_CUUP_F1=""
-IF_NAME_CUUP_F1="$IF_NAME_N2N3"  
+IF_NAME_CUUP_F1="$IF_NAME_F1_DEFAULT"  
 #
 ADD_OPTIONS_CUUP=""
 NAME_CUUP="oai-cuup"
