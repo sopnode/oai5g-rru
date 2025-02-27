@@ -245,11 +245,19 @@ else
     else
         # RUN_MODE=gnb-only
 	# -- Local RAN and external CN
-        SUBNET_N2N3="172.21.10" # e.g., "10.0.20" # only used if multus on N2/N3
-        NETMASK_N2N3="24" # only used if multus on N2/N3
+        HOST_AMF="10.10.3.200" #${NODE_AMF_UPF%"-v100"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
+	if [[ $GNB_MODE = 'monolithic' ]]; then
+	    NETMASK_N2N3="24" # only used if multus on N2/N3
+	elif [[ $GNB_MODE = 'cudu' ]]; then
+	    NETMASK_N2N3="24" # only used if multus on N2/N3
+	else
+	    NETMASK_N2N3="24" # only used if multus on N2/N3
+	fi
+	
+        SUBNET_N2N3="10.10.3" # "172.21.10" # e.g., "10.0.20" # only used if multus on N2/N3
+        
         IF_NAME_N2N3="n3br" #"$IF_NAME_N2N3" # host interface used for multus on N2/N3 and also on e1/f1 network interfaces if not monolithic mode
         # Set the external AMF IP address (N2)
-        HOST_AMF="10.10.3.200" #${NODE_AMF_UPF%"-v100"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
         # Set the local gNB host network interface to reach AMF/UPF (N2/N3)
 	MULTUS_GNB_N2="false" # XXX # only used if multus on N2/N3
 	IP_GNB_N2="$SUBNET_N2N3.223" # only used if multus on N2/N3
