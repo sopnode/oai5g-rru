@@ -161,6 +161,7 @@ if [[ $RUN_MODE = "full" ]]; then
     HOST_AMF="$NFS_AMF_HOST"
     MULTUS_GNB_N2="true"
     IP_GNB_N2="$SUBNET_N2N3.203"
+    GNB_N2_IF_NAME="n2"
     MULTUS_GNB_N3="false"
     if [[ $GNB_MODE = 'cucpup' ]]; then
 	F1IFNAME="f1c"
@@ -171,6 +172,7 @@ if [[ $RUN_MODE = "full" ]]; then
 	IP_GNB_N3="$IP_GNB_N2"
 	IP_NRUE="$SUBNET_N2N3.204"
     fi
+    GNB_N3_IF_NAME="n2"
     
 else
     # Local RAN, External MYSQL/UDR/UDM/AUSF/AMF/SMF
@@ -230,6 +232,7 @@ else
 	HOST_AMF="oai-amf"
 	MULTUS_GNB_N2="true"
 	IP_GNB_N2="$SUBNET_N2N3.223"
+	GNB_N2_IF_NAME="n2"
 	MULTUS_GNB_N3="false"
 	if [[ $GNB_MODE = 'cucpup' ]]; then
 	    IP_GNB_N3="$SUBNET_N2N3.224"
@@ -238,6 +241,7 @@ else
 	    IP_GNB_N3="$IP_GNB_N2"
 	    IP_NRUE="$SUBNET_N2N3.224"
 	fi
+	GNB_N3_IF_NAME="n2"
 	ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
 	#ROUTES_GNB_N2="[{'dst': '172.21.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
     else
@@ -253,9 +257,11 @@ else
 	IP_GNB_N2="$SUBNET_N2N3.205" # "$SUBNET_N2N3.223" 
         # Set the route to reach AMF
         ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
+	GNB_N2_IF_NAME="n3" # local pod network interface name for N2 (eth0 or n2 or n3)
 	#
 	MULTUS_GNB_N3="true"
 	IP_GNB_N3="$IP_GNB_N2" # "$SUBNET_N2N3.224"
+	GNB_N3_IF_NAME="$GNB_N2_IF_NAME" # pod network interface name for N3 (eth0 or n2/n3)
 	NETMASK_N2N3="24"
         IF_NAME_N2N3="n3br" # host interface used for multus on N2/N3 
 	#
@@ -271,11 +277,13 @@ else
 	#
 	MULTUS_CUCP_N2="true"
 	IP_CUCP_N2="$IP_GNB_N2"
+	CUCP_N2_IF_NAME="n2"
 	#
 	# ** CU-UP specific part **
 	#
 	MULTUS_CUUP_N3="true"
 	IP_CUUP_N3="$SUBNET_N2N3.206"
+	CUUP_N3_IF_NAME="n3"
 	#
 	# ** NRUE specific part **
 	#
@@ -375,6 +383,7 @@ NETMASK_CUCP_N2=${NETMASK_CUCP_N2:=$NETMASK_N2N3}
 GW_CUCP_N2=${GW_CUCP_N2:=""}
 ROUTES_CUCP_N2=${ROUTES_CUCP_N2:=""}
 IF_NAME_CUCP_N2=${IF_NAME_CUCP_N2:=$IF_NAME_N2N3}
+CUCP_N2_IF_NAME=${CUCP_N2_IF_NAME:=$GNB_N2_IF_NAME}
 #
 MULTUS_CUCP_F1="true"
 IP_CUCP_F1="172.21.16.92"
@@ -406,6 +415,7 @@ NETMASK_CUUP_N3=${NETMASK_CUUP_N3:=$NETMASK_N2N3}
 GW_CUUP_N3=${GW_CUUP_N3:=""}
 ROUTES_CUUP_N3=${ROUTES_CUUP_N3:=""}
 IF_NAME_CUUP_N3=${IF_NAME_CUUP_N3:=$IF_NAME_N2N3}
+CUUP_N3_IF_NAME=${CUUP_N3_IF_NAME:=$GNB_N2_IF_NAME}
 #
 MULTUS_CUUP_F1="true"
 IP_CUUP_F1="172.21.16.93"
@@ -911,6 +921,10 @@ s|@GNB_NAME@|$GNB_NAME|
 s|@MCC@|$MCC|
 s|@MNC@|$MNC|
 s|@TAC@|$TAC|
+s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
+s|@CUCP_N2_IF_NAME@|$CUCP_N2_IF_NAME|
+s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
+s|@CUUP_N3_IF_NAME@|$CUUP_N3_IF_NAME|
 s|@HOST_AMF@|$HOST_AMF|
 s|@START_TCPDUMP@|$PCAP|
 s|@TCPDUMP_CONTAINER@|$LOGS|
