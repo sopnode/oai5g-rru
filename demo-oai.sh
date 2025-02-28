@@ -173,7 +173,10 @@ if [[ $RUN_MODE = "full" ]]; then
 	IP_NRUE="$SUBNET_N2N3.204"
     fi
     GNB_N3_IF_NAME="n2"
-    
+	#
+	# ** NRUE specific part **
+	#
+	MULTUS_NRUE="true"
 else
     # Local RAN, External MYSQL/UDR/UDM/AUSF/AMF/SMF
     ENABLE_SNAT="off" # "yes" or "off"
@@ -244,6 +247,10 @@ else
 	GNB_N3_IF_NAME="n2"
 	ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
 	#ROUTES_GNB_N2="[{'dst': '172.21.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
+	#
+	# ** NRUE specific part **
+	#
+	MULTUS_NRUE="true"
     else
         # RUN_MODE=gnb-only
 	# -- Local RAN and external CN
