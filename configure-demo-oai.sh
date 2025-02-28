@@ -9,8 +9,8 @@ TAC="1"
 
 # DNN0 and DNN1 must be set in demo-oai.py or in prepare-demo-oai.sh scripts to configure Quectel UE
 #  if DNN1=="none", configure a single DNN will be configured in the mysql database
-DNN0_PDU_TYPE="IPV4V6" # XXX "IPV4" or "IPV4V6" ==> In open5gs DNN is internet
-DNN1_PDU_TYPE="IPV4V6" # XXX "IPV4" or "IPV4V6"
+DNN0_PDU_TYPE="IPV4" # XXX "IPV4" or "IPV4V6" ==> In open5gs DNN is internet
+DNN1_PDU_TYPE="IPV4" # XXX "IPV4" or "IPV4V6"
 
 # NSSAI (SST,SD) Configuration
 #
