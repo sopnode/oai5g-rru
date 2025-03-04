@@ -255,8 +255,9 @@ else
         # RUN_MODE=gnb-only
 	# -- Local RAN and external CN
 	#
-        SUBNET_N2N3="10.10.3" # "172.21.10"
-        HOST_AMF="$SUBNET_N2N3.200" #${NODE_AMF_UPF%"-v100"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
+        SUBNET_N2N3=$(echo $NODE_AMF_UPF | cut -d'.' -f1-3) # extract subnet from external AMF IP adress
+        HOST_AMF="$NODE_AMF_UPF" #${NODE_AMF_UPF%"-v100"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
+        #HOST_AMF="$SUBNET_N2N3.200" #${NODE_AMF_UPF%"-v100"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
 	#
 	# ** GNB specific part (also used for CU) **
 	#
