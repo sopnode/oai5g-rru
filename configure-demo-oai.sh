@@ -49,7 +49,7 @@ SLICE2_DOWNLINK="200Mbps"
 GNB_ID="0xe020"
 FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f" # default is "8baf473f2f8fd09487cccbd7097c6862"
 OPC="C42449363BBAD02B66D16BC975D77CC1" # default is "8E27B6AF0E692E750F32667A3B14605D"
-RFSIM_IMSI="001010000001121"
+RFSIM_IMSI="001010000002121"
 
 ##########################################################################################
 TMP="/tmp/tmp.$USER"

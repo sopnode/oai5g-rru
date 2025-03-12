@@ -261,7 +261,7 @@ else
 	# ** GNB specific part (also used for CU) **
 	#
 	MULTUS_GNB_N2="false"
-	IP_GNB_N2="$SUBNET_N2N3.205" # "$SUBNET_N2N3.223" 
+	IP_GNB_N2="$SUBNET_N2N3.207" # 205 for sopnode-w1, 207 for sopnode-l1
         # Set the route to reach AMF
         ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
 	GNB_N2_IF_NAME="n3" # local pod network interface name for N2 (eth0 or n2 or n3)
@@ -289,7 +289,7 @@ else
 	# ** CU-UP specific part **
 	#
 	MULTUS_CUUP_N3="true"
-	IP_CUUP_N3="$SUBNET_N2N3.206"
+	IP_CUUP_N3="$SUBNET_N2N3.208" # 206 for sopnode-w1, 208 for sopnode-l1
 	CUUP_N3_IF_NAME="n3"
 	#
 	# ** NRUE specific part **
