@@ -23,7 +23,7 @@ function usage() {
 NS="@DEF_NS@" # k8s namespace
 NODE_AMF_UPF="@DEF_NODE_AMF_UPF@" # node in wich run amf and upf pods
 NODE_GNB="@DEF_NODE_GNB@" # node in which gnb pod runs
-RRU="@DEF_RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
+RRU="@DEF_RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim', 'benetel1', 'benetel2']
 RUN_MODE="@DEF_RUN_MODE@" # in ['full', 'gnb-only', 'gnb-upf']
 GNB_MODE="@DEF_GNB_MODE@" # in ['monolithic', 'cudu', 'cucpup']
 LOGS="@DEF_LOGS@" # boolean, true if logs are retrieved on pods
@@ -73,6 +73,7 @@ IF_NAME_VLAN_N320_1="net-n320.1"
 IF_NAME_VLAN_N320_2="net-n320.2"
 IF_NAME_VLAN_JAGUAR="net-jaguar"
 IF_NAME_VLAN_PANTHER="net-panther"
+IF_NAME_VLAN_BENETEL="eth1" # for now on sopnode-w1
 
 
 
@@ -525,6 +526,25 @@ fi
 ADDR_jaguar="172.28.4.129" 
 ADDR_panther="172.28.4.193" 
 
+#### benetel RU case ####
+GNB_REPO_benetel="${OAISA_REPO}/oai-gnb"
+GNB_TAG_benetel="${RAN_TAG}"
+#
+CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x4-benetel550.conf"
+CONF_DU_benetel1=""
+CONF_benetel2="${CONF_benetel2}"
+CONF_DU_benetel2="${CONF_DU_benetel1}"
+OPTIONS_benetel="--thread-pool 9,11,13,15,17,19,21,23 --log_config.global_log_options level,nocolor,time"
+if [[ $RU_MODE = "dhcp" ]]; then
+    IP_GNB_benetel1="dhcp"
+    IP_GNB_benetel2="dhcp"
+else
+    IP_GNB_benetel1="10.10.0.103" # @IP ADDR_jaguar + 3
+    IP_GNB_benetel2="10.10.0.103" # @IP ADDR_panther + 3
+fi
+ADDR_benetel1="10.10.0.100" 
+ADDR_benetel2="${ADDR_benetel1}" # benetel2 not yet deployed
+
 
 ########################### oai-nr-ue rfsim chart parameters #####################
 NRUE_REPO="${R2LAB_REPO}/oai-nr-ue"
@@ -785,6 +805,20 @@ function configure-gnb() {
 	else
 	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_PANTHER"
 	    IP_GNB_RU1="$IP_GNB_panther"
+	fi
+	
+    elif [[ "$RRU" = "benetel1" || "$RRU" = "benetel2" ]]; then
+	ADDR_benetel=$(eval echo \"\${ADDR_$RRU}\")
+	MULTUS_GNB_RU1="true"
+	MULTUS_GNB_RU2="false"
+	RRU_TYPE="benetel"
+	ADD_OPTIONS_GNB="$OPTIONS_benetel"
+	QOS_GNB_DEF="true"
+	IF_NAME_GNB_RU1="$IF_NAME_VLAN_BENETEL"
+	if [[ "$RRU" = "benetel1" ]]; then
+	    IP_GNB_RU1="$IP_GNB_benetel1"
+	else
+	    IP_GNB_RU1="$IP_GNB_benetel2"
 	fi
 	
     elif [[ "$RRU" = "rfsim" ]]; then
