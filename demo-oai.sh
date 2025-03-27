@@ -454,7 +454,7 @@ NETMASK_GNB_RU="28"
 #
 ################## RRU-dependent part ###################
 #
-RU_MODE="dhcp" # in ['static', 'dhcp']
+RU_MODE="static" # in ['static', 'dhcp'] # for benetel now, temporary use static IP address
 #
 #### rfsim RU case ####
 #GNB_REPO_rfsim="${OAISA_REPO}/oai-gnb"
