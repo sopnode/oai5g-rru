@@ -810,6 +810,7 @@ function configure-gnb() {
     elif [[ "$RRU" = "benetel1" || "$RRU" = "benetel2" ]]; then
 	ADDR_benetel=$(eval echo \"\${ADDR_$RRU}\")
 	MULTUS_GNB_RU1="true"
+	NETMASK_GNB_RU="24"
 	MULTUS_GNB_RU2="false"
 	RRU_TYPE="benetel"
 	ADD_OPTIONS_GNB="$OPTIONS_benetel"
