@@ -5,8 +5,6 @@
 #
 
 # server used for following OAI5G functions
-#HOST_AMF_UPF="sopnode-w1"
-#HOST_GNB="sopnode-w1"
 HOST_AMF_UPF="10.10.3.200"
 HOST_GNB="eno1" # real network interface of the node on which the gnb is deployed
 
