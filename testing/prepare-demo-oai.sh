@@ -5,44 +5,45 @@
 #
 
 # server used for following OAI5G functions
-HOST_AMF_UPF="sopnode-w1"
-HOST_GNB="sopnode-w1"
+#HOST_AMF_UPF="sopnode-w1"
+#HOST_GNB="sopnode-w1"
+HOST_AMF_UPF="10.10.3.200"
+HOST_GNB="eno1" # real network interface of the node on which the gnb is deployed
 
 # k8s namespace
 NS="oaiw1-ci"
 
 # Repo/Branch/TAG for code
-REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
+#REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
+REPO_OAI5G_RRU="https://github.com/Ziyad-Mabrouk/oai5g-rru.git"
 #TAG_OAI5G_RRU="2024.w31"
-TAG_OAI5G_RRU="develop-r2lab"
+TAG_OAI5G_RRU="gen-cn2"
 REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git"
-#TAG_OAI_CN5G_FED="develop-r2lab"
-TAG_OAI_CN5G_FED="develop-r2lab"
+TAG_OAI_CN5G_FED="gen-cn2"
 
 # CN mode
 CN_MODE="advance"
 #CN_MODE="basic"
 
 # oai5g-rru running mode 
-RUN_MODE="full"
+#RUN_MODE="full"
 #RUN_MODE="gnb-upf"
-#RUN_MODE="gnb-only"
+RUN_MODE="gnb-only"
 
 # RAN options
-RRU="jaguar"
+#RRU="jaguar"
 #RRU="panther"
-#RRU="rfsim"
+RRU="rfsim"
 #RRU="b210"
 #RRU="n300"
 #RRU="n320"
-GNB_MODE="cudu"
+#GNB_MODE="cudu"
 #GNB_MODE="cucpup"
-#GNB_MODE="monolithic"
+GNB_MODE="monolithic"
 
 # DNNs 
-DNN0="oai"
-DNN1="internet"
-#DNN1="none"
+DNN0="internet"
+DNN1="streaming"
 
 # logs configuration
 # logs and pcap are automatically retrieved when running demo-oai.sh stop in /tmp/tmp.root/oai5g-stats.tgz
