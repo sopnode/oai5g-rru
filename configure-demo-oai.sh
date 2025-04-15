@@ -57,8 +57,8 @@ mkdir -p $TMP
 
 function update() {
     NS=$1; shift
-    NODE_AMF_UPF=$1; shift
-    NODE_GNB=$1; shift
+    NODE_AMF_UPF=$1; shift # removed -v100
+    NODE_GNB=$1; shift # removed -v100
     RRU=$1; shift 
     RUN_MODE=$1; shift # in ["full", "gnb-only", "gnb-upf"]
     LOGS=$1; shift # boolean in [true, false]
