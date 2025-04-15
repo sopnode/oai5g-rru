@@ -6,7 +6,7 @@
 
 # server used for following OAI5G functions
 HOST_AMF_UPF="10.10.3.200"
-HOST_GNB="eno1" # real network interface of the node on which the gnb is deployed
+HOST_GNB="precision-7530"
 
 # k8s namespace
 NS="oaiw1-ci"
