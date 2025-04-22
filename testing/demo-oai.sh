@@ -20,9 +20,9 @@ function usage() {
 #################################################################################
 # Following parameters automatically set by configure-demo-oai.sh script
 # do not change them here !
-NS="oaiw1-ci" # k8s namespace
+NS="open5gs" # k8s namespace
 NODE_AMF_UPF="10.10.3.200-v100" # node in wich run amf and upf pods
-NODE_GNB="wlp111s0-v100" # node in which gnb pod runs
+NODE_GNB="eno1"
 RRU="rfsim" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
 RUN_MODE="gnb-only" # in ['full', 'gnb-only', 'gnb-upf']
 GNB_MODE="monolithic" # in ['monolithic', 'cudu', 'cucpup']
@@ -63,10 +63,10 @@ PREFIX_STATS="$TMP/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance"
 
 # Interfaces names of VLANs in sopnode servers
-IF_NAME_N2N3_DEFAULT="net-100"
-IF_NAME_N6_DEFAULT="net-100"
-IF_NAME_E1_DEFAULT="net-100"
-IF_NAME_F1_DEFAULT="net-100"
+IF_NAME_N2N3_DEFAULT="eno1"
+IF_NAME_N6_DEFAULT="eno1"
+IF_NAME_E1_DEFAULT="eno1"
+IF_NAME_F1_DEFAULT="eno1"
 IF_NAME_VLAN_N300_1="net-n300.1"
 IF_NAME_VLAN_N300_2="net-n300.2"
 IF_NAME_VLAN_N320_1="net-n320.1"

@@ -9,7 +9,7 @@ HOST_AMF_UPF="10.10.3.200" # IP adress of the AMF
 HOST_GNB="precision-7530" # name of the Kubernetes node on which the gnb will be deployed
 
 # k8s namespace
-NS="oaiw1-ci"
+NS="open5gs"
 
 # Repo/Branch/TAG for code
 REPO_OAI5G_RRU="https://github.com/Ziyad-Mabrouk/oai5g-rru.git"
