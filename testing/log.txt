@@ -1,0 +1,2209 @@
+OAI5G scenario will use default rfsim RRU
+Step 1: clean up previous oai5g-rru and oai-cn5g-fed.git local directories if any
+./prepare-demo-oai.sh: Clone oai5g-rru and oai-cn5g-fed.git and configure charts and scripts
+git clone -b gen-cn2 https://github.com/Ziyad-Mabrouk/oai5g-rru.git
+git clone -b gen-cn2 https://github.com/Ziyad-Mabrouk/oai-cn5g-fed
+Step 2: retrieve latest configure-demo-oai.sh and demo-oai.sh scripts
+Pull done. If necessary, you can manually modify these 2 scripts before running prepare-demo-oai.sh configure.
+Step 1: use parameters from configure-demo-oai.sh to configure demo-oai.sh script
+./configure-demo-oai.sh update open5gs 10.10.3.200 precision-7530 rfsim gnb-only false false true /home/ziyad-mabrouk/oai5g-rru/testing advance monolithic internet streaming r2labuser r2labuser-pwd r2labuser@turletti.com
+Running update with inputs: open5gs 10.10.3.200 precision-7530 rfsim gnb-only false false true /home/ziyad-mabrouk/oai5g-rru/testing advance monolithic internet streaming r2labuser r2labuser-pwd r2labuser@turletti.com
+Configuring demo-oai.sh script
+Configuring demo-oai.sh script with possible new R2lab FIT nodes and registry credentials
+23,50c23,50
+< NS="@DEF_NS@" # k8s namespace
+< NODE_AMF_UPF="@DEF_NODE_AMF_UPF@" # node in wich run amf and upf pods
+< NODE_GNB="@DEF_NODE_GNB@" # node in which gnb pod runs
+< RRU="@DEF_RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
+< RUN_MODE="@DEF_RUN_MODE@" # in ['full', 'gnb-only', 'gnb-upf']
+< GNB_MODE="@DEF_GNB_MODE@" # in ['monolithic', 'cudu', 'cucpup']
+< LOGS="@DEF_LOGS@" # boolean, true if logs are retrieved on pods
+< PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
+< MONITORING="@DEF_MONITORING@" # boolean, true if prometheus metrics parser is generated on oai-gnb pod (monolithic)
+< #
+< MCC="@DEF_MCC@"
+< MNC="@DEF_MNC@"
+< TAC="@DEF_TAC@"
+< DNN0="@DEF_DNN0@"
+< DNN0_PDU_TYPE="@DEF_DNN0_PDU_TYPE@"
+< DNN1="@DEF_DNN1@"
+< DNN1_PDU_TYPE="@DEF_DNN1_PDU_TYPE@"
+< SLICE1_SST="@DEF_SLICE1_SST@"
+< SLICE1_SD="@DEF_SLICE1_SD@"
+< SLICE1_5QI="@DEF_SLICE1_5QI@"
+< SLICE1_UPLINK="@DEF_SLICE1_UPLINK@"
+< SLICE1_DOWNLINK="@DEF_SLICE1_DOWNLINK@"
+< SLICE2_SST="@DEF_SLICE2_SST@"
+< SLICE2_SD="@DEF_SLICE2_SD@"
+< SLICE2_5QI="@DEF_SLICE2_5QI@"
+< SLICE2_UPLINK="@DEF_SLICE2_UPLINK@"
+< SLICE2_DOWNLINK="@DEF_SLICE2_DOWNLINK@"
+< GNB_ID="@DEF_GNB_ID@"
+---
+> NS="open5gs" # k8s namespace
+> NODE_AMF_UPF="10.10.3.200" # node in wich run amf and upf pods
+> NODE_GNB="precision-7530" # node in which gnb pod runs
+> RRU="rfsim" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
+> RUN_MODE="gnb-only" # in ['full', 'gnb-only', 'gnb-upf']
+> GNB_MODE="monolithic" # in ['monolithic', 'cudu', 'cucpup']
+> LOGS="false" # boolean, true if logs are retrieved on pods
+> PCAP="false" # boolean, true if pcap are generated on pods
+> MONITORING="true" # boolean, true if prometheus metrics parser is generated on oai-gnb pod (monolithic)
+> #
+> MCC="001"
+> MNC="01"
+> TAC="1"
+> DNN0="internet"
+> DNN0_PDU_TYPE="IPV4"
+> DNN1="streaming"
+> DNN1_PDU_TYPE="IPV4"
+> SLICE1_SST="1"
+> SLICE1_SD="EMPTY"
+> SLICE1_5QI="9"
+> SLICE1_UPLINK="20Mbps"
+> SLICE1_DOWNLINK="40Mbps"
+> SLICE2_SST="1"
+> SLICE2_SD="000001"
+> SLICE2_5QI="5"
+> SLICE2_UPLINK="100Mbps"
+> SLICE2_DOWNLINK="200Mbps"
+> GNB_ID="0xe020"
+53,55c53,55
+< FULL_KEY="@DEF_FULL_KEY@"
+< OPC="@DEF_OPC@"
+< RFSIM_IMSI="@DEF_RFSIM_IMSI@"
+---
+> FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f"
+> OPC="C42449363BBAD02B66D16BC975D77CC1"
+> RFSIM_IMSI="001010000001121"
+57c57
+< PREFIX_DEMO="@DEF_PREFIX_DEMO@" # Directory in which all scripts will be copied on the k8s server to run the demo
+---
+> PREFIX_DEMO="/home/ziyad-mabrouk/oai5g-rru/testing" # Directory in which all scripts will be copied on the k8s server to run the demo
+600c600
+< function configure-oai-5g-@mode@() {
+---
+> function configure-oai-5g-advance() {
+604,605c604,605
+<     echo "Configuring chart $OAI5G_@MODE@/values.yaml for R2lab"
+<     cat > $TMP/@mode@-values.sed <<EOF
+---
+>     echo "Configuring chart $OAI5G_ADVANCE/values.yaml for R2lab"
+>     cat > $TMP/advance-values.sed <<EOF
+669,672c669,672
+<     cp "$OAI5G_@MODE@"/values.yaml $TMP/@mode@_values.yaml-orig
+<     echo "(Over)writing $OAI5G_@MODE@/values.yaml"
+<     sed -f $TMP/@mode@-values.sed < $TMP/@mode@_values.yaml-orig > "$OAI5G_@MODE@"/values.yaml
+<     diff $TMP/@mode@_values.yaml-orig "$OAI5G_@MODE@"/values.yaml
+---
+>     cp "$OAI5G_ADVANCE"/values.yaml $TMP/advance_values.yaml-orig
+>     echo "(Over)writing $OAI5G_ADVANCE/values.yaml"
+>     sed -f $TMP/advance-values.sed < $TMP/advance_values.yaml-orig > "$OAI5G_ADVANCE"/values.yaml
+>     diff $TMP/advance_values.yaml-orig "$OAI5G_ADVANCE"/values.yaml
+674,675c674,675
+<     echo "Configuring chart $OAI5G_@MODE@/config.yaml for R2lab"
+<     cat > $TMP/@mode@-config.sed <<EOF
+---
+>     echo "Configuring chart $OAI5G_ADVANCE/config.yaml for R2lab"
+>     cat > $TMP/advance-config.sed <<EOF
+709,711c709,711
+<     cp "$OAI5G_@MODE@"/config.yaml $TMP/@mode@_config.yaml-orig
+<     echo "(Over)writing $OAI5G_@MODE@/config.yaml"
+<     sed -f $TMP/@mode@-config.sed < $TMP/@mode@_config.yaml-orig > "$OAI5G_@MODE@"/config.yaml
+---
+>     cp "$OAI5G_ADVANCE"/config.yaml $TMP/advance_config.yaml-orig
+>     echo "(Over)writing $OAI5G_ADVANCE/config.yaml"
+>     sed -f $TMP/advance-config.sed < $TMP/advance_config.yaml-orig > "$OAI5G_ADVANCE"/config.yaml
+713,715c713,715
+<     awk '!/EMPTY/' "$OAI5G_@MODE@"/config.yaml > /tmp/temp && mv /tmp/temp "$OAI5G_@MODE@"/config.yaml
+<     diff $TMP/@mode@_config.yaml-orig "$OAI5G_@MODE@"/config.yaml
+<     cd "$OAI5G_@MODE@"
+---
+>     awk '!/EMPTY/' "$OAI5G_ADVANCE"/config.yaml > /tmp/temp && mv /tmp/temp "$OAI5G_ADVANCE"/config.yaml
+>     diff $TMP/advance_config.yaml-orig "$OAI5G_ADVANCE"/config.yaml
+>     cd "$OAI5G_ADVANCE"
+1128,1130c1128,1130
+<         --docker-username="@DEF_REGCRED_NAME@" \
+<         --docker-password="@DEF_REGCRED_PWD@" \
+<         --docker-email="@DEF_REGCRED_EMAIL@" || true
+---
+>         --docker-username="r2labuser" \
+>         --docker-password="r2labuser-pwd" \
+>         --docker-email="r2labuser@turletti.com" || true
+1133c1133
+<     configure-oai-5g-@mode@ 
+---
+>     configure-oai-5g-advance 
+1146,1147c1146,1147
+<     echo "cd $OAI5G_@MODE@"
+<     cd "$OAI5G_@MODE@" || { echo "Error: Failed to change directory"; exit 1; }
+---
+>     echo "cd $OAI5G_ADVANCE"
+>     cd "$OAI5G_ADVANCE" || { echo "Error: Failed to change directory"; exit 1; }
+1155,1156c1155,1156
+<     echo "helm --namespace=$NS install oai-5g-@mode@ ."
+<     if ! helm --create-namespace --namespace="$NS" install oai-5g-@mode@ .; then
+---
+>     echo "helm --namespace=$NS install oai-5g-advance ."
+>     if ! helm --create-namespace --namespace="$NS" install oai-5g-advance .; then
+1347,1348c1347,1348
+<     echo "helm --namespace=$NS uninstall oai-5g-@mode@"
+<     helm --namespace=$NS uninstall oai-5g-@mode@ 
+---
+>     echo "helm --namespace=$NS uninstall oai-5g-advance"
+>     helm --namespace=$NS uninstall oai-5g-advance 
+1445,1446c1445,1446
+<     AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+<     AMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
+---
+>     AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+>     AMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[*].status.podIP}")
+1450,1451c1450,1451
+<     AUSF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+<     AUSF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
+---
+>     AUSF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+>     AUSF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[*].status.podIP}")
+1455,1456c1455,1456
+<     NRF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+<     NRF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
+---
+>     NRF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+>     NRF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[*].status.podIP}")
+1460,1461c1460,1461
+<     SMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+<     SMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
+---
+>     SMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+>     SMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[*].status.podIP}")
+1465,1466c1465,1466
+<     UPF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+<     UPF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
+---
+>     UPF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+>     UPF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[*].status.podIP}")
+1470,1471c1470,1471
+<     UDM_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+<     UDM_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
+---
+>     UDM_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+>     UDM_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[*].status.podIP}")
+1475,1476c1475,1476
+<     UDR_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+<     UDR_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
+---
+>     UDR_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+>     UDR_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[*].status.podIP}")
+1545c1545
+<     AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+---
+>     AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+Patching oai_db-basic.sql generic database for R2lab UEs with both DNN0 and DNN1
+153c153
+< ('@DEF_MCC@@DEF_MNC@0000000001', '5G_AKA', '@DEF_FULL_KEY@', '@DEF_FULL_KEY@', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '@DEF_OPC@', NULL, NULL, NULL, NULL, '@DEF_MCC@@DEF_MNC@0000000001');
+---
+> ('001010000000001', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000001');
+155c155
+< ('@DEF_MCC@@DEF_MNC@0000000002', '5G_AKA', '@DEF_FULL_KEY@', '@DEF_FULL_KEY@', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '@DEF_OPC@', NULL, NULL, NULL, NULL, '@DEF_MCC@@DEF_MNC@0000000002');
+---
+> ('001010000000002', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000002');
+157c157
+< ('@DEF_MCC@@DEF_MNC@0000000003', '5G_AKA', '@DEF_FULL_KEY@', '@DEF_FULL_KEY@', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '@DEF_OPC@', NULL, NULL, NULL, NULL, '@DEF_MCC@@DEF_MNC@0000000003');
+---
+> ('001010000000003', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000003');
+159c159
+< ('@DEF_MCC@@DEF_MNC@0000000004', '5G_AKA', '@DEF_FULL_KEY@', '@DEF_FULL_KEY@', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '@DEF_OPC@', NULL, NULL, NULL, NULL, '@DEF_MCC@@DEF_MNC@0000000004');
+---
+> ('001010000000004', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000004');
+161c161
+< ('@DEF_MCC@@DEF_MNC@0000000005', '5G_AKA', '@DEF_FULL_KEY@', '@DEF_FULL_KEY@', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '@DEF_OPC@', NULL, NULL, NULL, NULL, '@DEF_MCC@@DEF_MNC@0000000005');
+---
+> ('001010000000005', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000005');
+163c163
+< ('@DEF_MCC@@DEF_MNC@0000000006', '5G_AKA', '@DEF_FULL_KEY@', '@DEF_FULL_KEY@', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '@DEF_OPC@', NULL, NULL, NULL, NULL, '@DEF_MCC@@DEF_MNC@0000000006');
+---
+> ('001010000000006', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000006');
+165c165
+< ('@DEF_MCC@@DEF_MNC@0000000007', '5G_AKA', '@DEF_FULL_KEY@', '@DEF_FULL_KEY@', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '@DEF_OPC@', NULL, NULL, NULL, NULL, '@DEF_MCC@@DEF_MNC@0000000007');
+---
+> ('001010000000007', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000007');
+167c167
+< ('@DEF_MCC@@DEF_MNC@0000000008', '5G_AKA', '@DEF_FULL_KEY@', '@DEF_FULL_KEY@', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '@DEF_OPC@', NULL, NULL, NULL, NULL, '@DEF_MCC@@DEF_MNC@0000000008');
+---
+> ('001010000000008', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000000008');
+169c169
+< ('@DEF_RFSIM_IMSI@', '5G_AKA', '@DEF_FULL_KEY@', '@DEF_FULL_KEY@', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '@DEF_OPC@', NULL, NULL, NULL, NULL, '@DEF_RFSIM_IMSI@');
+---
+> ('001010000001121', '5G_AKA', 'fec86ba6eb707ed08905757b1bb44b8f', 'fec86ba6eb707ed08905757b1bb44b8f', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', 'C42449363BBAD02B66D16BC975D77CC1', NULL, NULL, NULL, NULL, '001010000001121');
+316c316
+< ('@DEF_MCC@@DEF_MNC@0000000001', '@DEF_MCC@@DEF_MNC@', '{\"sst\": @DEF_SLICE1_SST@, \"sd\": \"@DEF_SLICE1_SD@\"}','{\"@DEF_DNN0@\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": @DEF_SLICE1_5QI@,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"@DEF_SLICE1_UPLINK@\", \"downlink\":\"@DEF_SLICE1_DOWNLINK@\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.11\"}]}}');
+---
+> ('001010000000001', '00101', '{\"sst\": 1, \"sd\": \"EMPTY\"}','{\"internet\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 9,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"20Mbps\", \"downlink\":\"40Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.11\"}]}}');
+318c318
+< ('@DEF_MCC@@DEF_MNC@0000000002', '@DEF_MCC@@DEF_MNC@', '{\"sst\": @DEF_SLICE1_SST@, \"sd\": \"@DEF_SLICE1_SD@\"}','{\"@DEF_DNN0@\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": @DEF_SLICE1_5QI@,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"@DEF_SLICE1_UPLINK@\", \"downlink\":\"@DEF_SLICE1_DOWNLINK@\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.12\"}]}}');
+---
+> ('001010000000002', '00101', '{\"sst\": 1, \"sd\": \"EMPTY\"}','{\"internet\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 9,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"20Mbps\", \"downlink\":\"40Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.12\"}]}}');
+320c320
+< ('@DEF_MCC@@DEF_MNC@0000000003', '@DEF_MCC@@DEF_MNC@', '{\"sst\": @DEF_SLICE1_SST@, \"sd\": \"@DEF_SLICE1_SD@\"}','{\"@DEF_DNN0@\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": @DEF_SLICE1_5QI@,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"@DEF_SLICE1_UPLINK@\", \"downlink\":\"@DEF_SLICE1_DOWNLINK@\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.13\"}]}}');
+---
+> ('001010000000003', '00101', '{\"sst\": 1, \"sd\": \"EMPTY\"}','{\"internet\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 9,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"20Mbps\", \"downlink\":\"40Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.13\"}]}}');
+322c322
+< ('@DEF_MCC@@DEF_MNC@0000000004', '@DEF_MCC@@DEF_MNC@', '{\"sst\": @DEF_SLICE1_SST@, \"sd\": \"@DEF_SLICE1_SD@\"}','{\"@DEF_DNN0@\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": @DEF_SLICE1_5QI@,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"@DEF_SLICE1_UPLINK@\", \"downlink\":\"@DEF_SLICE1_DOWNLINK@\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.14\"}]}}');
+---
+> ('001010000000004', '00101', '{\"sst\": 1, \"sd\": \"EMPTY\"}','{\"internet\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 9,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"20Mbps\", \"downlink\":\"40Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.14\"}]}}');
+324c324
+< ('@DEF_MCC@@DEF_MNC@0000000005', '@DEF_MCC@@DEF_MNC@', '{\"sst\": @DEF_SLICE1_SST@, \"sd\": \"@DEF_SLICE1_SD@\"}','{\"@DEF_DNN0@\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": @DEF_SLICE1_5QI@,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"@DEF_SLICE1_UPLINK@\", \"downlink\":\"@DEF_SLICE1_DOWNLINK@\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.15\"}]}}');
+---
+> ('001010000000005', '00101', '{\"sst\": 1, \"sd\": \"EMPTY\"}','{\"internet\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 9,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"20Mbps\", \"downlink\":\"40Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.15\"}]}}');
+326c326
+< ('@DEF_MCC@@DEF_MNC@0000000006', '@DEF_MCC@@DEF_MNC@', '{\"sst\": @DEF_SLICE1_SST@, \"sd\": \"@DEF_SLICE1_SD@\"}','{\"@DEF_DNN0@\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"@DEF_DNN0_PDU_TYPE@\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": @DEF_SLICE1_5QI@,\"arp\":{\"priorityLevel\": @DEF_SLICE1_ARP_PRIORITY_LEVEL@,\"preemptCap\": \"@DEF_SLICE1_ARP_PREEMPT_CAP@\",\"preemptVuln\":\"@DEF_SLICE1_ARP_PREEMPT_VULN@\"},\"priorityLevel\":@DEF_SLICE1_PRIORITY_LEVEL@},\"sessionAmbr\":{\"uplink\":\"@DEF_SLICE1_UPLINK@\", \"downlink\":\"@DEF_SLICE1_DOWNLINK@\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.16\"}]}}');
+---
+> ('001010000000006', '00101', '{\"sst\": 1, \"sd\": \"EMPTY\"}','{\"internet\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 9,\"arp\":{\"priorityLevel\": 8,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"20Mbps\", \"downlink\":\"40Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.16\"}]}}');
+328c328
+< ('@DEF_MCC@@DEF_MNC@0000000007', '@DEF_MCC@@DEF_MNC@', '{\"sst\": @DEF_SLICE2_SST@, \"sd\": \"@DEF_SLICE2_SD@\"}','{\"@DEF_DNN1@\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"@DEF_DNN1_PDU_TYPE@\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": @DEF_SLICE2_5QI@,\"arp\":{\"priorityLevel\": @DEF_SLICE2_ARP_PRIORITY_LEVEL@,\"preemptCap\": \"@DEF_SLICE2_ARP_PREEMPT_CAP@\",\"preemptVuln\":\"@DEF_SLICE2_ARP_PREEMPT_VULN@\"},\"priorityLevel\":@DEF_SLICE2_PRIORITY_LEVEL@},\"sessionAmbr\":{\"uplink\":\"@DEF_SLICE2_UPLINK@\", \"downlink\":\"@DEF_SLICE2_DOWNLINK@\"},\"staticIpAddress\":[{\"ipv4Addr\": \"14.1.1.17\"}]}}');
+---
+> ('001010000000007', '00101', '{\"sst\": 1, \"sd\": \"000001\"}','{\"streaming\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 5,\"arp\":{\"priorityLevel\": 1,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"100Mbps\", \"downlink\":\"200Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"14.1.1.17\"}]}}');
+330c330
+< ('@DEF_MCC@@DEF_MNC@0000000008', '@DEF_MCC@@DEF_MNC@', '{\"sst\": @DEF_SLICE1_SST@, \"sd\": \"@DEF_SLICE1_SD@\"}','{\"@DEF_DNN0@\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"@DEF_DNN0_PDU_TYPE@\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": @DEF_SLICE1_5QI@,\"arp\":{\"priorityLevel\": @DEF_SLICE1_ARP_PRIORITY_LEVEL@,\"preemptCap\": \"@DEF_SLICE1_ARP_PREEMPT_CAP@\",\"preemptVuln\":\"@DEF_SLICE1_ARP_PREEMPT_VULN@\"},\"priorityLevel\":@DEF_SLICE1_PRIORITY_LEVEL@},\"sessionAmbr\":{\"uplink\":\"@DEF_SLICE1_UPLINK@\", \"downlink\":\"@DEF_SLICE1_DOWNLINK@\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.18\"}]}}');
+---
+> ('001010000000008', '00101', '{\"sst\": 1, \"sd\": \"EMPTY\"}','{\"internet\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 9,\"arp\":{\"priorityLevel\": 8,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"20Mbps\", \"downlink\":\"40Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.18\"}]}}');
+332c332
+< ('@DEF_RFSIM_IMSI@', '@DEF_MCC@@DEF_MNC@', '{\"sst\": @DEF_SLICE1_SST@, \"sd\": \"@DEF_SLICE1_SD@\"}','{\"@DEF_DNN0@\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": @DEF_SLICE1_5QI@,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"@DEF_SLICE1_UPLINK@\", \"downlink\":\"@DEF_SLICE1_DOWNLINK@\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.10\"}]}}');
+---
+> ('001010000001121', '00101', '{\"sst\": 1, \"sd\": \"EMPTY\"}','{\"internet\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": 9,\"arp\":{\"priorityLevel\": 15,\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"20Mbps\", \"downlink\":\"40Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"12.1.1.10\"}]}}');
+Step 2: configure OAI5G charts to match the target scenario
+run init
+./demo-oai.sh: running init
+./demo-oai.sh configure-all
+./demo-oai.sh: running configure-all
+configure-all: Applying SophiaNode patches to OAI5G charts located on "/home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed"
+	 with oai-upf running on "10.10.3.200"
+	 with oai-gnb running on "precision-7530"
+	 with generate-logs: "false"
+	 with generate-pcap: "false"
+Create open5gs if not present and regcred secret
+secret "regcred" deleted
+secret/regcred created
+Configuring chart /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-core/oai-5g-advance/values.yaml for R2lab
+(Over)writing /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-core/oai-5g-advance/values.yaml
+5c5
+<   IP_NRF: @IP_NRF@
+---
+>   IP_NRF: 
+11c11
+<   enabled: @ENABLED_MYSQL@ #true
+---
+>   enabled:  #true
+19c19
+<   enabled: @ENABLED_NRF@ #true
+---
+>   enabled:  #true
+25c25
+<   includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #only for taking pcaps inside network function pod
+---
+>   includeTcpDumpContainer: false #only for taking pcaps inside network function pod
+32c32
+<   enabled: @ENABLED_NSSF@ #true
+---
+>   enabled:  #true
+40c40
+<   includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #only for taking pcaps inside network function pod
+---
+>   includeTcpDumpContainer: false #only for taking pcaps inside network function pod
+42c42
+<     sharedvolume: @SHAREDVOLUME@
+---
+>     sharedvolume: false
+47c47
+<   enabled: @ENABLED_UDR@ #true
+---
+>   enabled:  #true
+66c66
+<   includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #only for taking pcaps inside network function pod
+---
+>   includeTcpDumpContainer: false #only for taking pcaps inside network function pod
+73c73
+<   enabled: @ENABLED_UDM@ #true
+---
+>   enabled:  #true
+79c79
+<   includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #only for taking pcaps inside network function pod
+---
+>   includeTcpDumpContainer: false #only for taking pcaps inside network function pod
+86c86
+<   enabled: @ENABLED_AUSF@ #true
+---
+>   enabled:  #true
+93,94c93,94
+<     tcpdump: @START_TCPDUMP@
+<   includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #only for taking pcaps inside network function pod
+---
+>     tcpdump: false
+>   includeTcpDumpContainer: false #only for taking pcaps inside network function pod
+98c98
+<     privileged: @PRIVILEGED@
+---
+>     privileged: false
+100c100
+<     sharedvolume: @SHAREDVOLUME@
+---
+>     sharedvolume: false
+105c105
+<   enabled: @ENABLED_AMF@ #true
+---
+>   enabled:  #true
+112,113c112,113
+<     tcpdump: @START_TCPDUMP@  
+<   includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #only for taking pcaps inside network function pod
+---
+>     tcpdump: false  
+>   includeTcpDumpContainer: false #only for taking pcaps inside network function pod
+117c117
+<     privileged: @PRIVILEGED@
+---
+>     privileged: false
+119c119
+<     sharedvolume: @SHAREDVOLUME@
+---
+>     sharedvolume: false
+122c122
+<     defaultGateway: "@CN_DEFAULT_GW@"
+---
+>     defaultGateway: ""
+124,126c124,126
+<       create: @MULTUS_AMF_N2@
+<       ipAdd: "@IP_AMF_N2@"
+<       netmask: "@NETMASK_AMF_N2@"
+---
+>       create: 
+>       ipAdd: ""
+>       netmask: ""
+128c128
+<       mac: "@MAC_AMF_N2@"
+---
+>       mac: "12:34:00:02:02:01"
+131c131
+<       gateway: "@GW_AMF_N2@"
+---
+>       gateway: ""
+133,134c133,134
+<       routes: @ROUTES_AMF_N2@
+<       hostInterface: "@IF_NAME_AMF_N2@" # Interface of the host machine on which this pod will be scheduled
+---
+>       routes: 
+>       hostInterface: "" # Interface of the host machine on which this pod will be scheduled
+136c136
+<   nodeName: @NODE_AMF@
+---
+>   nodeName: "10.10.3.200"
+138c138
+<   enabled: @ENABLED_UPF@ #true
+---
+>   enabled:  #true
+145,146c145,146
+<     tcpdump: @START_TCPDUMP@  
+<   includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #only for taking pcaps inside network function pod
+---
+>     tcpdump: false  
+>   includeTcpDumpContainer: false #only for taking pcaps inside network function pod
+150c150
+<     privileged: true # @PRIVILEGED@ # upf fails without privilege mode on rocky
+---
+>     privileged: true # false # upf fails without privilege mode on rocky
+152c152
+<     sharedvolume: @SHAREDVOLUME@
+---
+>     sharedvolume: false
+158c158
+<     defaultGateway: "@CN_DEFAULT_GW@"
+---
+>     defaultGateway: ""
+160,162c160,162
+<       create: @MULTUS_UPF_N3@
+<       ipAdd: "@IP_UPF_N3@"
+<       netmask: "@NETMASK_UPF_N3@"
+---
+>       create: 
+>       ipAdd: ""
+>       netmask: ""
+164c164
+<       mac: "@MAC_UPF_N3@"
+---
+>       mac: "12:34:00:02:02:02"
+167c167
+<       gateway: "@GW_UPF_N3@"
+---
+>       gateway: ""
+169,170c169,170
+<       routes: @ROUTES_UPF_N3@
+<       hostInterface: "@IF_NAME_UPF_N3@"
+---
+>       routes: 
+>       hostInterface: ""
+173,175c173,175
+<       create: @MULTUS_UPF_N4@
+<       ipAdd: "@IP_UPF_N4@"
+<       netmask: "@NETMASK_UPF_N4@"
+---
+>       create: 
+>       ipAdd: ""
+>       netmask: ""
+177c177
+<       mac: "@MAC_UPF_N4@"
+---
+>       mac: "12:34:00:02:02:03"
+180c180
+<       gateway: "@GW_UPF_N4@"
+---
+>       gateway: ""
+182,183c182,183
+<       routes: @ROUTES_UPF_N4@
+<       hostInterface: "@IF_NAME_UPF_N4@"
+---
+>       routes: 
+>       hostInterface: ""
+185,186c185,186
+<       create: @MULTUS_UPF_N6@
+<       ipAdd: "@IP_UPF_N6@"
+---
+>       create: 
+>       ipAdd: ""
+188c188
+<       netmask: "@NETMASK_UPF_N6@"
+---
+>       netmask: ""
+190c190
+<       mac: "@MAC_UPF_N6@"
+---
+>       mac: "12:34:00:02:02:04"
+192c192
+<       gateway: "@GW_UPF_N6@"
+---
+>       gateway: ""
+194,195c194,195
+<       routes: @ROUTES_UPF_N6@
+<       hostInterface: "@IF_NAME_UPF_N6@"
+---
+>       routes: 
+>       hostInterface: ""
+198c198
+<   nodeName: @NODE_UPF@
+---
+>   nodeName: "10.10.3.200"
+200c200
+<   enabled: @ENABLED_TS@ #true
+---
+>   enabled:  #true
+206c206
+<   includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #only for taking pcaps inside network function pod
+---
+>   includeTcpDumpContainer: false #only for taking pcaps inside network function pod
+208,210c208,210
+<     create: @MULTUS_TS@
+<     ipAdd: "@IP_TS@"
+<     netmask: "@NETMASK_TS@"
+---
+>     create: 
+>     ipAdd: ""
+>     netmask: ""
+212,213c212,213
+<     mac: "@MAC_TS@"
+<     defaultGateway: "@GW_TS@"
+---
+>     mac: "12:34:00:02:02:05"
+>     defaultGateway: ""
+215c215
+<     hostInterface: "@IF_NAME_TS@"  # Interface of the host machine on which this pod will be scheduled
+---
+>     hostInterface: ""  # Interface of the host machine on which this pod will be scheduled
+218c218
+<     upfHost: @UPF_HOST@
+---
+>     upfHost: ""
+230c230
+<   nodeName: @NODE_TS@
+---
+>   nodeName: ""
+232c232
+<   enabled: @ENABLED_SMF@ #true
+---
+>   enabled:  #true
+239,240c239,240
+<     tcpdump: @START_TCPDUMP@  
+<   includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #only for taking pcaps inside network function pod
+---
+>     tcpdump: false  
+>   includeTcpDumpContainer: false #only for taking pcaps inside network function pod
+243c243
+<     defaultGateway: "@CN_DEFAULT_GW@"
+---
+>     defaultGateway: ""
+245,247c245,247
+<       create: @MULTUS_SMF_N4@
+<       ipAdd: "@IP_SMF_N4@"
+<       netmask: "@NETMASK_SMF_N4@"
+---
+>       create: 
+>       ipAdd: ""
+>       netmask: ""
+249c249
+<       mac: "@MAC_SMF_N4@"
+---
+>       mac: "12:34:00:02:02:06"
+251c251
+<       gateway: "@GW_SMF_N4@"
+---
+>       gateway: ""
+253,254c253,254
+<       routes: @ROUTES_SMF_N4@
+<       hostInterface: "@IF_NAME_SMF_N4@"
+---
+>       routes: 
+>       hostInterface: ""
+259c259
+<     privileged: @PRIVILEGED@
+---
+>     privileged: false
+261c261
+<     sharedvolume: @SHAREDVOLUME@
+---
+>     sharedvolume: false
+263c263
+<   nodeName: @NODE_SMF@
+---
+>   nodeName: 
+Configuring chart /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-core/oai-5g-advance/config.yaml for R2lab
+(Over)writing /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-core/oai-5g-advance/config.yaml
+18,19c18
+<     sst: @SLICE1_SST@ #1
+<     sd: @SLICE1_SD@ # no value before
+---
+>     sst: 1 #1
+21,22c20,21
+<     sst: @SLICE2_SST@ #1
+<     sd: @SLICE2_SD@ #FFFFFF # in hex
+---
+>     sst: 1 #1
+>     sd: 000001 #FFFFFF # in hex
+34c33
+<       interface_name: @IF_N2@
+---
+>       interface_name: 
+43c42
+<       interface_name: @IF_N4@
+---
+>       interface_name: 
+56c55
+<       interface_name: @IF_SBI@ #eth0
+---
+>       interface_name:  #eth0
+58c57
+<       interface_name: @IF_N3@
+---
+>       interface_name: 
+61c60
+<       interface_name: @IF_N4@
+---
+>       interface_name: 
+64c63
+<       interface_name: @IF_N6@
+---
+>       interface_name: 
+87c86
+<     host: @NFS_NRF_HOST@ #oai-nrf
+---
+>     host:  #oai-nrf
+123,124c122,123
+<     - mcc: @MCC@
+<       mnc: @MNC@
+---
+>     - mcc: 001
+>       mnc: 01
+129,131c128,130
+<     - mcc: @MCC@
+<       mnc: @MNC@
+<       tac: @TAC@
+---
+>     - mcc: 001
+>       mnc: 01
+>       tac: 0x0001
+154c153
+<     primary_ipv4: "@IP_DNS1@"
+---
+>     primary_ipv4: ""
+156c155
+<     secondary_ipv4: "@IP_DNS2@"
+---
+>     secondary_ipv4: ""
+167c166
+<           - dnn: "@DNN0@"
+---
+>           - dnn: "internet"
+170c169
+<           - dnn: "@DNN1@"
+---
+>           - dnn: "streaming"
+173c172
+<       dnn: "@DNN0@"
+---
+>       dnn: "internet"
+175,177c174,176
+<         5qi: @SLICE1_5QI@ #5
+<         session_ambr_ul: "@SLICE1_UPLINK@" # "200Mbps"
+<         session_ambr_dl: "@SLICE1_DOWNLINK@" # "400Mbps"
+---
+>         5qi: 9 #5
+>         session_ambr_ul: "20Mbps" # "200Mbps"
+>         session_ambr_dl: "40Mbps" # "400Mbps"
+179c178
+<       dnn: "@DNN1@"
+---
+>       dnn: "streaming"
+181,183c180,182
+<         5qi: @SLICE2_5QI@ #2
+<         session_ambr_ul: "@SLICE2_UPLINK@" # "100Mbps"
+<         session_ambr_dl: "@SLICE2_DOWNLINK@" # "200Mbps"
+---
+>         5qi: 5 #2
+>         session_ambr_ul: "100Mbps" # "100Mbps"
+>         session_ambr_dl: "200Mbps" # "200Mbps"
+203c202
+<     enable_snat: @ENABLE_SNAT@ # If "on": Source natting is done for UE, DEFAULT= off
+---
+>     enable_snat: off # If "on": Source natting is done for UE, DEFAULT= off
+209c208
+<         - dnn: @DNN0@
+---
+>         - dnn: internet
+212c211
+<         - dnn: @DNN1@
+---
+>         - dnn: streaming
+216,217c215,216
+<   - dnn: "@DNN0@"
+<     pdu_session_type: "@DNN0_PDU_TYPE@"
+---
+>   - dnn: "internet"
+>     pdu_session_type: "IPV4"
+219,220c218,219
+<   - dnn: "@DNN1@"
+<     pdu_session_type: "@DNN1_PDU_TYPE@"
+---
+>   - dnn: "streaming"
+>     pdu_session_type: "IPV4"
+helm dependency update
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "minio" chart repository
+...Successfully got an update from the "openebs" chart repository
+...Successfully got an update from the "grafana" chart repository
+...Successfully got an update from the "prometheus-community" chart repository
+...Successfully got an update from the "bitnami" chart repository
+Update Complete. ⎈Happy Helming!⎈
+Saving 11 charts
+Deleting outdated charts
+configure-mysql: mysql database already patched by configure-demo-oai.sh script, just copy it
+cp /home/ziyad-mabrouk/oai5g-rru/testing/oai5g-rru/patch-mysql/oai_db-basic.sql /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-core/mysql/initialization/
+configure-gnb: gNB on node precision-7530 with RRU rfsim and logs is false
+monolithic gNB, conf is /home/ziyad-mabrouk/oai5g-rru/testing/oai5g-rru/ran-config/conf/gnb.sa.band78.106prb.rfsim.conf
+Insert the right gNB conf file /home/ziyad-mabrouk/oai5g-rru/testing/oai5g-rru/ran-config/conf/gnb.sa.band78.106prb.rfsim.conf in the right configmap.yaml
+Configure configmap.yaml of oai-gnb/oai-du
+Monolithic mode, do not set AMF_IP_ADDRESS and CU_IP_ADDRESS
+MONITORING is set to True. A prometheus log parser container will be created besides the gnb
+(Over)writing /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates/configmap.yaml
+********************* Display modified /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates/configmap.yaml ************************
+---
+#https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/ci-scripts/conf_files/gnb.sa.band78.106prb.rfsim.conf
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-configmap
+data:
+  gnb.conf: |
+      Active_gNBs = ( "gNB-r2lab_rfsim");
+      # Asn1_verbosity, choice in: none, info, annoying
+      Asn1_verbosity = "none";
+      
+      gNBs =
+      (
+       {
+          ////////// Identification parameters:
+          gNB_ID    =  0xe020;
+          gNB_name  =  "gNB-r2lab_rfsim";
+      
+          // Tracking area code, 0x0000 and 0xfffe are reserved values
+          tracking_area_code  =  1;
+          plmn_list = ({ mcc = 001; mnc = 01; mnc_length = 2; snssaiList = ({ sst = 1; }, { sst = 1; sd = 0x000001; }) });
+      
+          nr_cellid = 12345678L;
+      
+          ////////// Physical parameters:
+          min_rxtxtime                                              = 6;
+      
+          servingCellConfigCommon = (
+          {
+       #spCellConfigCommon
+      
+            physCellId                                                    = 0;
+      
+      #  downlinkConfigCommon
+          #frequencyInfoDL
+            # this is 3600 MHz + 43 PRBs@30kHz SCS (same as initial BWP)
+            absoluteFrequencySSB                                          = 641280;
+            dl_frequencyBand                                                 = 78;
+            # this is 3600 MHz
+            dl_absoluteFrequencyPointA                                       = 640008;
+            #scs-SpecificCarrierList
+              dl_offstToCarrier                                              = 0;
+      # subcarrierSpacing
+      # 0=kHz15, 1=kHz30, 2=kHz60, 3=kHz120  
+              dl_subcarrierSpacing                                           = 1;
+              dl_carrierBandwidth                                            = 106;
+           #initialDownlinkBWP
+            #genericParameters
+              # this is RBstart=27,L=48 (275*(L-1))+RBstart
+              initialDLBWPlocationAndBandwidth                               = 28875; # 6366 12925 12956 28875 12952
+      # subcarrierSpacing
+      # 0=kHz15, 1=kHz30, 2=kHz60, 3=kHz120  
+              initialDLBWPsubcarrierSpacing                                           = 1;
+            #pdcch-ConfigCommon
+              initialDLBWPcontrolResourceSetZero                              = 12;
+              initialDLBWPsearchSpaceZero                                             = 0;
+      
+        #uplinkConfigCommon 
+           #frequencyInfoUL
+            ul_frequencyBand                                                 = 78;
+            #scs-SpecificCarrierList
+            ul_offstToCarrier                                              = 0;
+      # subcarrierSpacing
+      # 0=kHz15, 1=kHz30, 2=kHz60, 3=kHz120  
+            ul_subcarrierSpacing                                           = 1;
+            ul_carrierBandwidth                                            = 106;
+            pMax                                                          = 20;
+           #initialUplinkBWP
+            #genericParameters
+              initialULBWPlocationAndBandwidth                            = 28875;
+      # subcarrierSpacing
+      # 0=kHz15, 1=kHz30, 2=kHz60, 3=kHz120  
+              initialULBWPsubcarrierSpacing                                           = 1;
+            #rach-ConfigCommon
+              #rach-ConfigGeneric
+                prach_ConfigurationIndex                                  = 98;
+      #prach_msg1_FDM
+      #0 = one, 1=two, 2=four, 3=eight
+                prach_msg1_FDM                                            = 0;
+                prach_msg1_FrequencyStart                                 = 0;
+                zeroCorrelationZoneConfig                                 = 13;
+                preambleReceivedTargetPower                               = -96;
+      #preamblTransMax (0...10) = (3,4,5,6,7,8,10,20,50,100,200)
+                preambleTransMax                                          = 6;
+      #powerRampingStep
+      # 0=dB0,1=dB2,2=dB4,3=dB6
+              powerRampingStep                                            = 1;
+      #ra_ReponseWindow
+      #1,2,4,8,10,20,40,80
+              ra_ResponseWindow                                           = 4;
+      #ssb_perRACH_OccasionAndCB_PreamblesPerSSB_PR
+      #1=oneeighth,2=onefourth,3=half,4=one,5=two,6=four,7=eight,8=sixteen
+              ssb_perRACH_OccasionAndCB_PreamblesPerSSB_PR                = 4;
+      #oneHalf (0..15) 4,8,12,16,...60,64
+              ssb_perRACH_OccasionAndCB_PreamblesPerSSB                   = 14;
+      #ra_ContentionResolutionTimer
+      #(0..7) 8,16,24,32,40,48,56,64
+              ra_ContentionResolutionTimer                                = 7;
+              rsrp_ThresholdSSB                                           = 19;
+      #prach-RootSequenceIndex_PR
+      #1 = 839, 2 = 139
+              prach_RootSequenceIndex_PR                                  = 2;
+              prach_RootSequenceIndex                                     = 1;
+              # SCS for msg1, can only be 15 for 30 kHz < 6 GHz, takes precendence over the one derived from prach-ConfigIndex
+              #  
+              msg1_SubcarrierSpacing                                      = 1,
+      # restrictedSetConfig
+      # 0=unrestricted, 1=restricted type A, 2=restricted type B
+              restrictedSetConfig                                         = 0,
+      
+              msg3_DeltaPreamble                                          = 1;
+              p0_NominalWithGrant                                         =-90;
+      
+      # pucch-ConfigCommon setup :
+      # pucchGroupHopping
+      # 0 = neither, 1= group hopping, 2=sequence hopping
+              pucchGroupHopping                                           = 0;
+              hoppingId                                                   = 40;
+              p0_nominal                                                  = -90;
+      
+            ssb_PositionsInBurst_Bitmap                                   = 1;
+      
+      # ssb_periodicityServingCell
+      # 0 = ms5, 1=ms10, 2=ms20, 3=ms40, 4=ms80, 5=ms160, 6=spare2, 7=spare1 
+            ssb_periodicityServingCell                                    = 2;
+      
+      # dmrs_TypeA_position
+      # 0 = pos2, 1 = pos3
+            dmrs_TypeA_Position                                           = 0;
+      
+      # subcarrierSpacing
+      # 0=kHz15, 1=kHz30, 2=kHz60, 3=kHz120  
+            subcarrierSpacing                                             = 1;
+      
+      
+        #tdd-UL-DL-ConfigurationCommon
+      # subcarrierSpacing
+      # 0=kHz15, 1=kHz30, 2=kHz60, 3=kHz120  
+            referenceSubcarrierSpacing                                    = 1;
+            # pattern1 
+            # dl_UL_TransmissionPeriodicity
+            # 0=ms0p5, 1=ms0p625, 2=ms1, 3=ms1p25, 4=ms2, 5=ms2p5, 6=ms5, 7=ms10
+            dl_UL_TransmissionPeriodicity                                 = 6;
+            nrofDownlinkSlots                                             = 7;
+            nrofDownlinkSymbols                                           = 6;
+            nrofUplinkSlots                                               = 2;
+            nrofUplinkSymbols                                             = 4;
+      
+            ssPBCH_BlockPower                                             = -25;
+           }
+          );
+      
+      
+          # ------- SCTP definitions
+          SCTP :
+          {
+              # Number of streams to use in input/output
+              SCTP_INSTREAMS  = 2;
+              SCTP_OUTSTREAMS = 2;
+          };
+      
+      
+          ////////// AMF parameters:
+          amf_ip_address = ({ ipv4 = "@AMF_IP_ADDRESS@"; });	
+      
+      
+          NETWORK_INTERFACES :
+          {
+              GNB_IPV4_ADDRESS_FOR_NG_AMF              = "@GNB_N2_IP_ADDRESS@";
+              GNB_IPV4_ADDRESS_FOR_NGU                 = "@GNB_N3_IP_ADDRESS@";
+              GNB_PORT_FOR_S1U                         = 2152; # Spec 2152
+          };
+      
+        }
+      );
+      
+      MACRLCs = (
+      {
+        num_cc                      = 1;
+        tr_s_preference             = "local_L1";
+        tr_n_preference             = "local_RRC";
+        pusch_TargetSNRx10          = 200;
+        pucch_TargetSNRx10          = 200;
+      
+      }
+      );
+      
+      L1s = (
+      {
+        num_cc                = 1;
+        tr_n_preference       = "local_mac";
+        prach_dtx_threshold = 200;
+        pucch0_dtx_threshold = 150;
+        ofdm_offset_divisor = 8; #set this to UINT_MAX for offset 0
+      }
+      );
+      
+      RUs = (
+      {
+        local_rf       = "yes"
+        nb_tx          = 1
+        nb_rx          = 1
+        att_tx         = 0
+        att_rx         = 0;
+        bands          = [78];
+        max_pdschReferenceSignalPower = -27;
+        max_rxgain                    = 114;
+        eNB_instances  = [0];
+        clock_src = "internal";
+      }
+      );
+      
+      rfsimulator :
+      {
+        serveraddr = "server";
+        serverport = "4043";
+        options = (); #("saviq"); or/and "chanmod"
+        modelname = "AWGN";
+        IQfile = "/tmp/rfsimulator.iqs";
+      };
+      
+      security = {
+        # preferred ciphering algorithms
+        # the first one of the list that an UE supports in chosen
+        # valid values: nea0, nea1, nea2, nea3
+        ciphering_algorithms = ( "nea0" );
+      
+        # preferred integrity algorithms
+        # the first one of the list that an UE supports in chosen
+        # valid values: nia0, nia1, nia2, nia3
+        integrity_algorithms = ( "nia2", "nia0" );
+      
+        # setting 'drb_ciphering' to "no" disables ciphering for DRBs, no matter
+        # what 'ciphering_algorithms' configures; same thing for 'drb_integrity'
+        drb_ciphering = "yes";
+        drb_integrity = "no";
+      };
+      
+      log_config :
+      {
+        global_log_level                      ="info";
+        hw_log_level                          ="info";
+        phy_log_level                         ="info";
+        mac_log_level                         ="info";
+        rlc_log_level                         ="info";
+        pdcp_log_level                        ="info";
+        rrc_log_level                         ="info";
+        ngap_log_level                        ="debug";
+        f1ap_log_level                        ="info";
+      };
+      
+      #/* configuration for channel modelisation */
+      #/* To be included in main config file when */
+      #/* channel modelisation is used (rfsimulator with chanmod options enabled) */
+      channelmod = {
+        max_chan = 10;
+        modellist = "modellist_rfsimu_1";
+        modellist_rfsimu_1 = (
+          { # DL, modify on UE side
+            model_name     = "rfsimu_channel_enB0"
+            type           = "AWGN";
+            ploss_dB       = 20;
+            noise_power_dB = -4;
+            forgetfact     = 0;
+            offset         = 0;
+            ds_tdl         = 0;
+          },
+          { # UL, modify on gNB side
+            model_name     = "rfsimu_channel_ue0"
+            type           = "AWGN";
+            ploss_dB       = 20;
+            noise_power_dB = -2;
+            forgetfact     = 0;
+            offset         = 0;
+            ds_tdl         = 0;
+          }
+        );
+      };
+      
+(Over)writing /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-du/templates/configmap.yaml
+********************* Display modified /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-du/templates/configmap.yaml ************************
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-configmap
+#https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/ci-scripts/conf_files/gNB_SA_DU.conf
+data:
+  du.conf: |
+      Active_gNBs = ( "{{ .Values.config.duName}}");
+      # Asn1_verbosity, choice in: none, info, annoying
+      Asn1_verbosity = "none";
+
+      gNBs =
+      (
+       {
+          ////////// Identification parameters:
+          gNB_ID = 0xe020;
+          gNB_DU_ID = 0xe020;
+
+      #     cell_type =  "CELL_MACRO_GNB";
+
+          gNB_name  =  "{{ .Values.config.duName}}";
+
+          // Tracking area code, 0x0000 and 0xfffe are reserved values
+          tracking_area_code  = {{ .Values.config.tac}} ;
+          plmn_list = ({ mcc = 001; mnc = 01; mnc_length = 2; snssaiList = ({ sst = 1; }, { sst = 1; sd = 0x000001; }) });
+
+          nr_cellid = 12345678L;
+
+          ////////// Physical parameters:
+
+          min_rxtxtime                                              = 6;
+          force_256qam_off = 1;
+
+          servingCellConfigCommon = (
+          {
+       #spCellConfigCommon
+
+            physCellId                                                    = 0;
+
+      #  downlinkConfigCommon
+          #frequencyInfoDL
+            # this is 3600 MHz + 43 PRBs@30kHz SCS (same as initial BWP)
+            absoluteFrequencySSB                                          = 641280;
+            dl_frequencyBand                                                 = 78;
+            # this is 3600 MHz
+            dl_absoluteFrequencyPointA                                       = 640008;
+            #scs-SpecificCarrierList
+              dl_offstToCarrier                                              = 0;
+      # subcarrierSpacing
+      # 0=kHz15, 1=kHz30, 2=kHz60, 3=kHz120  
+              dl_subcarrierSpacing                                           = 1;
+              dl_carrierBandwidth                                            = 106;
+           #initialDownlinkBWP
+            #genericParameters
+              # this is RBstart=27,L=48 (275*(L-1))+RBstart
+              initialDLBWPlocationAndBandwidth                               = 28875; # 6366 12925 12956 28875 12952
+      # subcarrierSpacing
+      # 0=kHz15, 1=kHz30, 2=kHz60, 3=kHz120  
+              initialDLBWPsubcarrierSpacing                                           = 1;
+            #pdcch-ConfigCommon
+              initialDLBWPcontrolResourceSetZero                              = 12;
+              initialDLBWPsearchSpaceZero                                             = 0;
+
+        #uplinkConfigCommon 
+           #frequencyInfoUL
+            ul_frequencyBand                                                 = 78;
+            #scs-SpecificCarrierList
+            ul_offstToCarrier                                              = 0;
+      # subcarrierSpacing
+      # 0=kHz15, 1=kHz30, 2=kHz60, 3=kHz120  
+            ul_subcarrierSpacing                                           = 1;
+            ul_carrierBandwidth                                            = 106;
+            pMax                                                          = 20;
+           #initialUplinkBWP
+            #genericParameters
+              initialULBWPlocationAndBandwidth                            = 28875;
+      # subcarrierSpacing
+      # 0=kHz15, 1=kHz30, 2=kHz60, 3=kHz120  
+              initialULBWPsubcarrierSpacing                                           = 1;
+            #rach-ConfigCommon
+              #rach-ConfigGeneric
+                prach_ConfigurationIndex                                  = 98;
+      #prach_msg1_FDM
+      #0 = one, 1=two, 2=four, 3=eight
+                prach_msg1_FDM                                            = 0;
+                prach_msg1_FrequencyStart                                 = 0;
+                zeroCorrelationZoneConfig                                 = 13;
+                preambleReceivedTargetPower                               = -96;
+      #preamblTransMax (0...10) = (3,4,5,6,7,8,10,20,50,100,200)
+                preambleTransMax                                          = 6;
+      #powerRampingStep
+      # 0=dB0,1=dB2,2=dB4,3=dB6
+              powerRampingStep                                            = 1;
+      #ra_ReponseWindow
+      #1,2,4,8,10,20,40,80
+              ra_ResponseWindow                                           = 4;
+      #ssb_perRACH_OccasionAndCB_PreamblesPerSSB_PR
+      #1=oneeighth,2=onefourth,3=half,4=one,5=two,6=four,7=eight,8=sixteen
+              ssb_perRACH_OccasionAndCB_PreamblesPerSSB_PR                = 4;
+      #oneHalf (0..15) 4,8,12,16,...60,64
+              ssb_perRACH_OccasionAndCB_PreamblesPerSSB                   = 14;
+      #ra_ContentionResolutionTimer
+      #(0..7) 8,16,24,32,40,48,56,64
+              ra_ContentionResolutionTimer                                = 7;
+              rsrp_ThresholdSSB                                           = 19;
+      #prach-RootSequenceIndex_PR
+      #1 = 839, 2 = 139
+              prach_RootSequenceIndex_PR                                  = 2;
+              prach_RootSequenceIndex                                     = 1;
+              # SCS for msg1, can only be 15 for 30 kHz < 6 GHz, takes precendence over the one derived from prach-ConfigIndex
+              #  
+              msg1_SubcarrierSpacing                                      = 1,
+      # restrictedSetConfig
+      # 0=unrestricted, 1=restricted type A, 2=restricted type B
+              restrictedSetConfig                                         = 0,
+
+              msg3_DeltaPreamble                                          = 1;
+              p0_NominalWithGrant                                         =-90;
+
+      # pucch-ConfigCommon setup :
+      # pucchGroupHopping
+      # 0 = neither, 1= group hopping, 2=sequence hopping
+              pucchGroupHopping                                           = 0;
+              hoppingId                                                   = 40;
+              p0_nominal                                                  = -90;
+      # ssb_PositionsInBurs_BitmapPR
+      # 1=short, 2=medium, 3=long
+            ssb_PositionsInBurst_PR                                       = 2;
+            ssb_PositionsInBurst_Bitmap                                   = 1;
+
+      # ssb_periodicityServingCell
+      # 0 = ms5, 1=ms10, 2=ms20, 3=ms40, 4=ms80, 5=ms160, 6=spare2, 7=spare1 
+            ssb_periodicityServingCell                                    = 2;
+
+      # dmrs_TypeA_position
+      # 0 = pos2, 1 = pos3
+            dmrs_TypeA_Position                                           = 0;
+
+      # subcarrierSpacing
+      # 0=kHz15, 1=kHz30, 2=kHz60, 3=kHz120  
+            subcarrierSpacing                                             = 1;
+
+
+        #tdd-UL-DL-ConfigurationCommon
+      # subcarrierSpacing
+      # 0=kHz15, 1=kHz30, 2=kHz60, 3=kHz120  
+            referenceSubcarrierSpacing                                    = 1;
+            # pattern1 
+            # dl_UL_TransmissionPeriodicity
+            # 0=ms0p5, 1=ms0p625, 2=ms1, 3=ms1p25, 4=ms2, 5=ms2p5, 6=ms5, 7=ms10
+            dl_UL_TransmissionPeriodicity                                 = 6;
+            nrofDownlinkSlots                                             = 7;
+            nrofDownlinkSymbols                                           = 6;
+            nrofUplinkSlots                                               = 2;
+            nrofUplinkSymbols                                             = 4;
+
+            ssPBCH_BlockPower                                             = -25;
+           }
+
+        );
+
+
+          # ------- SCTP definitions
+          SCTP :
+          {
+              # Number of streams to use in input/output
+              SCTP_INSTREAMS  = 2;
+              SCTP_OUTSTREAMS = 2;
+          };
+        }
+      );
+
+      MACRLCs = (
+        {
+          num_cc           = 1;
+          tr_s_preference  = "local_L1";
+          tr_n_preference  = "f1";
+          local_n_address = "@F1_DU_IP_ADDRESS@";
+          remote_n_address = "@CU_IP_ADDRESS@";
+          local_n_portc   = 500;
+          local_n_portd   = {{ .Values.config.f1duPort}};
+          remote_n_portc  = 501;
+          remote_n_portd  = {{ .Values.config.f1cuPort}};
+          pusch_TargetSNRx10          = 200;
+          pucch_TargetSNRx10          = 200;
+        }
+      );
+
+      L1s = (
+      {
+        num_cc = 1;
+        tr_n_preference = "local_mac";
+        prach_dtx_threshold = 200;
+        pucch0_dtx_threshold = 150;
+        ofdm_offset_divisor = 8; #set this to UINT_MAX for offset 0
+      }
+      );
+
+      RUs = (
+          {     
+             local_rf       = "yes"
+               nb_tx          = 1
+               nb_rx          = 1
+               att_tx         = 0
+               att_rx         = 0;
+               bands          = [78];
+               max_pdschReferenceSignalPower = -27;
+               max_rxgain                    = 114;
+               eNB_instances  = [0];
+               #beamforming 1x4 matrix:
+               bf_weights = [0x00007fff, 0x0000, 0x0000, 0x0000];
+               clock_src = "internal";
+          }
+      );  
+
+      THREAD_STRUCT = (
+        {
+          #three config for level of parallelism "PARALLEL_SINGLE_THREAD", "PARALLEL_RU_L1_SPLIT", or "PARALLEL_RU_L1_TRX_SPLIT"
+          parallel_config    = "PARALLEL_SINGLE_THREAD";
+          #two option for worker "WORKER_DISABLE" or "WORKER_ENABLE"
+          worker_config      = "WORKER_ENABLE";
+        }
+      );
+      rfsimulator: {
+      serveraddr = "server";
+          serverport = 4043;
+          options = (); #("saviq"); or/and "chanmod"
+          modelname = "AWGN";
+          IQfile = "/tmp/rfsimulator.iqs"
+      }
+
+      log_config: {
+        global_log_level = "info";
+        hw_log_level = "info";
+        phy_log_level = "info";
+        mac_log_level = "info";
+        rlc_log_level = "info";
+        f1ap_log_level = "info";
+      };
+
+(Over)writing /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-cu/templates/configmap.yaml
+********************* Display modified /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-cu/templates/configmap.yaml ************************
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-configmap
+data:
+  #Taken from --> https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/ci-scripts/conf_files/gnb-cu.sa.band78.106prb.conf
+  cu.conf: |
+      Active_gNBs = ( "{{ .Values.config.cuName}}");
+      # Asn1_verbosity, choice in: none, info, annoying
+      Asn1_verbosity = "none";
+      Num_Threads_PUSCH = 8;
+
+      gNBs =
+      (
+       {
+          ////////// Identification parameters:
+          gNB_ID = 0xe020;
+
+      #     cell_type =  "CELL_MACRO_GNB";
+
+          gNB_name  =  "{{ .Values.config.cuName}}";
+
+          // Tracking area code, 0x0000 and 0xfffe are reserved values
+          tracking_area_code  = {{ .Values.config.tac}};
+          {{- if .Values.config.sd1 }}
+            {{- if .Values.config.sd2 }}
+              plmn_list = ({ mcc = 001; mnc = 01; mnc_length = 2; snssaiList = ({ sst = 1; }, { sst = 1; sd = 0x000001; }) });
+            {{- else}}
+              plmn_list = ({ mcc = 001; mnc = 01; mnc_length = 2; snssaiList = ({ sst = 1; }, { sst = 1; sd = 0x000001; }) });
+            {{- end}}
+          {{- else}}
+            plmn_list = ({ mcc = 001; mnc = 01; mnc_length = 2; snssaiList = ({ sst = 1; }, { sst = 1; sd = 0x000001; }) });
+          {{- end}}
+
+          nr_cellid = 12345678L;
+
+          tr_s_preference = "f1";
+
+          local_s_address = "@F1_IP_ADDRESS@";
+          remote_s_address = "127.0.0.1";
+          local_s_portc   = 501;
+          local_s_portd   = {{ .Values.config.f1cuPort}};
+          remote_s_portc  = 500;
+          remote_s_portd  = {{ .Values.config.f1duPort}};
+
+          # ------- SCTP definitions
+          SCTP :
+          {
+              # Number of streams to use in input/output
+              SCTP_INSTREAMS  = 2;
+              SCTP_OUTSTREAMS = 2;
+          };
+
+
+          ////////// AMF parameters:
+          amf_ip_address = ({ ipv4 = "@AMF_IP_ADDRESS@"; });
+
+          NETWORK_INTERFACES :
+          {
+            GNB_IPV4_ADDRESS_FOR_NG_AMF              = "@N2_IP_ADDRESS@";
+            GNB_IPV4_ADDRESS_FOR_NGU                 = "@N3_IP_ADDRESS@";
+            GNB_PORT_FOR_S1U                         = 2152; # Spec 2152
+          };
+        }
+      );
+
+      security = {
+        # preferred ciphering algorithms
+        # the first one of the list that an UE supports in chosen
+        # valid values: nea0, nea1, nea2, nea3
+        ciphering_algorithms = ( "nea0" );
+
+        # preferred integrity algorithms
+        # the first one of the list that an UE supports in chosen
+        # valid values: nia0, nia1, nia2, nia3
+        integrity_algorithms = ( "nia2", "nia0" );
+
+        # setting 'drb_ciphering' to "no" disables ciphering for DRBs, no matter
+        # what 'ciphering_algorithms' configures; same thing for 'drb_integrity'
+        drb_ciphering = "yes";
+        drb_integrity = "no";
+      };
+
+      log_config : {
+        global_log_level = "info";
+        pdcp_log_level = "info";
+        rrc_log_level = "info";
+        f1ap_log_level = "info";
+        ngap_log_level = "info";
+      };
+(Over)writing /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-cu-cp/templates/configmap.yaml
+********************* Display modified /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-cu-cp/templates/configmap.yaml ************************
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-configmap
+data:
+  cucp.conf: |
+      Active_gNBs = ( "{{ .Values.config.cucpName}}");
+      # Asn1_verbosity, choice in: none, info, annoying
+      Asn1_verbosity = "none";
+      Num_Threads_PUSCH = 8;
+      sa = 1;
+
+      gNBs =
+      (
+       {
+          ////////// Identification parameters:
+          gNB_ID = 0xe020;
+
+      #     cell_type =  "CELL_MACRO_GNB";
+
+          gNB_name  = "{{ .Values.config.cucpName}}";
+
+          // Tracking area code, 0x0000 and 0xfffe are reserved values
+          tracking_area_code  = {{ .Values.config.tac}};
+          {{- if .Values.config.sd1 }}
+            {{- if .Values.config.sd2 }}
+              plmn_list = ({ mcc = 001; mnc = 01; mnc_length = 2; snssaiList = ({ sst = 1; }, { sst = 1; sd = 0x000001; }) });
+            {{- else}}
+              plmn_list = ({ mcc = 001; mnc = 01; mnc_length = 2; snssaiList = ({ sst = 1; }, { sst = 1; sd = 0x000001; }) });
+            {{- end}}
+          {{- else}}
+            plmn_list = ({ mcc = 001; mnc = 01; mnc_length = 2; snssaiList = ({ sst = 1; }, { sst = 1; sd = 0x000001; }) });
+          {{- end}}
+
+          nr_cellid = 12345678L;
+
+          tr_s_preference = "f1";
+
+          local_s_address = "@F1_IP_ADDRESS@";
+          remote_s_address = "127.0.0.1";
+          local_s_portc   = 501;
+          local_s_portd   = {{ .Values.config.f1cuPort}};
+          remote_s_portc  = 500;
+          remote_s_portd  = {{ .Values.config.f1duPort}};
+
+          # ------- SCTP definitions
+          SCTP :
+          {
+              # Number of streams to use in input/output
+              SCTP_INSTREAMS  = 2;
+              SCTP_OUTSTREAMS = 2;
+          };
+
+
+          ////////// AMF parameters:
+          amf_ip_address = ({ ipv4 = "@AMF_IP_ADDRESS@"; });
+
+          E1_INTERFACE =
+          (
+            {
+              type = "cp";
+              ipv4_cucp = "@E1_IP_ADDRESS@";
+              port_cucp = 38462;
+              ipv4_cuup = "0.0.0.0";
+              port_cuup = 38462;
+            }
+          )
+
+          NETWORK_INTERFACES :
+          {
+            GNB_IPV4_ADDRESS_FOR_NG_AMF              = "@GNB_N2_IP_ADDRESS@";
+          };
+        }
+      );
+
+      security = {
+        # preferred ciphering algorithms
+        # the first one of the list that an UE supports in chosen
+        # valid values: nea0, nea1, nea2, nea3
+        ciphering_algorithms = ( "nea0" );
+
+        # preferred integrity algorithms
+        # the first one of the list that an UE supports in chosen
+        # valid values: nia0, nia1, nia2, nia3
+        integrity_algorithms = ( "nia2", "nia0" );
+
+        # setting 'drb_ciphering' to "no" disables ciphering for DRBs, no matter
+        # what 'ciphering_algorithms' configures; same thing for 'drb_integrity'
+        drb_ciphering = "yes";
+        drb_integrity = "no";
+      };
+           log_config :
+           {
+             global_log_level                      ="info";
+             hw_log_level                          ="info";
+             phy_log_level                         ="info";
+             mac_log_level                         ="info";
+             rlc_log_level                         ="debug";
+             pdcp_log_level                        ="info";
+             rrc_log_level                         ="info";
+             f1ap_log_level                        ="info";
+             ngap_log_level                        ="debug";
+             sctp_log_level                        ="info";
+          };
+
+(Over)writing /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-cu-up/templates/configmap.yaml
+********************* Display modified /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-cu-up/templates/configmap.yaml ************************
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-configmap
+data:
+  cuup.conf: |
+      Active_gNBs = ( "{{ .Values.config.cuupName}}");
+      # Asn1_verbosity, choice in: none, info, annoying
+      Asn1_verbosity = "none";
+      sa = 1;
+
+      gNBs =
+      (
+       {
+          ////////// Identification parameters:
+          gNB_ID = 0xe020;
+          gNB_CU_UP_ID = 0xe020;
+
+      #     cell_type =  "CELL_MACRO_GNB";
+
+          gNB_name  =  "{{ .Values.config.cuupName}}";
+
+          // Tracking area code, 0x0000 and 0xfffe are reserved values
+          tracking_area_code  = {{ .Values.config.tac}};
+          {{- if .Values.config.sd1 }}
+            {{- if .Values.config.sd2 }}
+              plmn_list = ({ mcc = 001; mnc = 01; mnc_length = 2; snssaiList = ({ sst = 1; }, { sst = 1; sd = 0x000001; }) });
+            {{- else}}
+              plmn_list = ({ mcc = 001; mnc = 01; mnc_length = 2; snssaiList = ({ sst = 1; }, { sst = 1; sd = 0x000001; }) });
+            {{- end}}
+          {{- else}}
+            plmn_list = ({ mcc = 001; mnc = 01; mnc_length = 2; snssaiList = ({ sst = 1; }, { sst = 1; sd = 0x000001; }) });
+          {{- end}}
+
+
+          tr_s_preference = "f1";
+
+          local_s_address = "@F1_IP_ADDRESS@";
+          remote_s_address = "127.0.0.1";
+          local_s_portc   = 501;
+          local_s_portd   = {{ .Values.config.f1cuPort}};
+          remote_s_portc  = 500;
+          remote_s_portd  = {{ .Values.config.f1duPort}};
+
+          # ------- SCTP definitions
+          SCTP :
+          {
+              # Number of streams to use in input/output
+              SCTP_INSTREAMS  = 2;
+              SCTP_OUTSTREAMS = 2;
+          };
+
+          E1_INTERFACE =
+          (
+            {
+              type = "up";
+              ipv4_cucp = "@CU_CP_IP_ADDRESS@";
+              ipv4_cuup = "@CU_UP_IP_ADDRESS@";
+            }
+          )
+
+          NETWORK_INTERFACES :
+          {
+            GNB_IPV4_ADDRESS_FOR_NG_AMF              = "@N3_IP_ADDRESS@"
+            GNB_IPV4_ADDRESS_FOR_NGU                 = "@N3_IP_ADDRESS@"
+            GNB_PORT_FOR_S1U                         = 2152; # Spec 2152
+          };
+        }
+      );
+
+      log_config : {
+        global_log_level = "info";
+        pdcp_log_level   = "info";
+        f1ap_log_level   = "info";
+        ngap_log_level   = "info";
+      };
+Then configure oai-gnb, oai-du, oai-cu, oai-cu-cp, oai-cu-up values charts
+(Over)writing /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/values.yaml
+6,7c6,7
+<   repository:  @GNB_REPO@
+<   version:  @GNB_TAG@ # image tag or develop
+---
+>   repository:  docker.io/r2labuser/oai-gnb
+>   version:  2024.w48 # image tag or develop
+38c38
+<   defaultGateway: "@DEFAULT_GW_GNB@"
+---
+>   defaultGateway: ""
+40,42c40,42
+<     create: @MULTUS_GNB_N2@
+<     ipAdd: "@IP_GNB_N2@"
+<     netmask: "@NETMASK_GNB_N2@"
+---
+>     create: false
+>     ipAdd: "10.10.3.205"
+>     netmask: "24"
+45c45
+<     mac: "@MAC_GNB_N2@"
+---
+>     mac: "12:34:00:02:02:07"
+47,49c47,49
+<     gateway: "@GW_GNB_N2@"
+<     routes: @ROUTES_GNB_N2@ # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
+<     hostInterface: "@IF_NAME_GNB_N2@" # Interface of the host machine on which this pod will be scheduled
+---
+>     gateway: ""
+>     routes:  # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
+>     hostInterface: "n3br" # Interface of the host machine on which this pod will be scheduled
+51,53c51,53
+<     create: @MULTUS_GNB_N3@
+<     ipAdd: "@IP_GNB_N3@"
+<     netmask: "@NETMASK_GNB_N3@"
+---
+>     create: true
+>     ipAdd: "10.10.3.205"
+>     netmask: "24"
+56c56
+<     mac: "@MAC_GNB_N3@"
+---
+>     mac: "12:34:00:02:02:08"
+58,60c58,60
+<     gateway: "@GW_GNB_N3@"
+<     routes: @ROUTES_GNB_N3@
+<     hostInterface: "@IF_NAME_GNB_N3@" # Interface of the host machine on which this pod will be scheduled
+---
+>     gateway: ""
+>     routes: 
+>     hostInterface: "n3br" # Interface of the host machine on which this pod will be scheduled
+62,64c62,64
+<     create: @MULTUS_GNB_RU1@
+<     ipAdd: "@IP_GNB_RU1@"
+<     netmask: "@NETMASK_GNB_RU1@"
+---
+>     create: false
+>     ipAdd: ""
+>     netmask: "28"
+67c67
+<     mac: "@MAC_GNB_RU1@"
+---
+>     mac: "12:34:00:02:02:09"
+69,71c69,71
+<     gateway: "@GW_GNB_RU1@"  #In case you don't have a gateway remove it from here
+<     mtu: @MTU_GNB_RU1@ 
+<     hostInterface: "@IF_NAME_GNB_RU1@"
+---
+>     gateway: ""  #In case you don't have a gateway remove it from here
+>     mtu:  
+>     hostInterface: ""
+74,76c74,76
+<     create: @MULTUS_GNB_RU2@
+<     ipAdd: "@IP_GNB_RU2@"
+<     netmask: "@NETMASK_GNB_RU2@"
+---
+>     create: false
+>     ipAdd: ""
+>     netmask: "28"
+79c79
+<     mac: "@MAC_GNB_RU2@"
+---
+>     mac: "12:34:00:02:02:0a"
+81,83c81,83
+<     gateway: "@GW_GNB_RU2@"  #In case you don't have a gateway remove it from here
+<     mtu: @MTU_GNB_RU2@ 
+<     hostInterface: "@IF_NAME_GNB_RU2@"
+---
+>     gateway: ""  #In case you don't have a gateway remove it from here
+>     mtu:  
+>     hostInterface: ""
+90,94c90,94
+<   useAdditionalOptions: "@ADD_OPTIONS_GNB@"
+<   gnbName: "@GNB_NAME@"
+<   mcc: "@MCC@" # check the information with AMF, SMF, UPF
+<   mnc: "@MNC@" # check the information with AMF, SMF, UPF
+<   tac: "@TAC@" # check the information with AMF
+---
+>   useAdditionalOptions: "-E --rfsim --log_config.global_log_options level,nocolor,time"
+>   gnbName: "gNB-r2lab_rfsim"
+>   mcc: "001" # check the information with AMF, SMF, UPF
+>   mnc: "01" # check the information with AMF, SMF, UPF
+>   tac: "1" # check the information with AMF
+96,99c96,99
+<   usrp: "@RRU_TYPE@" #allowed values rfsim, b2xx, n3xx or x3xx
+<   amfHost: "@HOST_AMF@" # amf ip-address or service-name oai-amf-svc
+<   n2IfName: "@GNB_N2_IF_NAME@" # n2 or eth0 if no multus
+<   n3IfName: "@GNB_N3_IF_NAME@" # n3 or eth0 if no multus
+---
+>   usrp: "rfsim" #allowed values rfsim, b2xx, n3xx or x3xx
+>   amfHost: "10.10.3.200" # amf ip-address or service-name oai-amf-svc
+>   n2IfName: "n3" # n2 or eth0 if no multus
+>   n3IfName: "n3" # n3 or eth0 if no multus
+113c113
+<   tcpdump: @START_TCPDUMP@
+---
+>   tcpdump: false
+115c115
+< includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #If true it will add a tcpdump container inside network function pod for debugging
+---
+> includeTcpDumpContainer: false #If true it will add a tcpdump container inside network function pod for debugging
+131c131
+<   sharedvolume: @SHAREDVOLUME@
+---
+>   sharedvolume: false
+140c140
+<   define: @QOS_GNB_DEF@
+---
+>   define: false
+165c165
+< nodeName: @NODE_GNB@
+---
+> nodeName: precision-7530
+(Over)writing /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-du/values.yaml
+6,7c6,7
+<   repository: @DU_REPO@ # docker.io/oaisoftwarealliance/oai-gnb
+<   version: @DU_TAG@ # image tag or develop
+---
+>   repository: docker.io/r2labuser/oai-gnb # docker.io/oaisoftwarealliance/oai-gnb
+>   version: 2024.w48 # image tag or develop
+22c22
+<   name: "@NAME_DU_SA@" # "oai-du-sa"
+---
+>   name: "oai-du-sa" # "oai-du-sa"
+33,35c33,35
+<     create: @MULTUS_DU_F1@ # false
+<     ipAdd: "@IP_DU_F1@" # "172.21.16.100"
+<     netmask: "@NETMASK_DU_F1@" # "22"
+---
+>     create: true # false
+>     ipAdd: "172.21.16.100" # "172.21.16.100"
+>     netmask: "22" # "22"
+37c37
+<     mac: "@MAC_DU_F1@"    
+---
+>     mac: "12:34:00:02:02:0b"    
+40,42c40,42
+<     gateway: "@GW_DU_F1@" # "172.21.7.254"
+<     routes: @ROUTES_DU_F1@ # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
+<     hostInterface: "@IF_NAME_DU_F1@"     # Interface of the host machine on which this pod will be scheduled
+---
+>     gateway: "" # "172.21.7.254"
+>     routes:  # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
+>     hostInterface: "eno1"     # Interface of the host machine on which this pod will be scheduled
+44,45c44,45
+<     create: @MULTUS_GNB_RU1@
+<     ipAdd: "@IP_GNB_RU1@"
+---
+>     create: false
+>     ipAdd: ""
+47c47
+<     netmask: "@NETMASK_GNB_RU1@"
+---
+>     netmask: "28"
+49c49
+<     mac: "@MAC_GNB_RU1@"
+---
+>     mac: "12:34:00:02:02:09"
+51,53c51,53
+<     gateway: "@GW_GNB_RU1@"  #In case you don't have a gateway remove it from here
+<     mtu: @MTU_GNB_RU1@ 
+<     hostInterface: "@IF_NAME_GNB_RU1@"
+---
+>     gateway: ""  #In case you don't have a gateway remove it from here
+>     mtu:  
+>     hostInterface: ""
+56,57c56,57
+<     create: @MULTUS_GNB_RU2@
+<     ipAdd: "@IP_GNB_RU2@"
+---
+>     create: false
+>     ipAdd: ""
+59c59
+<     netmask: "@NETMASK_GNB_RU2@"
+---
+>     netmask: "28"
+61c61
+<     mac: "@MAC_GNB_RU2@"
+---
+>     mac: "12:34:00:02:02:0a"
+63,65c63,65
+<     gateway: "@GW_GNB_RU2@"  #In case you don't have a gateway remove it from here
+<     mtu: @MTU_GNB_RU2@ 
+<     hostInterface: "@IF_NAME_GNB_RU2@"
+---
+>     gateway: ""  #In case you don't have a gateway remove it from here
+>     mtu:  
+>     hostInterface: ""
+72,76c72,76
+<   useAdditionalOptions: "@ADD_OPTIONS_GNB@" # same as for GNB
+<   duName: "@NAME_DU@"
+<   mcc: "@MCC@" # check the information with AMF, SMF, UPF
+<   mnc: "@MNC@" # check the information with AMF, SMF, UPF
+<   tac: "@TAC@" # check the information with AMF
+---
+>   useAdditionalOptions: "-E --rfsim --log_config.global_log_options level,nocolor,time" # same as for GNB
+>   duName: "oai-du"
+>   mcc: "001" # check the information with AMF, SMF, UPF
+>   mnc: "01" # check the information with AMF, SMF, UPF
+>   tac: "1" # check the information with AMF
+78c78
+<   usrp: "@RRU_TYPE@"   #allowed values rfsim, aw2s, b2xx, n3xx or x3xx
+---
+>   usrp: "rfsim"   #allowed values rfsim, aw2s, b2xx, n3xx or x3xx
+80,82c80,82
+<   cuHost: "@CU_HOST_FROM_DU@" # "oai-cu" ## Ip-address or hostname
+<   f1cuPort: "@F1CUPORT@" # "2153"   #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+<   f1duPort: "@F1DUPORT@" # "2153"   #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+---
+>   cuHost: "172.21.16.92" # "oai-cu" ## Ip-address or hostname
+>   f1cuPort: "2152" # "2153"   #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+>   f1duPort: "2152" # "2153"   #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+94c94
+<   tcpdump: @START_TCPDUMP@
+---
+>   tcpdump: false
+96c96
+< includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #If true it will add a tcpdump container inside network function pod for debugging
+---
+> includeTcpDumpContainer: false #If true it will add a tcpdump container inside network function pod for debugging
+105c105
+<   sharedvolume: @SHAREDVOLUME@
+---
+>   sharedvolume: false
+114c114
+<   define: @QOS_DU_DEF@
+---
+>   define: true
+140c140
+< nodeName: @NODE_DU@
+---
+> nodeName: precision-7530
+(Over)writing /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-cu/values.yaml
+6,7c6,7
+<   repository: @CU_REPO@ # docker.io/oaisoftwarealliance/oai-gnb
+<   version: @CU_TAG@ # image tag or develop
+---
+>   repository: docker.io/r2labuser/oai-gnb # docker.io/oaisoftwarealliance/oai-gnb
+>   version: 2024.w48 # image tag or develop
+22c22
+<   name:  @NAME_CU_SA@ # "oai-cu-sa"
+---
+>   name:  oai-cu-sa # "oai-cu-sa"
+33,35c33,35
+<     create: @MULTUS_CU_F1@ # false
+<     ipAdd: "@IP_CU_F1@" # "172.21.16.92"
+<     netmask: "@NETMASK_CU_F1@" # "22"
+---
+>     create: true # false
+>     ipAdd: "172.21.16.92" # "172.21.16.92"
+>     netmask: "22" # "22"
+37c37
+<     mac: "@MAC_CU_F1@"
+---
+>     mac: "12:34:00:02:02:0c"
+40,42c40,42
+<     gateway: "@GW_CU_F1@" # "172.21.19.254"
+<     routes: @ROUTES_CU_F1@
+<     hostInterface: "@IF_NAME_CU_F1@"  # Interface of the host machine on which this pod will be scheduled
+---
+>     gateway: "" # "172.21.19.254"
+>     routes: 
+>     hostInterface: "eno1"  # Interface of the host machine on which this pod will be scheduled
+44,45c44,45
+<     create: @MULTUS_CU_N2@
+<     ipAdd: "@IP_CU_N2@"
+---
+>     create: false
+>     ipAdd: "10.10.3.205"
+47c47
+<     netmask: "@NETMASK_CU_N2@"
+---
+>     netmask: "24"
+49c49
+<     mac: "@MAC_CU_N2@"
+---
+>     mac: "12:34:00:02:02:0d"
+51,53c51,53
+<     gateway: "@GW_CU_N2@"
+<     routes: @ROUTES_CU_N2@ # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
+<     hostInterface: "@IF_NAME_CU_N2@" # Interface of the host machine on which this pod will be scheduled
+---
+>     gateway: ""
+>     routes:  # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
+>     hostInterface: "n3br" # Interface of the host machine on which this pod will be scheduled
+55,56c55,56
+<     create: @MULTUS_CU_N3@
+<     ipAdd: "@IP_CU_N3@"
+---
+>     create: true
+>     ipAdd: "10.10.3.205"
+58c58
+<     netmask: "@NETMASK_CU_N3@"
+---
+>     netmask: "24"
+60c60
+<     mac: "@MAC_CU_N3@"
+---
+>     mac: "12:34:00:02:02:0e"
+62,64c62,64
+<     gateway: "@GW_CU_N3@"
+<     routes: @ROUTES_CU_N3@
+<     hostInterface: "@IF_NAME_CU_N3@" # Interface of the host machine on which this pod will be scheduled
+---
+>     gateway: ""
+>     routes: 
+>     hostInterface: "n3br" # Interface of the host machine on which this pod will be scheduled
+71c71
+<   useAdditionalOptions: "@ADD_OPTIONS_CU@" #"--sa --log_config.global_log_options level,nocolor,time"
+---
+>   useAdditionalOptions: "--log_config.global_log_options level,nocolor,time" #"--sa --log_config.global_log_options level,nocolor,time"
+73,83c73,83
+<   cuName: "@NAME_CU@" # "oai-cu"
+<   mcc: "@MCC@" # check the information with AMF, SMF, UPF
+<   mnc: "@MNC@" # check the information with AMF, SMF, UPF
+<   tac: "@TAC@" # check the information with AMF
+<   sst1: "@SST1@" #currently only 4 standard values are allowed 1,2,3,4
+<   sd1: "@SD1@" # must be in HEX format
+<   sst2: "@SST2@" #currently only 4 standard values are allowed 1,2,3,4
+<   sd2: "@SD2@" # must be in HEX format
+<   amfHost: "@HOST_AMF@" #  "oai-amf"  # amf ip-address or service-name oai-amf-svc or 172.21.6.94
+<   n2IfName: "@GNB_N2_IF_NAME@" # if multus.n2Interface.create is true then use n2
+<   n3IfName: "@GNB_N3_IF_NAME@" # if multus.n3Interface.create is true then use n3 or you can only use 1 interface n2 or eth0
+---
+>   cuName: "oai-cu" # "oai-cu"
+>   mcc: "001" # check the information with AMF, SMF, UPF
+>   mnc: "01" # check the information with AMF, SMF, UPF
+>   tac: "1" # check the information with AMF
+>   sst1: "1" #currently only 4 standard values are allowed 1,2,3,4
+>   sd1: "0xEMPTY" # must be in HEX format
+>   sst2: "1" #currently only 4 standard values are allowed 1,2,3,4
+>   sd2: "0x000001" # must be in HEX format
+>   amfHost: "10.10.3.200" #  "oai-amf"  # amf ip-address or service-name oai-amf-svc or 172.21.6.94
+>   n2IfName: "n3" # if multus.n2Interface.create is true then use n2
+>   n3IfName: "n3" # if multus.n3Interface.create is true then use n3 or you can only use 1 interface n2 or eth0
+85,86c85,86
+<   f1cuPort: "@F1CUPORT@" # 2153 if using same interface for f1 and n3 else standard port 2152 should be used if f1 and n3 interface are different
+<   f1duPort: "@F1DUPORT@" # 2153 if using same interface for f1 and n3 else standard port 2152 should be used if f1 and n3 interface are different
+---
+>   f1cuPort: "2152" # 2153 if using same interface for f1 and n3 else standard port 2152 should be used if f1 and n3 interface are different
+>   f1duPort: "2152" # 2153 if using same interface for f1 and n3 else standard port 2152 should be used if f1 and n3 interface are different
+98c98
+<   tcpdump: @START_TCPDUMP@
+---
+>   tcpdump: false
+100c100
+< includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #If true it will add a tcpdump container inside network function pod for debugging
+---
+> includeTcpDumpContainer: false #If true it will add a tcpdump container inside network function pod for debugging
+109c109
+<   sharedvolume: @SHAREDVOLUME@
+---
+>   sharedvolume: false
+119c119
+<   define: @QOS_CU_DEF@
+---
+>   define: true
+146c146
+< nodeName: @NODE_CU@
+---
+> nodeName: precision-7530
+(Over)writing /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-cu-cp/values.yaml
+6,7c6,7
+<   repository: @CUCP_REPO@ # docker.io/oaisoftwarealliance/oai-gnb
+<   version: @CUCP_TAG@ # image tag or develop
+---
+>   repository: docker.io/r2labuser/oai-gnb # docker.io/oaisoftwarealliance/oai-gnb
+>   version: 2024.w48 # image tag or develop
+22c22
+<   name: @NAME_CUCP_SA@ # "oai-cu-cp-sa"
+---
+>   name: oai-cu-cp-sa # "oai-cu-cp-sa"
+34,36c34,36
+<     create: @MULTUS_CUCP_E1@ # false
+<     ipAdd: "@IP_CUCP_E1@" # "192.168.18.12"
+<     netmask: "@NETMASK_CUCP_E1@" # "24"
+---
+>     create: true # false
+>     ipAdd: "192.168.18.12" # "192.168.18.12"
+>     netmask: "24" # "24"
+38c38
+<     mac: "@MAC_CUCP_E1@"
+---
+>     mac: "12:34:00:02:02:0f"
+41,43c41,43
+<     gateway: "@GW_CUCP_E1@" 
+<     routes: @ROUTES_CUCP_E1@ # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
+<     hostInterface:  "@IF_NAME_CUCP_E1@" # "bond0" # Interface of the host machine on which this pod will be scheduled
+---
+>     gateway: "" 
+>     routes:  # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
+>     hostInterface:  "eno1" # "bond0" # Interface of the host machine on which this pod will be scheduled
+45,46c45,46
+<     create: @MULTUS_CUCP_N2@
+<     ipAdd: "@IP_CUCP_N2@"
+---
+>     create: true
+>     ipAdd: "10.10.3.205"
+48c48
+<     netmask: "@NETMASK_CUCP_N2@"
+---
+>     netmask: "24"
+50c50
+<     mac: "@MAC_CUCP_N2@"
+---
+>     mac: "12:34:00:02:02:10"
+52,54c52,54
+<     gateway: "@GW_CUCP_N2@"
+<     routes: @ROUTES_CUCP_N2@ # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
+<     hostInterface: "@IF_NAME_CUCP_N2@" # Interface of the host machine on which this pod will be scheduled
+---
+>     gateway: ""
+>     routes:  # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
+>     hostInterface: "n3br" # Interface of the host machine on which this pod will be scheduled
+56,58c56,58
+<     create: @MULTUS_CUCP_F1@ # false
+<     ipAdd: "@IP_CUCP_F1@" # "172.21.16.92"
+<     netmask: "@NETMASK_CUCP_F1@" # "22"
+---
+>     create: true # false
+>     ipAdd: "172.21.16.92" # "172.21.16.92"
+>     netmask: "24" # "22"
+60c60
+<     mac: "@MAC_CUCP_F1@"
+---
+>     mac: "12:34:00:02:02:11"
+63,65c63,65
+<     gateway: "@GW_CUCP_F1@" # "172.21.19.254"
+<     routes: @ROUTES_CUCP_F1@
+<     hostInterface: "@IF_NAME_CUCP_F1@"  # Interface of the host machine on which this pod will be scheduled
+---
+>     gateway: "" # "172.21.19.254"
+>     routes: 
+>     hostInterface: "eno1"  # Interface of the host machine on which this pod will be scheduled
+71,81c71,81
+<   useAdditionalOptions: "@ADD_OPTIONS_CUCP@" #"--sa --log_config.global_log_options level,nocolor,time"
+<   cucpName: "@NAME_CUCP@" # "oai-cu-cp"
+<   mcc: "@MCC@" # check the information with AMF, SMF, UPF
+<   mnc: "@MNC@" # check the information with AMF, SMF, UPF
+<   tac: "@TAC@" # check the information with AMF
+<   sst1: "@SST1@" #currently only 4 standard values are allowed 1,2,3,4
+<   sd1: "@SD1@" # must be in HEX format
+<   sst2: "@SST2@" #currently only 4 standard values are allowed 1,2,3,4
+<   sd2: "@SD2@" # must be in HEX format
+<   amfhost: "@HOST_AMF@" #  "oai-amf"  # amf ip-address or service-name oai-amf-svc or 172.21.6.94
+<   n2IfName: "@CUCP_N2_IF_NAME@" # if multus.n2Interface.create is true then use n2
+---
+>   useAdditionalOptions: "--log_config.global_log_options level,nocolor,time" #"--sa --log_config.global_log_options level,nocolor,time"
+>   cucpName: "oai-cu-cp" # "oai-cu-cp"
+>   mcc: "001" # check the information with AMF, SMF, UPF
+>   mnc: "01" # check the information with AMF, SMF, UPF
+>   tac: "1" # check the information with AMF
+>   sst1: "1" #currently only 4 standard values are allowed 1,2,3,4
+>   sd1: "0xEMPTY" # must be in HEX format
+>   sst2: "1" #currently only 4 standard values are allowed 1,2,3,4
+>   sd2: "0x000001" # must be in HEX format
+>   amfhost: "10.10.3.200" #  "oai-amf"  # amf ip-address or service-name oai-amf-svc or 172.21.6.94
+>   n2IfName: "n2" # if multus.n2Interface.create is true then use n2
+83,85c83,85
+<   e1IfName: "@E1IFNAME@" # "eth0"   #if multus.e1Interface.create is true then use e1
+<   f1cuPort: "@F1CUPORT@"# "2153"   #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+<   f1duPort: "@F1DUPORT@"# "2153"   #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+---
+>   e1IfName: "e1" # "eth0"   #if multus.e1Interface.create is true then use e1
+>   f1cuPort: "2152"# "2153"   #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+>   f1duPort: "2152"# "2153"   #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+97c97
+<   tcpdump: @START_TCPDUMP@
+---
+>   tcpdump: false
+99c99
+< includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #If true it will add a tcpdump container inside network function pod for debugging
+---
+> includeTcpDumpContainer: false #If true it will add a tcpdump container inside network function pod for debugging
+109c109
+<   sharedvolume: @SHAREDVOLUME@
+---
+>   sharedvolume: false
+118c118
+<   define: @QOS_CUCP_DEF@
+---
+>   define: true
+145c145
+< nodeName: @NODE_CUCP@
+---
+> nodeName: precision-7530
+(Over)writing /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-cu-up/values.yaml
+6,7c6,7
+<   repository: @CUUP_REPO@ #docker.io/oaisoftwarealliance/oai-nr-cuup ## dockerhub oaisoftwarealliance/oai-gnb  
+<   version: @CUUP_TAG@ # 2023.w49 # image tag or develop
+---
+>   repository: docker.io/r2labuser/oai-nr-cuup #docker.io/oaisoftwarealliance/oai-nr-cuup ## dockerhub oaisoftwarealliance/oai-gnb  
+>   version: 2024.w48 # 2023.w49 # image tag or develop
+22c22
+<   name: @NAME_CUUP_SA@ # "oai-cu-up-sa"
+---
+>   name: oai-cu-up-sa # "oai-cu-up-sa"
+34,36c34,36
+<     create: @MULTUS_CUUP_E1@ # false
+<     ipAdd: "@IP_CUUP_E1@" # "192.168.18.13"
+<     netmask: "@NETMASK_CUUP_E1@" # "24"
+---
+>     create: true # false
+>     ipAdd: "192.168.18.13" # "192.168.18.13"
+>     netmask: "24" # "24"
+38c38
+<     mac: "@MAC_CUUP_E1@"    
+---
+>     mac: "12:34:00:02:02:12"    
+41,43c41,43
+<     gateway: "@GW_CUUP_E1@"
+<     routes: @ROUTES_CUUP_E1@ # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
+<     hostInterface: "@IF_NAME_CUUP_E1@" # "bond0" # Interface of the host machine on which this pod will be scheduled
+---
+>     gateway: ""
+>     routes:  # [{'dst': '10.8.0.0/24','gw': '172.21.7.254'}, {'dst': '10.9.0.0/24','gw': '172.21.7.254'}]
+>     hostInterface: "eno1" # "bond0" # Interface of the host machine on which this pod will be scheduled
+45c45
+<     create: @MULTUS_CUUP_N3@
+---
+>     create: true
+47,48c47,48
+<     ipAdd: "@IP_CUUP_N3@"
+<     netmask: "@NETMASK_CUUP_N3@"
+---
+>     ipAdd: "10.10.3.206"
+>     netmask: "24"
+50c50
+<     mac: "@MAC_CUUP_N3@"
+---
+>     mac: "12:34:00:02:02:13"
+52,54c52,54
+<     gateway:  "@GW_CUUP_N3@"
+<     routes: @ROUTES_CUUP_N3@
+<     hostInterface: "@IF_NAME_CUUP_N3@" # Interface of the host machine on which this pod will be scheduled
+---
+>     gateway:  ""
+>     routes: 
+>     hostInterface: "n3br" # Interface of the host machine on which this pod will be scheduled
+56,58c56,58
+<     create: @MULTUS_CUUP_F1@ # false
+<     ipAdd: "@IP_CUUP_F1@" # "172.21.16.93"
+<     netmask: "@NETMASK_CUUP_F1@" # "22"
+---
+>     create: true # false
+>     ipAdd: "172.21.16.93" # "172.21.16.93"
+>     netmask: "22" # "22"
+60c60
+<     mac: "@MAC_CUUP_F1@"
+---
+>     mac: "12:34:00:02:02:14"
+63,65c63,65
+<     gateway: "@GW_CUUP_F1@" # "172.21.19.254"
+<     routes: @ROUTES_CUUP_F1@
+<     hostInterface: "@IF_NAME_CUUP_F1@"  # Interface of the host machine on which this pod will be scheduled
+---
+>     gateway: "" # "172.21.19.254"
+>     routes: 
+>     hostInterface: "eno1"  # Interface of the host machine on which this pod will be scheduled
+71,81c71,81
+<   useAdditionalOptions: "@ADD_OPTIONS_CUUP@" # "--sa"
+<   cuupName: "@NAME_CUUP@" # "oai-cuup"
+<   mcc: "@MCC@" # check the information with AMF, SMF, UPF
+<   mnc: "@MNC@" # check the information with AMF, SMF, UPF
+<   tac: "@TAC@" # check the information with AMF
+<   sst1: "@SST1@" #currently only 4 standard values are allowed 1,2,3,4
+<   sd1: "@SD1@" # must be in HEX format
+<   sst2: "@SST2@" #currently only 4 standard values are allowed 1,2,3,4
+<   sd2: "@SD2@" # must be in HEX format
+<   cuCpHost: "@HOST_CUCP@" # "oai-cu" #
+<   n3IfName: "@CUUP_N3_IF_NAME@" # if multus.n3Interface.create is true then use n3 or eth0
+---
+>   useAdditionalOptions: "" # "--sa"
+>   cuupName: "oai-cuup" # "oai-cuup"
+>   mcc: "001" # check the information with AMF, SMF, UPF
+>   mnc: "01" # check the information with AMF, SMF, UPF
+>   tac: "1" # check the information with AMF
+>   sst1: "1" #currently only 4 standard values are allowed 1,2,3,4
+>   sd1: "0xEMPTY" # must be in HEX format
+>   sst2: "1" #currently only 4 standard values are allowed 1,2,3,4
+>   sd2: "0x000001" # must be in HEX format
+>   cuCpHost: "192.168.18.12" # "oai-cu" #
+>   n3IfName: "n3" # if multus.n3Interface.create is true then use n3 or eth0
+83,85c83,85
+<   e1IfName: "@E1IFNAME@" # "eth0"   #if multus.e1Interface.create is true then use e1
+<   f1cuPort: "@F1CUPORT@" # "2153"   #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+<   f1duPort: "@F1DUPORT@" # "2153"   #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+---
+>   e1IfName: "e1" # "eth0"   #if multus.e1Interface.create is true then use e1
+>   f1cuPort: "2152" # "2153"   #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+>   f1duPort: "2152" # "2153"   #2153 if using same interface for f1 and n3 else standard port 2152 should be use if f1 and n3 interface are different
+97c97
+<   tcpdump: @START_TCPDUMP@
+---
+>   tcpdump: false
+99c99
+< includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #If true it will add a tcpdump container inside network function pod for debugging
+---
+> includeTcpDumpContainer: false #If true it will add a tcpdump container inside network function pod for debugging
+108c108
+<   sharedvolume: @SHAREDVOLUME@
+---
+>   sharedvolume: false
+117c117
+<   define:  @QOS_CUUP_DEF@
+---
+>   define:  true
+143c143
+< nodeName: @NODE_CUUP@
+---
+> nodeName: precision-7530
+configure-nr-ue: /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-nr-ue/values.yaml configuration
+(Over)writing /home/ziyad-mabrouk/oai5g-rru/testing/oai-cn5g-fed/charts/oai-5g-ran/oai-nr-ue/values.yaml
+6,7c6,7
+<   repository: @NRUE_REPO@ # dockehub oaisoftwarealliance/oai-nr-ue
+<   version: @NRUE_TAG@ # image tag or develop 
+---
+>   repository: docker.io/r2labuser/oai-nr-ue # dockehub oaisoftwarealliance/oai-nr-ue
+>   version: 2024.w48 # image tag or develop 
+26,29c26,29
+<   create: @MULTUS_NRUE@
+<   ipadd: "@IP_NRUE@" # subnet should be able to reach the gNB
+<   netmask: "@NETMASK_NRUE@"
+<   mac: "@MAC_NRUE@"
+---
+>   create: false
+>   ipadd: "" # subnet should be able to reach the gNB
+>   netmask: "24"
+>   mac: "12:34:00:02:02:15"
+31,32c31,32
+<   defaultGateway: "@DEFAULT_GW_NRUE@"
+<   hostInterface: "@IF_NAME_NRUE@"
+---
+>   defaultGateway: ""
+>   hostInterface: "n3br"
+37,44c37,44
+<   fullImsi: "@RFSIM_IMSI@" # make sure all the below entries are present in the subscriber database
+<   fullKey: "@FULL_KEY@" 
+<   opc: "@OPC@"
+<   dnn: "@DNN@"
+<   sst: "@SST@" # "1" # configure according to gnb and amf, smf and upf 
+<   sd: "@SD@" # "16777215"
+<   usrp: "@NRUE_USRP@" # allowed rfsim, b2xx, n3xx, x3xx
+<   useAdditionalOptions: "@ADD_OPTIONS_NRUE@" # "--sa --rfsim -r 106 --numerology 1 -C 3619200000 --nokrnmod --log_config.global_log_options level,nocolor,time"
+---
+>   fullImsi: "001010000001121" # make sure all the below entries are present in the subscriber database
+>   fullKey: "fec86ba6eb707ed08905757b1bb44b8f" 
+>   opc: "C42449363BBAD02B66D16BC975D77CC1"
+>   dnn: "internet"
+>   sst: "1" # "1" # configure according to gnb and amf, smf and upf 
+>   sd: "16777215" # "16777215"
+>   usrp: "rfsim" # allowed rfsim, b2xx, n3xx, x3xx
+>   useAdditionalOptions: "--rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time" # "--sa --rfsim -r 106 --numerology 1 -C 3619200000 --nokrnmod --log_config.global_log_options level,nocolor,time"
+60c60
+<   tcpdump: @START_TCPDUMP@ # if false then started in sleep mode else it will start capturing packets, nr ue will have a lot of packets per sec better avoid this or add a filter in the deployment.yaml
+---
+>   tcpdump: false # if false then started in sleep mode else it will start capturing packets, nr ue will have a lot of packets per sec better avoid this or add a filter in the deployment.yaml
+62c62
+< includeTcpDumpContainer: @TCPDUMP_CONTAINER@ #If true it will add a tcpdump container inside network function pod for debugging
+---
+> includeTcpDumpContainer: false #If true it will add a tcpdump container inside network function pod for debugging
+75c75
+<   define: @QOS_NRUE_DEF@
+---
+>   define: false
+94c94
+<   sharedvolume: @SHAREDVOLUME@
+---
+>   sharedvolume: false
+102c102
+< nodeName: @NODE_NRUE@
+---
+> nodeName: 
+OAI5G charts are now configured for your scenario, you can use the start.sh script to launch your scenario.

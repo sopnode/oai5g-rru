@@ -872,7 +872,7 @@ EOF
             echo "MONITORING is set to True. A prometheus log parser container will be created besides the gnb"
         fi
         cat >> "$SED_VALUES_FILE" <<EOF
-s|@METRICS_PARSER_CONTAINER@|$MONITORING| 
+s|@METRICS_PARSER_CONTAINER@|$MONITORING|
 EOF
     fi
     
