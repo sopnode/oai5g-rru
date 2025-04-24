@@ -57,8 +57,8 @@ mkdir -p $TMP
 
 function update() {
     NS=$1; shift
-    NODE_AMF_UPF=$1"-v100"; shift
-    NODE_GNB=$1"-v100"; shift
+    NODE_AMF_UPF=$1; shift # removed -v100
+    NODE_GNB=$1; shift # removed -v100
     RRU=$1; shift 
     RUN_MODE=$1; shift # in ["full", "gnb-only", "gnb-upf"]
     LOGS=$1; shift # boolean in [true, false]
@@ -154,7 +154,7 @@ EOF
 
 }
 
-if test $# -ne 16; then
+if test $# -ne 17; then
     echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap monitoring prefix_demo cn_mode gnb_mode DNN0 DNN1 regcred_name regcred_password regcred_email "
     exit 1
 else
