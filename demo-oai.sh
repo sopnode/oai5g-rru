@@ -28,6 +28,7 @@ RUN_MODE="@DEF_RUN_MODE@" # in ['full', 'gnb-only', 'gnb-upf']
 GNB_MODE="@DEF_GNB_MODE@" # in ['monolithic', 'cudu', 'cucpup']
 LOGS="@DEF_LOGS@" # boolean, true if logs are retrieved on pods
 PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
+MONITORING="@DEF_MONITORING@" # boolean, true if prometheus metrics parser is generated on oai-gnb pod (monolithic)
 #
 MCC="@DEF_MCC@"
 MNC="@DEF_MNC@"

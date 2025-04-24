@@ -26,8 +26,9 @@ NODE_GNB="eno1"
 RRU="rfsim" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
 RUN_MODE="gnb-only" # in ['full', 'gnb-only', 'gnb-upf']
 GNB_MODE="monolithic" # in ['monolithic', 'cudu', 'cucpup']
-LOGS="true" # boolean, true if logs are retrieved on pods
+LOGS="false" # boolean, true if logs are retrieved on pods
 PCAP="false" # boolean, true if pcap are generated on pods
+MONITORING="true" # boolean, true if prometheus metrics parser is generated on oai-gnb pod (monolithic)
 #
 MCC="001"
 MNC="01"
