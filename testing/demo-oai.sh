@@ -867,13 +867,6 @@ s|@CU_CP_IP_ADDRESS@|$IP_CUCP_E1|
 EOF
     else
 	    echo "Monolithic mode, do not set AMF_IP_ADDRESS and CU_IP_ADDRESS"
-        # if $MONITORING is true, create and start prometheus log parser container (for now, available only for monolithic gnb)
-        if [[ $MONITORING == "true" ]]; then
-            echo "MONITORING is set to True. A prometheus log parser container will be created besides the gnb"
-        fi
-        cat >> "$SED_VALUES_FILE" <<EOF
-s|@METRICS_PARSER_CONTAINER@|$MONITORING|
-EOF
     fi
     
     for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
@@ -887,6 +880,21 @@ EOF
 
 
     # Configure gNB values.yaml charts
+
+    if [[ $GNB_MODE == 'monolithic' ]]; then
+        # if $MONITORING is true, create and start prometheus log parser container (for now, available only for monolithic gnb)
+        if [[ $MONITORING == "true" ]]; then
+            echo "MONITORING is set to True. A prometheus log parser container will be created besides the gnb"
+        fi
+        cat >> "$SED_VALUES_FILE" <<EOF
+s|@METRICS_PARSER_CONTAINER@|$MONITORING|
+EOF
+    ORIG_CHART="${OAI5G_RAN}/oai-gnb/values.yaml"
+	cp ${ORIG_CHART} $TMP/oai-gnb_values.yaml-orig
+	echo "(Over)writing $ORIG_CHART"
+	sed -f "$SED_VALUES_FILE" < $TMP/oai-gnb_values.yaml-orig > ${ORIG_CHART}
+	diff $TMP/oai-gnb_values.yaml-orig ${ORIG_CHART}
+    fi
 
     if [[ ! -z $SLICE1_SD ]]; then
 	    SED_SD1="s|@SD1@|0x$SLICE1_SD|"
