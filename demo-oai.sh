@@ -866,6 +866,10 @@ s|@CU_CP_IP_ADDRESS@|$IP_CUCP_E1|
 EOF
     else
 	    echo "Monolithic mode, do not set AMF_IP_ADDRESS and CU_IP_ADDRESS"
+        # if $MONITORING is true, create and start prometheus log parser container (for now, available only for monolithic gnb)
+        cat >> "$SED_VALUES_FILE" <<EOF
+s|@METRICS_PARSER_CONTAINER@|$MONITORING| 
+EOF
     fi
     
     for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
