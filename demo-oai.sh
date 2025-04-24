@@ -867,6 +867,9 @@ EOF
     else
 	    echo "Monolithic mode, do not set AMF_IP_ADDRESS and CU_IP_ADDRESS"
         # if $MONITORING is true, create and start prometheus log parser container (for now, available only for monolithic gnb)
+        if [[ $MONITORING == "true" ]]; then
+            echo "MONITORING is set to True. A prometheus log parser container will be created besides the gnb"
+        fi
         cat >> "$SED_VALUES_FILE" <<EOF
 s|@METRICS_PARSER_CONTAINER@|$MONITORING| 
 EOF
