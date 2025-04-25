@@ -460,7 +460,8 @@ RU_MODE="dhcp" # in ['static', 'dhcp']
 #
 #### rfsim RU case ####
 #GNB_REPO_rfsim="${OAISA_REPO}/oai-gnb"
-GNB_REPO_rfsim="${R2LAB_REPO}/oai-gnb"
+#GNB_REPO_rfsim="${R2LAB_REPO}/oai-gnb"
+GNB_REPO_rfsim="ghcr.io/ziyad-mabrouk/openairinterface5g/oai-gnb" # for monitoring tests
 GNB_TAG_rfsim="${RAN_TAG}"
 CONF_rfsim="gnb.sa.band78.106prb.rfsim.conf" 
 CONF_DU_rfsim="du.sa.band78.106prb.rfsim.conf" 
