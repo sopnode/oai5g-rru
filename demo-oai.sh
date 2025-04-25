@@ -64,11 +64,11 @@ PREFIX_STATS="$TMP/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance"
 
 # Interfaces names of VLANs in sopnode servers
-# Replaced "net-100" with my local network interface "eno1"
-IF_NAME_N2N3_DEFAULT="eno1" 
-IF_NAME_N6_DEFAULT="eno1"
-IF_NAME_E1_DEFAULT="eno1"
-IF_NAME_F1_DEFAULT="eno1"
+# Replaced "net-100" with my local network interface
+IF_NAME_N2N3_DEFAULT="@DEF_LOCAL_INTERFACE@" 
+IF_NAME_N6_DEFAULT="@DEF_LOCAL_INTERFACE@" 
+IF_NAME_E1_DEFAULT="@DEF_LOCAL_INTERFACE@" 
+IF_NAME_F1_DEFAULT="@DEF_LOCAL_INTERFACE@"
 IF_NAME_VLAN_N300_1="net-n300.1"
 IF_NAME_VLAN_N300_2="net-n300.2"
 IF_NAME_VLAN_N320_1="net-n320.1"
