@@ -884,12 +884,14 @@ EOF
     # Configure gNB values.yaml charts
 
     if [[ $GNB_MODE == 'monolithic' ]]; then
+        GNB_PULL_POLICY="Always" # for testing purposes
         # if $MONITORING is true, create and start prometheus log parser container (for now, available only for monolithic gnb)
         if [[ $MONITORING == "true" ]]; then
             echo "MONITORING is set to True. A prometheus log parser container will be created besides the gnb"
         fi
         cat >> "$SED_VALUES_FILE" <<EOF
 s|@METRICS_PARSER_CONTAINER@|$MONITORING|
+s|@GNB_PULL_POLICY@|$GNB_PULL_POLICY|
 EOF
     ORIG_CHART="${OAI5G_RAN}/oai-gnb/values.yaml"
 	cp ${ORIG_CHART} $TMP/oai-gnb_values.yaml-orig
