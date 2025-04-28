@@ -64,11 +64,11 @@ PREFIX_STATS="$TMP/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance"
 
 # Interfaces names of VLANs in sopnode servers
-# Replaced "net-100" with my local network interface "eno1"
-IF_NAME_N2N3_DEFAULT="eno1" 
-IF_NAME_N6_DEFAULT="eno1"
-IF_NAME_E1_DEFAULT="eno1"
-IF_NAME_F1_DEFAULT="eno1"
+# Replaced "net-100" with my local network interface
+IF_NAME_N2N3_DEFAULT="wlp111s0" 
+IF_NAME_N6_DEFAULT="wlp111s0" 
+IF_NAME_E1_DEFAULT="wlp111s0" 
+IF_NAME_F1_DEFAULT="wlp111s0"
 IF_NAME_VLAN_N300_1="net-n300.1"
 IF_NAME_VLAN_N300_2="net-n300.2"
 IF_NAME_VLAN_N320_1="net-n320.1"
@@ -461,8 +461,9 @@ RU_MODE="dhcp" # in ['static', 'dhcp']
 #### rfsim RU case ####
 #GNB_REPO_rfsim="${OAISA_REPO}/oai-gnb"
 #GNB_REPO_rfsim="${R2LAB_REPO}/oai-gnb"
+#GNB_TAG_rfsim="${RAN_TAG}"
 GNB_REPO_rfsim="ghcr.io/ziyad-mabrouk/openairinterface5g/oai-gnb" # for monitoring tests
-GNB_TAG_rfsim="${RAN_TAG}"
+GNB_TAG_rfsim="with-metrics"
 CONF_rfsim="gnb.sa.band78.106prb.rfsim.conf" 
 CONF_DU_rfsim="du.sa.band78.106prb.rfsim.conf" 
 OPTIONS_rfsim="-E --rfsim --log_config.global_log_options level,nocolor,time"
