@@ -9,9 +9,11 @@ function usage() {
     echo "            start-cn |"
     echo "            start-gnb |"
     echo "            start-nr-ue |"
+    echo "            start-nr-ue2 |"
     echo "            stop-cn |"
     echo "            stop-gnb |"
     echo "            stop-nr-ue |"
+    echo "            stop-nr-ue2 |"
     exit 1
 }
 
@@ -53,6 +55,7 @@ GNB_ID="@DEF_GNB_ID@"
 FULL_KEY="@DEF_FULL_KEY@"
 OPC="@DEF_OPC@"
 RFSIM_IMSI="@DEF_RFSIM_IMSI@"
+RFSIM_IMSI_UE2="@DEF_RFSIM_IMSI_UE2@"
 #
 PREFIX_DEMO="@DEF_PREFIX_DEMO@" # Directory in which all scripts will be copied on the k8s server to run the demo
 #
@@ -1121,6 +1124,48 @@ EOF
     diff $TMP/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
 }
 
+#################################################################################
+
+function configure-nr-ue2() {
+
+    # will NOT generate PCAP file to avoid wasting all memory resources
+    # However, a tcpdump container created e.g., to run iperf client"
+    DIR="$OAI5G_RAN/oai-nr-ue2"
+    ORIG_CHART="$DIR"/values.yaml
+    SED_FILE="$TMP/oai-nr-ue2-values.sed"
+    echo "configure-nr-ue2: $ORIG_CHART configuration"
+    ADD_OPTIONS_NRUE="$OPTIONS_NRUE"
+    cat > "$SED_FILE" <<EOF
+s|@NRUE_REPO@|$NRUE_REPO|
+s|@NRUE_TAG@|$NRUE_TAG|
+s|@MULTUS_NRUE2@|$MULTUS_NRUE|
+s|@IP_NRUE2@|$IP_NRUE|
+s|@NETMASK_NRUE2@|$NETMASK_NRUE|
+s|@MAC_NRUE2@|$(gener-mac)|
+s|@DEFAULT_GW_NRUE2@|$DEFAULT_GW_NRUE|
+s|@IF_NAME_NRUE2@|$IF_NAME_NRUE|
+s|@RFSIM_IMSI_UE2@|$RFSIM_IMSI_UE2|
+s|@FULL_KEY_UE2@|$FULL_KEY|
+s|@OPC_UE2@|$OPC|
+s|@DNN_UE2@|$DNN1|
+s|@SST_UE2@|$SLICE2_SST|
+s|@SD_UE2@|0x$SLICE2_SD|
+s|@NRUE2_USRP@|$NRUE_USRP|
+s|@ADD_OPTIONS_NRUE2@|$ADD_OPTIONS_NRUE|
+s|@START_TCPDUMP@|false|
+s|@TCPDUMP_CONTAINER@|$LOGS|
+s|@QOS_NRUE2_DEF@|false|
+s|@SHAREDVOLUME@|false|
+s|@NODE_NRUE2@||
+EOF
+    cp "$ORIG_CHART" $TMP/oai-nr-ue2_values.yaml-orig
+    echo "(Over)writing $DIR/values.yaml"
+    sed -f "$SED_FILE" < $TMP/oai-nr-ue2_values.yaml-orig > "$ORIG_CHART"
+    # if SD NSSAI field is set to "NULL", replace it by "16777215"
+    sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
+    diff $TMP/oai-nr-ue2_values.yaml-orig "$ORIG_CHART"
+}
+
 
 #################################################################################
 
@@ -1147,6 +1192,7 @@ function configure-all() {
     configure-gnb
     if [[ "$RRU" = "rfsim" ]]; then
 	configure-nr-ue
+    configure-nr-ue2
     fi
 }
 
@@ -1242,6 +1288,20 @@ function start-nr-ue() {
     kubectl wait pod -n $NS --for=condition=Ready --all
 }
 
+################################################################################
+
+function start-nr-ue2() {
+
+    echo "Running start-nr-ue2() on namespace: $NS, NODE_GNB=$NODE_GNB"
+    echo "cd $OAI5G_RAN"
+    cd "$OAI5G_RAN"
+
+    echo "helm -n $NS install oai-nr-ue2 oai-nr-ue2/" 
+    helm -n $NS install oai-nr-ue2 oai-nr-ue2/
+
+    echo "Wait until oai-nr-ue2 pod is READY"
+    kubectl wait pod -n $NS --for=condition=Ready --all
+}
 
 #################################################################################
 
@@ -1337,8 +1397,9 @@ EOF
     start-gnb 
 
     if [[ "$RRU" == "rfsim" ]]; then
-	echo "sleep 5s before starting nr-ue"; sleep 5
-	start-nr-ue 
+	echo "sleep 5s before starting nr-ue and nr-ue2"; sleep 5
+	start-nr-ue
+    start-nr-ue2
     fi
 
     echo "****************************************************************************"
@@ -1388,6 +1449,12 @@ function stop-nr-ue(){
 }
 
 
+function stop-nr-ue2(){
+    echo "helm -n $NS uninstall oai-nr-ue2"
+    helm -n $NS uninstall oai-nr-ue2
+}
+
+
 function stop() {
     echo "Running stop() on $NS namespace, logs=$LOGS"
 
@@ -1416,6 +1483,7 @@ function stop() {
 	stop-gnb
 	if [[ "$RRU" = "rfsim" ]]; then
 	    stop-nr-ue
+        stop-nr-ue2
 	fi
     else
         echo "OAI5G demo is not running, there is no pod on namespace $NS !"
@@ -1626,7 +1694,7 @@ if test $# -lt 1; then
     usage
 else
     case $1 in
-	init|start|stop|configure-all|start-cn|start-gnb|start-nr-ue|stop-cn|stop-gnb|stop-nr-ue|run-ping)
+	init|start|stop|configure-all|start-cn|start-gnb|start-nr-ue|start-nr-ue2|stop-cn|stop-gnb|stop-nr-ue|stop-nr-ue2|run-ping)
 	    echo "$0: running $1"
 	    "$1"
 	;;
