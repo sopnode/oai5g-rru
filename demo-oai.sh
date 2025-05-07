@@ -31,6 +31,7 @@ GNB_MODE="@DEF_GNB_MODE@" # in ['monolithic', 'cudu', 'cucpup']
 LOGS="@DEF_LOGS@" # boolean, true if logs are retrieved on pods
 PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
 MONITORING="@DEF_MONITORING@" # boolean, true if prometheus metrics parser is generated on oai-gnb pod (monolithic)
+FLEXRIC="@DEF_FLEXRIC@" # boolean, true if flexRIC is included
 #
 MCC="@DEF_MCC@"
 MNC="@DEF_MNC@"
@@ -544,6 +545,11 @@ NETMASK_NRUE="$NETMASK_N2N3"
 IF_NAME_NRUE="$IF_NAME_N2N3"
 NRUE_USRP="rfsim"
 
+########################### oai-flexric chart parameters #####################
+FLEXRIC_REPO="ghcr.io/ziyad-mabrouk/oai-flexric"
+FLEXRIC_TAG="latest"
+FLEXRIC_PULL_POLICY="Always"
+
 ##################################################################################
 
 # Generate unique MAC addresses for multus interfaces in oai5g pods
@@ -892,9 +898,14 @@ EOF
         if [[ $MONITORING == "true" ]]; then
             echo "MONITORING is set to True. A prometheus log parser container will be created besides the gnb"
         fi
+        if [[ $FLEXRIC == "true" ]]; then
+            echo "FLEXRIC is set to True. FlexRIC configurations will be applied"
+        fi
         cat >> "$SED_VALUES_FILE" <<EOF
 s|@METRICS_PARSER_CONTAINER@|$MONITORING|
 s|@GNB_PULL_POLICY@|$GNB_PULL_POLICY|
+s|@FLEXRIC@|$FLEXRIC|
+s|@HOST_FLEXRIC@|oai-flexric|
 EOF
     ORIG_CHART="${OAI5G_RAN}/oai-gnb/values.yaml"
 	cp ${ORIG_CHART} $TMP/oai-gnb_values.yaml-orig
@@ -1166,6 +1177,27 @@ EOF
     diff $TMP/oai-nr-ue2_values.yaml-orig "$ORIG_CHART"
 }
 
+#################################################################################
+
+function configure-flexric() {
+
+    DIR="$OAI5G_RAN/oai-flexric"
+    ORIG_CHART="$DIR"/values.yaml
+    SED_FILE="$TMP/oai-flexric-values.sed"
+    echo "configure-flexric: $ORIG_CHART configuration"
+    cat > "$SED_FILE" <<EOF
+s|@FLEXRIC_REPO@|$FLEXRIC_REPO|
+s|@FLEXRIC_TAG@|$FLEXRIC_TAG|
+s|@FLEXRIC_PULL_POLICY@|$FLEXRIC_PULL_POLICY|
+EOF
+    cp "$ORIG_CHART" $TMP/oai-nr-ue2_values.yaml-orig
+    echo "(Over)writing $DIR/values.yaml"
+    sed -f "$SED_FILE" < $TMP/oai-nr-ue2_values.yaml-orig > "$ORIG_CHART"
+    # if SD NSSAI field is set to "NULL", replace it by "16777215"
+    sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
+    diff $TMP/oai-nr-ue2_values.yaml-orig "$ORIG_CHART"
+}
+
 
 #################################################################################
 
@@ -1190,6 +1222,7 @@ function configure-all() {
     configure-oai-5g-@mode@ 
     configure-mysql
     configure-gnb
+    configure-flexric
     if [[ "$RRU" = "rfsim" ]]; then
 	configure-nr-ue
     configure-nr-ue2
@@ -1221,6 +1254,21 @@ function start-cn() {
         echo "Error: Pods did not become ready within timeout"
         exit 1
     fi
+}
+
+################################################################################
+
+function start-flexric() {
+
+    echo "Running start-flexric() on namespace: $NS, NODE_GNB=$NODE_GNB"
+    echo "cd $OAI5G_RAN"
+    cd "$OAI5G_RAN"
+
+    echo "helm -n $NS install oai-flexric oai-flexric/" 
+    helm -n $NS install oai-flexric oai-flexric/
+
+    echo "Wait until oai-flexric pod is READY"
+    kubectl wait pod -n $NS --for=condition=Ready --all
 }
 
 #################################################################################
@@ -1421,6 +1469,10 @@ function stop-cn(){
     helm --namespace=$NS uninstall oai-5g-@mode@ 
 }
 
+function stop-flexric(){
+    echo "helm -n $NS uninstall flexric"
+    helm -n $NS uninstall oai-flexric
+}
 
 function stop-gnb(){
     if [[ $GNB_MODE = 'monolithic' ]]; then
