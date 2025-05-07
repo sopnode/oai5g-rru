@@ -65,7 +65,7 @@ function update() {
     LOGS=$1; shift # boolean in [true, false]
     PCAP=$1; shift # boolean in [true, false]
     MONITORING=$1; shift # boolean in [true, false]
-    FLEXRIC=$1: shift # boolean
+    FLEXRIC=$1; shift # boolean
     LOCAL_INTERFACE=$1; shift
     PREFIX_DEMO=$1; shift
     CN_MODE=$1; shift
