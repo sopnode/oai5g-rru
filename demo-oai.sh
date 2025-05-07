@@ -1748,7 +1748,7 @@ if test $# -lt 1; then
     usage
 else
     case $1 in
-	init|start|stop|configure-all|start-cn|start-gnb|start-nr-ue|start-nr-ue2|stop-cn|stop-gnb|stop-nr-ue|stop-nr-ue2|run-ping)
+	init|start|stop|configure-all|start-cn|start-flexric|start-gnb|start-nr-ue|start-nr-ue2|stop-cn|stop-flexric|stop-gnb|stop-nr-ue|stop-nr-ue2|run-ping)
 	    echo "$0: running $1"
 	    "$1"
 	;;
