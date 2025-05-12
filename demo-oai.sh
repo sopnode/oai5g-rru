@@ -882,16 +882,6 @@ s|@CU_CP_IP_ADDRESS@|$IP_CUCP_E1|
 EOF
     else
 	    echo "Monolithic mode, do not set AMF_IP_ADDRESS and CU_IP_ADDRESS"
-        if [[ $FLEXRIC == "true" ]]; then
-            cat >> "$SED_CONF_FILE" <<EOF
-
-e2_agent :
-{
-  near_ric_ip_addr = "@FLEXRIC_IP@";
-  sm_dir = "/usr/local/lib/flexric/";
-};
-EOF
-        fi
     fi
     
     for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
@@ -902,6 +892,18 @@ EOF
 	    echo "********************* Display modified ${ORIG_CHART} ************************"
 	    cat ${ORIG_CHART}
     done
+
+    if [[ $FLEXRIC == "true" ]]; then
+        echo "adding FlexRIC-related conf in ${OAI5G_RAN}/oai-gnb/templates/configmap.yaml"
+        cat <<EOF >> "${OAI5G_RAN}/oai-gnb/templates/configmap.yaml"
+
+e2_agent :
+{
+  near_ric_ip_addr = "@FLEXRIC_IP@";
+  sm_dir = "/usr/local/lib/flexric/";
+};
+EOF
+    fi
 
 
     # Configure gNB values.yaml charts
@@ -1361,7 +1363,6 @@ function start-nr-ue2() {
     helm -n $NS install oai-nr-ue2 oai-nr-ue2/
 
     echo "Wait until oai-nr-ue2 pod is READY"
-    kubectl wait pod -n $NS --for=condition=Ready --all
     kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-nr-ue2
 }
 
