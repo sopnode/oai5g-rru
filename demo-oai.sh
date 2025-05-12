@@ -882,7 +882,7 @@ s|@CU_CP_IP_ADDRESS@|$IP_CUCP_E1|
 EOF
     else
 	    echo "Monolithic mode, do not set AMF_IP_ADDRESS and CU_IP_ADDRESS"
-        if [[ $FLEXRIC == "true" ]]: then
+        if [[ $FLEXRIC == "true" ]]; then
             cat >> "$SED_CONF_FILE" <<EOF
 
 e2_agent :
