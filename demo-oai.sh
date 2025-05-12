@@ -897,11 +897,11 @@ EOF
         echo "adding FlexRIC-related conf in ${OAI5G_RAN}/oai-gnb/templates/configmap.yaml"
         cat <<EOF >> "${OAI5G_RAN}/oai-gnb/templates/configmap.yaml"
 
-e2_agent :
-{
-  near_ric_ip_addr = "@FLEXRIC_IP@";
-  sm_dir = "/usr/local/lib/flexric/";
-};
+      e2_agent :
+      {
+        near_ric_ip_addr = "@FLEXRIC_IP@";
+        sm_dir = "/usr/local/lib/flexric/";
+      };
 EOF
     fi
 
