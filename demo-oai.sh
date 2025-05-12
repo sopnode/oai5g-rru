@@ -1282,7 +1282,7 @@ function start-flexric() {
     helm -n $NS install oai-flexric oai-flexric/
 
     echo "Wait until oai-flexric pod is READY"
-    kubectl wait pod -n $NS --for=condition=Ready --all
+    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-flexric
 }
 
 #################################################################################
@@ -1298,6 +1298,7 @@ function start-gnb() {
 	echo "helm -n $NS install oai-gnb oai-gnb/"
 	helm -n $NS install oai-gnb oai-gnb/
 	echo "Wait until the gNB pod is READY"
+    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-gnb
     elif [[ $GNB_MODE = 'cudu' ]]; then
 	echo "helm -n $NS install oai-cu oai-cu/"
 	helm -n $NS install oai-cu oai-cu/
@@ -1322,8 +1323,6 @@ function start-gnb() {
 	echo "helm install -n $NS oai-du oai-du/"
 	helm install -n $NS oai-du oai-du/
     fi
-    echo "kubectl -n $NS wait pod --for=condition=Ready --all"
-    kubectl -n $NS wait pod --for=condition=Ready --all
 }
 
 #################################################################################
@@ -1347,7 +1346,7 @@ function start-nr-ue() {
     helm -n $NS install oai-nr-ue oai-nr-ue/
 
     echo "Wait until oai-nr-ue pod is READY"
-    kubectl wait pod -n $NS --for=condition=Ready --all
+    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-nr-ue
 }
 
 ################################################################################
@@ -1363,6 +1362,7 @@ function start-nr-ue2() {
 
     echo "Wait until oai-nr-ue2 pod is READY"
     kubectl wait pod -n $NS --for=condition=Ready --all
+    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-nr-ue2
 }
 
 #################################################################################
