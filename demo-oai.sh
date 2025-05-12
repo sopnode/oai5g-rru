@@ -884,14 +884,14 @@ EOF
 	    echo "Monolithic mode, do not set AMF_IP_ADDRESS and CU_IP_ADDRESS"
     fi
     
-    for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
-	    ORIG_CHART="${OAI5G_RAN}/${nf}/templates/configmap.yaml"
-	    cp ${ORIG_CHART} $TMP/${nf}_configmap.yaml-orig
-	    echo "(Over)writing $ORIG_CHART"
-	    sed -f "$SED_CONF_FILE" < $TMP/${nf}_configmap.yaml-orig > ${ORIG_CHART}
-	    echo "********************* Display modified ${ORIG_CHART} ************************"
-	    cat ${ORIG_CHART}
-    done
+    # for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
+	#     ORIG_CHART="${OAI5G_RAN}/${nf}/templates/configmap.yaml"
+	#     cp ${ORIG_CHART} $TMP/${nf}_configmap.yaml-orig
+	#     echo "(Over)writing $ORIG_CHART"
+	#     sed -f "$SED_CONF_FILE" < $TMP/${nf}_configmap.yaml-orig > ${ORIG_CHART}
+	#     echo "********************* Display modified ${ORIG_CHART} ************************"
+	#     cat ${ORIG_CHART}
+    # done
 
 
     # Configure gNB values.yaml charts
