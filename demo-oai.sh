@@ -825,7 +825,7 @@ function configure-gnb() {
     if [[ $GNB_MODE = 'monolithic' ]]; then
 	CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_$RRU}\")
 	DIR_TEMPLATES="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates"
-	NB_LINES=8
+	NB_LINES=7
 	echo "monolithic gNB, conf is $CONF_ORIG"
     else
 	CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_DU_$RRU}\")
