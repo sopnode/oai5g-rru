@@ -551,8 +551,8 @@ NRUE_USRP="rfsim"
 ########################### oai-flexric chart parameters #####################
 FLEXRIC_REPO="ghcr.io/ziyad-mabrouk/oai-flexric"
 #FLEXRIC_REPO="oaisoftwarealliance/oai-flexric"
-FLEXRIC_TAG="latest"
-#FLEXRIC_TAG="develop"
+FLEXRIC_TAG="test"
+#FLEXRIC_TAG="latest"
 FLEXRIC_PULL_POLICY="Always"
 
 ##################################################################################
