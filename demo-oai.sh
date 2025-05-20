@@ -75,12 +75,12 @@ IF_NAME_N2N3_DEFAULT="@DEF_LOCAL_INTERFACE@"
 IF_NAME_N6_DEFAULT="@DEF_LOCAL_INTERFACE@" 
 IF_NAME_E1_DEFAULT="@DEF_LOCAL_INTERFACE@" 
 IF_NAME_F1_DEFAULT="@DEF_LOCAL_INTERFACE@"
-IF_NAME_VLAN_N300_1="net-n300.1"
-IF_NAME_VLAN_N300_2="net-n300.2"
-IF_NAME_VLAN_N320_1="net-n320.1"
-IF_NAME_VLAN_N320_2="net-n320.2"
-IF_NAME_VLAN_JAGUAR="net-jaguar"
-IF_NAME_VLAN_PANTHER="net-panther"
+IF_NAME_VLAN_N300_1="n300_1"
+IF_NAME_VLAN_N300_2="n300_2"
+IF_NAME_VLAN_N320_1="n320._"
+IF_NAME_VLAN_N320_2="n320_2"
+IF_NAME_VLAN_JAGUAR="jaguar"
+IF_NAME_VLAN_PANTHER="panther"
 
 
 
@@ -462,7 +462,7 @@ NETMASK_GNB_RU="28"
 #
 ################## RRU-dependent part ###################
 #
-RU_MODE="dhcp" # in ['static', 'dhcp']
+RU_MODE="static" # in ['static', 'dhcp']
 #
 #### rfsim RU case ####
 #GNB_REPO_rfsim="${OAISA_REPO}/oai-gnb"
@@ -487,8 +487,8 @@ OPTIONS_b2xx="-E --tune-offset 30000000 --log_config.global_log_options level,no
 
 #### n3xx RU case ####
 #GNB_REPO_n3xx="${OAISA_REPO}/oai-gnb"
-GNB_REPO_n3xx="${R2LAB_REPO}/oai-gnb"
-GNB_TAG_n3xx="${RAN_TAG}"
+GNB_REPO_n3xx=""ghcr.io/ziyad-mabrouk/openairinterface5g/oai-gnb""
+GNB_TAG_n3xx="test"
 #
 #CONF_n320="gnb.sa.band78.162prb.usrpn310.2x2-r2lab.conf"
 CONF_n320="gnb.sa.band78.106prb.n310.7ds2u.conf"
