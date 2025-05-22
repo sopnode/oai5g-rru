@@ -513,7 +513,7 @@ else
 fi
 MTU_n3xx="9000"
 ADDRS_n300="addr=172.28.4.1,second_addr=172.28.4.33"
-ADDRS_n320="addr=172.28.4.65,second_addr=172.28.4.97"
+ADDRS_n320="addr=172.28.4.65" # second_addr=172.28.4.97 doesn't work
 
 #### aw2s RU case ####
 #GNB_REPO_aw2s="${OAISA_REPO}/oai-gnb"
@@ -778,7 +778,7 @@ function configure-gnb() {
 	MTU_GNB_RU2="$MTU_n3xx"
 	RRU_TYPE="n3xx"
 	ADD_OPTIONS_GNB="$OPTIONS_n3xx"
-	QOS_GNB_DEF="true"
+	QOS_GNB_DEF="false" # avoid OOMKilled problems with k8s 
 	if [[ "$RRU" = "n300" ]]; then
 	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_N300_1"
 	    IF_NAME_GNB_RU2="$IF_NAME_VLAN_N300_2"
