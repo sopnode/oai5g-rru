@@ -321,8 +321,10 @@ CN_DEFAULT_GW=""
 ################################ oai-gnb chart parameters ########################
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
+MY_REPO="ghcr.io/ziyad-mabrouk/openairinterface5g"
 #
 #RAN_TAG="2024.w25"
+MY_TAG="test"
 RAN_TAG="2024.w48"
 GNB_NAME="gNB-r2lab"
 
@@ -466,11 +468,8 @@ RU_MODE="static" # in ['static', 'dhcp']
 #
 #### rfsim RU case ####
 #GNB_REPO_rfsim="${OAISA_REPO}/oai-gnb"
-#GNB_REPO_rfsim="${R2LAB_REPO}/oai-gnb"
-#GNB_TAG_rfsim="${RAN_TAG}"
-GNB_REPO_rfsim="ghcr.io/ziyad-mabrouk/openairinterface5g/oai-gnb"
-#GNB_TAG_rfsim="with-metrics"
-GNB_TAG_rfsim="test"
+GNB_REPO_rfsim="${MY_REPO}/oai-gnb"
+GNB_TAG_rfsim="${MY_TAG}"
 CONF_rfsim="gnb.sa.band78.106prb.rfsim.conf" 
 CONF_DU_rfsim="du.sa.band78.106prb.rfsim.conf" 
 OPTIONS_rfsim="-E --rfsim --log_config.global_log_options level,nocolor,time"
@@ -478,8 +477,8 @@ OPTIONS_rfsim="-E --rfsim --log_config.global_log_options level,nocolor,time"
 #
 #### b2xx RU case ####
 #GNB_REPO_b2xx="${OAISA_REPO}/oai-gnb"
-GNB_REPO_b2xx="${R2LAB_REPO}/oai-gnb"
-GNB_TAG_b2xx="${RAN_TAG}"
+GNB_REPO_b2xx="${MY_REPO}/oai-gnb"
+GNB_TAG_b2xx="${MY_TAG}"
 CONF_b210="gnb.sa.band78.fr1.106PRB.usrpb210.conf"
 #CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
 #OPTIONS_b2xx="--sa --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
@@ -487,8 +486,8 @@ OPTIONS_b2xx="-E --tune-offset 30000000 --log_config.global_log_options level,no
 
 #### n3xx RU case ####
 #GNB_REPO_n3xx="${OAISA_REPO}/oai-gnb"
-GNB_REPO_n3xx=""ghcr.io/ziyad-mabrouk/openairinterface5g/oai-gnb""
-GNB_TAG_n3xx="test"
+GNB_REPO_n3xx="${MY_REPO}/oai-gnb"
+GNB_TAG_n3xx="${MY_TAG}"
 #
 #CONF_n320="gnb.sa.band78.162prb.usrpn310.2x2-r2lab.conf"
 CONF_n320="gnb.sa.band78.106prb.n310.7ds2u.conf"
@@ -517,8 +516,8 @@ ADDRS_n320="addr=172.28.4.65" # second_addr=172.28.4.97 doesn't work
 
 #### aw2s RU case ####
 #GNB_REPO_aw2s="${OAISA_REPO}/oai-gnb"
-GNB_REPO_aw2s="${R2LAB_REPO}/oai-gnb-aw2s"
-GNB_TAG_aw2s="${RAN_TAG}"
+GNB_REPO_aw2s="${MY_REPO}/oai-gnb-aw2s"
+GNB_TAG_aw2s="${MY_TAG}"
 #
 CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 #CONF_jaguar="gnb.sa.band78.133prb.aw2s.dddsu.50MHz.conf"
