@@ -65,6 +65,8 @@ OAISA_REPO="docker.io/oaisoftwarealliance"
 # Interfaces names of VLANs in sopnode servers
 IF_NAME_N2N3_DEFAULT="net-100"
 IF_NAME_N6_DEFAULT="net-100"
+IF_NAME_E1_DEFAULT="net-100"
+IF_NAME_F1_DEFAULT="net-100"
 IF_NAME_VLAN_N300_1="net-n300.1"
 IF_NAME_VLAN_N300_2="net-n300.2"
 IF_NAME_VLAN_N320_1="net-n320.1"
@@ -156,13 +158,16 @@ if [[ $RUN_MODE = "full" ]]; then
     IP_DNS1="138.96.0.210"
     IP_DNS2="193.51.196.138"
     # ran charts
+    HOST_AMF="$IP_AMF_N2"
     MULTUS_GNB_N2="true"
     IP_GNB_N2="$SUBNET_N2N3.203"
     GNB_N2_IF_NAME="n2"
     MULTUS_GNB_N3="false"
     if [[ $GNB_MODE = 'cucpup' ]]; then
 	F1IFNAME="f1c"
+	MULTUS_CUUP_N3="true"
 	IP_GNB_N3="$SUBNET_N2N3.204"
+	CUUP_N3_IF_NAME="n3"
 	IP_NRUE="$SUBNET_N2N3.205"
     else
 	F1IFNAME="f1"
@@ -170,7 +175,10 @@ if [[ $RUN_MODE = "full" ]]; then
 	IP_NRUE="$SUBNET_N2N3.204"
     fi
     GNB_N3_IF_NAME="n2"
-    
+	#
+	# ** NRUE specific part **
+	#
+	MULTUS_NRUE="true"
 else
     # Local RAN, External MYSQL/UDR/UDM/AUSF/AMF/SMF
     ENABLE_SNAT="off" # "yes" or "off"
@@ -193,7 +201,7 @@ else
 	# amf 
 	ENABLED_AMF=false
 	NFS_AMF_HOST="$SUBNET_N2N3.200"
-	IP_AMF_N2="$SUBNET_N2N3.200"
+	IP_AMF_N2=""
 	IF_N2="" # unused
 	# smf
 	ENABLED_SMF=false
@@ -226,43 +234,73 @@ else
 	# TS
 	ENABLED_TS=false
 	# ran charts
+	HOST_AMF="oai-amf"
 	MULTUS_GNB_N2="true"
 	IP_GNB_N2="$SUBNET_N2N3.223"
 	GNB_N2_IF_NAME="n2"
 	MULTUS_GNB_N3="false"
 	if [[ $GNB_MODE = 'cucpup' ]]; then
+	    F1IFNAME="f1c"
+	    MULTUS_CUUP_N3="true"
 	    IP_GNB_N3="$SUBNET_N2N3.224"
+	    CUUP_N3_IF_NAME="n3"
 	    IP_NRUE="$SUBNET_N2N3.225"
 	else
+	    F1IFNAME="f1"
 	    IP_GNB_N3="$IP_GNB_N2"
 	    IP_NRUE="$SUBNET_N2N3.224"
 	fi
 	GNB_N3_IF_NAME="n2"
 	ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
 	#ROUTES_GNB_N2="[{'dst': '172.21.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
+	#
+	# ** NRUE specific part **
+	#
+	MULTUS_NRUE="true"
     else
         # RUN_MODE=gnb-only
 	# -- Local RAN and external CN
-        SUBNET_N2N3="172.21.10" # e.g., "10.0.20"
-        NETMASK_N2N3="26"
-        IF_NAME_N2N3="br-pepr" # e.g., "ran"
-        # Set the external AMF IP address (N2)
-        IP_AMF_N2="$SUBNET_N2N3.201"
-        # Set the local gNB host network interface to reach AMF/UPF (N2/N3)
-	MULTUS_GNB_N2="true"
-	IP_GNB_N2="$SUBNET_N2N3.223"
-	GNB_N2_IF_NAME="n2"
-        # Set the route to reach AMF/UPF
+	#
+        SUBNET_N2N3="10.10.3" # "172.21.10"
+        HOST_AMF="$SUBNET_N2N3.200" #${NODE_AMF_UPF%"-v100"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
+	#
+	# ** GNB specific part (also used for CU) **
+	#
+	MULTUS_GNB_N2="false"
+	IP_GNB_N2="$SUBNET_N2N3.205" # "$SUBNET_N2N3.223" 
+        # Set the route to reach AMF
         ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
-	MULTUS_GNB_N3="false"
-	if [[ $GNB_MODE = 'cucpup' ]]; then
-	    IP_GNB_N3="$SUBNET_N2N3.224"
-	    IP_NRUE="$SUBNET_N2N3.225"
-	else
-	    IP_GNB_N3="$IP_GNB_N2"
-	    IP_NRUE="$SUBNET_N2N3.224"
-	fi
-	GNB_N3_IF_NAME="n2"
+	GNB_N2_IF_NAME="n3" # local pod network interface name for N2 (eth0 or n2 or n3)
+	#
+	MULTUS_GNB_N3="true"
+	IP_GNB_N3="$IP_GNB_N2" # "$SUBNET_N2N3.224"
+	GNB_N3_IF_NAME="$GNB_N2_IF_NAME" # pod network interface name for N3 (eth0 or n2/n3)
+	NETMASK_N2N3="24"
+        IF_NAME_N2N3="n3br" # host interface used for multus on N2/N3 
+	#
+	#if [[ $GNB_MODE = 'cucpup' ]]; then
+	#    IP_GNB_N3="$SUBNET_N2N3.224"
+	#    IP_NRUE="$SUBNET_N2N3.225"
+	#else
+	#    IP_GNB_N3="$IP_GNB_N2"
+	#    IP_NRUE="$SUBNET_N2N3.224"
+	#fi
+	#
+	# ** CU-CP specific part **
+	#
+	MULTUS_CUCP_N2="true"
+	IP_CUCP_N2="$IP_GNB_N2"
+	CUCP_N2_IF_NAME="n2"
+	#
+	# ** CU-UP specific part **
+	#
+	MULTUS_CUUP_N3="true"
+	IP_CUUP_N3="$SUBNET_N2N3.206"
+	CUUP_N3_IF_NAME="n3"
+	#
+	# ** NRUE specific part **
+	#
+	MULTUS_NRUE="false"
     fi
 fi
 
@@ -287,7 +325,6 @@ GNB_NAME="gNB-r2lab"
 
 # DU/CU SPLIT parameters
 #
-HOST_AMF="oai-amf"
 NODE_CU="$NODE_GNB" # same node used for cu/cu-cp/cu-up and du
 
 E1IFNAME="e1"
@@ -304,7 +341,7 @@ IP_DU_F1="172.21.16.100"
 NETMASK_DU_F1="22"
 GW_DU_F1=""
 ROUTES_DU_F1=""
-IF_NAME_DU_F1="$IF_NAME_N2N3"
+IF_NAME_DU_F1="$IF_NAME_F1_DEFAULT"
 #
 NAME_DU="oai-du"
 QOS_DU_DEF="true"
@@ -320,27 +357,24 @@ IP_CU_F1="172.21.16.92"
 NETMASK_CU_F1="22"
 GW_CU_F1="" 
 ROUTES_CU_F1="" 
-IF_NAME_CU_F1="$IF_NAME_N2N3"
+IF_NAME_CU_F1="$IF_NAME_F1_DEFAULT"
 #
-MULTUS_CU_N2="true"
-IP_CU_N2="$IP_GNB_N2"  # "$SUBNET_N2N3.203" 
-NETMASK_CU_N2="$NETMASK_N2N3"  # "24"
-GW_CU_N2="" 
-ROUTES_CU_N2=""
-IF_NAME_CU_N2="$IF_NAME_N2N3"
+MULTUS_CU_N2=${MULTUS_CU_N2:=$MULTUS_GNB_N2}
+IP_CU_N2=${IP_CU_N2:=$IP_GNB_N2}
+NETMASK_CU_N2=${NETMASK_CU_N2:=$NETMASK_N2N3}
+GW_CU_N2=${GW_CU_N2:=""}
+ROUTES_CU_N2=${ROUTES_CU_N2:=""}
+IF_NAME_CU_N2=${IF_NAME_CU_N2:=$IF_NAME_N2N3}
 #
-MULTUS_CU_N3="false"
-IP_CU_N3="" 
-NETMASK_CU_N3=""
-GW_CU_N3="" 
-ROUTES_CU_N3=""
-IF_NAME_CU_N3=""
+MULTUS_CU_N3=${MULTUS_CU_N3:=$MULTUS_GNB_N3}
+IP_CU_N3=${IP_CU_N3:=$IP_GNB_N3}
+NETMASK_CU_N3=${NETMASK_CU_N3:=$NETMASK_N2N3}
+GW_CU_N3=${GW_CU_N3:=""}
+ROUTES_CU_N3=${ROUTES_CU_N3:=""}
+IF_NAME_CU_N3=${IF_NAME_CU_N3:=$IF_NAME_N2N3}
 #
 ADD_OPTIONS_CU="--log_config.global_log_options level,nocolor,time"
 NAME_CU="oai-cu"
-HOST_CU="$"
-N2IFNAME_CU="n2" 
-N3IFNAME_CU="n2"
 QOS_CU_DEF="true"
 # NODE_CU is defined above and also the same for CUCP/CUUP
 #
@@ -354,26 +388,25 @@ IP_CUCP_E1="192.168.18.12"
 NETMASK_CUCP_E1="24"
 GW_CUCP_E1=""
 ROUTES_CUCP_E1=""
-IF_NAME_CUCP_E1="$IF_NAME_N2N3"
+IF_NAME_CUCP_E1="$IF_NAME_E1_DEFAULT"
 #
-MULTUS_CUCP_N2="true"
-IP_CUCP_N2="$IP_GNB_N2" # "$SUBNET_N2N3.203"
-NETMASK_CUCP_N2="$NETMASK_N2N3" # "24"
-GW_CUCP_N2=""
-ROUTES_CUCP_N2=""
-IF_NAME_CUCP_N2="$IF_NAME_N2N3"
+MULTUS_CUCP_N2=${MULTUS_CUCP_N2:=$MULTUS_GNB_N2}
+IP_CUCP_N2=${IP_CUCP_N2:=$IP_GNB_N2} 
+NETMASK_CUCP_N2=${NETMASK_CUCP_N2:=$NETMASK_N2N3}
+GW_CUCP_N2=${GW_CUCP_N2:=""}
+ROUTES_CUCP_N2=${ROUTES_CUCP_N2:=""}
+IF_NAME_CUCP_N2=${IF_NAME_CUCP_N2:=$IF_NAME_N2N3}
+CUCP_N2_IF_NAME=${CUCP_N2_IF_NAME:=$GNB_N2_IF_NAME}
 #
 MULTUS_CUCP_F1="true"
 IP_CUCP_F1="172.21.16.92"
 NETMASK_CUCP_F1="24"
 GW_CUCP_F1=""
 ROUTES_CUCP_F1=""
-IF_NAME_CUCP_F1="$IF_NAME_N2N3"
+IF_NAME_CUCP_F1="$IF_NAME_F1_DEFAULT"
 #
 ADD_OPTIONS_CUCP="--log_config.global_log_options level,nocolor,time"
 NAME_CUCP="oai-cu-cp"
-N2IFNAME_CUCP="n2"
-N3IFNAME_CUCP="n2"
 QOS_CUCP_DEF="true"
 NODE_CUCP="$NODE_CU"
 #
@@ -387,26 +420,26 @@ IP_CUUP_E1="192.168.18.13"
 NETMASK_CUUP_E1="24"
 GW_CUUP_E1=""
 ROUTES_CUUP_E1="" 
-IF_NAME_CUUP_E1="$IF_NAME_N2N3"
+IF_NAME_CUUP_E1="$IF_NAME_E1_DEFAULT"
 #
-MULTUS_CUUP_N3="true"
-IP_CUUP_N3="$IP_GNB_N3"
-NETMASK_CUUP_N3="$NETMASK_N2N3" # "24"
-GW_CUUP_N3="" 
-ROUTES_CUUP_N3=""
-IF_NAME_CUUP_N3="$IF_NAME_N2N3"  
+MULTUS_CUUP_N3=${MULTUS_CUUP_N3:=$MULTUS_GNB_N3}
+IP_CUUP_N3=${IP_CUUP_N3:=$IP_GNB_N3}
+NETMASK_CUUP_N3=${NETMASK_CUUP_N3:=$NETMASK_N2N3}
+GW_CUUP_N3=${GW_CUUP_N3:=""}
+ROUTES_CUUP_N3=${ROUTES_CUUP_N3:=""}
+IF_NAME_CUUP_N3=${IF_NAME_CUUP_N3:=$IF_NAME_N2N3}
+CUUP_N3_IF_NAME=${CUUP_N3_IF_NAME:=$GNB_N2_IF_NAME}
 #
 MULTUS_CUUP_F1="true"
 IP_CUUP_F1="172.21.16.93"
 NETMASK_CUUP_F1="22"
 GW_CUUP_F1="" # "172.21.19.254"
 ROUTES_CUUP_F1=""
-IF_NAME_CUUP_F1="$IF_NAME_N2N3"  
+IF_NAME_CUUP_F1="$IF_NAME_F1_DEFAULT"  
 #
 ADD_OPTIONS_CUUP=""
 NAME_CUUP="oai-cuup"
 HOST_CUCP="$IP_CUCP_E1"   #"oai-cu"
-N3IFNAME_CUUP="n3"
 QOS_CUUP_DEF="true"
 NODE_CUUP="$NODE_CU"
 
@@ -421,7 +454,7 @@ fi
 ########## GNB Monolithic specific part ################
 #
 NETMASK_GNB_N2="$NETMASK_N2N3"
-NETMASK_GNB_N3=""
+NETMASK_GNB_N3="$NETMASK_N2N3"
 NETMASK_GNB_RU="28"
 #
 ################## RRU-dependent part ###################
@@ -820,12 +853,6 @@ s|@GNB_CU_UP_ID@|$GNB_ID|
 s|@GNB_DU_ID@|$GNB_ID|
 s|@TAC@|$TAC|
 s|plmn_list.*|plmn_list = $PLMN_LIST|
-s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
-s|@GNB_N2_IP_ADDRESS@|$IP_GNB_N2/$NETMASK_N2N3|
-s|@CU_UP_N2_IP_ADDRESS@|$IP_CUUP_N3|
-s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
-s|@GNB_N3_IP_ADDRESS@|$IP_GNB_N3/$NETMASK_N2N3|
-s|@CU_UP_N3_IP_ADDRESS@|$IP_CUUP_N3|
 s|@AW2S_IP_ADDRESS@|$ADDR_aw2s|
 s|@GNB_AW2S_LOCAL_IF_NAME@|$IF_NAME_GNB_RU1|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
@@ -838,7 +865,6 @@ EOF
     if [[ $GNB_MODE != 'monolithic' ]]; then
 	    echo "With cudu/cucpup modes, set here AMF_IP_ADDRESS, CUCP_IP_ADDRESS and CU_IP_ADDRESS"
 	    cat >> "$SED_CONF_FILE" <<EOF
-s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
 s|@CU_IP_ADDRESS@|$IP_CU_F1|
 s|@CU_CP_IP_ADDRESS@|$IP_CUCP_E1|
 EOF
@@ -871,7 +897,6 @@ s|@GNB_REPO@|$GNB_REPO|
 s|@GNB_TAG@|$GNB_TAG|
 s|@DEFAULT_GW_GNB@|$DEFAULT_GW_GNB|
 s|@MULTUS_GNB_N2@|$MULTUS_GNB_N2|
-s|@AMF_IP_ADDRESS@|$IP_AMF_N2|
 s|@IP_GNB_N2@|$IP_GNB_N2|
 s|@NETMASK_GNB_N2@|$NETMASK_GNB_N2|
 s|@MAC_GNB_N2@|$(gener-mac)|
@@ -910,7 +935,10 @@ s|@MCC@|$MCC|
 s|@MNC@|$MNC|
 s|@TAC@|$TAC|
 s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
+s|@CUCP_N2_IF_NAME@|$CUCP_N2_IF_NAME|
 s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
+s|@CUUP_N3_IF_NAME@|$CUUP_N3_IF_NAME|
+s|@HOST_AMF@|$HOST_AMF|
 s|@START_TCPDUMP@|$PCAP|
 s|@TCPDUMP_CONTAINER@|$LOGS|
 s|@SHAREDVOLUME@|$PCAP|
@@ -963,9 +991,6 @@ s|@ROUTES_CU_N3@|$ROUTES_CU_N3|
 s|@IF_NAME_CU_N3@|$IF_NAME_CU_N3|
 s|@ADD_OPTIONS_CU@|$ADD_OPTIONS_CU|
 s|@NAME_CU@|$NAME_CU|
-s|@HOST_AMF@|$HOST_AMF|
-s|@N2IFNAME_CU@|$N2IFNAME_CU|
-s|@N3IFNAME_CU@|$N3IFNAME_CU|
 s|@QOS_CU_DEF@|$QOS_CU_DEF|
 s|@NODE_CU@|$NODE_CU|
 
@@ -995,8 +1020,6 @@ s|@ROUTES_CUCP_F1@|$ROUTES_CUCP_F1|
 s|@IF_NAME_CUCP_F1@|$IF_NAME_CUCP_F1|
 s|@ADD_OPTIONS_CUCP@|$ADD_OPTIONS_CUCP|
 s|@NAME_CUCP@|$NAME_CUCP|
-s|@N2IFNAME_CUCP@|$N2IFNAME_CUCP|
-s|@N3IFNAME_CUCP@|$N3IFNAME_CUCP|
 s|@QOS_CUCP_DEF@|$QOS_CUCP_DEF|
 s|@NODE_CUCP@|$NODE_CUCP|
 
@@ -1027,8 +1050,6 @@ s|@IF_NAME_CUUP_F1@|$IF_NAME_CUUP_F1|
 s|@ADD_OPTIONS_CUUP@|$ADD_OPTIONS_CUUP|
 s|@NAME_CUUP@|$NAME_CUUP|
 s|@HOST_CUCP@|$HOST_CUCP|
-s|@N2IFNAME_CUUP@|$N2IFNAME_CUUP|
-s|@N3IFNAME_CUUP@|$N3IFNAME_CUUP|
 s|@QOS_CUUP_DEF@|$QOS_CUUP_DEF|
 s|@CU_HOST@|$CU_HOST|
 s|@NODE_CUUP@|$NODE_CUUP|
@@ -1056,7 +1077,7 @@ function configure-nr-ue() {
     cat > "$SED_FILE" <<EOF
 s|@NRUE_REPO@|$NRUE_REPO|
 s|@NRUE_TAG@|$NRUE_TAG|
-s|@MULTUS_NRUE@|true|
+s|@MULTUS_NRUE@|$MULTUS_NRUE|
 s|@IP_NRUE@|$IP_NRUE|
 s|@NETMASK_NRUE@|$NETMASK_NRUE|
 s|@MAC_NRUE@|$(gener-mac)|
