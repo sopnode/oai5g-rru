@@ -240,9 +240,13 @@ else
 	GNB_N2_IF_NAME="n2"
 	MULTUS_GNB_N3="false"
 	if [[ $GNB_MODE = 'cucpup' ]]; then
+	    F1IFNAME="f1c"
+	    MULTUS_CUUP_N3="true"
 	    IP_GNB_N3="$SUBNET_N2N3.224"
+	    CUUP_N3_IF_NAME="n3"
 	    IP_NRUE="$SUBNET_N2N3.225"
 	else
+	    F1IFNAME="f1"
 	    IP_GNB_N3="$IP_GNB_N2"
 	    IP_NRUE="$SUBNET_N2N3.224"
 	fi
