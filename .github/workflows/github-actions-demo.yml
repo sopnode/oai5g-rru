@@ -26,9 +26,9 @@ jobs:
           cp $WORK/local-scripts/run.sh $OAI5G/
           echo "Check/book R2lab slice"
           $OAI5G/run.sh get-slice
-          echo "Switch on jaguar and n300 RRUs"
+          echo "Switch on jaguar and panther RRUs"
           $OAI5G/run.sh init-rru jaguar
-          $OAI5G/run.sh init-rru n300
+          $OAI5G/run.sh init-rru panther
           echo "UE setup"
           $OAI5G/run.sh init-ue          
           echo "retrieve prepare-demo-oai.sh script"
@@ -48,8 +48,8 @@ jobs:
           $OAI5G/run.sh stop-ue || true
           echo "Abort the oai5g-rru demo with jaguar"
           $OAI5G/demo-oai.sh stop
-          echo "configure oai5g-rru demo script with the n300 RRU"
-          $OAI5G/prepare-demo-oai.sh -a -B $BRANCH -R n300
+          echo "configure oai5g-rru demo script with the panther RRU"
+          $OAI5G/prepare-demo-oai.sh -a -B $BRANCH -R panther
           echo "Run the oai5g-rru demo"
           $OAI5G/demo-oai.sh start
           echo "Sleep 10s"; sleep 10
@@ -60,7 +60,7 @@ jobs:
           $OAI5G/run.sh run-iperf || true
           echo "Now disconnect UE"
           $OAI5G/run.sh stop-ue || true
-          echo "Abort the oai5g-rru demo with n300"
+          echo "Abort the oai5g-rru demo with panther"
           $OAI5G/demo-oai.sh stop
           echo "Test finished, free up R2lab resources"
           $OAI5G/run.sh all-off
