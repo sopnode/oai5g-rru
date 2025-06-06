@@ -165,7 +165,9 @@ if [[ $RUN_MODE = "full" ]]; then
     MULTUS_GNB_N3="false"
     if [[ $GNB_MODE = 'cucpup' ]]; then
 	F1IFNAME="f1c"
+	MULTUS_CUUP_N3="true"
 	IP_GNB_N3="$SUBNET_N2N3.204"
+	CUUP_N3_IF_NAME="n3"
 	IP_NRUE="$SUBNET_N2N3.205"
     else
 	F1IFNAME="f1"
