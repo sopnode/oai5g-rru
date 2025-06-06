@@ -6,7 +6,7 @@ nf="gnb" #Default OAI5G network function
 usage()
 {
    echo "Usage: $0 [-n namespace] [-f oai-function]"
-   echo -e "\twith oai-function in {amf, gnb, nr-ue}"
+   echo -e "\twith oai-function in {amf, ausf, smf, udr, udm, nrf, nssf, lmf, upf, gnb, cu, cu-cp, cu-up, du, nr-ue}"
    exit 1 
 }
 
@@ -19,7 +19,7 @@ while getopts 'n:f:' flag; do
   esac
 done
 
-if [[ ($nf != "amf") && ($nf != "gnb") && ($nf != "nr-ue") ]]; then
+if [[ ($nf != "amf") && ($nf != "ausf") && ($nf != "smf") && ($nf != "udr") && ($nf != "udm") && ($nf != "nrf") && ($nf != "nssf") && ($nf != lmf) && ($nf != "upf") && ($nf != "gnb") && ($nf != "cu") && ($nf != "cu-cp") && ($nf != "cu-up") && ($nf != "du") && ($nf != "nr-ue") ]]; then
     usage
 fi
 
@@ -35,5 +35,16 @@ while true; do
     POD_NAME=$(kubectl -n$ns get pods -l app.kubernetes.io/name=oai-"${nf}" -o jsonpath="{.items[0].metadata.name}")
 
     echo "Show logs of "oai-${nf} pod $POD_NAME
-    kubectl -n "$ns" -c "${nf}" logs -f $POD_NAME
+    case $nf in
+	"cu")
+	    kubectl -n "$ns" -c "oai-${nf}" logs -f $POD_NAME ;;
+	"du")
+	    kubectl -n "$ns" -c "gnb${nf}" logs -f $POD_NAME ;;
+	"cu-cp")
+	    kubectl -n "$ns" -c "gnbcucp" logs -f $POD_NAME ;;
+	"cu-up")
+	    kubectl -n "$ns" -c "gnbcuup" logs -f $POD_NAME ;;
+	*)
+	    kubectl -n "$ns" -c "${nf}" logs -f $POD_NAME ;;
+	esac
 done

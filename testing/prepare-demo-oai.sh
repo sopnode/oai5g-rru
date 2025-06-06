@@ -5,7 +5,8 @@
 #
 
 # server used for following OAI5G functions
-HOST_AMF_UPF="sopnode-w1"
+HOST_AMF_UPF="sopnode-w1" # use this parameter to set up external AMF IP address when using RUN_MODE="gnb-only"
+#HOST_AMF_UPF="10.10.3.200" # AMF IP used with open5gs
 HOST_GNB="sopnode-w1"
 
 # k8s namespace
@@ -16,7 +17,6 @@ REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
 #TAG_OAI5G_RRU="2024.w31"
 TAG_OAI5G_RRU="develop-r2lab"
 REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git"
-#TAG_OAI_CN5G_FED="develop-r2lab"
 TAG_OAI_CN5G_FED="develop-r2lab"
 
 # CN mode
@@ -40,8 +40,8 @@ GNB_MODE="cudu"
 #GNB_MODE="monolithic"
 
 # DNNs 
-DNN0="oai"
-DNN1="internet"
+DNN0="internet"
+DNN1="streaming"
 #DNN1="none"
 
 # logs configuration
@@ -134,6 +134,6 @@ elif [[ "$action" = 'pull' ]]; then
 elif [[ "$action" = 'configure' ]]; then
     configure_all_scripts
 else
-    usage
+     usage
 fi
 
