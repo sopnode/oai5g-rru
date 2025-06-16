@@ -460,7 +460,7 @@ fi
 #
 NETMASK_GNB_N2="$NETMASK_N2N3"
 NETMASK_GNB_N3="$NETMASK_N2N3"
-NETMASK_GNB_RU="28"
+NETMASK_GNB_RU="24"
 #
 ################## RRU-dependent part ###################
 #
