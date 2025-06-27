@@ -320,7 +320,7 @@ OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 #
 #RAN_TAG="2024.w25"
-RAN_TAG="2024.w48"
+RAN_TAG="2025.w25"
 GNB_NAME="gNB-r2lab"
 
 # DU/CU SPLIT parameters
