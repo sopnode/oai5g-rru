@@ -511,7 +511,7 @@ else
     IP_GNB_N320_2="192.168.233.110" # @IP N320.2 + 4
 fi
 MTU_n3xx="9216"
-ADDRS_n300="addr=192.168.233.103,second_addr=192.168.233.104"
+ADDRS_n300="addr=192.168.233.104"
 ADDRS_n320="addr=192.168.233.105"
 
 #### aw2s RU case ####
