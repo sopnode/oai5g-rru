@@ -511,7 +511,36 @@ else
     IP_GNB_N320_2="192.168.233.110" # @IP N320.2 + 4
 fi
 MTU_n3xx="9216"
-ADDRS_n300="addr=192.168.233.104"
+echo Install UHD dependencies
+apt install -y autoconf automake build-essential ccache cmake cpufrequtils doxygen ethtool g++ git inetutils-tools libboost-all-dev libncurses5 libncurses5-dev libncurses-dev libusb-1.0-0 libusb-1.0-0-dev libusb-dev python3-dev python3-mako python3-numpy python3-requests python3-scipy python3-setuptools python3-ruamel.yaml
+echo Build UHD
+git clone https://github.com/EttusResearch/uhd.git ~/uhd
+cd ~/uhd
+git checkout v4.7.0.0
+cd host
+mkdir build
+cd build
+cmake ../
+make -j $(nproc)
+make test
+make install
+ldconfig
+uhd_images_downloader
+
+get_usrp_ips() {
+    local USRP_SERIAL=$1
+    
+    local TMP_FILE=$(mktemp)
+    uhd_find_devices --args serial=${USRP_SERIAL} >"$TMP_FILE"
+
+    local USRP_IP=$(grep "    addr" "$TMP_FILE" | awk '{print $2}')
+    #local USRP_MGMT_IP=$(grep "    mgmt_addr" "$TMP_FILE" | head -1 | awk '{print $2}')
+    
+    rm "$TMP_FILE"
+    echo "$USRP_IP"
+}
+
+ADDRS_n300="addr=$(get_usrp_ips 31D98C7)"
 ADDRS_n320="addr=192.168.233.105"
 
 #### aw2s RU case ####
