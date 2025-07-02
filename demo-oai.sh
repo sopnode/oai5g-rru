@@ -511,21 +511,6 @@ else
     IP_GNB_N320_2="192.168.233.110" # @IP N320.2 + 4
 fi
 MTU_n3xx="9216"
-echo Install UHD dependencies
-apt install -y autoconf automake build-essential ccache cmake cpufrequtils doxygen ethtool g++ git inetutils-tools libboost-all-dev libncurses5 libncurses5-dev libncurses-dev libusb-1.0-0 libusb-1.0-0-dev libusb-dev python3-dev python3-mako python3-numpy python3-requests python3-scipy python3-setuptools python3-ruamel.yaml
-echo Build UHD
-git clone https://github.com/EttusResearch/uhd.git ~/uhd
-cd ~/uhd
-git checkout v4.7.0.0
-cd host
-mkdir build
-cd build
-cmake ../
-make -j $(nproc)
-make test
-make install
-ldconfig
-uhd_images_downloader
 
 get_usrp_ips() {
     local USRP_SERIAL=$1
