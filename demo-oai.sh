@@ -11,11 +11,13 @@ function usage() {
     echo "            start-gnb |"
     echo "            start-nr-ue |"
     echo "            start-nr-ue2 |"
+    echo "            start-nr-ue3 |"
     echo "            stop-cn |"
     echo "            stop-flexric |"
     echo "            stop-gnb |"
     echo "            stop-nr-ue |"
     echo "            stop-nr-ue2 |"
+    echo "            stop-nr-ue3 |"
     exit 1
 }
 
@@ -59,6 +61,7 @@ FULL_KEY="@DEF_FULL_KEY@"
 OPC="@DEF_OPC@"
 RFSIM_IMSI="@DEF_RFSIM_IMSI@"
 RFSIM_IMSI_UE2="@DEF_RFSIM_IMSI_UE2@"
+RFSIM_IMSI_UE3="@DEF_RFSIM_IMSI_UE3@"
 #
 PREFIX_DEMO="@DEF_PREFIX_DEMO@" # Directory in which all scripts will be copied on the k8s server to run the demo
 #
@@ -1211,6 +1214,48 @@ EOF
 
 #################################################################################
 
+function configure-nr-ue3() {
+
+    # will NOT generate PCAP file to avoid wasting all memory resources
+    # However, a tcpdump container created e.g., to run iperf client"
+    DIR="$OAI5G_RAN/oai-nr-ue3"
+    ORIG_CHART="$DIR"/values.yaml
+    SED_FILE="$TMP/oai-nr-ue3-values.sed"
+    echo "configure-nr-ue3: $ORIG_CHART configuration"
+    ADD_OPTIONS_NRUE="$OPTIONS_NRUE"
+    cat > "$SED_FILE" <<EOF
+s|@NRUE_REPO@|$NRUE_REPO|
+s|@NRUE_TAG@|$NRUE_TAG|
+s|@MULTUS_NRUE3@|$MULTUS_NRUE|
+s|@IP_NRUE3@|$IP_NRUE|
+s|@NETMASK_NRUE3@|$NETMASK_NRUE|
+s|@MAC_NRUE3@|$(gener-mac)|
+s|@DEFAULT_GW_NRUE3@|$DEFAULT_GW_NRUE|
+s|@IF_NAME_NRUE3@|$IF_NAME_NRUE|
+s|@RFSIM_IMSI_UE3@|$RFSIM_IMSI_UE3|
+s|@FULL_KEY_UE3@|$FULL_KEY|
+s|@OPC_UE3@|$OPC|
+s|@DNN_UE3@|$DNN0|
+s|@SST_UE3@|$SLICE1_SST|
+s|@SD_UE3@|0x$SLICE1_SD|
+s|@NRUE3_USRP@|$NRUE_USRP|
+s|@ADD_OPTIONS_NRUE3@|$ADD_OPTIONS_NRUE|
+s|@START_TCPDUMP@|false|
+s|@TCPDUMP_CONTAINER@|$LOGS|
+s|@QOS_NRUE3_DEF@|false|
+s|@SHAREDVOLUME@|false|
+s|@NODE_NRUE3@||
+EOF
+    cp "$ORIG_CHART" $TMP/oai-nr-ue3_values.yaml-orig
+    echo "(Over)writing $DIR/values.yaml"
+    sed -f "$SED_FILE" < $TMP/oai-nr-ue3_values.yaml-orig > "$ORIG_CHART"
+    # if SD NSSAI field is set to "NULL", replace it by "16777215"
+    sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
+    diff $TMP/oai-nr-ue3_values.yaml-orig "$ORIG_CHART"
+}
+
+#################################################################################
+
 function configure-flexric() {
 
     DIR="$OAI5G_RAN/oai-flexric"
@@ -1222,12 +1267,12 @@ s|@FLEXRIC_REPO@|$FLEXRIC_REPO|
 s|@FLEXRIC_TAG@|$FLEXRIC_TAG|
 s|@FLEXRIC_PULL_POLICY@|$FLEXRIC_PULL_POLICY|
 EOF
-    cp "$ORIG_CHART" $TMP/oai-nr-ue2_values.yaml-orig
+    cp "$ORIG_CHART" $TMP/oai-flexric_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_FILE" < $TMP/oai-nr-ue2_values.yaml-orig > "$ORIG_CHART"
+    sed -f "$SED_FILE" < $TMP/oai-flexric_values.yaml-orig > "$ORIG_CHART"
     # if SD NSSAI field is set to "NULL", replace it by "16777215"
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
-    diff $TMP/oai-nr-ue2_values.yaml-orig "$ORIG_CHART"
+    diff $TMP/oai-flexric_values.yaml-orig "$ORIG_CHART"
 }
 
 
@@ -1258,6 +1303,7 @@ function configure-all() {
     if [[ "$RRU" = "rfsim" ]]; then
 	configure-nr-ue
     configure-nr-ue2
+    configure-nr-ue3
     fi
 }
 
@@ -1380,6 +1426,21 @@ function start-nr-ue2() {
 
     echo "Wait until oai-nr-ue2 pod is READY"
     kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-nr-ue2
+}
+
+#################################################################################
+
+function start-nr-ue3() {
+
+    echo "Running start-nr-ue3() on namespace: $NS, NODE_GNB=$NODE_GNB"
+    echo "cd $OAI5G_RAN"
+    cd "$OAI5G_RAN"
+
+    echo "helm -n $NS install oai-nr-ue3 oai-nr-ue3/" 
+    helm -n $NS install oai-nr-ue3 oai-nr-ue3/
+
+    echo "Wait until oai-nr-ue3 pod is READY"
+    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-nr-ue3
 }
 
 #################################################################################
@@ -1537,6 +1598,10 @@ function stop-nr-ue2(){
     helm -n $NS uninstall oai-nr-ue2
 }
 
+function stop-nr-ue3(){
+    echo "helm -n $NS uninstall oai-nr-ue3"
+    helm -n $NS uninstall oai-nr-ue3
+}
 
 function stop() {
     echo "Running stop() on $NS namespace, logs=$LOGS"
@@ -1567,6 +1632,7 @@ function stop() {
 	if [[ "$RRU" = "rfsim" ]]; then
 	    stop-nr-ue
         stop-nr-ue2
+        stop-nr-ue3
 	fi
     else
         echo "OAI5G demo is not running, there is no pod on namespace $NS !"
@@ -1777,7 +1843,7 @@ if test $# -lt 1; then
     usage
 else
     case $1 in
-	init|start|stop|configure-all|start-cn|start-flexric|start-gnb|start-nr-ue|start-nr-ue2|stop-cn|stop-flexric|stop-gnb|stop-nr-ue|stop-nr-ue2|run-ping)
+	init|start|stop|configure-all|start-cn|start-flexric|start-gnb|start-nr-ue|start-nr-ue2|start-nr-ue3|stop-cn|stop-flexric|stop-gnb|stop-nr-ue|stop-nr-ue2|stop-nr-ue3|run-ping)
 	    echo "$0: running $1"
 	    "$1"
 	;;
