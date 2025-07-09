@@ -805,7 +805,7 @@ function configure-gnb() {
 	    IP_GNB_RU1="$IP_GNB_N300_1"
 	    IP_GNB_RU2="$IP_GNB_N300_2"
 	else
-        IP=$(get_usrp_ip_with 31B3A77) || exit 1
+        IP=$(get_usrp_ip 31B3A77) || exit 1
         ADDRS_n320="addr=${IP}"
 	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_N320_1"
 	    IF_NAME_GNB_RU2="$IF_NAME_VLAN_N320_2"
