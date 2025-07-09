@@ -515,21 +515,29 @@ else
 fi
 MTU_n3xx="9216"
 
-get_usrp_ips() {
+get_usrp_ip() {
     local USRP_SERIAL=$1
-    
-    local TMP_FILE=$(mktemp)
-    uhd_find_devices --args serial=${USRP_SERIAL} >"$TMP_FILE"
+    local RETRIES=3
+    local DELAY=30
 
-    local USRP_IP=$(grep "    addr" "$TMP_FILE" | awk '{print $2}')
-    #local USRP_MGMT_IP=$(grep "    mgmt_addr" "$TMP_FILE" | head -1 | awk '{print $2}')
-    
-    rm "$TMP_FILE"
-    echo "$USRP_IP"
+    for attempt in $(seq 1 "$RETRIES"); do
+        local TMP_FILE=$(mktemp)
+        uhd_find_devices --args serial=${USRP_SERIAL} >"$TMP_FILE"
+        local USRP_IP=$(grep "    addr" "$TMP_FILE" | awk '{print $2}')
+        rm "$TMP_FILE"
+
+        if [[ -n "$USRP_IP" ]]; then
+            echo "$USRP_IP"
+            return 0
+        else
+            echo "Attempt $attempt/$RETRIES: USRP $USRP_SERIAL not found. Retrying in $DELAY seconds..." >&2
+            sleep "$DELAY"
+        fi
+    done
+
+    echo "ERROR: Failed to find USRP device with serial $USRP_SERIAL after $RETRIES attempts." >&2
+    return 1
 }
-
-ADDRS_n300="addr=$(get_usrp_ips 31D98C7)"
-ADDRS_n320="addr=192.168.233.105"
 
 #### aw2s RU case ####
 #GNB_REPO_aw2s="${OAISA_REPO}/oai-gnb"
@@ -789,6 +797,21 @@ function configure-gnb() {
 	QOS_GNB_DEF="false"
 
     elif [[ "$RRU" = "n300" || "$RRU" = "n320" ]]; then
+	if [[ "$RRU" = "n300" ]]; then
+        IP=$(get_usrp_ip 31D98C7) || exit 1
+        ADDRS_n300="addr=${IP}"
+	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_N300_1"
+	    IF_NAME_GNB_RU2="$IF_NAME_VLAN_N300_2"
+	    IP_GNB_RU1="$IP_GNB_N300_1"
+	    IP_GNB_RU2="$IP_GNB_N300_2"
+	else
+        IP=$(get_usrp_ip_with 31B3A77) || exit 1
+        ADDRS_n320="addr=${IP}"
+	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_N320_1"
+	    IF_NAME_GNB_RU2="$IF_NAME_VLAN_N320_2"
+	    IP_GNB_RU1="$IP_GNB_N320_1"
+	    IP_GNB_RU2="$IP_GNB_N320_2"
+	fi
 	SDR_ADDRS=$(eval echo \"\${ADDRS_$RRU}\")
 	MULTUS_GNB_RU1="true"
 	MTU_GNB_RU1="$MTU_n3xx"
@@ -797,17 +820,6 @@ function configure-gnb() {
 	RRU_TYPE="n3xx"
 	ADD_OPTIONS_GNB="$OPTIONS_n3xx"
 	QOS_GNB_DEF="false" # avoid OOMKilled problems with k8s 
-	if [[ "$RRU" = "n300" ]]; then
-	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_N300_1"
-	    IF_NAME_GNB_RU2="$IF_NAME_VLAN_N300_2"
-	    IP_GNB_RU1="$IP_GNB_N300_1"
-	    IP_GNB_RU2="$IP_GNB_N300_2"
-	else
-	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_N320_1"
-	    IF_NAME_GNB_RU2="$IF_NAME_VLAN_N320_2"
-	    IP_GNB_RU1="$IP_GNB_N320_1"
-	    IP_GNB_RU2="$IP_GNB_N320_2"
-	fi
 
     elif [[ "$RRU" = "jaguar" || "$RRU" = "panther" ]]; then
 	ADDR_aw2s=$(eval echo \"\${ADDR_$RRU}\")
