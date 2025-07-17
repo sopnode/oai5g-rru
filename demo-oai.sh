@@ -514,30 +514,8 @@ else
     IP_GNB_N320_2="192.168.233.113" # @IP N320.2 + 7
 fi
 MTU_n3xx="9216"
-
-get_usrp_ip() {
-    local USRP_SERIAL=$1
-    local RETRIES=3
-    local DELAY=30
-
-    for attempt in $(seq 1 "$RETRIES"); do
-        local TMP_FILE=$(mktemp)
-        uhd_find_devices --args serial=${USRP_SERIAL} >"$TMP_FILE"
-        local USRP_IP=$(grep "    addr" "$TMP_FILE" | awk '{print $2}')
-        rm "$TMP_FILE"
-
-        if [[ -n "$USRP_IP" ]]; then
-            echo "$USRP_IP"
-            return 0
-        else
-            echo "Attempt $attempt/$RETRIES: USRP $USRP_SERIAL not found. Retrying in $DELAY seconds..." >&2
-            sleep "$DELAY"
-        fi
-    done
-
-    echo "ERROR: Failed to find USRP device with serial $USRP_SERIAL after $RETRIES attempts." >&2
-    return 1
-}
+ADDRS_n300="addr=192.168.235.103,second_addr=192.168.235.104"
+ADDRS_n320="addr=192.168.235.105"
 
 #### aw2s RU case ####
 #GNB_REPO_aw2s="${OAISA_REPO}/oai-gnb"
@@ -797,15 +775,11 @@ function configure-gnb() {
 
     elif [[ "$RRU" = "n300" || "$RRU" = "n320" ]]; then
 	if [[ "$RRU" = "n300" ]]; then
-        IP=$(get_usrp_ip 31D98C7) || exit 1
-        ADDRS_n300="addr=${IP}"
 	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_N300_1"
 	    IF_NAME_GNB_RU2="$IF_NAME_VLAN_N300_2"
 	    IP_GNB_RU1="$IP_GNB_N300_1"
 	    IP_GNB_RU2="$IP_GNB_N300_2"
 	else
-        IP=$(get_usrp_ip 31B3A77) || exit 1
-        ADDRS_n320="addr=${IP}"
 	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_N320_1"
 	    IF_NAME_GNB_RU2="$IF_NAME_VLAN_N320_2"
 	    IP_GNB_RU1="$IP_GNB_N320_1"
