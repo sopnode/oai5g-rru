@@ -467,7 +467,7 @@ NETMASK_GNB_RU="24"
 #
 ################## RRU-dependent part ###################
 #
-RU_MODE="static" # in ['static', 'dhcp']
+RU_MODE="dhcp" # in ['static', 'dhcp']
 #
 #### rfsim RU case ####
 #GNB_REPO_rfsim="${OAISA_REPO}/oai-gnb"
@@ -508,10 +508,10 @@ if [[ $RU_MODE = "dhcp" ]]; then
     IP_GNB_N320_1="dhcp"
     IP_GNB_N320_2="dhcp"
 else
-    IP_GNB_N300_1="192.168.233.110" # @IP N300.1 + 7
-    IP_GNB_N300_2="192.168.233.111" # @IP N300.2 + 7
-    IP_GNB_N320_1="192.168.233.112" # @IP N320.1 + 7
-    IP_GNB_N320_2="192.168.233.113" # @IP N320.2 + 7
+    IP_GNB_N300_1="192.168.235.110" # @IP N300.1 + 7
+    IP_GNB_N300_2="192.168.235.111" # @IP N300.2 + 7
+    IP_GNB_N320_1="192.168.235.112" # @IP N320.1 + 7
+    IP_GNB_N320_2="192.168.235.113" # @IP N320.2 + 7
 fi
 MTU_n3xx="9216"
 ADDRS_n300="addr=192.168.235.103,second_addr=192.168.235.104"
@@ -534,11 +534,11 @@ if [[ $RU_MODE = "dhcp" ]]; then
     IP_GNB_jaguar="dhcp"
     IP_GNB_panther="dhcp"
 else
-    IP_GNB_jaguar="172.28.4.132" # @IP ADDR_jaguar + 3
-    IP_GNB_panther="172.28.4.196" # @IP ADDR_panther + 3
+    IP_GNB_jaguar="192.168.236.104" # @IP ADDR_jaguar + 3
+    IP_GNB_panther="192.168.236.106" # @IP ADDR_panther + 3
 fi
-ADDR_jaguar="172.28.4.129" 
-ADDR_panther="172.28.4.193" 
+ADDR_jaguar="192.168.236.101" 
+ADDR_panther="192.168.236.103" 
 
 
 ########################### oai-nr-ue rfsim chart parameters #####################
