@@ -530,8 +530,8 @@ else
     IP_GNB_jaguar="172.28.4.132" # @IP ADDR_jaguar + 3
     IP_GNB_panther="172.28.4.196" # @IP ADDR_panther + 3
 fi
-ADDR_jaguar="172.28.4.129" 
-ADDR_panther="172.28.4.193" 
+ADDR_jaguar="192.168.236.101" 
+ADDR_panther="192.168.236.103" 
 
 
 ########################### oai-nr-ue rfsim chart parameters #####################
