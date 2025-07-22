@@ -459,7 +459,7 @@ NETMASK_GNB_RU="24"
 #
 ################## RRU-dependent part ###################
 #
-RU_MODE="static" # in ['static', 'dhcp']
+RU_MODE="dhcp" # in ['static', 'dhcp']
 #
 #### rfsim RU case ####
 #GNB_REPO_rfsim="${OAISA_REPO}/oai-gnb"
