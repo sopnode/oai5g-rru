@@ -262,7 +262,7 @@ else
 	# -- Local RAN and external CN
 	#
         SUBNET_N2N3="10.10.3" # "172.21.10"
-        HOST_AMF="$SUBNET_N2N3.200" #${NODE_AMF_UPF%"-v100"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
+        HOST_AMF="$SUBNET_N2N3.200" #${NODE_AMF_UPF%"-v30"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
 	#
 	# ** GNB specific part (also used for CU) **
 	#
@@ -565,16 +565,16 @@ function gener-mac()
 	fi
 	PREFIX="12:34:00:"
 	case $NODE_AMF_UPF in
-	    "sopnode-l1-v100")
+	    "sopnode-l1-v30")
 		PREFIX=$PREFIX"00:";;
-	    "sopnode-w1-v100")
+	    "sopnode-w1-v30")
 		PREFIX=$PREFIX"01:";;
 	    *)  PREFIX=$PREFIX"02:";;
 	esac
 	case $NODE_GNB in
-	    "sopnode-l1-v100")
+	    "sopnode-l1-v30")
 		PREFIX=$PREFIX"00:";;	
-	    "sopnode-w1-v100")
+	    "sopnode-w1-v30")
 		PREFIX=$PREFIX"01:";;	
 	    *)  PREFIX=$PREFIX"02:";;
 	esac

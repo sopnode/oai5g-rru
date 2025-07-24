@@ -57,8 +57,8 @@ mkdir -p $TMP
 
 function update() {
     NS=$1; shift
-    NODE_AMF_UPF=$1"-v100"; shift
-    NODE_GNB=$1"-v100"; shift
+    NODE_AMF_UPF=$1; shift
+    NODE_GNB=$1; shift
     RRU=$1; shift 
     RUN_MODE=$1; shift # in ["full", "gnb-only", "gnb-upf"]
     LOGS=$1; shift # boolean in [true, false]
@@ -72,6 +72,12 @@ function update() {
     REGCRED_PWD=$1; shift
     REGCRED_EMAIL=$1; shift
 
+    # if node is a sopnode, add the "-v30" suffix
+    if [[ $NODE_AMF_UPF == sopnode* ]]; then
+	NODE_AMF_UPF="${NODE_AMF_UPF}-v30"
+    if [[ $NODE_GNB == sopnode* ]]; then
+	NODE_GNB="${NODE_GNB}-v30"
+    
     # Convert to lowercase boolean parameters
     GNB_ONLY="${GNB_ONLY,,}"
     LOGS="${LOGS,,}"

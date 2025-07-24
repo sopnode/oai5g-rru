@@ -103,7 +103,7 @@ def run(*, mode, gateway, slicename, master, namespace, logs,
         load_images: FIT images will be deployed
         k8s_fit: FIT node number attached to the k8s cluster as worker node
         amf_spgwu: node name in which amf and spgwu-tiny will be deployed
-        gnb: node name in which oai-gnb will be deployed, e.g., fit02, pc01 or sopnode-w1 (without v100 suffix)
+        gnb: node name in which oai-gnb will be deployed, e.g., fit02, pc01 or sopnode-w1 (without v30 suffix)
         phones: list of indices of phones to use
         quectel_nodes: list of indices of quectel UE nodes to use
         qhat_nodes: list of indices of qhat UE nodes to use
