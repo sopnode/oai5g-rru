@@ -75,8 +75,10 @@ function update() {
     # if node is a sopnode, add the "-v30" suffix
     if [[ $NODE_AMF_UPF == sopnode* ]]; then
 	NODE_AMF_UPF="${NODE_AMF_UPF}-v30"
+    fi
     if [[ $NODE_GNB == sopnode* ]]; then
 	NODE_GNB="${NODE_GNB}-v30"
+    fi
     
     # Convert to lowercase boolean parameters
     GNB_ONLY="${GNB_ONLY,,}"
