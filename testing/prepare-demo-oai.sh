@@ -15,7 +15,7 @@ NS="oaiw1-ci"
 # Repo/Branch/TAG for code
 REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
 #TAG_OAI5G_RRU="2024.w31"
-TAG_OAI5G_RRU="develop-r2lab"
+TAG_OAI5G_RRU="2025.w29"
 REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git"
 TAG_OAI_CN5G_FED="develop-r2lab"
 
