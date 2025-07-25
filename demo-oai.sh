@@ -319,8 +319,8 @@ CN_DEFAULT_GW=""
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 #
-#RAN_TAG="2024.w48"
-RAN_TAG="2025.w29" # includes "Initial support for RedCap" feature in gNB
+RAN_TAG="Fix_dedicatedBWPsLogs"
+#RAN_TAG="2025.w29" # includes "Initial support for RedCap" feature in gNB
 GNB_NAME="gNB-r2lab"
 
 # DU/CU SPLIT parameters
@@ -474,8 +474,8 @@ OPTIONS_rfsim="-E --rfsim --log_config.global_log_options level,nocolor,time"
 #GNB_REPO_b2xx="${OAISA_REPO}/oai-gnb"
 GNB_REPO_b2xx="${R2LAB_REPO}/oai-gnb"
 GNB_TAG_b2xx="${RAN_TAG}"
-CONF_b210="gnb.sa.band78.fr1.106PRB.usrpb210.conf"
-#CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
+CONF_b210="gnb.sa.band78.fr1.106PRB.usrpb210.redcap.yaml"
+#CONF_b210="gnb.sa.band78.fr1.106PRB.usrpb210.conf"
 #OPTIONS_b2xx="--sa --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 OPTIONS_b2xx="-E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 
