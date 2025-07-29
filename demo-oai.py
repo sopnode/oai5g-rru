@@ -38,7 +38,7 @@ OAI5G_RRU_REPO = 'https://github.com/sopnode/oai5g-rru.git'
 OAI5G_RRU_TAG = 'rg255c' # XXX
 #OAI5G_RRU_TAG = 'v2.1.0-1.0-1.2'
 OAI_CN5G_FED_REPO = 'https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git'
-OAI_CN5G_FED_TAG = 'develop-r2lab' # XXX
+#OAI_CN5G_FED_TAG = 'develop-r2lab' # XXX
 OAI_CN5G_FED_TAG = 'rg255c' # XXX
 #OAI_CN5G_FED_TAG = 'v2.1.0-1.2'
 ##########################################################################################
