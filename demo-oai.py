@@ -48,7 +48,7 @@ default_master = 'sopnode-w1'
 # Default R2lab FIT node images
 #default_image = 'kubernetes'
 default_image = 'u18-lowlat-kube-uhd'
-default_quectel_image = 'mbim-quectel'
+default_quectel_image = 'mbim-quectel' 
 
 
 # This script uses one R2lab FIT node as a k8s worker attached to the cluster
@@ -82,8 +82,8 @@ default_regcred_email = 'r2labuser@turletti.com'
 
 default_run_mode = 'full'
 default_gnb_mode = 'monolithic'
-default_dnn0 = 'internet'
-default_dnn1 = 'streaming'
+default_dnn0 = 'oai.ipv4'
+default_dnn1 = 'none'
 
 
 def run(*, mode, gateway, slicename, master, namespace, logs,
