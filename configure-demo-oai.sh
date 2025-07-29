@@ -33,8 +33,8 @@ SLICE1_ARP_PRIORITY_LEVEL="8"
 SLICE1_ARP_PREEMPT_CAP="NOT_PREEMPT" # "NOT_PREEMPT" or "MAY_PREEMPT" # to trigger preemption
 SLICE1_ARP_PREEMPT_VULN="PREEMPTABLE" # "PREEMPTABLE" or "NOT_PREEMPT" # preemption vulnerability
 SLICE1_PRIORITY_LEVEL="1"
-SLICE1_UPLINK="20Mbps"
-SLICE1_DOWNLINK="40Mbps"
+SLICE1_UPLINK="10Gbps"
+SLICE1_DOWNLINK="10Gbps"
 
 SLICE2_SST="1"
 SLICE2_SD="000001"
@@ -147,10 +147,10 @@ EOF
 
     DIR_GENERIC_DB="$PREFIX_DEMO/oai5g-rru/patch-mysql"
     if [[ "$DNN1" = "none" ]]; then
-	echo "Patching oai_db-basic.sql generic database for R2lab UEs with DNN0 only"
+	echo "Patching oai_db-basic.sql generic database for R2lab UEs with slices1's DNNs (DNN0+DNN_IMS)  only"
 	oai_db_basic_template="oai_db-basic-generic.sql"
     else
-	echo "Patching oai_db-basic.sql generic database for R2lab UEs with both DNN0 and DNN1"
+	echo "Patching oai_db-basic.sql generic database for R2lab UEs with both DNN0/DNN_IMS and DNN1"
 	oai_db_basic_template="oai_db-basic-generic-2dnn.sql"
     fi
     cp $DIR_GENERIC_DB/${oai_db_basic_template} "$TMP"/${oai_db_basic_template}
