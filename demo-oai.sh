@@ -558,6 +558,38 @@ FLEXRIC_TAG="test"
 #FLEXRIC_TAG="latest"
 FLEXRIC_PULL_POLICY="Always"
 
+
+########################### sopnode-f3 specific tuning #####################
+
+if [[ "$NODE_GNB" == "sopnode-f3" ]]; then
+  echo "Configuring core affinity for sopnode-f3..."
+
+  # Set new AW2S options
+  OPTIONS_aw2s="--thread-pool 48,50,52,54,56,58,60,62 --log_config.global_log_options level,nocolor,time"
+
+  # Path to the gNB config file
+  CONF_FILE="$PREFIX_DEMO/oai5g-rru/ran-config/conf/$CONF_jaguar"
+
+  if [[ -f "$CONF_FILE" ]]; then
+    echo "Patching $CONF_FILE..."
+
+    # Replace rxfh_core_id
+    sed -i 's/^\s*rxfh_core_id\s*=.*/        rxfh_core_id   = 48;/' "$CONF_FILE"
+
+    # Replace txfh_core_id
+    sed -i 's/^\s*txfh_core_id\s*=.*/        txfh_core_id   = 50;/' "$CONF_FILE"
+
+    # Replace tp_cores
+    sed -i 's/^\s*tp_cores\s*=.*/        tp_cores       = [52,54,56,58,60,62,96,98];/' "$CONF_FILE"
+
+    # Replace num_tp_cores
+    sed -i 's/^\s*num_tp_cores\s*=.*/        num_tp_cores   = 8;/' "$CONF_FILE"
+  else
+    echo "Warning: Config file $CONF_FILE not found."
+  fi
+fi
+
+
 ##################################################################################
 
 # Generate unique MAC addresses for multus interfaces in oai5g pods
