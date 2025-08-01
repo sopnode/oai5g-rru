@@ -7,17 +7,11 @@ function usage() {
     echo "            stop |"
     echo "            configure-all |"
     echo "            start-cn |"
-    echo "            start-flexric |"
     echo "            start-gnb |"
     echo "            start-nr-ue |"
-    echo "            start-nr-ue2 |"
-    echo "            start-nr-ue3 |"
     echo "            stop-cn |"
-    echo "            stop-flexric |"
     echo "            stop-gnb |"
     echo "            stop-nr-ue |"
-    echo "            stop-nr-ue2 |"
-    echo "            stop-nr-ue3 |"
     exit 1
 }
 
@@ -26,44 +20,41 @@ function usage() {
 #################################################################################
 # Following parameters automatically set by configure-demo-oai.sh script
 # do not change them here !
-NS="@DEF_NS@" # k8s namespace
-NODE_AMF_UPF="@DEF_NODE_AMF_UPF@" # node in wich run amf and upf pods
-NODE_GNB="@DEF_NODE_GNB@" # node in which gnb pod runs
-RRU="@DEF_RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
-RUN_MODE="@DEF_RUN_MODE@" # in ['full', 'gnb-only', 'gnb-upf']
-GNB_MODE="@DEF_GNB_MODE@" # in ['monolithic', 'cudu', 'cucpup']
-LOGS="@DEF_LOGS@" # boolean, true if logs are retrieved on pods
-PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
-MONITORING="@DEF_MONITORING@" # boolean, true if prometheus metrics parser is generated on oai-gnb pod (monolithic)
-FLEXRIC="@DEF_FLEXRIC@" # boolean, true if flexRIC is included
+NS="open5gs" # k8s namespace
+NODE_AMF_UPF="10.10.3.200" # node in wich run amf and upf pods
+NODE_GNB="precision-7530" # node in which gnb pod runs
+RRU="rfsim" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
+RUN_MODE="gnb-only" # in ['full', 'gnb-only', 'gnb-upf']
+GNB_MODE="monolithic" # in ['monolithic', 'cudu', 'cucpup']
+LOGS="false" # boolean, true if logs are retrieved on pods
+PCAP="false" # boolean, true if pcap are generated on pods
+MONITORING="true" # boolean, true if prometheus metrics parser is generated on oai-gnb pod (monolithic)
 #
-MCC="@DEF_MCC@"
-MNC="@DEF_MNC@"
-TAC="@DEF_TAC@"
-DNN0="@DEF_DNN0@"
-DNN0_PDU_TYPE="@DEF_DNN0_PDU_TYPE@"
-DNN1="@DEF_DNN1@"
-DNN1_PDU_TYPE="@DEF_DNN1_PDU_TYPE@"
-SLICE1_SST="@DEF_SLICE1_SST@"
-SLICE1_SD="@DEF_SLICE1_SD@"
-SLICE1_5QI="@DEF_SLICE1_5QI@"
-SLICE1_UPLINK="@DEF_SLICE1_UPLINK@"
-SLICE1_DOWNLINK="@DEF_SLICE1_DOWNLINK@"
-SLICE2_SST="@DEF_SLICE2_SST@"
-SLICE2_SD="@DEF_SLICE2_SD@"
-SLICE2_5QI="@DEF_SLICE2_5QI@"
-SLICE2_UPLINK="@DEF_SLICE2_UPLINK@"
-SLICE2_DOWNLINK="@DEF_SLICE2_DOWNLINK@"
-GNB_ID="@DEF_GNB_ID@"
+MCC="001"
+MNC="01"
+TAC="1"
+DNN0="internet"
+DNN0_PDU_TYPE="IPV4"
+DNN1="streaming"
+DNN1_PDU_TYPE="IPV4"
+SLICE1_SST="1"
+SLICE1_SD="EMPTY"
+SLICE1_5QI="9"
+SLICE1_UPLINK="20Mbps"
+SLICE1_DOWNLINK="40Mbps"
+SLICE2_SST="1"
+SLICE2_SD="000001"
+SLICE2_5QI="5"
+SLICE2_UPLINK="100Mbps"
+SLICE2_DOWNLINK="200Mbps"
+GNB_ID="0xe020"
 #
 ################SST0="@DEF_SST0@"
-FULL_KEY="@DEF_FULL_KEY@"
-OPC="@DEF_OPC@"
-RFSIM_IMSI="@DEF_RFSIM_IMSI@"
-RFSIM_IMSI_UE2="@DEF_RFSIM_IMSI_UE2@"
-RFSIM_IMSI_UE3="@DEF_RFSIM_IMSI_UE3@"
+FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f"
+OPC="C42449363BBAD02B66D16BC975D77CC1"
+RFSIM_IMSI="001010000001121"
 #
-PREFIX_DEMO="@DEF_PREFIX_DEMO@" # Directory in which all scripts will be copied on the k8s server to run the demo
+PREFIX_DEMO="/home/ziyad-mabrouk/oai5g-rru/testing" # Directory in which all scripts will be copied on the k8s server to run the demo
 #
 #################################################################################
 ##################################################################################
@@ -74,16 +65,16 @@ OAISA_REPO="docker.io/oaisoftwarealliance"
 
 # Interfaces names of VLANs in sopnode servers
 # Replaced "net-100" with my local network interface
-IF_NAME_N2N3_DEFAULT="@DEF_LOCAL_INTERFACE@" 
-IF_NAME_N6_DEFAULT="@DEF_LOCAL_INTERFACE@" 
-IF_NAME_E1_DEFAULT="@DEF_LOCAL_INTERFACE@" 
-IF_NAME_F1_DEFAULT="@DEF_LOCAL_INTERFACE@"
-IF_NAME_VLAN_N300_1="r2lab_usrp"
-IF_NAME_VLAN_N300_2="r2lab_usrp"
-IF_NAME_VLAN_N320_1="r2lab_usrp"
-IF_NAME_VLAN_N320_2="r2lab_usrp"
-IF_NAME_VLAN_JAGUAR="r2lab_aw2s"
-IF_NAME_VLAN_PANTHER="r2lab_aw2s"
+IF_NAME_N2N3_DEFAULT="wlp111s0" 
+IF_NAME_N6_DEFAULT="wlp111s0" 
+IF_NAME_E1_DEFAULT="wlp111s0" 
+IF_NAME_F1_DEFAULT="wlp111s0"
+IF_NAME_VLAN_N300_1="net-n300.1"
+IF_NAME_VLAN_N300_2="net-n300.2"
+IF_NAME_VLAN_N320_1="net-n320.1"
+IF_NAME_VLAN_N320_2="net-n320.2"
+IF_NAME_VLAN_JAGUAR="net-jaguar"
+IF_NAME_VLAN_PANTHER="net-panther"
 
 
 
@@ -176,9 +167,7 @@ if [[ $RUN_MODE = "full" ]]; then
     MULTUS_GNB_N3="false"
     if [[ $GNB_MODE = 'cucpup' ]]; then
 	F1IFNAME="f1c"
-	MULTUS_CUUP_N3="true"
 	IP_GNB_N3="$SUBNET_N2N3.204"
-	CUUP_N3_IF_NAME="n3"
 	IP_NRUE="$SUBNET_N2N3.205"
     else
 	F1IFNAME="f1"
@@ -251,13 +240,9 @@ else
 	GNB_N2_IF_NAME="n2"
 	MULTUS_GNB_N3="false"
 	if [[ $GNB_MODE = 'cucpup' ]]; then
-	    F1IFNAME="f1c"
-	    MULTUS_CUUP_N3="true"
 	    IP_GNB_N3="$SUBNET_N2N3.224"
-	    CUUP_N3_IF_NAME="n3"
 	    IP_NRUE="$SUBNET_N2N3.225"
 	else
-	    F1IFNAME="f1"
 	    IP_GNB_N3="$IP_GNB_N2"
 	    IP_NRUE="$SUBNET_N2N3.224"
 	fi
@@ -330,11 +315,9 @@ CN_DEFAULT_GW=""
 ################################ oai-gnb chart parameters ########################
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
-MY_REPO="ghcr.io/ziyad-mabrouk/openairinterface5g"
 #
 #RAN_TAG="2024.w25"
-MY_TAG="test"
-RAN_TAG="2024.w48"
+#RAN_TAG="2024.w48"
 GNB_NAME="gNB-r2lab"
 
 # DU/CU SPLIT parameters
@@ -469,16 +452,18 @@ fi
 #
 NETMASK_GNB_N2="$NETMASK_N2N3"
 NETMASK_GNB_N3="$NETMASK_N2N3"
-NETMASK_GNB_RU="24"
+NETMASK_GNB_RU="28"
 #
 ################## RRU-dependent part ###################
 #
-RU_MODE="static" # in ['static', 'dhcp']
+RU_MODE="dhcp" # in ['static', 'dhcp']
 #
 #### rfsim RU case ####
 #GNB_REPO_rfsim="${OAISA_REPO}/oai-gnb"
-GNB_REPO_rfsim="${MY_REPO}/oai-gnb"
-GNB_TAG_rfsim="${MY_TAG}"
+#GNB_REPO_rfsim="${R2LAB_REPO}/oai-gnb"
+#GNB_TAG_rfsim="${RAN_TAG}"
+GNB_REPO_rfsim="ghcr.io/ziyad-mabrouk/openairinterface5g/oai-gnb"
+GNB_TAG_rfsim="with-metrics"
 CONF_rfsim="gnb.sa.band78.106prb.rfsim.conf" 
 CONF_DU_rfsim="du.sa.band78.106prb.rfsim.conf" 
 OPTIONS_rfsim="-E --rfsim --log_config.global_log_options level,nocolor,time"
@@ -486,8 +471,8 @@ OPTIONS_rfsim="-E --rfsim --log_config.global_log_options level,nocolor,time"
 #
 #### b2xx RU case ####
 #GNB_REPO_b2xx="${OAISA_REPO}/oai-gnb"
-GNB_REPO_b2xx="${MY_REPO}/oai-gnb"
-GNB_TAG_b2xx="${MY_TAG}"
+GNB_REPO_b2xx="${R2LAB_REPO}/oai-gnb"
+GNB_TAG_b2xx="${RAN_TAG}"
 CONF_b210="gnb.sa.band78.fr1.106PRB.usrpb210.conf"
 #CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
 #OPTIONS_b2xx="--sa --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
@@ -495,8 +480,8 @@ OPTIONS_b2xx="-E --tune-offset 30000000 --log_config.global_log_options level,no
 
 #### n3xx RU case ####
 #GNB_REPO_n3xx="${OAISA_REPO}/oai-gnb"
-GNB_REPO_n3xx="${MY_REPO}/oai-gnb"
-GNB_TAG_n3xx="${MY_TAG}"
+GNB_REPO_n3xx="${R2LAB_REPO}/oai-gnb"
+GNB_TAG_n3xx="${RAN_TAG}"
 #
 #CONF_n320="gnb.sa.band78.162prb.usrpn310.2x2-r2lab.conf"
 CONF_n320="gnb.sa.band78.106prb.n310.7ds2u.conf"
@@ -514,37 +499,36 @@ if [[ $RU_MODE = "dhcp" ]]; then
     IP_GNB_N320_1="dhcp"
     IP_GNB_N320_2="dhcp"
 else
-    IP_GNB_N300_1="192.168.235.120" # @IP N300.1 + 17
-    IP_GNB_N300_2="192.168.235.121" # @IP N300.2 + 17
-    IP_GNB_N320_1="$IP_GNB_N300_1"
-    IP_GNB_N320_2="$IP_GNB_N300_2"
+    IP_GNB_N300_1="172.28.4.4" # @IP N300.1 + 3
+    IP_GNB_N300_2="172.28.4.36" # @IP N300.2 + 3
+    IP_GNB_N320_1="172.28.4.68" # @IP N320.1 + 3
+    IP_GNB_N320_2="172.28.4.100" # @IP N320.2 + 3
 fi
-MTU_n3xx="9216"
-ADDRS_n300="addr=192.168.235.103,second_addr=192.168.235.104"
-ADDRS_n320="addr=192.168.235.105"
+MTU_n3xx="9000"
+ADDRS_n300="addr=172.28.4.1,second_addr=172.28.4.33"
+ADDRS_n320="addr=172.28.4.65,second_addr=172.28.4.97"
 
 #### aw2s RU case ####
 #GNB_REPO_aw2s="${OAISA_REPO}/oai-gnb"
-GNB_REPO_aw2s="${MY_REPO}/oai-gnb-aw2s"
-GNB_TAG_aw2s="${MY_TAG}"
+GNB_REPO_aw2s="${R2LAB_REPO}/oai-gnb-aw2s"
+GNB_TAG_aw2s="${RAN_TAG}"
 #
-CONF_jaguar="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.conf"
-#CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
+CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 #CONF_jaguar="gnb.sa.band78.133prb.aw2s.dddsu.50MHz.conf"
 CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 #CONF_DU_jaguar="du.sa.band78.133prb.aw2s.dddsuu.50MHz.conf"
 CONF_panther="${CONF_jaguar}"
 CONF_DU_panther="${CONF_DU_jaguar}"
-OPTIONS_aw2s="--thread-pool 25,27,29,31,33,35,37,39 --log_config.global_log_options level,nocolor,time"
+OPTIONS_aw2s="--thread-pool 9,11,13,15,17,19,21,23 --log_config.global_log_options level,nocolor,time"
 if [[ $RU_MODE = "dhcp" ]]; then
     IP_GNB_jaguar="dhcp"
     IP_GNB_panther="dhcp"
 else
-    IP_GNB_jaguar="192.168.236.104" # @IP ADDR_jaguar + 3
-    IP_GNB_panther="192.168.236.106" # @IP ADDR_panther + 3
+    IP_GNB_jaguar="172.28.4.132" # @IP ADDR_jaguar + 3
+    IP_GNB_panther="172.28.4.196" # @IP ADDR_panther + 3
 fi
-ADDR_jaguar="192.168.236.101" 
-ADDR_panther="192.168.236.103" 
+ADDR_jaguar="172.28.4.129" 
+ADDR_panther="172.28.4.193" 
 
 
 ########################### oai-nr-ue rfsim chart parameters #####################
@@ -556,45 +540,6 @@ OPTIONS_NRUE="--rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_co
 NETMASK_NRUE="$NETMASK_N2N3"
 IF_NAME_NRUE="$IF_NAME_N2N3"
 NRUE_USRP="rfsim"
-
-########################### oai-flexric chart parameters #####################
-FLEXRIC_REPO="ghcr.io/ziyad-mabrouk/oai-flexric"
-#FLEXRIC_REPO="oaisoftwarealliance/oai-flexric"
-FLEXRIC_TAG="test"
-#FLEXRIC_TAG="latest"
-FLEXRIC_PULL_POLICY="Always"
-
-
-########################### sopnode-f3 specific tuning #####################
-
-if [[ "$NODE_GNB" == "sopnode-f3" ]]; then
-  echo "Configuring core affinity for sopnode-f3..."
-
-  # Set new AW2S options
-  OPTIONS_aw2s="--thread-pool 48,50,52,54,56,58,60,62 --log_config.global_log_options level,nocolor,time"
-
-  # Path to the gNB config file
-  CONF_FILE="$PREFIX_DEMO/oai5g-rru/ran-config/conf/$CONF_jaguar"
-
-  if [[ -f "$CONF_FILE" ]]; then
-    echo "Patching $CONF_FILE..."
-
-    # Replace rxfh_core_id
-    sed -i 's/^\s*rxfh_core_id\s*=.*/        rxfh_core_id   = 48;/' "$CONF_FILE"
-
-    # Replace txfh_core_id
-    sed -i 's/^\s*txfh_core_id\s*=.*/        txfh_core_id   = 50;/' "$CONF_FILE"
-
-    # Replace tp_cores
-    sed -i 's/^\s*tp_cores\s*=.*/        tp_cores       = [52,54,56,58,60,62,96,98];/' "$CONF_FILE"
-
-    # Replace num_tp_cores
-    sed -i 's/^\s*num_tp_cores\s*=.*/        num_tp_cores   = 8;/' "$CONF_FILE"
-  else
-    echo "Warning: Config file $CONF_FILE not found."
-  fi
-fi
-
 
 ##################################################################################
 
@@ -654,12 +599,12 @@ function init() {
 
 #################################################################################
 
-function configure-oai-5g-@mode@() {
+function configure-oai-5g-advance() {
 
     # if $LOGS is true, create a tcpdump container with privileges
     # if $PCAP is true, start tcpdump and create a shared volume to store pcap
-    echo "Configuring chart $OAI5G_@MODE@/values.yaml for R2lab"
-    cat > $TMP/@mode@-values.sed <<EOF
+    echo "Configuring chart $OAI5G_ADVANCE/values.yaml for R2lab"
+    cat > $TMP/advance-values.sed <<EOF
 s|@PRIVILEGED@|$LOGS|
 s|@TCPDUMP_CONTAINER@|$LOGS|
 s|@START_TCPDUMP@|$PCAP|
@@ -723,13 +668,13 @@ s|@ROUTES_SMF_N4@|$ROUTES_SMF_N4|
 s|@IF_NAME_SMF_N4@|$IF_NAME_SMF_N4|
 s|@NODE_SMF@||
 EOF
-    cp "$OAI5G_@MODE@"/values.yaml $TMP/@mode@_values.yaml-orig
-    echo "(Over)writing $OAI5G_@MODE@/values.yaml"
-    sed -f $TMP/@mode@-values.sed < $TMP/@mode@_values.yaml-orig > "$OAI5G_@MODE@"/values.yaml
-    diff $TMP/@mode@_values.yaml-orig "$OAI5G_@MODE@"/values.yaml
+    cp "$OAI5G_ADVANCE"/values.yaml $TMP/advance_values.yaml-orig
+    echo "(Over)writing $OAI5G_ADVANCE/values.yaml"
+    sed -f $TMP/advance-values.sed < $TMP/advance_values.yaml-orig > "$OAI5G_ADVANCE"/values.yaml
+    diff $TMP/advance_values.yaml-orig "$OAI5G_ADVANCE"/values.yaml
 
-    echo "Configuring chart $OAI5G_@MODE@/config.yaml for R2lab"
-    cat > $TMP/@mode@-config.sed <<EOF
+    echo "Configuring chart $OAI5G_ADVANCE/config.yaml for R2lab"
+    cat > $TMP/advance-config.sed <<EOF
 s|@NFS_AMF_HOST@|$NFS_AMF_HOST|
 s|@NFS_SMF_HOST@|$NFS_SMF_HOST|
 s|@NFS_UPF_HOST@|$NFS_UPF_HOST|
@@ -763,13 +708,13 @@ s|@SLICE2_DOWNLINK@|$SLICE2_DOWNLINK|
 s|@IP_DNS1@|$IP_DNS1|
 s|@IP_DNS2@|$IP_DNS2|
 EOF
-    cp "$OAI5G_@MODE@"/config.yaml $TMP/@mode@_config.yaml-orig
-    echo "(Over)writing $OAI5G_@MODE@/config.yaml"
-    sed -f $TMP/@mode@-config.sed < $TMP/@mode@_config.yaml-orig > "$OAI5G_@MODE@"/config.yaml
+    cp "$OAI5G_ADVANCE"/config.yaml $TMP/advance_config.yaml-orig
+    echo "(Over)writing $OAI5G_ADVANCE/config.yaml"
+    sed -f $TMP/advance-config.sed < $TMP/advance_config.yaml-orig > "$OAI5G_ADVANCE"/config.yaml
     # if SD NSSAI field is set to "NULL", erase the sd line
-    awk '!/EMPTY/' "$OAI5G_@MODE@"/config.yaml > /tmp/temp && mv /tmp/temp "$OAI5G_@MODE@"/config.yaml
-    diff $TMP/@mode@_config.yaml-orig "$OAI5G_@MODE@"/config.yaml
-    cd "$OAI5G_@MODE@"
+    awk '!/EMPTY/' "$OAI5G_ADVANCE"/config.yaml > /tmp/temp && mv /tmp/temp "$OAI5G_ADVANCE"/config.yaml
+    diff $TMP/advance_config.yaml-orig "$OAI5G_ADVANCE"/config.yaml
+    cd "$OAI5G_ADVANCE"
     echo "helm dependency update"
     helm dependency update
 }
@@ -812,6 +757,14 @@ function configure-gnb() {
 	QOS_GNB_DEF="false"
 
     elif [[ "$RRU" = "n300" || "$RRU" = "n320" ]]; then
+	SDR_ADDRS=$(eval echo \"\${ADDRS_$RRU}\")
+	MULTUS_GNB_RU1="true"
+	MTU_GNB_RU1="$MTU_n3xx"
+	MULTUS_GNB_RU2="true"
+	MTU_GNB_RU2="$MTU_n3xx"
+	RRU_TYPE="n3xx"
+	ADD_OPTIONS_GNB="$OPTIONS_n3xx"
+	QOS_GNB_DEF="true"
 	if [[ "$RRU" = "n300" ]]; then
 	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_N300_1"
 	    IF_NAME_GNB_RU2="$IF_NAME_VLAN_N300_2"
@@ -823,19 +776,10 @@ function configure-gnb() {
 	    IP_GNB_RU1="$IP_GNB_N320_1"
 	    IP_GNB_RU2="$IP_GNB_N320_2"
 	fi
-	SDR_ADDRS=$(eval echo \"\${ADDRS_$RRU}\")
-	MULTUS_GNB_RU1="true"
-	MTU_GNB_RU1="$MTU_n3xx"
-	MULTUS_GNB_RU2="true"
-	MTU_GNB_RU2="$MTU_n3xx"
-	RRU_TYPE="n3xx"
-	ADD_OPTIONS_GNB="$OPTIONS_n3xx"
-	QOS_GNB_DEF="false" # avoid OOMKilled problems with k8s 
 
     elif [[ "$RRU" = "jaguar" || "$RRU" = "panther" ]]; then
 	ADDR_aw2s=$(eval echo \"\${ADDR_$RRU}\")
 	MULTUS_GNB_RU1="true"
-    MTU_GNB_RU1="$MTU_n3xx"
 	MULTUS_GNB_RU2="false"
 	RRU_TYPE="aw2s"
 	ADD_OPTIONS_GNB="$OPTIONS_aw2s"
@@ -868,7 +812,7 @@ function configure-gnb() {
     if [[ $GNB_MODE = 'monolithic' ]]; then
 	CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_$RRU}\")
 	DIR_TEMPLATES="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates"
-	NB_LINES=7
+	NB_LINES=8
 	echo "monolithic gNB, conf is $CONF_ORIG"
     else
 	CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_DU_$RRU}\")
@@ -936,35 +880,16 @@ EOF
 	    cat ${ORIG_CHART}
     done
 
-    if [[ $FLEXRIC == "true" ]]; then
-        echo "adding FlexRIC-related conf in ${OAI5G_RAN}/oai-gnb/templates/configmap.yaml"
-        cat <<EOF >> "${OAI5G_RAN}/oai-gnb/templates/configmap.yaml"
-
-      e2_agent :
-      {
-        near_ric_ip_addr = "@FLEXRIC_IP@";
-        sm_dir = "/usr/local/lib/flexric/";
-      };
-EOF
-    fi
-
 
     # Configure gNB values.yaml charts
 
     if [[ $GNB_MODE == 'monolithic' ]]; then
-        GNB_PULL_POLICY="Always" # for testing purposes
         # if $MONITORING is true, create and start prometheus log parser container (for now, available only for monolithic gnb)
         if [[ $MONITORING == "true" ]]; then
             echo "MONITORING is set to True. A prometheus log parser container will be created besides the gnb"
         fi
-        if [[ $FLEXRIC == "true" ]]; then
-            echo "FLEXRIC is set to True. FlexRIC configurations will be applied"
-        fi
         cat >> "$SED_VALUES_FILE" <<EOF
 s|@METRICS_PARSER_CONTAINER@|$MONITORING|
-s|@GNB_PULL_POLICY@|$GNB_PULL_POLICY|
-s|@FLEXRIC@|$FLEXRIC|
-s|@HOST_FLEXRIC@|oai-flexric|
 EOF
     ORIG_CHART="${OAI5G_RAN}/oai-gnb/values.yaml"
 	cp ${ORIG_CHART} $TMP/oai-gnb_values.yaml-orig
@@ -1194,111 +1119,6 @@ EOF
     diff $TMP/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
 }
 
-#################################################################################
-
-function configure-nr-ue2() {
-
-    # will NOT generate PCAP file to avoid wasting all memory resources
-    # However, a tcpdump container created e.g., to run iperf client"
-    DIR="$OAI5G_RAN/oai-nr-ue2"
-    ORIG_CHART="$DIR"/values.yaml
-    SED_FILE="$TMP/oai-nr-ue2-values.sed"
-    echo "configure-nr-ue2: $ORIG_CHART configuration"
-    ADD_OPTIONS_NRUE="$OPTIONS_NRUE"
-    cat > "$SED_FILE" <<EOF
-s|@NRUE_REPO@|$NRUE_REPO|
-s|@NRUE_TAG@|$NRUE_TAG|
-s|@MULTUS_NRUE2@|$MULTUS_NRUE|
-s|@IP_NRUE2@|$IP_NRUE|
-s|@NETMASK_NRUE2@|$NETMASK_NRUE|
-s|@MAC_NRUE2@|$(gener-mac)|
-s|@DEFAULT_GW_NRUE2@|$DEFAULT_GW_NRUE|
-s|@IF_NAME_NRUE2@|$IF_NAME_NRUE|
-s|@RFSIM_IMSI_UE2@|$RFSIM_IMSI_UE2|
-s|@FULL_KEY_UE2@|$FULL_KEY|
-s|@OPC_UE2@|$OPC|
-s|@DNN_UE2@|$DNN1|
-s|@SST_UE2@|$SLICE2_SST|
-s|@SD_UE2@|0x$SLICE2_SD|
-s|@NRUE2_USRP@|$NRUE_USRP|
-s|@ADD_OPTIONS_NRUE2@|$ADD_OPTIONS_NRUE|
-s|@START_TCPDUMP@|false|
-s|@TCPDUMP_CONTAINER@|$LOGS|
-s|@QOS_NRUE2_DEF@|false|
-s|@SHAREDVOLUME@|false|
-s|@NODE_NRUE2@||
-EOF
-    cp "$ORIG_CHART" $TMP/oai-nr-ue2_values.yaml-orig
-    echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_FILE" < $TMP/oai-nr-ue2_values.yaml-orig > "$ORIG_CHART"
-    # if SD NSSAI field is set to "NULL", replace it by "16777215"
-    sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
-    diff $TMP/oai-nr-ue2_values.yaml-orig "$ORIG_CHART"
-}
-
-#################################################################################
-
-function configure-nr-ue3() {
-
-    # will NOT generate PCAP file to avoid wasting all memory resources
-    # However, a tcpdump container created e.g., to run iperf client"
-    DIR="$OAI5G_RAN/oai-nr-ue3"
-    ORIG_CHART="$DIR"/values.yaml
-    SED_FILE="$TMP/oai-nr-ue3-values.sed"
-    echo "configure-nr-ue3: $ORIG_CHART configuration"
-    ADD_OPTIONS_NRUE="$OPTIONS_NRUE"
-    cat > "$SED_FILE" <<EOF
-s|@NRUE_REPO@|$NRUE_REPO|
-s|@NRUE_TAG@|$NRUE_TAG|
-s|@MULTUS_NRUE3@|$MULTUS_NRUE|
-s|@IP_NRUE3@|$IP_NRUE|
-s|@NETMASK_NRUE3@|$NETMASK_NRUE|
-s|@MAC_NRUE3@|$(gener-mac)|
-s|@DEFAULT_GW_NRUE3@|$DEFAULT_GW_NRUE|
-s|@IF_NAME_NRUE3@|$IF_NAME_NRUE|
-s|@RFSIM_IMSI_UE3@|$RFSIM_IMSI_UE3|
-s|@FULL_KEY_UE3@|$FULL_KEY|
-s|@OPC_UE3@|$OPC|
-s|@DNN_UE3@|$DNN0|
-s|@SST_UE3@|$SLICE1_SST|
-s|@SD_UE3@|0x$SLICE1_SD|
-s|@NRUE3_USRP@|$NRUE_USRP|
-s|@ADD_OPTIONS_NRUE3@|$ADD_OPTIONS_NRUE|
-s|@START_TCPDUMP@|false|
-s|@TCPDUMP_CONTAINER@|$LOGS|
-s|@QOS_NRUE3_DEF@|false|
-s|@SHAREDVOLUME@|false|
-s|@NODE_NRUE3@||
-EOF
-    cp "$ORIG_CHART" $TMP/oai-nr-ue3_values.yaml-orig
-    echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_FILE" < $TMP/oai-nr-ue3_values.yaml-orig > "$ORIG_CHART"
-    # if SD NSSAI field is set to "NULL", replace it by "16777215"
-    sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
-    diff $TMP/oai-nr-ue3_values.yaml-orig "$ORIG_CHART"
-}
-
-#################################################################################
-
-function configure-flexric() {
-
-    DIR="$OAI5G_RAN/oai-flexric"
-    ORIG_CHART="$DIR"/values.yaml
-    SED_FILE="$TMP/oai-flexric-values.sed"
-    echo "configure-flexric: $ORIG_CHART configuration"
-    cat > "$SED_FILE" <<EOF
-s|@FLEXRIC_REPO@|$FLEXRIC_REPO|
-s|@FLEXRIC_TAG@|$FLEXRIC_TAG|
-s|@FLEXRIC_PULL_POLICY@|$FLEXRIC_PULL_POLICY|
-EOF
-    cp "$ORIG_CHART" $TMP/oai-flexric_values.yaml-orig
-    echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_FILE" < $TMP/oai-flexric_values.yaml-orig > "$ORIG_CHART"
-    # if SD NSSAI field is set to "NULL", replace it by "16777215"
-    sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
-    diff $TMP/oai-flexric_values.yaml-orig "$ORIG_CHART"
-}
-
 
 #################################################################################
 
@@ -1315,19 +1135,16 @@ function configure-all() {
     kubectl -n "$NS" delete secret regcred || true
     kubectl -n "$NS" create secret docker-registry regcred \
         --docker-server=https://index.docker.io/v1/ \
-        --docker-username="@DEF_REGCRED_NAME@" \
-        --docker-password="@DEF_REGCRED_PWD@" \
-        --docker-email="@DEF_REGCRED_EMAIL@" || true
+        --docker-username="r2labuser" \
+        --docker-password="r2labuser-pwd" \
+        --docker-email="r2labuser@turletti.com" || true
 
     # Ensure that helm spray plugin is installed
-    configure-oai-5g-@mode@ 
+    configure-oai-5g-advance 
     configure-mysql
     configure-gnb
-    configure-flexric
     if [[ "$RRU" = "rfsim" ]]; then
 	configure-nr-ue
-    configure-nr-ue2
-    configure-nr-ue3
     fi
 }
 
@@ -1336,8 +1153,8 @@ function configure-all() {
 
 function start-cn() {
     echo "Running start-cn() with namespace=$NS, NODE_AMF_UPF=$NODE_AMF_UPF"
-    echo "cd $OAI5G_@MODE@"
-    cd "$OAI5G_@MODE@" || { echo "Error: Failed to change directory"; exit 1; }
+    echo "cd $OAI5G_ADVANCE"
+    cd "$OAI5G_ADVANCE" || { echo "Error: Failed to change directory"; exit 1; }
 
     echo "helm dependency update"
     if ! helm dependency update; then
@@ -1345,8 +1162,8 @@ function start-cn() {
         exit 1
     fi
 
-    echo "helm --namespace=$NS install oai-5g-@mode@ ."
-    if ! helm --create-namespace --namespace="$NS" install oai-5g-@mode@ .; then
+    echo "helm --namespace=$NS install oai-5g-advance ."
+    if ! helm --create-namespace --namespace="$NS" install oai-5g-advance .; then
         echo "Error: Failed to install helm chart"
         exit 1
     fi
@@ -1356,21 +1173,6 @@ function start-cn() {
         echo "Error: Pods did not become ready within timeout"
         exit 1
     fi
-}
-
-################################################################################
-
-function start-flexric() {
-
-    echo "Running start-flexric() on namespace: $NS, NODE_GNB=$NODE_GNB"
-    echo "cd $OAI5G_RAN"
-    cd "$OAI5G_RAN"
-
-    echo "helm -n $NS install oai-flexric oai-flexric/" 
-    helm -n $NS install oai-flexric oai-flexric/
-
-    echo "Wait until oai-flexric pod is READY"
-    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-flexric
 }
 
 #################################################################################
@@ -1386,7 +1188,6 @@ function start-gnb() {
 	echo "helm -n $NS install oai-gnb oai-gnb/"
 	helm -n $NS install oai-gnb oai-gnb/
 	echo "Wait until the gNB pod is READY"
-    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-gnb
     elif [[ $GNB_MODE = 'cudu' ]]; then
 	echo "helm -n $NS install oai-cu oai-cu/"
 	helm -n $NS install oai-cu oai-cu/
@@ -1411,6 +1212,8 @@ function start-gnb() {
 	echo "helm install -n $NS oai-du oai-du/"
 	helm install -n $NS oai-du oai-du/
     fi
+    echo "kubectl -n $NS wait pod --for=condition=Ready --all"
+    kubectl -n $NS wait pod --for=condition=Ready --all
 }
 
 #################################################################################
@@ -1434,38 +1237,9 @@ function start-nr-ue() {
     helm -n $NS install oai-nr-ue oai-nr-ue/
 
     echo "Wait until oai-nr-ue pod is READY"
-    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-nr-ue
+    kubectl wait pod -n $NS --for=condition=Ready --all
 }
 
-################################################################################
-
-function start-nr-ue2() {
-
-    echo "Running start-nr-ue2() on namespace: $NS, NODE_GNB=$NODE_GNB"
-    echo "cd $OAI5G_RAN"
-    cd "$OAI5G_RAN"
-
-    echo "helm -n $NS install oai-nr-ue2 oai-nr-ue2/" 
-    helm -n $NS install oai-nr-ue2 oai-nr-ue2/
-
-    echo "Wait until oai-nr-ue2 pod is READY"
-    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-nr-ue2
-}
-
-#################################################################################
-
-function start-nr-ue3() {
-
-    echo "Running start-nr-ue3() on namespace: $NS, NODE_GNB=$NODE_GNB"
-    echo "cd $OAI5G_RAN"
-    cd "$OAI5G_RAN"
-
-    echo "helm -n $NS install oai-nr-ue3 oai-nr-ue3/" 
-    helm -n $NS install oai-nr-ue3 oai-nr-ue3/
-
-    echo "Wait until oai-nr-ue3 pod is READY"
-    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-nr-ue3
-}
 
 #################################################################################
 
@@ -1561,9 +1335,8 @@ EOF
     start-gnb 
 
     if [[ "$RRU" == "rfsim" ]]; then
-	echo "sleep 5s before starting nr-ue and nr-ue2"; sleep 5
-	start-nr-ue
-    start-nr-ue2
+	echo "sleep 5s before starting nr-ue"; sleep 5
+	start-nr-ue 
     fi
 
     echo "****************************************************************************"
@@ -1581,14 +1354,10 @@ function run-ping() {
 #################################################################################
 
 function stop-cn(){
-    echo "helm --namespace=$NS uninstall oai-5g-@mode@"
-    helm --namespace=$NS uninstall oai-5g-@mode@ 
+    echo "helm --namespace=$NS uninstall oai-5g-advance"
+    helm --namespace=$NS uninstall oai-5g-advance 
 }
 
-function stop-flexric(){
-    echo "helm -n $NS uninstall flexric"
-    helm -n $NS uninstall oai-flexric
-}
 
 function stop-gnb(){
     if [[ $GNB_MODE = 'monolithic' ]]; then
@@ -1616,16 +1385,6 @@ function stop-nr-ue(){
     helm -n $NS uninstall oai-nr-ue
 }
 
-
-function stop-nr-ue2(){
-    echo "helm -n $NS uninstall oai-nr-ue2"
-    helm -n $NS uninstall oai-nr-ue2
-}
-
-function stop-nr-ue3(){
-    echo "helm -n $NS uninstall oai-nr-ue3"
-    helm -n $NS uninstall oai-nr-ue3
-}
 
 function stop() {
     echo "Running stop() on $NS namespace, logs=$LOGS"
@@ -1655,8 +1414,6 @@ function stop() {
 	stop-gnb
 	if [[ "$RRU" = "rfsim" ]]; then
 	    stop-nr-ue
-        stop-nr-ue2
-        stop-nr-ue3
 	fi
     else
         echo "OAI5G demo is not running, there is no pod on namespace $NS !"
@@ -1695,38 +1452,38 @@ function get-all-logs() {
     	cp "$PREFIX_DEMO"/prepare-demo-oai.sh "$prefix"/
     fi
 
-    AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
-    AMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
+    AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+    AMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[*].status.podIP}")
     echo -e "\t - Retrieving logs for oai-amf $AMF_POD_NAME running with IP $AMF_eth0_IP"
     kubectl --namespace $NS -c amf logs $AMF_POD_NAME > "$prefix"/amf-"$DATE".logs
 
-    AUSF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
-    AUSF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
+    AUSF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+    AUSF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[*].status.podIP}")
     echo -e "\t - Retrieving logs for oai-ausf $AUSF_POD_NAME running with IP $AUSF_eth0_IP"
     kubectl --namespace $NS -c ausf logs $AUSF_POD_NAME > "$prefix"/ausf-"$DATE".logs
 
-    NRF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
-    NRF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
+    NRF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+    NRF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[*].status.podIP}")
     echo -e "\t - Retrieving logs for oai-nrf $NRF_POD_NAME running with IP $NRF_eth0_IP"
     kubectl --namespace $NS -c nrf logs $NRF_POD_NAME > "$prefix"/nrf-"$DATE".logs
 
-    SMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
-    SMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
+    SMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+    SMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[*].status.podIP}")
     echo -e "\t - Retrieving logs for oai-smf $SMF_POD_NAME running with IP $SMF_eth0_IP"
     kubectl --namespace $NS -c smf logs $SMF_POD_NAME > "$prefix"/smf-"$DATE".logs
 
-    UPF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
-    UPF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
+    UPF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+    UPF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[*].status.podIP}")
     echo -e "\t - Retrieving logs for oai-upf $UPF_POD_NAME running with IP $UPF_eth0_IP"
     kubectl --namespace $NS -c upf logs $UPF_POD_NAME > "$prefix"/upf-"$DATE".logs
 
-    UDM_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
-    UDM_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
+    UDM_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+    UDM_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[*].status.podIP}")
     echo -e "\t - Retrieving logs for oai-udm $UDM_POD_NAME running with IP $UDM_eth0_IP"
     kubectl --namespace $NS -c udm logs $UDM_POD_NAME > "$prefix"/udm-"$DATE".logs
     
-    UDR_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
-    UDR_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
+    UDR_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
+    UDR_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[*].status.podIP}")
     echo -e "\t - Retrieving logs for oai-udr $UDR_POD_NAME running with IP $UDR_eth0_IP"
     kubectl --namespace $NS -c udr logs $UDR_POD_NAME > "$prefix"/udr-"$DATE".logs
 
@@ -1795,7 +1552,7 @@ function get-cn-pcap(){
 
     DATE=`date +"%Y-%m-%dT%H.%M.%S"`
 
-    AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
+    AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-advance" -o jsonpath="{.items[0].metadata.name}")
     echo "Retrieve OAI5G CN pcap files from the AMF pod on ns $NS"
     echo "kubectl -c tcpdump -n $NS exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz -C tmp pcap"
     kubectl -c tcpdump -n $NS exec -i $AMF_POD_NAME -- /bin/tar cfz cn-pcap.tgz -C tmp pcap || true
@@ -1867,7 +1624,7 @@ if test $# -lt 1; then
     usage
 else
     case $1 in
-	init|start|stop|configure-all|start-cn|start-flexric|start-gnb|start-nr-ue|start-nr-ue2|start-nr-ue3|stop-cn|stop-flexric|stop-gnb|stop-nr-ue|stop-nr-ue2|stop-nr-ue3|run-ping)
+	init|start|stop|configure-all|start-cn|start-gnb|start-nr-ue|stop-cn|stop-gnb|stop-nr-ue|run-ping)
 	    echo "$0: running $1"
 	    "$1"
 	;;

@@ -5,50 +5,50 @@
 #
 
 # server used for following OAI5G functions
-HOST_AMF_UPF="sopnode-w1"
-HOST_GNB="sopnode-w1"
+HOST_AMF_UPF="10.10.3.200" # IP adress of the AMF
+HOST_GNB="precision-7530" # name of the Kubernetes node on which the gnb will be deployed
 
 # k8s namespace
-NS="oaiw1-ci"
+NS="open5gs"
 
 # Repo/Branch/TAG for code
-REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
-#TAG_OAI5G_RRU="2024.w31"
-TAG_OAI5G_RRU="develop-r2lab"
-REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git"
-#TAG_OAI_CN5G_FED="develop-r2lab"
-TAG_OAI_CN5G_FED="develop-r2lab"
+REPO_OAI5G_RRU="https://github.com/Ziyad-Mabrouk/oai5g-rru.git"
+TAG_OAI5G_RRU="gen-cn2"
+REPO_OAI_CN5G_FED="https://github.com/Ziyad-Mabrouk/oai-cn5g-fed"
+TAG_OAI_CN5G_FED="gen-cn2"
 
 # CN mode
 CN_MODE="advance"
 #CN_MODE="basic"
 
 # oai5g-rru running mode 
-RUN_MODE="full"
+#RUN_MODE="full"
 #RUN_MODE="gnb-upf"
-#RUN_MODE="gnb-only"
+RUN_MODE="gnb-only"
 
 # RAN options
-RRU="jaguar"
+#RRU="jaguar"
 #RRU="panther"
-#RRU="rfsim"
+RRU="rfsim"
 #RRU="b210"
 #RRU="n300"
 #RRU="n320"
-GNB_MODE="cudu"
+#GNB_MODE="cudu"
 #GNB_MODE="cucpup"
-#GNB_MODE="monolithic"
+GNB_MODE="monolithic"
 
 # DNNs 
-DNN0="oai"
-DNN1="internet"
-#DNN1="none"
+DNN0="internet"
+DNN1="streaming"
 
 # logs configuration
 # logs and pcap are automatically retrieved when running demo-oai.sh stop in /tmp/tmp.root/oai5g-stats.tgz
 # you should manually erase /tmp/tmp.root/oai5g-stats directory before running another scenario to prevent retrieving old logs/pcaps
-LOGS="true"
+LOGS="false"
 PCAP="false"
+MONITORING="true"
+FLEXRIC="true"
+LOCAL_INTERFACE="wlp111s0"
 #PCAP="true"
 
 # identity used to git pull
@@ -81,8 +81,8 @@ function git_pull(){
 
 function configure_all_scripts(){
     echo "Step 1: use parameters from configure-demo-oai.sh to configure demo-oai.sh script"
-    echo "./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $DIR $CN_MODE $GNB_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL"
-    ./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $DIR $CN_MODE $GNB_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL
+    echo "./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $MONITORING $FLEXRIC $LOCAL_INTERFACE $DIR $CN_MODE $GNB_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL"
+    ./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $MONITORING $FLEXRIC $LOCAL_INTERFACE $DIR $CN_MODE $GNB_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL
     echo "Step 2: configure OAI5G charts to match the target scenario"
     echo "run init"
     ./demo-oai.sh init

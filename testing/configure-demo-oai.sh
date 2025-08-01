@@ -49,9 +49,7 @@ SLICE2_DOWNLINK="200Mbps"
 GNB_ID="0xe020"
 FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f" # default is "8baf473f2f8fd09487cccbd7097c6862"
 OPC="C42449363BBAD02B66D16BC975D77CC1" # default is "8E27B6AF0E692E750F32667A3B14605D"
-RFSIM_IMSI="001010000000006"
-RFSIM_IMSI_UE2="001010000000007"
-RFSIM_IMSI_UE3="001010000000008"
+RFSIM_IMSI="001010000001121"
 
 ##########################################################################################
 TMP="/tmp/tmp.$USER"
@@ -66,7 +64,6 @@ function update() {
     LOGS=$1; shift # boolean in [true, false]
     PCAP=$1; shift # boolean in [true, false]
     MONITORING=$1; shift # boolean in [true, false]
-    FLEXRIC=$1; shift # boolean
     LOCAL_INTERFACE=$1; shift
     PREFIX_DEMO=$1; shift
     CN_MODE=$1; shift
@@ -82,7 +79,6 @@ function update() {
     LOGS="${LOGS,,}"
     PCAP="${PCAP,,}"
     MONITORING="${MONITORING,,}"
-    FLEXRIC="${FLEXRIC,,}"
 
     if [[ "$CN_MODE" = "advance" ]]; then
 	mode="advance"
@@ -103,7 +99,6 @@ s|@DEF_GNB_MODE@|$GNB_MODE|
 s|@DEF_LOGS@|$LOGS|
 s|@DEF_PCAP@|$PCAP|
 s|@DEF_MONITORING@|$MONITORING|
-s|@DEF_FLEXRIC@|$FLEXRIC|
 s|@DEF_LOCAL_INTERFACE@|$LOCAL_INTERFACE|
 s|@DEF_MCC@|${MCC}|g
 s|@DEF_MNC@|${MNC}|g
@@ -134,8 +129,6 @@ s|@DEF_GNB_ID@|${GNB_ID}|
 s|@DEF_FULL_KEY@|${FULL_KEY}|g
 s|@DEF_OPC@|${OPC}|g
 s|@DEF_RFSIM_IMSI@|${RFSIM_IMSI}|g
-s|@DEF_RFSIM_IMSI_UE2@|${RFSIM_IMSI_UE2}|g
-s|@DEF_RFSIM_IMSI_UE3@|${RFSIM_IMSI_UE3}|g
 s|@DEF_PREFIX_DEMO@|$PREFIX_DEMO|
 s|@MODE@|$MODE|g
 s|@mode@|$mode|g
@@ -163,8 +156,8 @@ EOF
 
 }
 
-if test $# -ne 19; then
-    echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap monitoring flexric local_interface prefix_demo cn_mode gnb_mode DNN0 DNN1 regcred_name regcred_password regcred_email "
+if test $# -ne 18; then
+    echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap monitoring local_interface prefix_demo cn_mode gnb_mode DNN0 DNN1 regcred_name regcred_password regcred_email "
     exit 1
 else
     shift
