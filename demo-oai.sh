@@ -767,7 +767,7 @@ function configure-gnb() {
 	SDR_ADDRS=$(eval echo \"\${ADDRS_$RRU}\")
 	MULTUS_GNB_RU1="true"
 	MTU_GNB_RU1="$MTU_n3xx"
-	MULTUS_GNB_RU2="true"
+	MULTUS_GNB_RU2="false"
 	MTU_GNB_RU2="$MTU_n3xx"
 	RRU_TYPE="n3xx"
 	ADD_OPTIONS_GNB="$OPTIONS_n3xx"
