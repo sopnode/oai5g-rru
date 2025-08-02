@@ -520,6 +520,7 @@ GNB_REPO_aw2s="${R2LAB_REPO}/oai-gnb-aw2s"
 GNB_TAG_aw2s="${RAN_TAG}"
 #
 CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz-redcap.conf"
+#CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz-redcap.conf"
 #CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 #CONF_jaguar="gnb.sa.band78.133prb.aw2s.dddsu.50MHz.conf"
 CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
