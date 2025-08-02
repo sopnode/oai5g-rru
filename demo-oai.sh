@@ -519,12 +519,12 @@ ADDRS_n320="addr=192.168.235.105"
 GNB_REPO_aw2s="${R2LAB_REPO}/oai-gnb-aw2s"
 GNB_TAG_aw2s="${RAN_TAG}"
 #
-CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz-redcap.conf"
-#CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
+#CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz-redcap.conf"
+CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 #CONF_jaguar="gnb.sa.band78.133prb.aw2s.dddsu.50MHz.conf"
 CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 #CONF_DU_jaguar="du.sa.band78.133prb.aw2s.dddsuu.50MHz.conf"
-3CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.1x1.conf" # to test with redcap qhats based on RG255C-GL (qhat20/21/22/23)
+#CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.1x1.conf" # to test with redcap qhats based on RG255C-GL (qhat20/21/22/23)
 #CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.conf" # to test with redcap qhats based on RG255C-GL (qhat20/21/22/23)
 CONF_panther="${CONF_jaguar}"
 CONF_DU_panther="${CONF_DU_jaguar}"
