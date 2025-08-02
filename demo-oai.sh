@@ -509,8 +509,10 @@ else
     IP_GNB_N320_2="192.168.235.99" # hopefully unused...
 fi
 MTU_n3xx="9000"
-ADDRS_n300="addr=192.168.235.103,second_addr=192.168.235.104"
-ADDRS_n320="addr=192.168.235.105,second_addr=192.168.235.106"
+ADDRS_n300="addr=192.168.235.103"
+ADDRS_n320="addr=192.168.235.105"
+#ADDRS_n300="addr=192.168.235.103,second_addr=192.168.235.104"
+#ADDRS_n320="addr=192.168.235.105,second_addr=192.168.235.106"
 
 #### aw2s RU case ####
 #GNB_REPO_aw2s="${OAISA_REPO}/oai-gnb"
