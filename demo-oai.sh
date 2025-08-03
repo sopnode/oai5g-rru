@@ -459,7 +459,7 @@ NETMASK_GNB_RU="24"
 #
 ################## RRU-dependent part ###################
 #
-RU_MODE="static" # in ['static', 'dhcp']
+RU_MODE="dhcp" # in ['static', 'dhcp']
 #
 #### rfsim RU case ####
 #GNB_REPO_rfsim="${OAISA_REPO}/oai-gnb"
@@ -475,6 +475,7 @@ OPTIONS_rfsim="-E --rfsim --log_config.global_log_options level,nocolor,time"
 GNB_REPO_b2xx="${R2LAB_REPO}/oai-gnb"
 GNB_TAG_b2xx="${RAN_TAG}"
 CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210.redcap.conf"
+CONF_DU_b210="du.sa.band78.fr1.51PRB.usrpb210.redcap.conf"
 #CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210.redcap.conf.yaml"
 #CONF_b210="gnb.sa.band78.fr1.106PRB.usrpb210.redcap.conf"
 #CONF_b210="gnb.sa.band78.fr1.106PRB.usrpb210.conf"
@@ -490,7 +491,8 @@ GNB_TAG_n3xx="${RAN_TAG}"
 CONF_n320="gnb.sa.band78.106prb.n310.7ds2u-redcap.conf"
 #CONF_n320="gnb.sa.band78.106prb.usrpn310.ddsuu-2x2.conf"
 #CONF_DU_n320="du.sa.band78.106prb.usrpn310.ddsuu-2x2-new.conf"
-CONF_DU_n320="du.sa.band78.106prb.n310.7ds2u.conf"
+CONF_DU_n320="du.sa.band78.106prb.n310.7ds2u-redcap.conf"
+#CONF_DU_n320="du.sa.band78.106prb.n310.7ds2u.conf"
 #CONF_n300="gnb.sa.band78.106prb.n310.7ds2u.conf"
 CONF_n300="$CONF_n320"
 CONF_DU_n300="$CONF_DU_n320"
@@ -524,7 +526,8 @@ CONF_jaguar="gnb.sa.band78.51prb.aw2s.ddsuu-redcap.conf"
 #CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz-redcap.conf"
 #CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 #CONF_jaguar="gnb.sa.band78.133prb.aw2s.dddsu.50MHz.conf"
-CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
+CONF_DU_jaguar="du.sa.band78.51prb.aw2s.ddsuu-redcap.conf"
+#CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 #CONF_DU_jaguar="du.sa.band78.133prb.aw2s.dddsuu.50MHz.conf"
 #CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.1x1.conf" # to test with redcap qhats based on RG255C-GL (qhat20/21/22/23)
 #CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.conf" # to test with redcap qhats based on RG255C-GL (qhat20/21/22/23)
