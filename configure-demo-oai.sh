@@ -59,8 +59,8 @@ mkdir -p $TMP
 
 function update() {
     NS=$1; shift
-    NODE_AMF_UPF=$1; shift # removed -v100
-    NODE_GNB=$1; shift # removed -v100
+    NODE_AMF_UPF=$1; shift
+    NODE_GNB=$1; shift
     RRU=$1; shift 
     RUN_MODE=$1; shift # in ["full", "gnb-only", "gnb-upf"]
     LOGS=$1; shift # boolean in [true, false]
@@ -84,6 +84,14 @@ function update() {
     MONITORING="${MONITORING,,}"
     FLEXRIC="${FLEXRIC,,}"
 
+    # if node is a sopnode-w or sopnode-l1, add the "-v30" suffix
+    if [[ "$NODE_AMF_UPF" == "sopnode-l1" || "$NODE_AMF_UPF" == "sopnode-w1" ]]; then
+	NODE_AMF_UPF="${NODE_AMF_UPF}-v30"
+    fi
+    if [[ $NODE_GNB == "sopnode-l1" || "$NODE_GNB" == "sopnode-w1" ]]; then
+	NODE_GNB="${NODE_GNB}-v30"
+    fi
+    
     if [[ "$CN_MODE" = "advance" ]]; then
 	mode="advance"
 	MODE="ADVANCE"
