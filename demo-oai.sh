@@ -319,8 +319,8 @@ CN_DEFAULT_GW=""
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 #
-RAN_TAG="Fix_dedicatedBWPsLogs"
-#RAN_TAG="2025.w31" #Fix_dedicatedBWPsLogs"
+#RAN_TAG="Fix_dedicatedBWPsLogs"
+RAN_TAG="2025.w31" # 2025.31 includes Fix_dedicatedBWPs
 #RAN_TAG="2025.w29" # includes "Initial support for RedCap" feature in gNB
 GNB_NAME="gNB-r2lab"
 
