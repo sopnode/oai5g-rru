@@ -1554,6 +1554,10 @@ EOF
     kubectl -n $NS apply -f $TMP/cn5g-pvc.yaml
     fi
 
+    if [[ $FLEXRIC = "true" ]]; then
+	start-flexric
+    fi
+
     if [[ "$RUN_MODE" != "gnb-only" ]]; then
 	start-cn 
     fi
