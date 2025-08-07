@@ -1554,20 +1554,21 @@ EOF
     kubectl -n $NS apply -f $TMP/cn5g-pvc.yaml
     fi
 
+    if [[ "$RUN_MODE" != "gnb-only" ]]; then
+	start-cn 
+    fi
+    
     if [[ $FLEXRIC = "true" ]]; then
 	start-flexric
     fi
 
-    if [[ "$RUN_MODE" != "gnb-only" ]]; then
-	start-cn 
-    fi
     echo "sleep 20s before running RAN pods"; sleep 20
     start-gnb 
 
     if [[ "$RRU" == "rfsim" ]]; then
 	echo "sleep 5s before starting nr-ue and nr-ue2"; sleep 5
 	start-nr-ue
-    start-nr-ue2
+	start-nr-ue2
     fi
 
     echo "****************************************************************************"
@@ -1656,11 +1657,13 @@ function stop() {
 	if [[ "$RUN_MODE" != "gnb-only" ]]; then
 	    stop-cn
 	fi
+	if [[ $FLEXRIC = "true" ]]; then
+	    stop-flexric
+	fi
 	stop-gnb
 	if [[ "$RRU" = "rfsim" ]]; then
 	    stop-nr-ue
-        stop-nr-ue2
-        stop-nr-ue3
+            stop-nr-ue2
 	fi
     else
         echo "OAI5G demo is not running, there is no pod on namespace $NS !"
