@@ -476,7 +476,7 @@ NETMASK_GNB_RU="24"
 RU_MODE="static" # in ['static', 'dhcp']
 #
 #### rfsim RU case ####
-GNB_REPO_rfsim="${OAISA_REPO}/oai-gnb"
+GNB_REPO_rfsim="${R2LAB_REPO}/oai-gnb"
 #GNB_REPO_rfsim="${MY_REPO}/oai-gnb"
 #GNB_TAG_rfsim="${MY_TAG}"
 GNB_TAG_rfsim="${RAN_TAG}"
@@ -486,7 +486,7 @@ OPTIONS_rfsim="-E --rfsim --log_config.global_log_options level,nocolor,time"
 #OPTIONS_rfsim="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
 #
 #### b2xx RU case ####
-GNB_REPO_b2xx="${OAISA_REPO}/oai-gnb"
+GNB_REPO_b2xx="${R2LAB_REPO}/oai-gnb"
 #GNB_REPO_b2xx="${MY_REPO}/oai-gnb"
 GNB_TAG_b2xx="${RAN_TAG}"
 #GNB_TAG_b2xx="${MY_TAG}"
@@ -496,7 +496,7 @@ CONF_b210="gnb.sa.band78.fr1.106PRB.usrpb210.conf"
 OPTIONS_b2xx="-E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 
 #### n3xx RU case ####
-GNB_REPO_n3xx="${OAISA_REPO}/oai-gnb"
+GNB_REPO_n3xx="${R2LAB_REPO}/oai-gnb"
 #GNB_REPO_n3xx="${MY_REPO}/oai-gnb"
 GNB_TAG_n3xx="${RAN_TAG}"
 #GNB_TAG_n3xx="${MY_TAG}"
@@ -527,13 +527,13 @@ ADDRS_n300="addr=192.168.235.103,second_addr=192.168.235.104"
 ADDRS_n320="addr=192.168.235.105"
 
 #### aw2s RU case ####
-GNB_REPO_aw2s="${OAISA_REPO}/oai-gnb"
+GNB_REPO_aw2s="${R2LAB_REPO}/oai-gnb-aw2s"
 #GNB_REPO_aw2s="${MY_REPO}/oai-gnb-aw2s"
 GNB_TAG_aw2s="${RAN_TAG}"
 #GNB_TAG_aw2s="${MY_TAG}"
 #
-CONF_jaguar="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.conf"
-#CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
+#CONF_jaguar="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.conf"
+CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 #CONF_jaguar="gnb.sa.band78.133prb.aw2s.dddsu.50MHz.conf"
 CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
 #CONF_DU_jaguar="du.sa.band78.133prb.aw2s.dddsuu.50MHz.conf"
