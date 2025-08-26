@@ -522,7 +522,7 @@ else
     IP_GNB_N320_1="$IP_GNB_N300_1"
     IP_GNB_N320_2="$IP_GNB_N300_2"
 fi
-MTU_n3xx="9216"
+MTU_n3xx="9000"
 ADDRS_n300="addr=192.168.235.103,second_addr=192.168.235.104"
 ADDRS_n320="addr=192.168.235.105"
 
@@ -839,7 +839,6 @@ function configure-gnb() {
     elif [[ "$RRU" = "jaguar" || "$RRU" = "panther" ]]; then
 	ADDR_aw2s=$(eval echo \"\${ADDR_$RRU}\")
 	MULTUS_GNB_RU1="true"
-    MTU_GNB_RU1="$MTU_n3xx"
 	MULTUS_GNB_RU2="false"
 	RRU_TYPE="aw2s"
 	ADD_OPTIONS_GNB="$OPTIONS_aw2s"
