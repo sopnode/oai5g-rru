@@ -555,7 +555,7 @@ CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x4-benetel550.conf"
 CONF_DU_benetel1=""
 CONF_benetel2="${CONF_benetel1}"
 CONF_DU_benetel2="${CONF_DU_benetel1}"
-OPTIONS_benetel="--thread-pool 9,11,13,15,17,19,21,23 --log_config.global_log_options level,nocolor,time"
+OPTIONS_benetel="--thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
 if [[ $RU_MODE = "dhcp" ]]; then
     IP_GNB_benetel1="dhcp"
     IP_GNB_benetel2="dhcp"
@@ -563,6 +563,7 @@ else
     IP_GNB_benetel1="192.168.233.104" # @IP ADDR_jaguar + 3
     IP_GNB_benetel2="192.168.233.105" # @IP ADDR_panther + 3
 fi
+MTU_benetel="9600"
 ADDR_benetel1="192.168.233.101" 
 ADDR_benetel2="192.168.233.102"
 MAC_benetel1="8c:1f:64:d1:12:8c"
@@ -875,6 +876,7 @@ function configure-gnb() {
     elif [[ "$RRU" = "benetel1" || "$RRU" = "benetel2" ]]; then
 	ADDR_benetel=$(eval echo \"\${ADDR_$RRU}\")
 	MULTUS_GNB_RU1="true"
+	MTU_GNB_RU1="$MTU_benetel"
 	MULTUS_GNB_RU2="false"
 	RRU_TYPE="benetel"
 	ADD_OPTIONS_GNB="$OPTIONS_benetel"
