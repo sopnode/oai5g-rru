@@ -553,7 +553,7 @@ GNB_TAG_benetel="${RAN_TAG}"
 CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x4-benetel550.conf"
 #CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x2-benetel550.conf"
 CONF_DU_benetel1=""
-CONF_benetel2="${CONF_benetel2}"
+CONF_benetel2="${CONF_benetel1}"
 CONF_DU_benetel2="${CONF_DU_benetel1}"
 OPTIONS_benetel="--thread-pool 9,11,13,15,17,19,21,23 --log_config.global_log_options level,nocolor,time"
 if [[ $RU_MODE = "dhcp" ]]; then
@@ -561,7 +561,7 @@ if [[ $RU_MODE = "dhcp" ]]; then
     IP_GNB_benetel2="dhcp"
 else
     IP_GNB_benetel1="192.168.233.104" # @IP ADDR_jaguar + 3
-    IP_GNB_benetel2="10.10.0.105" # @IP ADDR_panther + 3
+    IP_GNB_benetel2="192.168.233.105" # @IP ADDR_panther + 3
 fi
 ADDR_benetel1="192.168.233.101" 
 ADDR_benetel2="192.168.233.102"
@@ -882,10 +882,10 @@ function configure-gnb() {
 	IF_NAME_GNB_RU1="$IF_NAME_VLAN_BENETEL"
 	if [[ "$RRU" = "benetel1" ]]; then
 	    IP_GNB_RU1="$IP_GNB_benetel1"
-	    MAC_BENETEL="$MAC_BENETEL1"
+	    MAC_BENETEL="$MAC_benetel1"
 	else
 	    IP_GNB_RU1="$IP_GNB_benetel2"
-	    MAC_BENETEL="$MAC_BENETEL2"
+	    MAC_BENETEL="$MAC_benetel2"
 	fi
 	
     elif [[ "$RRU" = "rfsim" ]]; then
