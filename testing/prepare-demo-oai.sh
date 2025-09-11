@@ -5,7 +5,7 @@
 #
 
 # server used for following OAI5G functions
-HOST_AMF_UPF="10.10.3.200" # IP adress of the AMF
+HOST_AMF_UPF="10.10.3.200" # IP address of the AMF
 HOST_GNB="precision-7530" # name of the Kubernetes node on which the gnb will be deployed
 
 # k8s namespace
@@ -27,9 +27,11 @@ CN_MODE="advance"
 RUN_MODE="gnb-only"
 
 # RAN options
+RRU="benetel1"
+#RRU="benetel2"
 #RRU="jaguar"
 #RRU="panther"
-RRU="rfsim"
+#RRU="rfsim"
 #RRU="b210"
 #RRU="n300"
 #RRU="n320"
