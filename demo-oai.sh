@@ -1427,6 +1427,13 @@ function start-gnb() {
     echo "cd $OAI5G_RAN"
     cd "$OAI5G_RAN"
 
+    if [[ $FLEXRIC == "true" ]]; then
+	FLEXRIC_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-flexric" -o jsonpath="{.items[*].status.podIP}")
+	# Set the FLEXRIC_IP parameter in the gnb chart
+	echo "sed set flexrichost parameter to $FLEXRIC_IP in ${OAI5G_RAN}/oai-gnb/values.yaml"
+	sed -i "s/flexrichost:.*/flexrichost: \"$FLEXRIC_IP\"/" ${OAI5G_RAN}/oai-gnb/values.yaml
+    fi
+
     if [[ $GNB_MODE = 'monolithic' ]]; then
 	echo "helm -n $NS install oai-gnb oai-gnb/"
 	helm -n $NS install oai-gnb oai-gnb/
