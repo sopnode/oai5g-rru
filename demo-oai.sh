@@ -563,7 +563,7 @@ else
     IP_GNB_benetel1="192.168.233.104" # @IP ADDR_jaguar + 3
     IP_GNB_benetel2="192.168.233.105" # @IP ADDR_panther + 3
 fi
-MTU_benetel="9600"
+MTU_benetel="9216"
 ADDR_benetel1="192.168.233.101" 
 ADDR_benetel2="192.168.233.102"
 MAC_benetel1="8c:1f:64:d1:12:8c"
