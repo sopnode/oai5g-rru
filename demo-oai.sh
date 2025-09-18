@@ -564,6 +564,12 @@ else
     IP_GNB_benetel2="192.168.233.105" # @IP ADDR_panther + 3
 fi
 MTU_benetel="9216"
+VLAN_RU1="1"
+CPLANE_MAC_RU1="00:11:22:33:44:67"
+UPLANE_MAC_RU1="00:11:22:33:44:66"
+SRIOV_NS="openshift-sriov-network-operator"
+SRIOV_RN_CPLANE="ruvfioc"
+SRIOV_RN_UPLANE="ruvfioc"
 ADDR_benetel1="192.168.233.101" 
 ADDR_benetel2="192.168.233.102"
 MAC_benetel1="8c:1f:64:d1:12:8c"
@@ -883,10 +889,8 @@ function configure-gnb() {
 	QOS_GNB_DEF="true"
 	IF_NAME_GNB_RU1="$IF_NAME_VLAN_BENETEL"
 	if [[ "$RRU" = "benetel1" ]]; then
-	    IP_GNB_RU1="$IP_GNB_benetel1"
 	    MAC_BENETEL="$MAC_benetel1"
 	else
-	    IP_GNB_RU1="$IP_GNB_benetel2"
 	    MAC_BENETEL="$MAC_benetel2"
 	fi
 	
@@ -1051,6 +1055,12 @@ s|@MAC_GNB_RU1@|$(gener-mac)|
 s|@GW_GNB_RU1@|$GW_GNB_RU1|
 s|@MTU_GNB_RU1@|$MTU_GNB_RU1|
 s|@IF_NAME_GNB_RU1@|$IF_NAME_GNB_RU1|
+s|@VLAN_RU1@|$VLAN_RU1|
+s|@CPLANE_MAC_RU1@|$CPLANE_MAC_RU1|
+s|@UPLANE_MAC_RU1@|$UPLANE_MAC_RU1|
+s|@SRIOV_NS@|$SRIOV_NS|
+s|@SRIOV_RN_CPLANE@|$SRIOV_RN_CPLANE|
+s|@SRIOV_RN_UPLANE@|$SRIOV_RN_UPLANE|
 s|@MULTUS_GNB_RU2@|$MULTUS_GNB_RU2|
 s|@IP_GNB_RU2@|$IP_GNB_RU2|
 s|@NETMASK_GNB_RU2@|$NETMASK_GNB_RU|
