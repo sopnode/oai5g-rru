@@ -334,7 +334,7 @@ R2LAB_REPO="docker.io/r2labuser"
 MY_REPO="ghcr.io/ziyad-mabrouk/openairinterface5g"
 #
 #RAN_TAG="2024.w25"
-RAN_TAG="2025.w34"
+RAN_TAG="2025.w36"
 GNB_NAME="gNB-r2lab"
 
 # DU/CU SPLIT parameters
@@ -547,7 +547,7 @@ ADDR_jaguar="192.168.236.101"
 ADDR_panther="192.168.236.103"
 
 #### benetel RU case ####
-GNB_REPO_benetel="${OAISA_REPO}/oai-gnb"
+GNB_REPO_benetel="${OAISA_REPO}/oai-gnb-fhi72"
 GNB_TAG_benetel="${RAN_TAG}"
 #
 CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x4-benetel550.conf"
