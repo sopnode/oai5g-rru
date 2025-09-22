@@ -908,7 +908,8 @@ function configure-gnb() {
     
     GNB_REPO=$(eval echo \"\${GNB_REPO_$RRU_TYPE}\")
     GNB_TAG=$(eval echo \"\${GNB_TAG_$RRU_TYPE}\")
-    GNB_NAME="${GNB_NAME}_${RRU}"
+    #GNB_NAME="${GNB_NAME}_${RRU}"
+    GNB_NAME="${RRU}"
     NAME_GNB_DU="${NAME_GNB_DU}-${RRU}"
 
     if [[ $GNB_MODE = 'monolithic' ]]; then
