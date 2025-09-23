@@ -1,0 +1,13 @@
+digraph asynciojobs{
+compound=true;
+graph [];
+1 [style="rounded",label="1: root@faraday.inria.fr
+rhubarbe leases --check",shape="box",color="red",penwidth="2"]
+2 [style="rounded",label="2: root@fit01
+RunScript: demo-oai.sh init",shape="box",penwidth="0.5"]
+1 -> 2;
+3 [style="rounded",label="3: root@fit01
+rm -rf oai5g-rru; git clone --branch rg255c https://github.com/sopnode/oai5g-rru.git; cp oai5g-rru/demo-oai.sh /root/; chmod a+x /root/demo-oai.sh; cp oai5g-rru/configure-demo-oai.sh /root/; cp oai5g-rru/testing/logs.sh /root/; cp oai5g-rru/testing/run-iperf-server.sh /root/; /root/configure-demo-oai.sh update oai5g sopnode-w1 pc01 b210 full True False /root advance monolithic internet streaming r2labuser r2labuser-pwd r2labuser@turletti.com ; rm -rf oai-cn5g-fed; git clone --branch rg255c https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git
+/root/demo-oai.sh configure-all",shape="box",color="red",penwidth="2"]
+2 -> 3;
+}
