@@ -552,7 +552,7 @@ GNB_TAG_benetel="${RAN_TAG}"
 #
 CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x4-benetel550.conf"
 #CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x2-benetel550.conf"
-CONF_DU_benetel1=""
+CONF_DU_benetel1="du.sa.band78.273prb.fhi72.4x4-benetel550.conf"
 CONF_benetel2="${CONF_benetel1}"
 CONF_DU_benetel2="${CONF_DU_benetel1}"
 OPTIONS_benetel="--thread-pool 1,3,5,7,9,11,13,15 --log_config.global_log_options level,nocolor,time"
