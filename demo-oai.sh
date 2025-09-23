@@ -1001,28 +1001,6 @@ EOF
 
     # Configure gNB values.yaml charts
 
-    if [[ $GNB_MODE == 'monolithic' ]]; then
-        GNB_PULL_POLICY="Always" # for testing purposes
-        # if $MONITORING is true, create and start prometheus log parser container (for now, available only for monolithic gnb)
-        if [[ $MONITORING == "true" ]]; then
-            echo "MONITORING is set to True. A prometheus log parser container will be created besides the gnb"
-        fi
-        if [[ $FLEXRIC == "true" ]]; then
-            echo "FLEXRIC is set to True. FlexRIC configurations will be applied"
-        fi
-        cat >> "$SED_VALUES_FILE" <<EOF
-s|@METRICS_PARSER_CONTAINER@|$MONITORING|
-s|@GNB_PULL_POLICY@|$GNB_PULL_POLICY|
-s|@FLEXRIC@|$FLEXRIC|
-s|@HOST_FLEXRIC@|oai-flexric|
-EOF
-    ORIG_CHART="${OAI5G_RAN}/oai-gnb/values.yaml"
-	cp ${ORIG_CHART} $TMP/oai-gnb_values.yaml-orig
-	echo "(Over)writing $ORIG_CHART"
-	sed -f "$SED_VALUES_FILE" < $TMP/oai-gnb_values.yaml-orig > ${ORIG_CHART}
-	diff $TMP/oai-gnb_values.yaml-orig ${ORIG_CHART}
-    fi
-
     if [[ ! -z $SLICE1_SD ]]; then
 	    SED_SD1="s|@SD1@|0x$SLICE1_SD|"
     fi
@@ -1199,6 +1177,10 @@ s|@HOST_CUCP@|$HOST_CUCP|
 s|@QOS_CUUP_DEF@|$QOS_CUUP_DEF|
 s|@CU_HOST@|$CU_HOST|
 s|@NODE_CUUP@|$NODE_CUUP|
+
+s|@METRICS_PARSER_CONTAINER@|$MONITORING|
+s|@FLEXRIC@|$FLEXRIC|
+s|@HOST_FLEXRIC@|oai-flexric|
 EOF
     for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
 	ORIG_CHART="${OAI5G_RAN}/${nf}/values.yaml"
