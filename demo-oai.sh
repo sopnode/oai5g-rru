@@ -574,8 +574,8 @@ ADDR_benetel1="192.168.233.101"
 ADDR_benetel2="192.168.233.102"
 MAC_benetel1="8c:1f:64:d1:12:8c"
 MAC_benetel2="8c:1f:64:d1:12:50"
-DPDK_VF1="3a:11.0" # for sopnode-f3
-DPDK_VF2="3a:11.1" # for sopnode-f3
+DPDK_VF_U="0000:3a:11.0" # for sopnode-f3 U_PLANE
+DPDK_VF_C="0000:3a:11.1" # for sopnode-f3 C_PLANE
 
 
 
@@ -957,8 +957,8 @@ s|@TAC@|$TAC|
 s|plmn_list.*|plmn_list = $PLMN_LIST|
 s|@AW2S_IP_ADDRESS@|$ADDR_aw2s|
 s|@MAC_BENETEL@|$MAC_BENETEL|g
-s|@DPDK_VF1@|$DPDK_VF1|
-s|@DPDK_VF2@|$DPDK_VF2|
+s|@DPDK_VF_U@|$DPDK_VF_U|
+s|@DPDK_VF_C@|$DPDK_VF_C|
 s|@GNB_AW2S_LOCAL_IF_NAME@|$IF_NAME_GNB_RU1|
 s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
 EOF
