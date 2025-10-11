@@ -333,8 +333,9 @@ OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 MY_REPO="ghcr.io/ziyad-mabrouk/openairinterface5g"
 #
-#RAN_TAG="2024.w25"
-RAN_TAG="2025.w36"
+RAN_TAG="2025.w41" # 2025.w40 should fix Benetel crashes
+#  segfault in openair1/SCHED_NR/nr_ru_procedures.c (triggered by
+#  do_precoding=0 and null buffer dereference during TX precoding)
 GNB_NAME="gNB-r2lab"
 
 # DU/CU SPLIT parameters
