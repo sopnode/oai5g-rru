@@ -548,10 +548,18 @@ ADDR_jaguar="192.168.236.101"
 ADDR_panther="192.168.236.103"
 
 #### benetel RU case ####
-GNB_REPO_benetel="${OAISA_REPO}/oai-gnb-fhi72"
+#GNB_REPO_benetel="${OAISA_REPO}/oai-gnb-fhi72"
 #GNB_TAG_benetel="${RAN_TAG}"
-#GNB_TAG_benetel="2024.w44" # FOR NOW...
-GNB_TAG_benetel="develop" # 
+
+### for debug in progres...
+
+#GNB_REPO_benetel="${OAISA_REPO}/oai-gnb-fhi72"
+#GNB_TAG_benetel="develop"
+#GNB_TAG_benetel="2024.w44" # NO SEGMENTATION FAULT WITH THIS VERSION
+
+GNB_REPO_benetel="${R2LAB_REPO}/oai-gnb-fhi72"
+GNB_TAG_benetel="2025.w40" # latest home-made compil on rocky linux
+
 #
 #CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x4-benetel550-2024.w44.conf"
 
