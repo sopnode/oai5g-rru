@@ -550,12 +550,12 @@ ADDR_panther="192.168.236.103"
 #### benetel RU case ####
 GNB_REPO_benetel="${OAISA_REPO}/oai-gnb-fhi72"
 #GNB_TAG_benetel="${RAN_TAG}"
-#GNB_TAG_benetel="2024.w44" # FOR NOW...
-GNB_TAG_benetel="develop" # 
+GNB_TAG_benetel="2024.w44" # FOR NOW...
+#GNB_TAG_benetel="develop" # 
 #
-#CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x4-benetel550-2024.w44.conf"
+CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x4-benetel550-2024.w44.conf"
 
-CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x4-benetel550.conf"
+#CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x4-benetel550.conf"
 #CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x2-benetel550.conf"
 CONF_DU_benetel1="du.sa.band78.273prb.fhi72.4x4-benetel550.conf"
 CONF_benetel2="${CONF_benetel1}"
