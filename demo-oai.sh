@@ -84,7 +84,7 @@ IF_NAME_VLAN_N320_1="net-n320.1"
 IF_NAME_VLAN_N320_2="net-n320.2"
 IF_NAME_VLAN_JAGUAR="net-jaguar"
 IF_NAME_VLAN_PANTHER="net-panther"
-IF_NAME_VLAN_BENETEL="ens15f2" # on sopnode-f3
+IF_NAME_VLAN_BENETEL="ens15f1" # on sopnode-f3
 
 
 
@@ -578,7 +578,7 @@ else
     IP_GNB_benetel2="192.168.233.105" # @IP ADDR_panther + 3
 fi
 MTU_benetel="9216"
-VLAN_RU1="1"
+VLAN_RU1="801"
 CPLANE_MAC_RU1="00:11:22:33:44:67"
 UPLANE_MAC_RU1="00:11:22:33:44:66"
 SRIOV_NS="sriov-network-operator"
@@ -588,8 +588,8 @@ ADDR_benetel1="192.168.233.101"
 ADDR_benetel2="192.168.233.102"
 MAC_benetel1="8c:1f:64:d1:12:8c"
 MAC_benetel2="8c:1f:64:d1:12:50"
-DPDK_VF_U="0000:3a:11.0" # for sopnode-f3 U_PLANE
-DPDK_VF_C="0000:3a:11.1" # for sopnode-f3 C_PLANE
+DPDK_VF_U="0000:3a:09.0" # for sopnode-f3 U_PLANE
+DPDK_VF_C="0000:3a:09.1" # for sopnode-f3 C_PLANE
 
 
 
