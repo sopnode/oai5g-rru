@@ -554,7 +554,7 @@ ADDR_panther="192.168.236.103"
 ### for debug in progress...
 
 GNB_REPO_benetel="${OAISA_REPO}/oai-gnb-fhi72"
-GNB_TAG_benetel="develop"
+GNB_TAG_benetel="2025.w40"
 #GNB_TAG_benetel="2024.w44" # NO SEGMENTATION FAULT WITH THIS VERSION
 
 #GNB_REPO_benetel="${R2LAB_REPO}/oai-gnb-fhi72"
