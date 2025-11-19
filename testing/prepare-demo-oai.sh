@@ -5,11 +5,11 @@
 #
 
 # server used for following OAI5G functions
-HOST_AMF_UPF="10.10.3.200" # IP address of the AMF
-HOST_GNB="sopnode-f1" # name of the Kubernetes node on which the gnb will be deployed
+HOST_AMF_UPF="sopnode-f3" # "10.10.3.200" # IP address of the AMF
+HOST_GNB="sopnode-f3" # name of the Kubernetes node on which the gnb will be deployed
 
 # k8s namespace
-NS="open5gs"
+NS="oai"
 
 # Repo/Branch/TAG for code
 REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
@@ -22,9 +22,9 @@ CN_MODE="advance"
 #CN_MODE="basic"
 
 # oai5g-rru running mode
-#RUN_MODE="full"
+RUN_MODE="full"
 #RUN_MODE="gnb-upf"
-RUN_MODE="gnb-only"
+#RUN_MODE="gnb-only"
 
 # RAN options
 RRU="benetel1"
