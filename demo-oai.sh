@@ -84,7 +84,7 @@ IF_NAME_VLAN_N320_1="net-n320.1"
 IF_NAME_VLAN_N320_2="net-n320.2"
 IF_NAME_VLAN_JAGUAR="net-jaguar"
 IF_NAME_VLAN_PANTHER="net-panther"
-IF_NAME_VLAN_BENETEL="ens15f1" # on sopnode-f3
+IF_NAME_VLAN_BENETEL="ens15f1np1" # on sopnode-f3
 
 
 
