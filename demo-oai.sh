@@ -578,12 +578,13 @@ else
     IP_GNB_benetel2="192.168.233.105" # @IP ADDR_panther + 3
 fi
 MTU_benetel="9216"
-VLAN_RU1="801"
 CPLANE_MAC_RU1="00:11:22:33:44:67"
 UPLANE_MAC_RU1="00:11:22:33:44:66"
 SRIOV_NS="sriov-network-operator"
 SRIOV_RN_CPLANE="ruvfioc"
 SRIOV_RN_UPLANE="ruvfiou"
+VLAN_benetel1="801"
+VLAN_benetel2="802"
 ADDR_benetel1="192.168.233.101" 
 ADDR_benetel2="192.168.233.102"
 MAC_benetel1="8c:1f:64:d1:12:8c"
@@ -904,8 +905,10 @@ function configure-gnb() {
 	IF_NAME_GNB_RU1="$IF_NAME_VLAN_BENETEL"
 	if [[ "$RRU" = "benetel1" ]]; then
 	    MAC_BENETEL="$MAC_benetel1"
+	    VLAN_RU1="$VLAN_benetel1"
 	else
 	    MAC_BENETEL="$MAC_benetel2"
+	    VLAN_RU1="$VLAN_benetel2"
 	fi
 	
     elif [[ "$RRU" = "rfsim" ]]; then
