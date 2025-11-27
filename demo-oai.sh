@@ -1151,16 +1151,21 @@ function start-cn() {
     fi
 
     echo "helm --namespace=$NS install oai-5g-@mode@ ."
-    if ! helm --create-namespace --namespace="$NS" install oai-5g-@mode@ .; then
+    if ! helm --create-namespace --namespace="$NS" install oai-5g-@mode@ . --wait --timeout=300s; then
         echo "Error: Failed to install helm chart"
         exit 1
     fi
 
     echo "Wait until all 5G Core pods are READY"
-    if ! kubectl wait pod -n "$NS" --for=condition=Ready --all --timeout=300s; then
-        echo "Error: Pods did not become ready within timeout"
+    if ! kubectl wait pod \
+        --namespace="$NS" \
+        --for=condition=Ready \
+        --selector='app.kubernetes.io/instance=oai-5g-@mode@' \
+        --timeout=300s; then
+        echo "Error: 5G Core pods did not become ready within timeout"
         exit 1
     fi
+    echo "✔ All 5G Core pods are READY"
 }
 
 #################################################################################
