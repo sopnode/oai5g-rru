@@ -262,10 +262,4 @@ EOF
     cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-tail.sql" >> "$DB"
 }
 
-# ---------------------------------------------------------------------------
-# Main execution
-# ---------------------------------------------------------------------------
-
-update
-
 echo "Generation complete."
