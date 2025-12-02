@@ -195,13 +195,15 @@ generate_dynamic_sql() {
     DEF_OPC="$7"
 
     DB="$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic.sql"
-    echo "Generating database at $DB"
+    cp ${DB} ${DB}.orig
+    AS_DB=${TMP}/TableAS.sql
+    SMSD_DB=${TMP}/TableSMSD.sql
+    rm -f ${AS_DB} ${SMSD_DB}
+    touch ${AS_DB} ${SMSD_DB}
+    echo "Generating new database at $DB"
 
     # 1) Copy static top of file (tables definitions unchanged)
-    sed '/-- Dynamic IPADDRESS Allocation/,$d' \
-        "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-head.sql" > "$DB"
-
-    echo "-- Dynamic IPADDRESS Allocation" >> "$DB"
+    cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-head.sql" > "$DB"
 
     IP=$START_IP
 
@@ -227,7 +229,7 @@ generate_dynamic_sql() {
         else
 	    DNN=${DEF_DNN1}
 	    DNN_PDU_TYPE=${DNN1_PDU_TYPE}
-            SST=${SLICE1_SST}
+            SST=${SLICE2_SST}
             SD=${SLICE2_SD}
             QOS_5QI=${SLICE2_5QI}
             ARP_PRIORITY_LEVEL=${SLICE2_ARP_PRIORITY_LEVEL}
@@ -243,19 +245,28 @@ generate_dynamic_sql() {
         ((IP++))
 
         # AuthenticationSubscription
-        cat >> "$DB" <<EOF
+        cat >> "$AS_DB" <<EOF
 INSERT INTO \`AuthenticationSubscription\` (\`ueid\`, \`authenticationMethod\`, \`encPermanentKey\`, \`protectionParameterId\`, \`sequenceNumber\`, \`authenticationManagementField\`, \`algorithmId\`, \`encOpcKey\`, \`encTopcKey\`, \`vectorGenerationInHss\`, \`n5gcAuthMethod\`, \`rgAuthenticationInd\`, \`supi\`) VALUES
 ('${IMSI}', '5G_AKA', '${DEF_FULL_KEY}', '${DEF_FULL_KEY}', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '${DEF_OPC}', NULL, NULL, NULL, NULL, '${IMSI}');
 EOF
 
         # SessionManagementSubscriptionData
-        cat >> "$DB" <<EOF
+        cat >> "$SMSD_DB" <<EOF
 INSERT INTO \`SessionManagementSubscriptionData\` (\`ueid\`, \`servingPlmnid\`, \`singleNssai\`, \`dnnConfigurations\`) VALUES
 ('${IMSI}', '${DEF_MCC}${DEF_MNC}', '{\"sst\": ${SST}, \"sd\": \"${SD}\"}','{\"${DNN}\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"${DNN_PDU_TYPE}\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": ${QOS_5QI},\"arp\":{\"priorityLevel\": ${ARP_PRIORITY_LEVEL},\"preemptCap\": \"${ARP_PREEMPT_CAP}\",\"preemptVuln\":\"${ARP_PREEMPT_VULN}\"},\"priorityLevel\":${PRIORITY_LEVEL}},\"sessionAmbr\":{\"uplink\":\"${UPLINK}\", \"downlink\":\"${DOWNLINK}\"},\"staticIpAddress\":[{\"ipv4Addr\": \"${IPADDR}\"}]}}');
 EOF
     done
 
-    # tail of DB (indexes, commit)
+    # append AuthenticationSubscription Table
+    cat "$AS_DB" >> "$DB"
+
+    # append in-between empty tables
+    cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-head.sql" >> "$DB"
+
+    # append SessionManagementSubscriptionData Table
+    cat "$SMSD_DB" >> "$DB"
+
+    # append tail of DB (indexes, commit)
     cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-tail.sql" >> "$DB"
 }
 
