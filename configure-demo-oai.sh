@@ -1,15 +1,15 @@
 #!/bin/bash
 
 ##########################################################################################
-#  Configure here the following variables used in demo-oai.sh script and in MYSQL database
-#
+#  Configure here following variables used in demo-oai.sh script and in MYSQL database
+
+
 MCC="001" 
 MNC="01" 
 TAC="1" 
 
-# DNN0 and DNN1 must be set in demo-oai.py or in prepare-demo-oai.sh scripts to configure Quectel UE
-#  if DNN1=="none", configure a single DNN will be configured in the mysql database
-DNN0_PDU_TYPE="IPV4" # XXX "IPV4" or "IPV4V6" ==> In open5gs DNN is internet
+# DNN0 and DNN1 must be initialized in scripts demo-oai.py or in prepare-demo-oai.sh scripts 
+DNN0_PDU_TYPE="IPV4" # XXX "IPV4" or "IPV4V6" 
 DNN1_PDU_TYPE="IPV4" # XXX "IPV4" or "IPV4V6"
 
 # NSSAI (SST,SD) Configuration
@@ -26,12 +26,13 @@ DNN1_PDU_TYPE="IPV4" # XXX "IPV4" or "IPV4V6"
 # - only sst field defined in gnb.conf
 # - "16777215" in nr-ue rfsim scenario
 #
+
 SLICE1_SST="1"
-SLICE1_SD="000001" # "EMPTY" 
+SLICE1_SD="000001" # can also be set to "EMPTY" 
 SLICE1_5QI="9" # non-GBR
 SLICE1_ARP_PRIORITY_LEVEL="8"
-SLICE1_ARP_PREEMPT_CAP="NOT_PREEMPT" # "NOT_PREEMPT" or "MAY_PREEMPT" # to trigger preemption
-SLICE1_ARP_PREEMPT_VULN="PREEMPTABLE" # "PREEMPTABLE" or "NOT_PREEMPT" # preemption vulnerability
+SLICE1_ARP_PREEMPT_CAP="NOT_PREEMPT" # "NOT_PREEMPT" or "MAY_PREEMPT" 
+SLICE1_ARP_PREEMPT_VULN="PREEMPTABLE" # "PREEMPTABLE" or "NOT_PREEMPT" 
 SLICE1_PRIORITY_LEVEL="1"
 SLICE1_UPLINK="20Mbps"
 SLICE1_DOWNLINK="40Mbps"
@@ -41,8 +42,8 @@ SLICE2_SST="1"
 SLICE2_SD="000002"
 SLICE2_5QI="5" # non-GBR
 SLICE2_ARP_PRIORITY_LEVEL="1"
-SLICE2_ARP_PREEMPT_CAP="NOT_PREEMPT" # "NOT_PREEMPT" or "MAY_PREEMPT" # to trigger preemption
-SLICE2_ARP_PREEMPT_VULN="PREEMPTABLE" # "PREEMPTABLE" or "NOT_PREEMPT" # preemption vulnerability
+SLICE2_ARP_PREEMPT_CAP="NOT_PREEMPT" # "NOT_PREEMPT" or "MAY_PREEMPT"
+SLICE2_ARP_PREEMPT_VULN="PREEMPTABLE" # "PREEMPTABLE" or "NOT_PREEMPT"
 SLICE2_PRIORITY_LEVEL="1"
 SLICE2_UPLINK="100Mbps"
 SLICE2_DOWNLINK="200Mbps"
@@ -50,13 +51,13 @@ SLICE2_IP_PREFIX="14.1.1"
 
 
 GNB_ID="0xe020"
-FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f" # default is "8baf473f2f8fd09487cccbd7097c6862"
-OPC="C42449363BBAD02B66D16BC975D77CC1" # default is "8E27B6AF0E692E750F32667A3B14605D"
+FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f" 
+OPC="C42449363BBAD02B66D16BC975D77CC1" 
 RFSIM_IMSI="001010000001121"
 RFSIM_IMSI_UE2="001010000001122"
 RFSIM_IMSI_UE3="001010000001123"
 
-# Dynamic mapping for UEs → slice index
+# Dynamic mapping for UEs → slice index (1 for SLICE1 or 2 for SLICE2)
 
 UE_SLICE_MAP=(
   "0000000001:2"
