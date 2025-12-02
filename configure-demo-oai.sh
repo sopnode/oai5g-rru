@@ -32,15 +32,14 @@ SLICE2_UPLINK="100Mbps"
 SLICE2_DOWNLINK="200Mbps"
 SLICE2_IPV4_PREFIX="14.1.1"
 
-START_IP=11
+START_IP=100       # first IP offset
+MAX_UES=15         # default number of UEs (static list below)
 
 GNB_ID="0xe020"
 FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f"
 OPC="C42449363BBAD02B66D16BC975D77CC1"
 RFSIM_IMSI="001010000001121"
 
-##########################################################################################
-# UE → Slice mapping (modifiable by user)
 UE_SLICE_MAP=(
   "0000000001:1"
   "0000000002:1"
@@ -58,70 +57,99 @@ UE_SLICE_MAP=(
   "0000000014:1"
   "${RFSIM_IMSI:9}:1"
 )
-
 ##########################################################################################
+
 TMP="/tmp/tmp.$USER"
 mkdir -p $TMP
 
-function gen_dynamic_mysql() {
+function gen_mysql_database() {
     PREFIX_DEMO=$1
 
-    SQL_FILE="$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic.sql"
-    mkdir -p "$(dirname "$SQL_FILE")"
-    echo "Generating dynamic MySQL DB → $SQL_FILE"
+    DB_FILE="$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic.sql"
+    mkdir -p "$(dirname $DB_FILE)"
+    rm -f "$DB_FILE"
 
-cat > "$SQL_FILE" <<EOF
--- AUTO GENERATED OAI DB
-START TRANSACTION;
+    echo "Generating dynamic MySQL DB → $DB_FILE"
 
+    #
+    # STATIC TABLE DEFINITIONS (unaltered from original)
+    #
+    cat << 'EOF' >> "$DB_FILE"
+CREATE TABLE IF NOT EXISTS `AuthenticationSubscription` (
+  `ueid` varchar(255) NOT NULL,
+  `authenticationMethod` varchar(255) DEFAULT NULL,
+  `encPermanentKey` varchar(255) DEFAULT NULL,
+  `protectionParameterId` varchar(255) DEFAULT NULL,
+  `sequenceNumber` json DEFAULT NULL,
+  `authenticationManagementField` varchar(255) DEFAULT NULL,
+  `algorithmId` varchar(255) DEFAULT NULL,
+  `encOpcKey` varchar(255) DEFAULT NULL,
+  `encTopcKey` varchar(255) DEFAULT NULL,
+  `vectorGenerationInHss` tinyint(1) DEFAULT NULL,
+  `n5gcAuthMethod` varchar(255) DEFAULT NULL,
+  `rgAuthenticationInd` tinyint(1) DEFAULT NULL,
+  `supi` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ueid`)
+);
+CREATE TABLE IF NOT EXISTS `AccessAndMobilitySubscriptionData` (
+  `ueid` varchar(255) NOT NULL,
+  `subscribedUeAmbr` json DEFAULT NULL,
+  PRIMARY KEY (`ueid`)
+);
+CREATE TABLE IF NOT EXISTS `SessionManagementSubscriptionData` (
+  `ueid` varchar(255) NOT NULL,
+  `singleNssai` json DEFAULT NULL,
+  `dnnConfigurations` json DEFAULT NULL,
+  PRIMARY KEY (`ueid`)
+);
 EOF
 
-    COUNTER=$START_IP
+    #
+    # UE INSERTS (dynamic)
+    #
+    COUNT=0
+    IP=$START_IP
 
     for entry in "${UE_SLICE_MAP[@]}"; do
-        UE_ID=${entry%%:*}
-        SLICE=${entry#*:}
+        (( COUNT == MAX_UES )) && break
 
-        IMSI="${MCC}${MNC}${UE_ID}"
-        SUPI="${IMSI}"
+        IMSI_SUFFIX="${entry%%:*}"
+        SLICE="${entry##*:}"
+
+        IMSI="${MCC}${MNC}${IMSI_SUFFIX}"
 
         if [[ "$SLICE" == "1" ]]; then
-            IP="${SLICE1_IPV4_PREFIX}.${COUNTER}"
-            sst=$SLICE1_SST
-            sd=$SLICE1_SD
-            upl=$SLICE1_UPLINK
-            dwn=$SLICE1_DOWNLINK
-            qfi=$SLICE1_5QI
-            arp=$SLICE1_ARP_PRIORITY_LEVEL
+            SLICE_IPV4_PREFIX="$SLICE1_IPV4_PREFIX"
+            SST="$SLICE1_SST"
+            SD="$SLICE1_SD"
         else
-            IP="${SLICE2_IPV4_PREFIX}.${COUNTER}"
-            sst=$SLICE2_SST
-            sd=$SLICE2_SD
-            upl=$SLICE2_UPLINK
-            dwn=$SLICE2_DOWNLINK
-            qfi=$SLICE2_5QI
-            arp=$SLICE2_ARP_PRIORITY_LEVEL
+            SLICE_IPV4_PREFIX="$SLICE2_IPV4_PREFIX"
+            SST="$SLICE2_SST"
+            SD="$SLICE2_SD"
         fi
 
+        IPADDR="${SLICE_IPV4_PREFIX}.${IP}"
+        ((IP++))
+
         # AuthenticationSubscription
-cat >> "$SQL_FILE" <<EOF
-INSERT INTO AuthenticationSubscription (ueid,authenticationMethod,encPermanentKey,protectionParameterId,sequenceNumber,authenticationManagementField,algorithmId,encOpcKey,encTopcKey,vectorGenerationInHss,n5gcAuthMethod,rgAuthenticationInd,supi)
-VALUES ('$IMSI','5G_AKA','$FULL_KEY','$FULL_KEY','{"sqn": "000000000020", "sqnScheme": "NON_TIME_BASED", "lastIndexes": {"ausf": 0}}', '8000','milenage','$OPC',NULL,NULL,NULL,NULL,'$SUPI');
-EOF
+        echo "INSERT INTO AuthenticationSubscription VALUES" \
+        "('$IMSI','5G_AKA','$FULL_KEY','$FULL_KEY','{\"sqn\":\"000000000020\",\"sqnScheme\":\"NON_TIME_BASED\",\"lastIndexes\":{\"ausf\":0}}'," \
+        "'8000','milenage','$OPC',NULL,NULL,NULL,NULL,'$IMSI');" >> "$DB_FILE"
+
+        # AccessAndMobilitySubscriptionData
+        echo "INSERT INTO AccessAndMobilitySubscriptionData VALUES" \
+        "('$IMSI','{\"uplink\":\"1Gbps\",\"downlink\":\"2Gbps\"}');" >> "$DB_FILE"
 
         # SessionManagementSubscriptionData
-cat >> "$SQL_FILE" <<EOF
-INSERT INTO SessionManagementSubscriptionData (ueid,servingPlmnid,singleNssai,dnnConfigurations)
-VALUES ('$IMSI','${MCC}${MNC}','{"sst": $sst, "sd": "$sd"}','{"internet":{"pduSessionTypes":{"defaultSessionType":"IPV4"},"sscModes":{"defaultSscMode":"SSC_MODE_1"},"5gQosProfile":{"5qi": $qfi,"arp":{"priorityLevel": $arp,"preemptCap":"NOT_PREEMPT","preemptVuln":"PREEMPTABLE"},"priorityLevel":1},"sessionAmbr":{"uplink":"$upl","downlink":"$dwn"},"staticIpAddress":[{"ipv4Addr":"$IP"}]}}');
-EOF
+        echo "INSERT INTO SessionManagementSubscriptionData VALUES" \
+        "('$IMSI','[{\"sst\":$SST,\"sd\":\"$SD\"}]'," \
+        "'{\"${DNN0}\":{\"staticIpAddress\":[{\"ipv4Addr\":\"$IPADDR\"}]}}');" >> "$DB_FILE"
 
-        COUNTER=$((COUNTER+1))
+        ((COUNT++))
     done
 
-echo "COMMIT;" >> "$SQL_FILE"
+    echo "✔ MySQL DB generated"
 }
-
-##########################################################################################
 
 function update() {
     NS=$1; shift
@@ -140,19 +168,35 @@ function update() {
     REGCRED_PWD=$1; shift
     REGCRED_EMAIL=$1; shift
 
+    echo "Configuring demo-oai.sh script"
+    cat > "$TMP"/demo-oai.sed <<EOF
+s|@DEF_NS@|$NS|
+s|@DEF_NODE_AMF_UPF@|$NODE_AMF_UPF|
+s|@DEF_NODE_GNB@|$NODE_GNB|
+s|@DEF_RRU@|$RRU|
+s|@DEF_RUN_MODE@|$RUN_MODE|
+s|@DEF_GNB_MODE@|$GNB_MODE|
+s|@DEF_LOGS@|$LOGS|
+s|@DEF_PCAP@|$PCAP|
+s|@DEF_MCC@|${MCC}|g
+s|@DEF_MNC@|${MNC}|g
+s|@DEF_TAC@|${TAC}|g
+EOF
+
     cp "$PREFIX_DEMO"/demo-oai.sh "$TMP"/demo-oai-orig.sh
-    sed -f "$TMP"/demo-oai.sed < "$TMP"/demo-oai-orig.sh > $PREFIX_DEMO/demo-oai.sh
+    sed -f "$TMP"/demo-oai.sed < "$TMP"/demo-oai-orig.sh > "$PREFIX_DEMO"/demo-oai.sh
+    diff "$TMP"/demo-oai-orig.sh "$PREFIX_DEMO"/demo-oai.sh
 
-    gen_dynamic_mysql "$PREFIX_DEMO"
+    ### NEW ELEGANT DB GENERATION ###
+    gen_mysql_database "$PREFIX_DEMO"
 }
-
-##########################################################################################
 
 if test $# -ne 16; then
     echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap prefix_demo cn_mode gnb_mode DNN0 DNN1 regcred_name regcred_password regcred_email"
     exit 1
 else
     shift
+    echo "Running update with inputs: $@"
     update "$@"
     exit 0
 fi
