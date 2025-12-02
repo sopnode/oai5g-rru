@@ -137,39 +137,131 @@ EOF
     sed -f "$TMP"/demo-oai.sed < "$TMP"/demo-oai-orig.sh > $PREFIX_DEMO/demo-oai.sh
     diff "$TMP"/demo-oai-orig.sh $PREFIX_DEMO/demo-oai.sh
 
-    ##########################################################################
-    # GENERATE MYSQL DATABASE DYNAMICALLY
-    ##########################################################################
-    ORIG_DB="$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-orig.sql"
-    NEW_DB="$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic.sql"
+    #
+    # --- Génération dynamique de oai_db-basic.sql à partir de oai_db-basic-orig.sql ---
+    #
+    DIR_GENERIC_DB="$PREFIX_DEMO/oai5g-rru/patch-mysql"
+    ORIG_SQL="$DIR_GENERIC_DB/oai_db-basic-orig.sql"
+    OUT_SQL="$DIR_GENERIC_DB/oai_db-basic.sql"
+    TMP_SQL="$TMP/oai_db-basic.tmp.sql"
 
-    echo "Generating dynamic MySQL database: $NEW_DB"
-    awk '/INSERT INTO `AuthenticationSubscription`/{exit} {print}' $ORIG_DB > $NEW_DB
+    if [ ! -f "$ORIG_SQL" ]; then
+        echo "ERROR: original SQL template $ORIG_SQL not found. Aborting generation of dynamic DB."
+    else
+        echo "Generating dynamic MySQL initialization file: $OUT_SQL"
 
-    IP=$START_IP
+        # split orig into header (everything before the AUTO_INCREMENT block)
+        awk '/^-- AUTO_INCREMENT for table `SdmSubscriptions`/ { exit } { print }' "$ORIG_SQL" > "$TMP_SQL"
 
-    for entry in "${UE_SLICE_MAP[@]}"; do
-        IMSI=$(echo "$entry" | cut -d: -f1)
-        SLICE=$(echo "$entry" | cut -d: -f2)
-        UEID="${MCC}${MNC}${IMSI}"
+        # now append our generated INSERTs (AuthenticationSubscription + SessionManagementSubscriptionData)
+        echo "" >> "$TMP_SQL"
+        echo "-- Dumping data (generated) for tables AuthenticationSubscription and SessionManagementSubscriptionData" >> "$TMP_SQL"
+        echo "" >> "$TMP_SQL"
 
-        if [[ "$SLICE" == "1" ]]; then
-            SST="$SLICE1_SST"; SD="$SLICE1_SD"
-            PREFIX="$SLICE1_IPV4_PREFIX"
-        else
-            SST="$SLICE2_SST"; SD="$SLICE2_SD"
-            PREFIX="$SLICE2_IPV4_PREFIX"
+        # AuthenticationSubscription INSERTs for UE 0001..0014
+        for i in $(seq -f "%010g" 1 14); do
+            # ueid format: MCC MNC + zero-padded 10-digit index
+            ueid="${MCC}${MNC}${i}"
+            printf "INSERT INTO \`AuthenticationSubscription\` (\`ueid\`, \`authenticationMethod\`, \`encPermanentKey\`, \`protectionParameterId\`, \`sequenceNumber\`, \`authenticationManagementField\`, \`algorithmId\`, \`encOpcKey\`, \`encTopcKey\`, \`vectorGenerationInHss\`, \`n5gcAuthMethod\`, \`rgAuthenticationInd\`, \`supi\`) VALUES\n" >> "$TMP_SQL"
+            printf "('%s', '5G_AKA', '%s', '%s', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '%s', NULL, NULL, NULL, NULL, '%s');\n\n" \
+                "$ueid" "$FULL_KEY" "$FULL_KEY" "$OPC" "$ueid" >> "$TMP_SQL"
+        done
+
+        # Add RFSIM special AuthenticationSubscription (kept as last entry like in original)
+        if [ -n "$RFSIM_IMSI" ]; then
+            printf "INSERT INTO \`AuthenticationSubscription\` (\`ueid\`, \`authenticationMethod\`, \`encPermanentKey\`, \`protectionParameterId\`, \`sequenceNumber\`, \`authenticationManagementField\`, \`algorithmId\`, \`encOpcKey\`, \`encTopcKey\`, \`vectorGenerationInHss\`, \`n5gcAuthMethod\`, \`rgAuthenticationInd\`, \`supi\`) VALUES\n" >> "$TMP_SQL"
+            printf "('%s', '5G_AKA', '%s', '%s', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '%s', NULL, NULL, NULL, NULL, '%s');\n\n" \
+                "$RFSIM_IMSI" "$FULL_KEY" "$FULL_KEY" "$OPC" "$RFSIM_IMSI" >> "$TMP_SQL"
         fi
 
-        IPADDR="$PREFIX.$IP"
-        IP=$((IP + 1))
+        #
+        # SessionManagementSubscriptionData INSERTs
+        #
+        # We'll generate UEs 0001..0014, with IPs starting at START_IP.
+        # Default mapping: UE 7 -> slice2, others -> slice1 (reproduit mapping d'origine).
+        #
+        ip_counter=$START_IP
+        for idx in $(seq 1 14); do
+            ueid="${MCC}${MNC}$(printf "%010d" $idx)"
+            # decide slice: 2 only for idx==7, else 1 (matches original file)
+            if [ "$idx" -eq 7 ]; then
+                slice="2"
+                sst="${SLICE2_SST}"
+                sd="${SLICE2_SD}"
+                fiveqi="${SLICE2_5QI}"
+                arp_prio="${SLICE2_ARP_PRIORITY_LEVEL}"
+                arp_preempt_cap="${SLICE2_ARP_PREEMPT_CAP}"
+                arp_preempt_vuln="${SLICE2_ARP_PREEMPT_VULN}"
+                priority_level="${SLICE2_PRIORITY_LEVEL}"
+                uplink="${SLICE2_UPLINK}"
+                downlink="${SLICE2_DOWNLINK}"
+                prefix="${SLICE2_IPV4_PREFIX}"
+                dnn_pdu="${DNN1_PDU_TYPE}"
+                # choose template block name "streaming" like original for slice2
+                service_name="streaming"
+            else
+                slice="1"
+                sst="${SLICE1_SST}"
+                sd="${SLICE1_SD}"
+                fiveqi="${SLICE1_5QI}"
+                arp_prio="${SLICE1_ARP_PRIORITY_LEVEL}"
+                arp_preempt_cap="${SLICE1_ARP_PREEMPT_CAP}"
+                arp_preempt_vuln="${SLICE1_ARP_PREEMPT_VULN}"
+                priority_level="${SLICE1_PRIORITY_LEVEL}"
+                uplink="${SLICE1_UPLINK}"
+                downlink="${SLICE1_DOWNLINK}"
+                prefix="${SLICE1_IPV4_PREFIX}"
+                dnn_pdu="${DNN0_PDU_TYPE}"
+                service_name="internet"
+            fi
 
-        echo "INSERT INTO AuthenticationSubscription VALUES('$UEID','5G_AKA','$FULL_KEY','$FULL_KEY','{\"sqn\":\"000000000020\",\"sqnScheme\":\"NON_TIME_BASED\",\"lastIndexes\":{\"ausf\":0}}','8000','milenage','$OPC',NULL,NULL,NULL,NULL,'$UEID');" >> $NEW_DB
+            # translate special SD value "EMPTY" -> "FFFFFF" to mimic original behavior
+            if [ "$sd" = "EMPTY" ]; then
+                sd_sql="FFFFFF"
+            else
+                sd_sql="$sd"
+            fi
 
-        echo "INSERT INTO SessionManagementSubscriptionData VALUES('$UEID','${MCC}${MNC}','{\"sst\": $SST, \"sd\": \"$SD\"}','{\"${DNN0}\":{\"pduSessionTypes\":{\"defaultSessionType\":\"${DNN0_PDU_TYPE}\"},\"staticIpAddress\":[{\"ipv4Addr\": \"$IPADDR\"}]}}');" >> $NEW_DB
-    done
+            ip_addr="${prefix}.${ip_counter}"
+            ip_counter=$((ip_counter + 1))
 
-    awk '/ALTER TABLE/{found=1} found {print}' $ORIG_DB >> $NEW_DB
+            # Build dnnConfigurations JSON (kept minimal but matching original keys)
+            # Using single-quoted SQL literal and escaped double quotes inside JSON
+            if [ "$service_name" = "internet" ]; then
+                cat >> "$TMP_SQL" <<EOF
+INSERT INTO \`SessionManagementSubscriptionData\` (\`ueid\`, \`servingPlmnid\`, \`singleNssai\`, \`dnnConfigurations\`) VALUES
+('$ueid', '${MCC}${MNC}', '{\"sst\": ${sst}, \"sd\":\"${sd_sql}\"}',
+'{\"${service_name}\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"${dnn_pdu}\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": ${fiveqi},\"arp\":{\"priorityLevel\": ${arp_prio},\"preemptCap\": \"${arp_preempt_cap}\",\"preemptVuln\":\"${arp_preempt_vuln}\"},\"priorityLevel\":${priority_level}},\"sessionAmbr\":{\"uplink\":\"${uplink}\", \"downlink\":\"${downlink}\"},\"staticIpAddress\":[{\"ipv4Addr\": \"${ip_addr}\"}]}}');
+EOF
+            else
+                # streaming (slice2) template (same structure but can vary)
+                cat >> "$TMP_SQL" <<EOF
+INSERT INTO \`SessionManagementSubscriptionData\` (\`ueid\`, \`servingPlmnid\`, \`singleNssai\`, \`dnnConfigurations\`) VALUES
+('$ueid', '${MCC}${MNC}', '{\"sst\": ${sst}, \"sd\":\"${sd_sql}\"}',
+'{\"${service_name}\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"${dnn_pdu}\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": ${fiveqi},\"arp\":{\"priorityLevel\": ${arp_prio},\"preemptCap\": \"${arp_preempt_cap}\",\"preemptVuln\":\"${arp_preempt_vuln}\"},\"priorityLevel\":${priority_level}},\"sessionAmbr\":{\"uplink\":\"${uplink}\", \"downlink\":\"${downlink}\"},\"staticIpAddress\":[{\"ipv4Addr\": \"${ip_addr}\"}]}}');
+EOF
+            fi
+        done
+
+        # Add RFSIM IMSI SessionManagementSubscriptionData at end (use slice1 by default)
+        if [ -n "$RFSIM_IMSI" ]; then
+            # Use slice1 parameters for RFSIM (matches original example)
+            r_ip="${SLICE1_IPV4_PREFIX}.$((START_IP + 14))"
+            cat >> "$TMP_SQL" <<EOF
+
+INSERT INTO \`SessionManagementSubscriptionData\` (\`ueid\`, \`servingPlmnid\`, \`singleNssai\`, \`dnnConfigurations\`) VALUES
+('$RFSIM_IMSI', '${MCC}${MNC}', '{\"sst\": ${SLICE1_SST}, \"sd\":\"${SLICE1_SD}\"}',
+'{\"${DNN0}\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"${DNN0_PDU_TYPE}\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": ${SLICE1_5QI},\"arp\":{\"priorityLevel\": ${SLICE1_ARP_PRIORITY_LEVEL},\"preemptCap\": \"${SLICE1_ARP_PREEMPT_CAP}\",\"preemptVuln\":\"${SLICE1_ARP_PREEMPT_VULN}\"},\"priorityLevel\":${SLICE1_PRIORITY_LEVEL}},\"sessionAmbr\":{\"uplink\":\"${SLICE1_UPLINK}\", \"downlink\":\"${SLICE1_DOWNLINK}\"},\"staticIpAddress\":[{\"ipv4Addr\": \"${r_ip}\"}]}}');
+EOF
+        fi
+
+        # Finally append the tail of original file (from AUTO_INCREMENT block onward)
+        awk '/^-- AUTO_INCREMENT for table `SdmSubscriptions`/ { flag=1 } flag { print }' "$ORIG_SQL" >> "$TMP_SQL"
+
+        # move temp to final
+        mv "$TMP_SQL" "$OUT_SQL"
+        echo "Dynamic SQL generated at $OUT_SQL"
+    fi
     echo "MySQL generation complete."
 }
 
