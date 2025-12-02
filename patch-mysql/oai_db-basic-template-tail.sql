@@ -1,31 +1,8 @@
+
+
 --
--- Indexes for dumped tables
+-- AUTO_INCREMENT for table `SdmSubscriptions`
 --
-
-ALTER TABLE `AccessAndMobilitySubscriptionData`
-  ADD PRIMARY KEY (`ueid`,`servingPlmnid`) USING BTREE;
-
-ALTER TABLE `Amf3GppAccessRegistration`
-  ADD PRIMARY KEY (`ueid`);
-
-ALTER TABLE `AuthenticationStatus`
-  ADD PRIMARY KEY (`ueid`);
-
-ALTER TABLE `AuthenticationSubscription`
-  ADD PRIMARY KEY (`ueid`);
-
-ALTER TABLE `SdmSubscriptions`
-  ADD PRIMARY KEY (`subsId`,`ueid`) USING BTREE;
-
-ALTER TABLE `SessionManagementSubscriptionData`
-  ADD PRIMARY KEY (`ueid`,`servingPlmnid`) USING BTREE;
-
-ALTER TABLE `SmfRegistrations`
-  ADD PRIMARY KEY (`ueid`,`subpduSessionId`) USING BTREE;
-
-ALTER TABLE `SmfSelectionSubscriptionData`
-  ADD PRIMARY KEY (`ueid`,`servingPlmnid`) USING BTREE;
-
 ALTER TABLE `SdmSubscriptions`
   MODIFY `subsId` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;

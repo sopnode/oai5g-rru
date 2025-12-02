@@ -1,3 +1,12 @@
+-- phpMyAdmin SQL Dump
+-- version 5.1.0
+-- https://www.phpmyadmin.net/
+--
+-- Host: 172.16.200.10:3306
+-- Generation Time: Mar 22, 2021 at 10:31 AM
+-- Server version: 5.7.33
+-- PHP Version: 7.4.15
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -136,4 +145,7 @@ CREATE TABLE `AuthenticationSubscription` (
   `supi` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- DYNAMIC INSERTS WILL BE GENERATED HERE
+--
+-- Dumping data for table `AuthenticationSubscription`
+--
+
