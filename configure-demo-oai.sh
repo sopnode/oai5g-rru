@@ -262,4 +262,13 @@ EOF
     cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-tail.sql" >> "$DB"
 }
 
-echo "Generation complete."
+
+if test $# -ne 16; then
+    echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap prefix_demo cn_mode gnb_mode DNN0 DNN1 regcred_name regcred_password regcred_email "
+    exit 1
+else
+    shift
+    echo "Running update with inputs: $@"
+    update "$@"
+    exit 0
+fi
