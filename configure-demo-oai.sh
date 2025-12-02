@@ -7,48 +7,36 @@ MCC="001"
 MNC="01" 
 TAC="1" 
 
-# DNN0 and DNN1 must be set in demo-oai.py or in prepare-demo-oai.sh scripts to configure Quectel UE
-#  if DNN1=="none", configure a single DNN will be configured in the mysql database
-DNN0_PDU_TYPE="IPV4" # XXX "IPV4" or "IPV4V6" ==> In open5gs DNN is internet
-DNN1_PDU_TYPE="IPV4" # XXX "IPV4" or "IPV4V6"
+DNN0_PDU_TYPE="IPV4"
+DNN1_PDU_TYPE="IPV4"
 
-# NSSAI (SST,SD) Configuration
-#
-# NOTA on SD format encoding in the charts
-# - in mysql database, SD field is a string/hexadecimal without 0x prefix,
-#    and encoded with the format: \"ABCDEF\"
-# - in gNB configmaps sd format should include 0x prexix or use the decimal form
-# - in core/config.yaml and ue/values.yaml, it is in hex form without 0x prefix
-
-# The case of empty SD field (encoded as "EMPTY" is particular, it will correspond to :
-# - \"FFFFFF\" in mysql database
-# - only sst field defined in nssai within config.yaml of the CN
-# - only sst field defined in gnb.conf
-# - "16777215" in nr-ue rfsim scenario
-#
 SLICE1_SST="1"
-SLICE1_SD="EMPTY" # "EMPTY" 
-SLICE1_5QI="9" # non-GBR
+SLICE1_SD="EMPTY"
+SLICE1_5QI="9"
 SLICE1_ARP_PRIORITY_LEVEL="8"
-SLICE1_ARP_PREEMPT_CAP="NOT_PREEMPT" # "NOT_PREEMPT" or "MAY_PREEMPT" # to trigger preemption
-SLICE1_ARP_PREEMPT_VULN="PREEMPTABLE" # "PREEMPTABLE" or "NOT_PREEMPT" # preemption vulnerability
+SLICE1_ARP_PREEMPT_CAP="NOT_PREEMPT"
+SLICE1_ARP_PREEMPT_VULN="PREEMPTABLE"
 SLICE1_PRIORITY_LEVEL="1"
 SLICE1_UPLINK="20Mbps"
 SLICE1_DOWNLINK="40Mbps"
+SLICE1_IPV4_PREFIX="12.1.1"
+
+SLICE2_IPV4_PREFIX="14.1.1"
+START_IP=100
 
 SLICE2_SST="1"
 SLICE2_SD="000001"
-SLICE2_5QI="5" # non-GBR
+SLICE2_5QI="5"
 SLICE2_ARP_PRIORITY_LEVEL="1"
-SLICE2_ARP_PREEMPT_CAP="NOT_PREEMPT" # "NOT_PREEMPT" or "MAY_PREEMPT" # to trigger preemption
-SLICE2_ARP_PREEMPT_VULN="PREEMPTABLE" # "PREEMPTABLE" or "NOT_PREEMPT" # preemption vulnerability
+SLICE2_ARP_PREEMPT_CAP="NOT_PREEMPT"
+SLICE2_ARP_PREEMPT_VULN="PREEMPTABLE"
 SLICE2_PRIORITY_LEVEL="1"
 SLICE2_UPLINK="100Mbps"
 SLICE2_DOWNLINK="200Mbps"
 
 GNB_ID="0xe020"
-FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f" # default is "8baf473f2f8fd09487cccbd7097c6862"
-OPC="C42449363BBAD02B66D16BC975D77CC1" # default is "8E27B6AF0E692E750F32667A3B14605D"
+FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f"
+OPC="C42449363BBAD02B66D16BC975D77CC1"
 RFSIM_IMSI="001010000001121"
 
 ##########################################################################################
@@ -60,9 +48,9 @@ function update() {
     NODE_AMF_UPF=$1; shift
     NODE_GNB=$1; shift
     RRU=$1; shift 
-    RUN_MODE=$1; shift # in ["full", "gnb-only", "gnb-upf"]
-    LOGS=$1; shift # boolean in [true, false]
-    PCAP=$1; shift # boolean in [true, false]
+    RUN_MODE=$1; shift
+    LOGS=$1; shift
+    PCAP=$1; shift
     PREFIX_DEMO=$1; shift
     CN_MODE=$1; shift
     GNB_MODE=$1; shift
@@ -72,25 +60,22 @@ function update() {
     REGCRED_PWD=$1; shift
     REGCRED_EMAIL=$1; shift
 
-    # if node is a sopnode, add the "-v30" suffix
     if [[ $NODE_AMF_UPF == sopnode* ]]; then
-	NODE_AMF_UPF="${NODE_AMF_UPF}-v30"
+        NODE_AMF_UPF="${NODE_AMF_UPF}-v30"
     fi
     if [[ $NODE_GNB == sopnode* ]]; then
-	NODE_GNB="${NODE_GNB}-v30"
+        NODE_GNB="${NODE_GNB}-v30"
     fi
-    
-    # Convert to lowercase boolean parameters
-    GNB_ONLY="${GNB_ONLY,,}"
+
     LOGS="${LOGS,,}"
     PCAP="${PCAP,,}"
 
     if [[ "$CN_MODE" = "advance" ]]; then
-	mode="advance"
-	MODE="ADVANCE"
+        mode="advance"
+        MODE="ADVANCE"
     else
-	mode="basic"
-	MODE="BASIC"
+        mode="basic"
+        MODE="BASIC"
     fi
     
     echo "Configuring demo-oai.sh script"
@@ -141,22 +126,89 @@ s|@DEF_REGCRED_EMAIL@|$REGCRED_EMAIL|
 EOF
 
     cp "$PREFIX_DEMO"/demo-oai.sh "$TMP"/demo-oai-orig.sh
-    echo "Configuring demo-oai.sh script with possible new R2lab FIT nodes and registry credentials"
     sed -f "$TMP"/demo-oai.sed < "$TMP"/demo-oai-orig.sh > $PREFIX_DEMO/demo-oai.sh
     diff "$TMP"/demo-oai-orig.sh $PREFIX_DEMO/demo-oai.sh
 
-    DIR_GENERIC_DB="$PREFIX_DEMO/oai5g-rru/patch-mysql"
-    if [[ "$DNN1" = "none" ]]; then
-	echo "Patching oai_db-basic.sql generic database for R2lab UEs with DNN0 only"
-	oai_db_basic_template="oai_db-basic-generic.sql"
-    else
-	echo "Patching oai_db-basic.sql generic database for R2lab UEs with both DNN0 and DNN1"
-	oai_db_basic_template="oai_db-basic-generic-2dnn.sql"
-    fi
-    cp $DIR_GENERIC_DB/${oai_db_basic_template} "$TMP"/${oai_db_basic_template}
-    sed -f "$TMP"/demo-oai.sed < "$TMP"/${oai_db_basic_template} > $DIR_GENERIC_DB/oai_db-basic.sql
-    diff $DIR_GENERIC_DB/${oai_db_basic_template} $DIR_GENERIC_DB/oai_db-basic.sql
+    ###########################################################################
+    ### NEW MYSQL GENERATION BLOCK — replaces old patch-mysql mechanism
+    ###########################################################################
 
+    echo "Generating dynamic MySQL DB..."
+    DB="$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic.sql"
+    mkdir -p "$(dirname "$DB")"
+    rm -f "$DB"
+
+    # header
+    cat <<EOF > "$DB"
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+/*!40101 SET NAMES utf8mb4 */;
+EOF
+
+    # list of UEs (static, as before)
+    UE_LIST=(
+        "0000000001:1"
+        "0000000002:1"
+        "0000000003:1"
+        "0000000004:1"
+        "0000000005:1"
+        "0000000006:1"
+        "0000000007:2"
+        "0000000008:1"
+        "0000000009:1"
+        "0000000010:1"
+        "0000000011:1"
+        "0000000012:1"
+        "0000000013:1"
+        "0000000014:1"
+        "${RFSIM_IMSI: -10}:1"
+    )
+
+    idx=0
+    for u in "${UE_LIST[@]}"; do
+        base="${u%%:*}"
+        slice="${u##*:}"
+        imsi="${MCC}${MNC}${base}"
+        idx=$((idx + 1))
+        ip=$((START_IP + idx))
+
+        # choose slice params
+        if [[ $slice -eq 1 ]]; then
+            prefix="$SLICE1_IPV4_PREFIX"
+            sst="$SLICE1_SST"
+            sd="$SLICE1_SD"
+            qi="$SLICE1_5QI"
+            uplink="$SLICE1_UPLINK"
+            downlink="$SLICE1_DOWNLINK"
+            dnn="$DNN0"
+        else
+            prefix="$SLICE2_IPV4_PREFIX"
+            sst="$SLICE2_SST"
+            sd="$SLICE2_SD"
+            qi="$SLICE2_5QI"
+            uplink="$SLICE2_UPLINK"
+            downlink="$SLICE2_DOWNLINK"
+            dnn="$DNN1"
+        fi
+
+        [[ "$sd" == "EMPTY" ]] && sd="FFFFFF"
+
+        cat <<EOF >> "$DB"
+INSERT INTO AuthenticationSubscription VALUES
+('$imsi','5G_AKA','${FULL_KEY}','${FULL_KEY}','{\"sqn\":\"000000000020\"}','8000','milenage','${OPC}',NULL,NULL,NULL,NULL,'$imsi');
+
+INSERT INTO SessionManagementSubscriptionData VALUES
+('$imsi','${MCC}${MNC}','{\"sst\":$sst,\"sd\":\"$sd\"}',
+ '{\"$dnn\":{\"pduSessionTypes\":{\"defaultSessionType\":\"IPV4\"},
+            \"5gQosProfile\":{\"5qi\":$qi},
+            \"sessionAmbr\":{\"uplink\":\"$uplink\",\"downlink\":\"$downlink\"},
+            \"staticIpAddress\":[{\"ipv4Addr\":\"${prefix}.${ip}\"}]}}');
+EOF
+    done
+
+    echo "COMMIT;" >> "$DB"
+    ###########################################################################
 }
 
 if test $# -ne 16; then
