@@ -80,8 +80,6 @@ UE_SLICE_MAP=(
 
 ##########################################################################################
 TMP="/tmp/tmp.$USER"
-#PREFIX_DEMO="$(cd "$(dirname "$0")" && pwd)"
-#TMP="$PREFIX_DEMO/tmp"
 mkdir -p "$TMP"
 
 function update() {
@@ -92,9 +90,6 @@ function update() {
     RUN_MODE=$1; shift # in ["full", "gnb-only", "gnb-upf"]
     LOGS=$1; shift # boolean in [true, false]
     PCAP=$1; shift # boolean in [true, false]
-    MONITORING=$1; shift # boolean in [true, false]
-    FLEXRIC=$1; shift # boolean
-    LOCAL_INTERFACE=$1; shift
     PREFIX_DEMO=$1; shift
     CN_MODE=$1; shift
     GNB_MODE=$1; shift
@@ -217,6 +212,7 @@ generate_dynamic_sql() {
 
         # Slice parameters selection
         if [[ "$SLICE" == "1" ]]; then
+	    DEF_DNN="@DEF_DNN0@"
 	    DNN_PDU_TYPE=${DNN0_PDU_TYPE}
             SST=${SLICE1_SST}
             SD=${SLICE1_SD}
@@ -229,6 +225,7 @@ generate_dynamic_sql() {
 	    DOWNLINK=${SLICE1_DOWNLINK}
             IP_PREFIX=${SLICE1_IP_PREFIX}
         else
+	    DEF_DNN="@DEF_DNN1@"
 	    DNN_PDU_TYPE=${DNN1_PDU_TYPE}
             SST=${SLICE1_SST}
             SD=${SLICE2_SD}
@@ -254,7 +251,7 @@ EOF
         # SessionManagementSubscriptionData
         cat >> "$DB" <<EOF
 INSERT INTO \`SessionManagementSubscriptionData\` (\`ueid\`, \`servingPlmnid\`, \`singleNssai\`, \`dnnConfigurations\`) VALUES
-('${IMSI}', '${DEF_MCC}${DEF_MNC}', '{\"sst\": ${SST}, \"sd\": \"${SD}\"}','{\"internet\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"${DNN_PDU_TYPE}\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": ${QOS_5QI},\"arp\":{\"priorityLevel\": ${ARP_PRIORITY_LEVEL},\"preemptCap\": \"${ARP_PREEMPT_CAP}\",\"preemptVuln\":\"${ARP_PREEMPT_VULN}\"},\"priorityLevel\":${PRIORITY_LEVEL}},\"sessionAmbr\":{\"uplink\":\"${UPLINK}\", \"downlink\":\"${DOWNLINK}\"},\"staticIpAddress\":[{\"ipv4Addr\": \"${IPADDR}\"}]}}');
+('${IMSI}', '${DEF_MCC}${DEF_MNC}', '{\"sst\": ${SST}, \"sd\": \"${SD}\"}','{\"${DEF_DNN}\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"${DNN_PDU_TYPE}\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": ${QOS_5QI},\"arp\":{\"priorityLevel\": ${ARP_PRIORITY_LEVEL},\"preemptCap\": \"${ARP_PREEMPT_CAP}\",\"preemptVuln\":\"${ARP_PREEMPT_VULN}\"},\"priorityLevel\":${PRIORITY_LEVEL}},\"sessionAmbr\":{\"uplink\":\"${UPLINK}\", \"downlink\":\"${DOWNLINK}\"},\"staticIpAddress\":[{\"ipv4Addr\": \"${IPADDR}\"}]}}');
 EOF
     done
 
