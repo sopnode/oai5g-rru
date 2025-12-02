@@ -1,24 +1,63 @@
 #!/bin/bash
 
-# ------------------------------------------------------------------------------
-# Original environnement variables and sed system preserved
-# ------------------------------------------------------------------------------
+##########################################################################################
+#  Configure here the following variables used in demo-oai.sh script and in MYSQL database
+#
+MCC="001" 
+MNC="01" 
+TAC="1" 
 
-PREFIX_DEMO="$(cd "$(dirname "$0")" && pwd)"
-TMP="$PREFIX_DEMO/tmp"
-mkdir -p "$TMP"
+# DNN0 and DNN1 must be set in demo-oai.py or in prepare-demo-oai.sh scripts to configure Quectel UE
+#  if DNN1=="none", configure a single DNN will be configured in the mysql database
+DNN0_PDU_TYPE="IPV4" # XXX "IPV4" or "IPV4V6" ==> In open5gs DNN is internet
+DNN1_PDU_TYPE="IPV4" # XXX "IPV4" or "IPV4V6"
 
-# Default values (can be overridden externally)
-DEF_MCC="${DEF_MCC:-001}"
-DEF_MNC="${DEF_MNC:-01}"
-DEF_FULL_KEY="${DEF_FULL_KEY:-fec86ba6eb707ed08905757b1bb44b8f}"
-DEF_OPC="${DEF_OPC:-C42449363BBAD02B66D16BC975D77CC1}"
-START_IP="${START_IP:-11}"
-RFSIM_IMSI="${RFSIM_IMSI:-001010000001121}"
+# NSSAI (SST,SD) Configuration
+#
+# NOTA on SD format encoding in the charts
+# - in mysql database, SD field is a string/hexadecimal without 0x prefix,
+#    and encoded with the format: \"ABCDEF\"
+# - in gNB configmaps sd format should include 0x prexix or use the decimal form
+# - in core/config.yaml and ue/values.yaml, it is in hex form without 0x prefix
 
-# ---------------------------------------------------------------------------
-# Elegant dynamic mapping for UEs → slice index (unchanged format)
-# ---------------------------------------------------------------------------
+# The case of empty SD field (encoded as "EMPTY" is particular, it will correspond to :
+# - \"FFFFFF\" in mysql database
+# - only sst field defined in nssai within config.yaml of the CN
+# - only sst field defined in gnb.conf
+# - "16777215" in nr-ue rfsim scenario
+#
+SLICE1_SST="1"
+SLICE1_SD="EMPTY" # "EMPTY" 
+SLICE1_5QI="9" # non-GBR
+SLICE1_ARP_PRIORITY_LEVEL="8"
+SLICE1_ARP_PREEMPT_CAP="NOT_PREEMPT" # "NOT_PREEMPT" or "MAY_PREEMPT" # to trigger preemption
+SLICE1_ARP_PREEMPT_VULN="PREEMPTABLE" # "PREEMPTABLE" or "NOT_PREEMPT" # preemption vulnerability
+SLICE1_PRIORITY_LEVEL="1"
+SLICE1_UPLINK="20Mbps"
+SLICE1_DOWNLINK="40Mbps"
+SLICE1_IP_PREFIX="12.1.1"
+
+SLICE2_SST="1"
+SLICE2_SD="000001"
+SLICE2_5QI="5" # non-GBR
+SLICE2_ARP_PRIORITY_LEVEL="1"
+SLICE2_ARP_PREEMPT_CAP="NOT_PREEMPT" # "NOT_PREEMPT" or "MAY_PREEMPT" # to trigger preemption
+SLICE2_ARP_PREEMPT_VULN="PREEMPTABLE" # "PREEMPTABLE" or "NOT_PREEMPT" # preemption vulnerability
+SLICE2_PRIORITY_LEVEL="1"
+SLICE2_UPLINK="100Mbps"
+SLICE2_DOWNLINK="200Mbps"
+SLICE2_IP_PREFIX="14.1.1"
+
+
+GNB_ID="0xe020"
+FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f" # default is "8baf473f2f8fd09487cccbd7097c6862"
+OPC="C42449363BBAD02B66D16BC975D77CC1" # default is "8E27B6AF0E692E750F32667A3B14605D"
+RFSIM_IMSI="001010000000101"
+RFSIM_IMSI_UE2="001010000000102"
+RFSIM_IMSI_UE3="001010000000103"
+
+# Dynamic mapping for UEs → slice index
+
 UE_SLICE_MAP=(
   "0000000001:1"
   "0000000002:1"
@@ -37,20 +76,134 @@ UE_SLICE_MAP=(
   "${RFSIM_IMSI:9}:1"
 )
 
-# ---------------------------------------------------------------------------
-# update() : original logic preserved
-# ---------------------------------------------------------------------------
-update() {
-    echo "Updating demo-oai.sh with environment parameters"
+
+
+##########################################################################################
+TMP="/tmp/tmp.$USER"
+#PREFIX_DEMO="$(cd "$(dirname "$0")" && pwd)"
+#TMP="$PREFIX_DEMO/tmp"
+mkdir -p "$TMP"
+
+function update() {
+    NS=$1; shift
+    NODE_AMF_UPF=$1; shift
+    NODE_GNB=$1; shift
+    RRU=$1; shift 
+    RUN_MODE=$1; shift # in ["full", "gnb-only", "gnb-upf"]
+    LOGS=$1; shift # boolean in [true, false]
+    PCAP=$1; shift # boolean in [true, false]
+    MONITORING=$1; shift # boolean in [true, false]
+    FLEXRIC=$1; shift # boolean
+    LOCAL_INTERFACE=$1; shift
+    PREFIX_DEMO=$1; shift
+    CN_MODE=$1; shift
+    GNB_MODE=$1; shift
+    DNN0=$1; shift
+    DNN1=$1; shift
+    REGCRED_NAME=$1; shift
+    REGCRED_PWD=$1; shift
+    REGCRED_EMAIL=$1; shift
+
+    # Convert to lowercase boolean parameters
+    GNB_ONLY="${GNB_ONLY,,}"
+    LOGS="${LOGS,,}"
+    PCAP="${PCAP,,}"
+    MONITORING="${MONITORING,,}"
+    FLEXRIC="${FLEXRIC,,}"
+
+    # if node is a sopnode-w or sopnode-l1, add the "-v30" suffix
+    if [[ "$NODE_AMF_UPF" == "sopnode-l1" || "$NODE_AMF_UPF" == "sopnode-w1" ]]; then
+	NODE_AMF_UPF="${NODE_AMF_UPF}-v30"
+    fi
+    if [[ $NODE_GNB == "sopnode-l1" || "$NODE_GNB" == "sopnode-w1" ]]; then
+	NODE_GNB="${NODE_GNB}-v30"
+    fi
+    
+    if [[ "$CN_MODE" = "advance" ]]; then
+	mode="advance"
+	MODE="ADVANCE"
+    else
+	mode="basic"
+	MODE="BASIC"
+    fi
+    
+    echo "Configuring demo-oai.sh script"
+    cat > "$TMP"/demo-oai.sed <<EOF
+s|@DEF_NS@|$NS|
+s|@DEF_NODE_AMF_UPF@|$NODE_AMF_UPF|
+s|@DEF_NODE_GNB@|$NODE_GNB|
+s|@DEF_RRU@|$RRU|
+s|@DEF_RUN_MODE@|$RUN_MODE|
+s|@DEF_GNB_MODE@|$GNB_MODE|
+s|@DEF_LOGS@|$LOGS|
+s|@DEF_PCAP@|$PCAP|
+s|@DEF_MONITORING@|$MONITORING|
+s|@DEF_FLEXRIC@|$FLEXRIC|
+s|@DEF_LOCAL_INTERFACE@|$LOCAL_INTERFACE|
+s|@DEF_MCC@|${MCC}|g
+s|@DEF_MNC@|${MNC}|g
+s|@DEF_TAC@|${TAC}|g
+s|@DEF_DNN0@|${DNN0}|
+s|@DEF_DNN0_PDU_TYPE@|${DNN0_PDU_TYPE}|
+s|@DEF_DNN1@|${DNN1}|
+s|@DEF_DNN1_PDU_TYPE@|${DNN1_PDU_TYPE}|
+s|@DEF_SLICE1_SST@|${SLICE1_SST}|
+s|@DEF_SLICE1_SD@|${SLICE1_SD}|
+s|@DEF_SLICE1_5QI@|${SLICE1_5QI}|
+s|@DEF_SLICE1_ARP_PRIORITY_LEVEL@|${SLICE1_ARP_PRIORITY_LEVEL}|
+s|@DEF_SLICE1_ARP_PREEMPT_CAP@|${SLICE1_ARP_PREEMPT_CAP}|
+s|@DEF_SLICE1_ARP_PREEMPT_VULN@|${SLICE1_ARP_PREEMPT_VULN}|
+s|@DEF_SLICE1_PRIORITY_LEVEL@|${SLICE1_PRIORITY_LEVEL}|
+s|@DEF_SLICE1_UPLINK@|${SLICE1_UPLINK}|
+s|@DEF_SLICE1_DOWNLINK@|${SLICE1_DOWNLINK}|
+s|@DEF_SLICE2_SST@|${SLICE2_SST}|
+s|@DEF_SLICE2_SD@|${SLICE2_SD}|
+s|@DEF_SLICE2_5QI@|${SLICE2_5QI}|
+s|@DEF_SLICE2_ARP_PRIORITY_LEVEL@|${SLICE2_ARP_PRIORITY_LEVEL}|
+s|@DEF_SLICE2_ARP_PREEMPT_CAP@|${SLICE2_ARP_PREEMPT_CAP}|
+s|@DEF_SLICE2_ARP_PREEMPT_VULN@|${SLICE2_ARP_PREEMPT_VULN}|
+s|@DEF_SLICE2_PRIORITY_LEVEL@|${SLICE2_PRIORITY_LEVEL}|
+s|@DEF_SLICE2_UPLINK@|${SLICE2_UPLINK}|
+s|@DEF_SLICE2_DOWNLINK@|${SLICE2_DOWNLINK}|
+s|@DEF_GNB_ID@|${GNB_ID}|
+s|@DEF_FULL_KEY@|${FULL_KEY}|g
+s|@DEF_OPC@|${OPC}|g
+s|@DEF_RFSIM_IMSI@|${RFSIM_IMSI}|g
+s|@DEF_RFSIM_IMSI_UE2@|${RFSIM_IMSI_UE2}|g
+s|@DEF_RFSIM_IMSI_UE3@|${RFSIM_IMSI_UE3}|g
+s|@DEF_PREFIX_DEMO@|$PREFIX_DEMO|
+s|@MODE@|$MODE|g
+s|@mode@|$mode|g
+s|@DEF_REGCRED_NAME@|$REGCRED_NAME|
+s|@DEF_REGCRED_PWD@|$REGCRED_PWD|
+s|@DEF_REGCRED_EMAIL@|$REGCRED_EMAIL|
+EOF
+
     cp "$PREFIX_DEMO"/demo-oai.sh "$TMP"/demo-oai-orig.sh
-    sed -f "$TMP"/demo-oai.sed < "$TMP"/demo-oai-orig.sh > "$PREFIX_DEMO"/demo-oai.sh
-    diff "$TMP"/demo-oai-orig.sh "$PREFIX_DEMO"/demo-oai.sh || true
+    echo "Configuring demo-oai.sh script with possible new R2lab FIT nodes and registry credentials"
+    sed -f "$TMP"/demo-oai.sed < "$TMP"/demo-oai-orig.sh > $PREFIX_DEMO/demo-oai.sh
+    diff "$TMP"/demo-oai-orig.sh $PREFIX_DEMO/demo-oai.sh
+
+    echo "Generating SQL database with dynamic parameters..."
+
+    generate_dynamic_sql \
+        "$PREFIX_DEMO" \
+        "$START_IP" \
+        "$MCC" \
+        "$MNC" \
+        "$FULL_KEY" \
+        "$OPC"
 }
 
-# ---------------------------------------------------------------------------
-# NEW: Elegant SQL generation (no mysql CLI)
-# ---------------------------------------------------------------------------
+# Dynamic SQL generation 
+
 generate_dynamic_sql() {
+    PREFIX_DEMO="$1"
+    START_IP="$2"
+    DEF_MCC="$3"
+    DEF_MNC="$4"
+    DEF_FULL_KEY="$5"
+    DEF_OPC="$6"
 
     DB="$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic.sql"
     echo "Generating database at $DB"
@@ -68,20 +221,34 @@ generate_dynamic_sql() {
         SLICE=${entry##*:}
         IMSI="${DEF_MCC}${DEF_MNC}${UE}"
 
-        # Slice prefix selection
+        # Slice parameters selection
         if [[ "$SLICE" == "1" ]]; then
-            PREFIX="12.1.1"
-            SD="FFFFFF"
-            QOS_5QI=9
-            ARP=8
+	    DNN_PDU_TYPE=${DNN0_PDU_TYPE}
+            SST=${SLICE1_SST}
+            SD=${SLICE1_SD}
+            QOS_5QI=${SLICE1_5QI}
+            ARP_PRIORITY_LEVEL=${SLICE1_ARP_PRIORITY_LEVEL}
+	    ARP_PREEMPT_CAP=${SLICE1_ARP_PREEMPT_CAP}
+	    ARP_PREEMPT_VULN=${SLICE1_ARP_PREEMPT_VULN}
+	    PRIORITY_LEVEL=${SLICE1_PRIORITY_LEVEL}
+	    UPLINK=${SLICE1_UPLINK}
+	    DOWNLINK=${SLICE1_DOWNLINK}
+            IP_PREFIX=${SLICE1_IP_PREFIX}
         else
-            PREFIX="14.1.1"
-            SD="000001"
-            QOS_5QI=5
-            ARP=1
+	    DNN_PDU_TYPE=${DNN1_PDU_TYPE}
+            SST=${SLICE1_SST}
+            SD=${SLICE2_SD}
+            QOS_5QI=${SLICE2_5QI}
+            ARP_PRIORITY_LEVEL=${SLICE2_ARP_PRIORITY_LEVEL}
+	    ARP_PREEMPT_CAP=${SLICE2_ARP_PREEMPT_CAP}
+	    ARP_PREEMPT_VULN=${SLICE2_ARP_PREEMPT_VULN}
+	    PRIORITY_LEVEL=${SLICE2_PRIORITY_LEVEL}
+	    UPLINK=${SLICE2_UPLINK}
+	    DOWNLINK=${SLICE2_DOWNLINK}
+            IP_PREFIX=${SLICE2_IP_PREFIX}
         fi
 
-        IPADDR="${PREFIX}.${IP}"
+        IPADDR="${IP_PREFIX}.${IP}"
         ((IP++))
 
         # AuthenticationSubscription
@@ -93,7 +260,7 @@ EOF
         # SessionManagementSubscriptionData
         cat >> "$DB" <<EOF
 INSERT INTO \`SessionManagementSubscriptionData\` (\`ueid\`, \`servingPlmnid\`, \`singleNssai\`, \`dnnConfigurations\`) VALUES
-('${IMSI}', '${DEF_MCC}${DEF_MNC}', '{\"sst\": 1, \"sd\": \"${SD}\"}','{\"internet\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"IPV4\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": ${QOS_5QI},\"arp\":{\"priorityLevel\": ${ARP},\"preemptCap\": \"NOT_PREEMPT\",\"preemptVuln\":\"PREEMPTABLE\"},\"priorityLevel\":1},\"sessionAmbr\":{\"uplink\":\"20Mbps\", \"downlink\":\"40Mbps\"},\"staticIpAddress\":[{\"ipv4Addr\": \"${IPADDR}\"}]}}');
+('${IMSI}', '${DEF_MCC}${DEF_MNC}', '{\"sst\": ${SST}, \"sd\": \"${SD}\"}','{\"internet\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"${DNN_PDU_TYPE}\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": ${QOS_5QI},\"arp\":{\"priorityLevel\": ${ARP_PRIORITY_LEVEL},\"preemptCap\": \"${ARP_PREEMPT_CAP}\",\"preemptVuln\":\"${ARP_PREEMPT_VULN}\"},\"priorityLevel\":${PRIORITY_LEVEL}},\"sessionAmbr\":{\"uplink\":\"${UPLINK}\", \"downlink\":\"${DOWNLINK}\"},\"staticIpAddress\":[{\"ipv4Addr\": \"${IPADDR}\"}]}}');
 EOF
     done
 
@@ -106,6 +273,5 @@ EOF
 # ---------------------------------------------------------------------------
 
 update
-generate_dynamic_sql
 
 echo "Generation complete."
