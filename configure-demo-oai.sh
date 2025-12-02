@@ -186,13 +186,7 @@ EOF
 
     echo "Generating SQL database with dynamic parameters..."
 
-    generate_dynamic_sql \
-        "$PREFIX_DEMO" \
-        "$START_IP" \
-        "$MCC" \
-        "$MNC" \
-        "$FULL_KEY" \
-        "$OPC"
+    generate_dynamic_sql "$PREFIX_DEMO" "$START_IP" "$MCC" "$MNC" "$FULL_KEY" "$OPC"
 }
 
 # Dynamic SQL generation 
