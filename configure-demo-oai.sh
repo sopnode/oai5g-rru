@@ -73,7 +73,7 @@ UE_SLICE_MAP=(
   "0000000012:1"
   "0000000013:1"
   "0000000014:1"
-  "${RFSIM_IMSI:9}:1"
+  "${RFSIM_IMSI:5}:1"
 )
 
 # IP suffix is incremented by 1 for each UE, starting from $START_IP
@@ -261,7 +261,7 @@ EOF
     cat "$AS_DB" >> "$DB"
 
     # append in-between empty tables
-    cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-head.sql" >> "$DB"
+    cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-between.sql" >> "$DB"
 
     # append SessionManagementSubscriptionData Table
     cat "$SMSD_DB" >> "$DB"
