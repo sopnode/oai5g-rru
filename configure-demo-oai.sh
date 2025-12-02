@@ -76,7 +76,8 @@ UE_SLICE_MAP=(
   "${RFSIM_IMSI:9}:1"
 )
 
-
+# IP suffix is incremented by 1 for each UE, starting from $START_IP
+START_IP=11
 
 ##########################################################################################
 TMP="/tmp/tmp.$USER"
@@ -103,8 +104,6 @@ function update() {
     GNB_ONLY="${GNB_ONLY,,}"
     LOGS="${LOGS,,}"
     PCAP="${PCAP,,}"
-    MONITORING="${MONITORING,,}"
-    FLEXRIC="${FLEXRIC,,}"
 
     # if node is a sopnode-w or sopnode-l1, add the "-v30" suffix
     if [[ "$NODE_AMF_UPF" == "sopnode-l1" || "$NODE_AMF_UPF" == "sopnode-w1" ]]; then
@@ -181,18 +180,19 @@ EOF
 
     echo "Generating SQL database with dynamic parameters..."
 
-    generate_dynamic_sql "$PREFIX_DEMO" "$START_IP" "$MCC" "$MNC" "$FULL_KEY" "$OPC"
+    generate_dynamic_sql "$PREFIX_DEMO" "$DNN0" "$DNN1" "$MCC" "$MNC" "$FULL_KEY" "$OPC"
 }
 
 # Dynamic SQL generation 
 
 generate_dynamic_sql() {
     PREFIX_DEMO="$1"
-    START_IP="$2"
-    DEF_MCC="$3"
-    DEF_MNC="$4"
-    DEF_FULL_KEY="$5"
-    DEF_OPC="$6"
+    DEF_DNN0="$2"
+    DEF_DNN1="$3"
+    DEF_MCC="$4"
+    DEF_MNC="$5"
+    DEF_FULL_KEY="$6"
+    DEF_OPC="$7"
 
     DB="$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic.sql"
     echo "Generating database at $DB"
@@ -212,7 +212,7 @@ generate_dynamic_sql() {
 
         # Slice parameters selection
         if [[ "$SLICE" == "1" ]]; then
-	    DEF_DNN="@DEF_DNN0@"
+	    DNN=${DEF_DNN0}
 	    DNN_PDU_TYPE=${DNN0_PDU_TYPE}
             SST=${SLICE1_SST}
             SD=${SLICE1_SD}
@@ -225,7 +225,7 @@ generate_dynamic_sql() {
 	    DOWNLINK=${SLICE1_DOWNLINK}
             IP_PREFIX=${SLICE1_IP_PREFIX}
         else
-	    DEF_DNN="@DEF_DNN1@"
+	    DNN=${DEF_DNN1}
 	    DNN_PDU_TYPE=${DNN1_PDU_TYPE}
             SST=${SLICE1_SST}
             SD=${SLICE2_SD}
@@ -251,7 +251,7 @@ EOF
         # SessionManagementSubscriptionData
         cat >> "$DB" <<EOF
 INSERT INTO \`SessionManagementSubscriptionData\` (\`ueid\`, \`servingPlmnid\`, \`singleNssai\`, \`dnnConfigurations\`) VALUES
-('${IMSI}', '${DEF_MCC}${DEF_MNC}', '{\"sst\": ${SST}, \"sd\": \"${SD}\"}','{\"${DEF_DNN}\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"${DNN_PDU_TYPE}\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": ${QOS_5QI},\"arp\":{\"priorityLevel\": ${ARP_PRIORITY_LEVEL},\"preemptCap\": \"${ARP_PREEMPT_CAP}\",\"preemptVuln\":\"${ARP_PREEMPT_VULN}\"},\"priorityLevel\":${PRIORITY_LEVEL}},\"sessionAmbr\":{\"uplink\":\"${UPLINK}\", \"downlink\":\"${DOWNLINK}\"},\"staticIpAddress\":[{\"ipv4Addr\": \"${IPADDR}\"}]}}');
+('${IMSI}', '${DEF_MCC}${DEF_MNC}', '{\"sst\": ${SST}, \"sd\": \"${SD}\"}','{\"${DNN}\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"${DNN_PDU_TYPE}\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": ${QOS_5QI},\"arp\":{\"priorityLevel\": ${ARP_PRIORITY_LEVEL},\"preemptCap\": \"${ARP_PREEMPT_CAP}\",\"preemptVuln\":\"${ARP_PREEMPT_VULN}\"},\"priorityLevel\":${PRIORITY_LEVEL}},\"sessionAmbr\":{\"uplink\":\"${UPLINK}\", \"downlink\":\"${DOWNLINK}\"},\"staticIpAddress\":[{\"ipv4Addr\": \"${IPADDR}\"}]}}');
 EOF
     done
 
