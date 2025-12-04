@@ -60,17 +60,17 @@ RC_MAIL="r2labuser@turletti.com"
 
 
 DIR="$(pwd)"
-COMMAND=$(basename $0)
+COMMAND=$(basename "$0")
 
 function git_pull(){
 
     echo "Step 1: clean up previous oai5g-rru and oai-cn5g-fed.git local directories if any"
-    cd $DIR
+    cd "$DIR" || exit
     rm -rf oai5g-rru oai-cn5g-fed
     echo "$0: Clone oai5g-rru and oai-cn5g-fed.git and configure charts and scripts"
     TAG=${OAI_BRANCH:-$TAG_OAI5G_RRU}
     echo "git clone -b $TAG $REPO_OAI5G_RRU"
-    git clone -b $TAG $REPO_OAI5G_RRU
+    git clone -b "$TAG" "$REPO_OAI5G_RRU"
     echo "git clone -b $TAG_OAI_CN5G_FED $REPO_OAI_CN5G_FED"
     git clone -b $TAG_OAI_CN5G_FED $REPO_OAI_CN5G_FED
     echo "Step 2: retrieve latest configure-demo-oai.sh and demo-oai.sh scripts"
@@ -84,7 +84,7 @@ function git_pull(){
 function configure_all_scripts(){
     echo "Step 1: use parameters from configure-demo-oai.sh to configure demo-oai.sh script"
     echo "./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $MONITORING $FLEXRIC $LOCAL_INTERFACE $DIR $CN_MODE $GNB_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL"
-    ./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $MONITORING $FLEXRIC $LOCAL_INTERFACE $DIR $CN_MODE $GNB_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL
+    ./configure-demo-oai.sh update "$NS" "$HOST_AMF_UPF" "$HOST_GNB" "$RRU" "$RUN_MODE" "$LOGS" "$PCAP" "$MONITORING" "$FLEXRIC" "$LOCAL_INTERFACE" "$DIR" "$CN_MODE" "$GNB_MODE" "$DNN0" "$DNN1" "$RC_NAME" "$RC_PWD" "$RC_MAIL"
     echo "Step 2: configure OAI5G charts to match the target scenario"
     echo "run init"
     ./demo-oai.sh init

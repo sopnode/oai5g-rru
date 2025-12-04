@@ -182,8 +182,8 @@ EOF
 
     cp "$PREFIX_DEMO"/demo-oai.sh "$TMP"/demo-oai-orig.sh
     echo "Configuring demo-oai.sh script with possible new R2lab FIT nodes and registry credentials"
-    sed -f "$TMP"/demo-oai.sed < "$TMP"/demo-oai-orig.sh > $PREFIX_DEMO/demo-oai.sh
-    diff "$TMP"/demo-oai-orig.sh $PREFIX_DEMO/demo-oai.sh
+    sed -f "$TMP"/demo-oai.sed < "$TMP"/demo-oai-orig.sh > "$PREFIX_DEMO"/demo-oai.sh
+    diff "$TMP"/demo-oai-orig.sh "$PREFIX_DEMO"/demo-oai.sh
 
     echo "Generating SQL database with dynamic parameters..."
 
@@ -202,11 +202,11 @@ generate_dynamic_sql() {
     DEF_OPC="$7"
 
     DB="$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic.sql"
-    cp ${DB} ${DB}.orig
+    cp "$DB" "$DB".orig
     AS_DB=${TMP}/TableAS.sql
     SMSD_DB=${TMP}/TableSMSD.sql
-    rm -f ${AS_DB} ${SMSD_DB}
-    touch ${AS_DB} ${SMSD_DB}
+    rm -f "AS_DB" "$SMSD_DB"
+    touch "$AS_DB" "$SMSD_DB"
     echo "Generating new database at $DB"
 
     # 1) Copy static top of file (tables definitions unchanged)
@@ -264,17 +264,20 @@ INSERT INTO \`SessionManagementSubscriptionData\` (\`ueid\`, \`servingPlmnid\`, 
 EOF
     done
 
-    # append AuthenticationSubscription Table
-    cat "$AS_DB" >> "$DB"
+    {
+	# append AuthenticationSubscription Table
+	cat "$AS_DB"
 
-    # append in-between empty tables
-    cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-between.sql" >> "$DB"
+	# append in-between empty tables
+	cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-between.sql"
 
-    # append SessionManagementSubscriptionData Table
-    cat "$SMSD_DB" >> "$DB"
+	# append SessionManagementSubscriptionData Table
+	cat "$SMSD_DB"
 
-    # append tail of DB (indexes, commit)
-    cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-tail.sql" >> "$DB"
+	# append tail of DB (indexes, commit)
+	cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-tail.sql"
+    }   >> "$DB"
+    
 }
 
 
@@ -283,7 +286,7 @@ if test $# -ne 19; then
     exit 1
 else
     shift
-    echo "Running update with inputs: $@"
+    printf 'Running update with inputs: %s\n' "$@"
     update "$@"
     exit 0
 fi
