@@ -49,7 +49,6 @@ SLICE2_UPLINK="100Mbps"
 SLICE2_DOWNLINK="200Mbps"
 SLICE2_IP_PREFIX="14.1.1"
 
-
 GNB_ID="0xe020"
 FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f" 
 OPC="C42449363BBAD02B66D16BC975D77CC1" 
@@ -75,6 +74,8 @@ UE_SLICE_MAP=(
   "0000000013:1"
   "0000000014:1"
   "${RFSIM_IMSI:5}:1"
+  "${RFSIM_IMSI_UE2:5}:1"
+  "${RFSIM_IMSI_UE3:5}:1"
 )
 
 # IP suffix is incremented by 1 for each UE, starting from $START_IP
@@ -92,6 +93,9 @@ function update() {
     RUN_MODE=$1; shift # in ["full", "gnb-only", "gnb-upf"]
     LOGS=$1; shift # boolean in [true, false]
     PCAP=$1; shift # boolean in [true, false]
+    MONITORING=$1; shift # boolean in [true, false]
+    FLEXRIC=$1; shift # boolean
+    LOCAL_INTERFACE=$1; shift
     PREFIX_DEMO=$1; shift
     CN_MODE=$1; shift
     GNB_MODE=$1; shift
@@ -105,6 +109,8 @@ function update() {
     GNB_ONLY="${GNB_ONLY,,}"
     LOGS="${LOGS,,}"
     PCAP="${PCAP,,}"
+    MONITORING="${MONITORING,,}"
+    FLEXRIC="${FLEXRIC,,}"
 
     # if node is a sopnode-w or sopnode-l1, add the "-v30" suffix
     if [[ "$NODE_AMF_UPF" == "sopnode-l1" || "$NODE_AMF_UPF" == "sopnode-w1" ]]; then
@@ -272,8 +278,8 @@ EOF
 }
 
 
-if test $# -ne 16; then
-    echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap prefix_demo cn_mode gnb_mode DNN0 DNN1 regcred_name regcred_password regcred_email "
+if test $# -ne 19; then
+    echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap monitoring flexric local_interface prefix_demo cn_mode gnb_mode DNN0 DNN1 regcred_name regcred_password regcred_email "
     exit 1
 else
     shift
