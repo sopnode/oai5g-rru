@@ -49,7 +49,6 @@ SLICE2_UPLINK="100Mbps"
 SLICE2_DOWNLINK="200Mbps"
 SLICE2_IP_PREFIX="14.1.1"
 
-
 GNB_ID="0xe020"
 FULL_KEY="fec86ba6eb707ed08905757b1bb44b8f" 
 OPC="C42449363BBAD02B66D16BC975D77CC1" 
@@ -75,6 +74,8 @@ UE_SLICE_MAP=(
   "0000000013:1"
   "0000000014:1"
   "${RFSIM_IMSI:5}:1"
+  "${RFSIM_IMSI_UE2:5}:1"
+  "${RFSIM_IMSI_UE3:5}:1"
 )
 
 # IP suffix is incremented by 1 for each UE, starting from $START_IP
@@ -92,6 +93,9 @@ function update() {
     RUN_MODE=$1; shift # in ["full", "gnb-only", "gnb-upf"]
     LOGS=$1; shift # boolean in [true, false]
     PCAP=$1; shift # boolean in [true, false]
+    MONITORING=$1; shift # boolean in [true, false]
+    FLEXRIC=$1; shift # boolean
+    LOCAL_INTERFACE=$1; shift
     PREFIX_DEMO=$1; shift
     CN_MODE=$1; shift
     GNB_MODE=$1; shift
@@ -105,6 +109,8 @@ function update() {
     GNB_ONLY="${GNB_ONLY,,}"
     LOGS="${LOGS,,}"
     PCAP="${PCAP,,}"
+    MONITORING="${MONITORING,,}"
+    FLEXRIC="${FLEXRIC,,}"
 
     # if node is a sopnode-w or sopnode-l1, add the "-v30" suffix
     if [[ "$NODE_AMF_UPF" == "sopnode-l1" || "$NODE_AMF_UPF" == "sopnode-w1" ]]; then
@@ -176,8 +182,8 @@ EOF
 
     cp "$PREFIX_DEMO"/demo-oai.sh "$TMP"/demo-oai-orig.sh
     echo "Configuring demo-oai.sh script with possible new R2lab FIT nodes and registry credentials"
-    sed -f "$TMP"/demo-oai.sed < "$TMP"/demo-oai-orig.sh > $PREFIX_DEMO/demo-oai.sh
-    diff "$TMP"/demo-oai-orig.sh $PREFIX_DEMO/demo-oai.sh
+    sed -f "$TMP"/demo-oai.sed < "$TMP"/demo-oai-orig.sh > "$PREFIX_DEMO"/demo-oai.sh
+    diff "$TMP"/demo-oai-orig.sh "$PREFIX_DEMO"/demo-oai.sh
 
     echo "Generating SQL database with dynamic parameters..."
 
@@ -196,11 +202,11 @@ generate_dynamic_sql() {
     DEF_OPC="$7"
 
     DB="$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic.sql"
-    cp ${DB} ${DB}.orig
+    cp "$DB" "$DB".orig
     AS_DB=${TMP}/TableAS.sql
     SMSD_DB=${TMP}/TableSMSD.sql
-    rm -f ${AS_DB} ${SMSD_DB}
-    touch ${AS_DB} ${SMSD_DB}
+    rm -f "AS_DB" "$SMSD_DB"
+    touch "$AS_DB" "$SMSD_DB"
     echo "Generating new database at $DB"
 
     # 1) Copy static top of file (tables definitions unchanged)
@@ -258,26 +264,29 @@ INSERT INTO \`SessionManagementSubscriptionData\` (\`ueid\`, \`servingPlmnid\`, 
 EOF
     done
 
-    # append AuthenticationSubscription Table
-    cat "$AS_DB" >> "$DB"
+    {
+	# append AuthenticationSubscription Table
+	cat "$AS_DB"
 
-    # append in-between empty tables
-    cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-between.sql" >> "$DB"
+	# append in-between empty tables
+	cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-between.sql"
 
-    # append SessionManagementSubscriptionData Table
-    cat "$SMSD_DB" >> "$DB"
+	# append SessionManagementSubscriptionData Table
+	cat "$SMSD_DB"
 
-    # append tail of DB (indexes, commit)
-    cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-tail.sql" >> "$DB"
+	# append tail of DB (indexes, commit)
+	cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-tail.sql"
+    }   >> "$DB"
+    
 }
 
 
-if test $# -ne 16; then
-    echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap prefix_demo cn_mode gnb_mode DNN0 DNN1 regcred_name regcred_password regcred_email "
+if test $# -ne 19; then
+    echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap monitoring flexric local_interface prefix_demo cn_mode gnb_mode DNN0 DNN1 regcred_name regcred_password regcred_email "
     exit 1
 else
     shift
-    echo "Running update with inputs: $@"
+    printf 'Running update with inputs: %s\n' "$@"
     update "$@"
     exit 0
 fi

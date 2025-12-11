@@ -10,45 +10,47 @@ HOST_AMF_UPF="sopnode-w1" # use this parameter to set up external AMF IP address
 HOST_GNB="sopnode-w1"
 
 # k8s namespace
-NS="oaiw1-ci"
+NS="open5gs"
 
 # Repo/Branch/TAG for code
 REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
-#TAG_OAI5G_RRU="2024.w31"
-TAG_OAI5G_RRU="develop-r2lab"
+#TAG_OAI5G_RRU="2025.w46"
+TAG_OAI5G_RRU="combine-gen-cn2-into-develop-r2lab" # "develop-r2lab"
 REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git"
-TAG_OAI_CN5G_FED="develop-r2lab"
+TAG_OAI_CN5G_FED="gen-cn2" # "develop-r2lab"
 
 # CN mode
 CN_MODE="advance"
 #CN_MODE="basic"
 
 # oai5g-rru running mode 
-RUN_MODE="full"
+#RUN_MODE="full"
 #RUN_MODE="gnb-upf"
-#RUN_MODE="gnb-only"
+RUN_MODE="gnb-only"
 
 # RAN options
-RRU="jaguar"
+#RRU="jaguar"
 #RRU="panther"
-#RRU="rfsim"
+RRU="rfsim"
 #RRU="b210"
 #RRU="n300"
 #RRU="n320"
-GNB_MODE="cudu"
+#GNB_MODE="cudu"
 #GNB_MODE="cucpup"
-#GNB_MODE="monolithic"
+GNB_MODE="monolithic"
 
 # DNNs 
 DNN0="internet"
-DNN1="streaming"
-#DNN1="none"
+DNN1="streaming" # "none"
 
 # logs configuration
 # logs and pcap are automatically retrieved when running demo-oai.sh stop in /tmp/tmp.root/oai5g-stats.tgz
 # you should manually erase /tmp/tmp.root/oai5g-stats directory before running another scenario to prevent retrieving old logs/pcaps
-LOGS="true"
+LOGS="false"
 PCAP="false"
+MONITORING="false"
+FLEXRIC="false"
+LOCAL_INTERFACE="net-30" # "net-30" is used to possibly reach R2lab k8s workers from sopnode-{l1|w1}
 #PCAP="true"
 
 # identity used to git pull
@@ -58,17 +60,17 @@ RC_MAIL="r2labuser@turletti.com"
 
 
 DIR="$(pwd)"
-COMMAND=$(basename $0)
+COMMAND=$(basename "$0")
 
 function git_pull(){
 
     echo "Step 1: clean up previous oai5g-rru and oai-cn5g-fed.git local directories if any"
-    cd $DIR
+    cd "$DIR" || exit
     rm -rf oai5g-rru oai-cn5g-fed
     echo "$0: Clone oai5g-rru and oai-cn5g-fed.git and configure charts and scripts"
     TAG=${OAI_BRANCH:-$TAG_OAI5G_RRU}
     echo "git clone -b $TAG $REPO_OAI5G_RRU"
-    git clone -b $TAG $REPO_OAI5G_RRU
+    git clone -b "$TAG" "$REPO_OAI5G_RRU"
     echo "git clone -b $TAG_OAI_CN5G_FED $REPO_OAI_CN5G_FED"
     git clone -b $TAG_OAI_CN5G_FED $REPO_OAI_CN5G_FED
     echo "Step 2: retrieve latest configure-demo-oai.sh and demo-oai.sh scripts"
@@ -81,8 +83,8 @@ function git_pull(){
 
 function configure_all_scripts(){
     echo "Step 1: use parameters from configure-demo-oai.sh to configure demo-oai.sh script"
-    echo "./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $DIR $CN_MODE $GNB_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL"
-    ./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $DIR $CN_MODE $GNB_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL
+    echo "./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $MONITORING $FLEXRIC $LOCAL_INTERFACE $DIR $CN_MODE $GNB_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL"
+    ./configure-demo-oai.sh update "$NS" "$HOST_AMF_UPF" "$HOST_GNB" "$RRU" "$RUN_MODE" "$LOGS" "$PCAP" "$MONITORING" "$FLEXRIC" "$LOCAL_INTERFACE" "$DIR" "$CN_MODE" "$GNB_MODE" "$DNN0" "$DNN1" "$RC_NAME" "$RC_PWD" "$RC_MAIL"
     echo "Step 2: configure OAI5G charts to match the target scenario"
     echo "run init"
     ./demo-oai.sh init
