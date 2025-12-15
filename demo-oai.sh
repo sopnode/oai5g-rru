@@ -343,6 +343,7 @@ MY_REPO="ghcr.io/ziyad-mabrouk/openairinterface5g"
 #RAN_TAG="2024.w48"
 RAN_TAG="2025.w34" # starting from w29 includes "Initial support for RedCap" feature in gNB
 GNB_NAME="gNB-r2lab"
+GNB_PULL_POLICY="IfNotPresent"
 
 # DU/CU SPLIT parameters
 #
@@ -838,27 +839,23 @@ function configure-mysql() {
 
 function patch_snssai() {
     local file="$1"
-
+    
     awk -v sst1="$SLICE1_SST" \
         -v sd1="$SLICE1_SD" \
         -v sst2="${SLICE2_SST:-}" \
         -v sd2="${SLICE2_SD:-EMPTY}" '
     function print_snssai(base_indent) {
-        item_indent = base_indent "  "
-        subitem_indent = item_indent "  "
+        indent = base_indent "  "  # 2 espaces supplémentaires par YAML
+        subindent = indent "  "
 
         # Slice 1
-        print item_indent "- sst: " sst1
-        if (sd1 != "EMPTY") {
-            print subitem_indent "sd: " sd1
-        }
+        print indent "- sst: " sst1
+        if (sd1 != "EMPTY") { print subindent "sd: " sd1 }
 
         # Slice 2 (optional)
         if (sst2 != "") {
-            print item_indent "- sst: " sst2
-            if (sd2 != "EMPTY") {
-                print subitem_indent "sd: " sd2
-            }
+            print indent "- sst: " sst2
+            if (sd2 != "EMPTY") { print subindent "sd: " sd2 }
         }
     }
 
@@ -872,16 +869,17 @@ function patch_snssai() {
         next
     }
 
+    # Remove old block content
     in_block && /^[[:space:]]*-/ { next }
     in_block && /^[[:space:]]*sd:/ { next }
 
-    in_block && !/^[[:space:]]+/ {
-        in_block = 0
-    }
+    # End of block
+    in_block && !/^[[:space:]]+/ { in_block = 0 }
 
     !in_block { print }
     ' "$file"
 }
+
 
 function configure-gnb() {
 
@@ -1123,6 +1121,9 @@ s|@SRIOV_NS@|$SRIOV_NS|
 s|@MAC_UPLANE1@|$MAC_UPLANE1|
 s|@MAC_CPLANE1@|$MAC_CPLANE1|
 s|@VLAN_RU1@|$VLAN_RU1|
+s|@GNB_PULL_POLICY@|$GNB_PULL_POLICY|
+s|@FLEXRIC@|$FLEXRIC|
+s|@HOST_FLEXRIC@|oai-flexric|
 s|@IP_GNB_RU1@|$IP_GNB_RU1|
 s|@NETMASK_GNB_RU1@|$NETMASK_GNB_RU|
 s|@MAC_GNB_RU1@|$(gener-mac)|
