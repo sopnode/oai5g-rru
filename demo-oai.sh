@@ -555,6 +555,42 @@ fi
 ADDR_jaguar="192.168.236.101" 
 ADDR_panther="192.168.236.103" 
 
+#### benetel RU case ####
+TYPE_N2="macvlan"
+MODE_N2="bridge"
+TYPE_N3="macvlan"
+MODE_N3="bridge"
+
+GNB_REPO_benetel="${OAISA_REPO}/oai-gnb-fhi72"
+#GNB_TAG_benetel="${RAN_TAG}"
+GNB_TAG_benetel="2025.w50"
+
+#CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x4-benetel550-ci-scripts.conf"
+CONF_DU_benetel1="du.sa.band78.273prb.fhi72.4x4-benetel550.conf"
+#CONF_benetel2="${CONF_benetel1}"
+#CONF_DU_benetel2="${CONF_DU_benetel1}"
+OPTIONS_benetel="--log_config.global_log_options level,nocolor,time"
+if [[ $RU_MODE = "dhcp" ]]; then
+    IP_GNB_benetel1="dhcp"
+    IP_GNB_benetel2="dhcp"
+else
+    IP_GNB_benetel1="192.168.233.104" # @IP ADDR_jaguar + 3
+    IP_GNB_benetel2="192.168.233.105" # @IP ADDR_panther + 3
+fi
+MTU_benetel="9216"
+MAC_UPLANE1="00:11:22:33:44:66"
+MAC_CPLANE1="00:11:22:33:44:67"
+SRIOV_NS="sriov-network-operator"
+VLAN_benetel1="801"
+VLAN_benetel2="802"
+ADDR_benetel1="192.168.233.101" 
+ADDR_benetel2="192.168.233.102"
+MAC_benetel1="8c:1f:64:d1:12:8c"
+MAC_benetel2="8c:1f:64:d1:12:50"
+DPDK_VF_U="0000:3a:09.0" # for sopnode-f3 U_PLANE
+DPDK_VF_C="0000:3a:09.1" # for sopnode-f3 C_PLANE
+
+
 
 ########################### oai-nr-ue rfsim chart parameters #####################
 NRUE_REPO="${R2LAB_REPO}/oai-nr-ue"
@@ -800,6 +836,53 @@ function configure-mysql() {
 #################################################################################
 
 
+function patch_snssai() {
+    local file="$1"
+
+    awk -v sst1="$SLICE1_SST" \
+        -v sd1="$SLICE1_SD" \
+        -v sst2="${SLICE2_SST:-}" \
+        -v sd2="${SLICE2_SD:-EMPTY}" '
+    function print_snssai(base_indent) {
+        item_indent = base_indent "  "
+        subitem_indent = item_indent "  "
+
+        # Slice 1
+        print item_indent "- sst: " sst1
+        if (sd1 != "EMPTY") {
+            print subitem_indent "sd: " sd1
+        }
+
+        # Slice 2 (optional)
+        if (sst2 != "") {
+            print item_indent "- sst: " sst2
+            if (sd2 != "EMPTY") {
+                print subitem_indent "sd: " sd2
+            }
+        }
+    }
+
+    BEGIN { in_block = 0 }
+
+    /^([[:space:]]*)snssaiList:/ {
+        base_indent = substr($0, 1, RLENGTH - 11)
+        print $0
+        print_snssai(base_indent)
+        in_block = 1
+        next
+    }
+
+    in_block && /^[[:space:]]*-/ { next }
+    in_block && /^[[:space:]]*sd:/ { next }
+
+    in_block && !/^[[:space:]]+/ {
+        in_block = 0
+    }
+
+    !in_block { print }
+    ' "$file"
+}
+
 function configure-gnb() {
 
     # Prepare mounted.conf and gnb chart files
@@ -855,6 +938,23 @@ function configure-gnb() {
 	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_PANTHER"
 	    IP_GNB_RU1="$IP_GNB_panther"
 	fi
+
+    elif [[ "$RRU" = "benetel1" || "$RRU" = "benetel2" ]]; then
+	ADDR_benetel=$(eval echo \"\${ADDR_$RRU}\")
+	MULTUS_UPLANE1="true"
+	MULTUS_CPLANE1="true"
+	MTU_GNB_RU1="$MTU_benetel"
+	RRU_TYPE="benetel"
+	ADD_OPTIONS_GNB="$OPTIONS_benetel"
+	QOS_GNB_DEF="true"
+	IF_NAME_GNB_RU1="$IF_NAME_VLAN_BENETEL"
+	if [[ "$RRU" = "benetel1" ]]; then
+	    MAC_BENETEL="$MAC_benetel1"
+	    VLAN_RU1="$VLAN_benetel1"
+	else
+	    MAC_BENETEL="$MAC_benetel2"
+	    VLAN_RU1="$VLAN_benetel2"
+	fi
 	
     elif [[ "$RRU" = "rfsim" ]]; then
 	MULTUS_GNB_RU1="false"
@@ -908,6 +1008,9 @@ function configure-gnb() {
 	fi
     fi
     mv "$TMP"/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
+
+    # Patch snssai values and config charts for fhi scenario
+    
 
     cat > "$SED_CONF_FILE" <<EOF
 s|@GNB_NAME@|$GNB_NAME|
@@ -994,20 +1097,32 @@ s|@GNB_REPO@|$GNB_REPO|
 s|@GNB_TAG@|$GNB_TAG|
 s|@DEFAULT_GW_GNB@|$DEFAULT_GW_GNB|
 s|@MULTUS_GNB_N2@|$MULTUS_GNB_N2|
+s|@TYPE_N2@|$TYPE_N2|
 s|@IP_GNB_N2@|$IP_GNB_N2|
 s|@NETMASK_GNB_N2@|$NETMASK_GNB_N2|
 s|@MAC_GNB_N2@|$(gener-mac)|
 s|@GW_GNB_N2@|$GW_GNB_N2|
 s|@ROUTES_GNB_N2@|$ROUTES_GNB_N2|
+s|@MODE_N2@|$MODE_N2|
 s|@IF_NAME_GNB_N2@|$IF_NAME_N2N3|
 s|@MULTUS_GNB_N3@|$MULTUS_GNB_N3|
+s|@TYPE_N3@|$TYPE_N3|
+s|@VLAN_RU1@|$VLAN_RU1|
 s|@IP_GNB_N3@|$IP_GNB_N3|
 s|@NETMASK_GNB_N3@|$NETMASK_GNB_N3|
 s|@MAC_GNB_N3@|$(gener-mac)|
 s|@GW_GNB_N3@|$GW_GNB_N3|
 s|@ROUTES_GNB_N3@|$ROUTES_GNB_N3|
+s|@MODE_N3@|$MODE_N3|
 s|@IF_NAME_GNB_N3@|$IF_NAME_N2N3|
 s|@MULTUS_GNB_RU1@|$MULTUS_GNB_RU1|
+s|@MULTUS_UPLANE1@|$MULTUS_UPLANE1|
+s|@MULTUS_CPLANE1@|$MULTUS_CPLANE1|
+s|@MAC_BENETEL@|$MAC_BENETEL|
+s|@SRIOV_NS@|$SRIOV_NS|
+s|@MAC_UPLANE1@|$MAC_UPLANE1|
+s|@MAC_CPLANE1@|$MAC_CPLANE1|
+s|@VLAN_RU1@|$VLAN_RU1|
 s|@IP_GNB_RU1@|$IP_GNB_RU1|
 s|@NETMASK_GNB_RU1@|$NETMASK_GNB_RU|
 s|@MAC_GNB_RU1@|$(gener-mac)|
@@ -1151,12 +1266,25 @@ s|@QOS_CUUP_DEF@|$QOS_CUUP_DEF|
 s|@CU_HOST@|$CU_HOST|
 s|@NODE_CUUP@|$NODE_CUUP|
 EOF
-    for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
+    for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
 	ORIG_CHART="${OAI5G_RAN}/${nf}/values.yaml"
 	cp ${ORIG_CHART} "$TMP"/${nf}_values.yaml-orig
 	echo "(Over)writing $ORIG_CHART"
-	sed -f "$SED_VALUES_FILE" < "$TMP"/${nf}_values.yaml-orig > ${ORIG_CHART}
-	diff "$TMP"/${nf}_values.yaml-orig ${ORIG_CHART}
+	sed -f "$SED_VALUES_FILE" < "$TMP/${nf}_values.yaml-orig" > "$TMP/${nf}_values.yaml-sed"
+	if [[ "$nf" == "oai-gnb-fhi-72" ]]; then
+            patch_snssai "$TMP/${nf}_values.yaml-sed" > "${ORIG_CHART}"
+	else
+            mv "$TMP/${nf}_values.yaml-sed" "${ORIG_CHART}"
+	fi
+	diff "$TMP/${nf}_values.yaml-orig" "${ORIG_CHART}"
+    done
+    for nf in oai-gnb-fhi-72 ; do
+	ORIG_CHART="${OAI5G_RAN}/${nf}/config.yaml"
+	cp ${ORIG_CHART} "$TMP"/${nf}_config.yaml-orig
+	echo "(Over)writing $ORIG_CHART"
+	sed -f "$SED_VALUES_FILE" < "$TMP/${nf}_config.yaml-orig" > "$TMP/${nf}_config.yaml-sed"
+	patch_snssai "$TMP/${nf}_config.yaml-sed" > "${ORIG_CHART}"
+	diff "$TMP/${nf}_config.yaml-orig" "${ORIG_CHART}"
     done
 }
 
