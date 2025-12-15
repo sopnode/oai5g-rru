@@ -837,45 +837,52 @@ function configure-mysql() {
 #################################################################################
 
 
+
 function patch_snssai() {
     local file="$1"
-    
+
     awk -v sst1="$SLICE1_SST" \
         -v sd1="$SLICE1_SD" \
         -v sst2="${SLICE2_SST:-}" \
         -v sd2="${SLICE2_SD:-EMPTY}" '
     function print_snssai(base_indent) {
-        indent = base_indent "  "  # 2 espaces supplémentaires par YAML
-        subindent = indent "  "
+        # Base indent is the indentation of snssaiList:
+        # Items need 2 spaces more
+        item_indent = base_indent "  "
+        subitem_indent = item_indent "  "
 
         # Slice 1
-        print indent "- sst: " sst1
-        if (sd1 != "EMPTY") { print subindent "sd: " sd1 }
+        print item_indent "- sst: " sst1
+        if (sd1 != "EMPTY") { print subitem_indent "sd: " sd1 }
 
         # Slice 2 (optional)
         if (sst2 != "") {
-            print indent "- sst: " sst2
-            if (sd2 != "EMPTY") { print subindent "sd: " sd2 }
+            print item_indent "- sst: " sst2
+            if (sd2 != "EMPTY") { print subitem_indent "sd: " sd2 }
         }
     }
 
     BEGIN { in_block = 0 }
 
-    /^([[:space:]]*)snssaiList:/ {
-        base_indent = substr($0, 1, RLENGTH - 11)
+    # Match snssaiList and capture indentation
+    /^[[:space:]]*snssaiList:/ {
+        # everything up to "snssaiList:"
+        match($0, /^([[:space:]]*)snssaiList:/, m)
+        base_indent = m[1]
         print $0
         print_snssai(base_indent)
         in_block = 1
         next
     }
 
-    # Remove old block content
+    # Skip existing items of snssaiList
     in_block && /^[[:space:]]*-/ { next }
     in_block && /^[[:space:]]*sd:/ { next }
 
-    # End of block
+    # Exit block if indentation decreases (next YAML key)
     in_block && !/^[[:space:]]+/ { in_block = 0 }
 
+    # Print all other lines
     !in_block { print }
     ' "$file"
 }
