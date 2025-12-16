@@ -867,8 +867,9 @@ function patch_snssai() {
     # Match snssaiList and capture indentation
     /^[[:space:]]*snssaiList:/ {
         # everything up to "snssaiList:"
-        match($0, /^([[:space:]]*)snssaiList:/, m)
-        base_indent = m[1]
+	base_indent = $0
+	sub(/snssaiList:.*/, "", base_indent)
+
         print $0
         print_snssai(base_indent)
         in_block = 1
