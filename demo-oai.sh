@@ -933,26 +933,19 @@ echo "===== FIN DEBUG ====="
 ########################################
 # Multus 
 ########################################
-echo "===== DEBUG Multus avant modification ====="
-yq eval '.multus.interfaces[] | select(.name=="n2")' "$VALUES_FILE"
-echo "IF_NAME_N2N3=$IF_NAME_N2N3"
-echo "IP_GNB_N2=$IP_GNB_N2"
-echo "=========================================="
-
-yq eval -i "$VALUES_FILE" <<'YAML'
+yq eval -i '
 if has("multus") then
   .multus.enabled = true
-  (.multus.interfaces[] | select(.name=="n2") | .hostInterface) = env(IF_NAME_N2N3)
-  (.multus.interfaces[] | select(.name=="n2") | .ipAdd) = env(IP_GNB_N2)
+  .multus.interfaces = [
+    { name: "n2", enabled: (env(MULTUS_GNB_N2)=="true"), type: env(TYPE_N2), hostInterface: env(IF_NAME_N2N3), ipAdd: env(IP_GNB_N2) },
+    { name: "n3", enabled: (env(MULTUS_GNB_N3)=="true"), type: env(TYPE_N3), hostInterface: env(IF_NAME_N2N3), ipAdd: env(IP_GNB_N3) },
+    { name: "uplane1", enabled: (env(MULTUS_UPLANE1)=="true"), type: "sriov", mac: env(MAC_UPLANE1), sriovNetworkNamespace: env(SRIOV_NS), vlan: env(VLAN_RU1) },
+    { name: "cplane1", enabled: (env(MULTUS_CPLANE1)=="true"), type: "sriov", mac: env(MAC_CPLANE1), sriovNetworkNamespace: env(SRIOV_NS), vlan: env(VLAN_RU1) }
+  ]
 else
   .
 end
-YAML
-
-echo "===== DEBUG Multus après modification ====="
-yq eval '.multus.interfaces[] | select(.name=="n2")' "$VALUES_FILE"
-echo "=========================================="
-
+' "$VALUES_FILE"
 
 
 echo "88888888888888"
