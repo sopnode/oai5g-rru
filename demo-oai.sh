@@ -973,7 +973,23 @@ end
 
 echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 cat "$VALUES_FILE"
-    
+
+echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+# variables (ajuste si nécessaire)
+VF=/root/test-oai.v2.2.0/charts/oai-5g-ran/oai-gnb-fhi-72/values.yaml
+
+echo "=== BEFORE ==="
+yq eval '.multus.interfaces[] | select(.name=="n2")' "$VF"
+echo "env(IF_NAME_N2N3)=" "$(env | grep '^IF_NAME_N2N3=' || true)"
+
+# run the command you used (exact)
+yq eval -i '(.multus.interfaces[] | select(.name=="n2") | .hostInterface) = strenv(IF_NAME_N2N3) |
+(.multus.interfaces[] | select(.name=="n2") | .ipAdd) = strenv(IP_GNB_N2)' "$VF"
+echo "yq exit:$?"
+
+echo "=== AFTER ==="
+yq eval '.multus.interfaces[] | select(.name=="n2")' "$VF"
+
     ########################################
     # NSSAI 
     ########################################
@@ -1022,7 +1038,7 @@ configure-gnb() {
     }
 
     # for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
-    for nf in oai-gnb oai-gnb-fhi-72; do
+    for nf in oai-gnb-fhi-72; do
 	VALUES="${OAI5G_RAN}/${nf}/values.yaml"
 	echo "***** nf: $nf, $VALUES"
 
