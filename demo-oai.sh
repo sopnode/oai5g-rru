@@ -329,7 +329,7 @@ fi
 
 ############################### oai-cn5g chart parameters ########################
 #
-OAI5G_CHARTS="$PREFIX_DEMO/oai-cn5g-fed/charts"
+OAI5G_CHARTS="$PREFIX_DEMO/charts"
 OAI5G_CORE="$OAI5G_CHARTS/oai-5g-core"
 OAI5G_BASIC="$OAI5G_CORE/oai-5g-basic"
 OAI5G_ADVANCE="$OAI5G_CORE/oai-5g-advance"
@@ -998,7 +998,7 @@ configure-gnb() {
 
     echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $LOGS"
 
-    DIR_CHARTS="$PREFIX_DEMO/oai-cn5g-fed/charts"
+    DIR_CHARTS="$PREFIX_DEMO/charts"
 
     
     # First load RU specific parameters
