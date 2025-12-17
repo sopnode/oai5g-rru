@@ -1018,7 +1018,8 @@ configure-gnb() {
             continue
 	fi	
 	cp "$VALUES" "${OAI5G_RAN}/${nf}/values.yaml.orig"
-
+	echo "***** nf: $nf, $VALUES"
+	env | grep -E 'GNB|MULTUS|FLEXRIC'  # montre quelles variables sont définies
 	apply-gnb-values-yq "$VALUES"
 
 	#case "$nf" in
