@@ -1021,7 +1021,7 @@ configure-gnb() {
     }
 
     # for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
-    for nf in oai-gnb oai-gnb-fhi-72
+    for nf in oai-gnb oai-gnb-fhi-72; do
 	VALUES="${OAI5G_RAN}/${nf}/values.yaml"
 	echo "***** nf: $nf, $VALUES"
 
