@@ -1009,7 +1009,6 @@ configure-gnb() {
     }
 
     for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
-	echo "OAI5G_RAN=$OAI5G_RAN"
 	VALUES="${OAI5G_RAN}/${nf}/values.yaml"
 	echo "***** nf: $nf, $VALUES"
 
@@ -1018,18 +1017,12 @@ configure-gnb() {
             continue
 	fi	
 	cp "$VALUES" "${OAI5G_RAN}/${nf}/values.yaml.orig"
-	echo "***** nf: $nf, $VALUES"
-	env | grep -E 'GNB|MULTUS|FLEXRIC'  # montre quelles variables sont définies
+	
+	set +u
 	apply-gnb-values-yq "$VALUES"
-
-	#case "$nf" in
-	#    oai-gnb|oai-gnb-fhi-72)
-	#apply-gnb-values.sh "$VALUES"
-	#;;
-	#esac
+	set -u
 
 	diff -u "${OAI5G_RAN}/${nf}/values.yaml.orig" "$VALUES"
-	echo "@@@@@@ $nf"
     done
 
 }
