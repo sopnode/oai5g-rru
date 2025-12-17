@@ -97,7 +97,7 @@ if [[ $RUN_MODE = "full" ]]; then
     SUBNET_N6="192.168.3"
     NETMASK_N2N3="24"
     NETMASK_N6="24"
-    IF_NAME_N2N3="$IF_NAME_N2N3_DEFAULT"
+    export IF_NAME_N2N3="$IF_NAME_N2N3_DEFAULT"
     IF_NAME_N6="$IF_NAME_N6_DEFAULT"
     #
     ENABLED_MYSQL=true
@@ -171,157 +171,157 @@ if [[ $RUN_MODE = "full" ]]; then
     IP_DNS2="193.51.196.138"
     # ran charts
     export HOST_AMF="$IP_AMF_N2"
-    MULTUS_GNB_N2="true"
-    IP_GNB_N2="$SUBNET_N2N3.203"
-    GNB_N2_IF_NAME="n2"
-    MULTUS_GNB_N3="false"
+    export MULTUS_GNB_N2="true"
+    export IP_GNB_N2="$SUBNET_N2N3.203"
+    export GNB_N2_IF_NAME="n2"
+    export MULTUS_GNB_N3="false"
     if [[ $GNB_MODE = 'cucpup' ]]; then
-	F1IFNAME="f1c"
-	MULTUS_CUUP_N3="true"
-	IP_GNB_N3="$SUBNET_N2N3.204"
-	CUUP_N3_IF_NAME="n3"
-	IP_NRUE="$SUBNET_N2N3.205"
-	IP_NRUE2="$SUBNET_N2N3.206"
-	IP_NRUE3="$SUBNET_N2N3.207"
+	export F1IFNAME="f1c"
+	export MULTUS_CUUP_N3="true"
+	export IP_GNB_N3="$SUBNET_N2N3.204"
+	export CUUP_N3_IF_NAME="n3"
+	export IP_NRUE="$SUBNET_N2N3.205"
+	export IP_NRUE2="$SUBNET_N2N3.206"
+	export IP_NRUE3="$SUBNET_N2N3.207"
     else
-	F1IFNAME="f1"
-	IP_GNB_N3="$IP_GNB_N2"
-	IP_NRUE="$SUBNET_N2N3.204"
-	IP_NRUE2="$SUBNET_N2N3.205"
-	IP_NRUE3="$SUBNET_N2N3.206"
+	export F1IFNAME="f1"
+	export IP_GNB_N3="$IP_GNB_N2"
+	export IP_NRUE="$SUBNET_N2N3.204"
+	export IP_NRUE2="$SUBNET_N2N3.205"
+	export IP_NRUE3="$SUBNET_N2N3.206"
     fi
     GNB_N3_IF_NAME="n2"
 	#
 	# ** NRUE specific part **
 	#
-	MULTUS_NRUE="true"
+	export MULTUS_NRUE="true"
 else
     # Local RAN, External MYSQL/UDR/UDM/AUSF/AMF/SMF
     ENABLE_SNAT="off" # "yes" or "off"
     if [[ $RUN_MODE = "gnb-upf" ]]; then
 	# Local RAN and local UPF
-	SUBNET_N2N3="172.21.10"
-	NETMASK_N2N3="26"
-	IF_NAME_N2N3="br-slices"
+	export SUBNET_N2N3="172.21.10"
+	export NETMASK_N2N3="26"
+	export IF_NAME_N2N3="br-slices"
 	#
-	ENABLED_MYSQL=false
-	ENABLED_NRF=false
-	NFS_NRF_HOST="$SUBNET_N2N3.203"
-	ENABLED_NSSF=false
-	ENABLED_UDR=false
-	NFS_UDR_HOST="oai-udr"
-	ENABLED_UDM=false
-	NFS_UDM_HOST="oai-udm"
-	ENABLED_AUSF=false
-	NFS_AUSF_HOST="oai-ausf"
+	export ENABLED_MYSQL=false
+	export ENABLED_NRF=false
+	export NFS_NRF_HOST="$SUBNET_N2N3.203"
+	export ENABLED_NSSF=false
+	export ENABLED_UDR=false
+	export NFS_UDR_HOST="oai-udr"
+	export ENABLED_UDM=false
+	export NFS_UDM_HOST="oai-udm"
+	export ENABLED_AUSF=false
+	export NFS_AUSF_HOST="oai-ausf"
 	# amf 
-	ENABLED_AMF=false
-	NFS_AMF_HOST="$SUBNET_N2N3.200"
-	IP_AMF_N2=""
-	IF_N2="" # unused
+	export ENABLED_AMF=false
+	export NFS_AMF_HOST="$SUBNET_N2N3.200"
+	export IP_AMF_N2=""
+	export IF_N2="" # unused
 	# smf
-	ENABLED_SMF=false
-	NFS_SMF_HOST="$SUBNET_N2N3.202"
+	export ENABLED_SMF=false
+	export NFS_SMF_HOST="$SUBNET_N2N3.202"
 	# upf
-	ENABLED_UPF=true
-	NFS_UPF_HOST="oai-upf"
-	IF_SBI="n3"
-	IF_N3="n3"
-	IF_N4="n3"
-	IF_N6="eth0"
-	MULTUS_UPF_N3="true"
-	IP_UPF_N3="$SUBNET_N2N3.222"
-	NETMASK_UPF_N3="$NETMASK_N2N3"
-	GW_UPF_N3=""
-	ROUTES_UPF_N3="[{'dst': '10.8.0.0/24','gw': '172.21.10.254'}]"
-	IF_NAME_UPF_N3="$IF_NAME_N2N3"
-	MULTUS_UPF_N4="false"
-	IP_UPF_N4="" 
-	NETMASK_UPF_N4=""
-	GW_UPF_N4=""
-	ROUTES_UPF_N4=""
-	IF_NAME_UPF_N4=""
-	MULTUS_UPF_N6="false"
-	IP_UPF_N6="" 
-	NETMASK_UPF_N6=""
-	GW_UPF_N6=""
-	ROUTES_UPF_N6=""
-	IF_NAME_UPF_N6=""
+	export ENABLED_UPF=true
+	export NFS_UPF_HOST="oai-upf"
+	export IF_SBI="n3"
+	export IF_N3="n3"
+	export IF_N4="n3"
+	export IF_N6="eth0"
+	export MULTUS_UPF_N3="true"
+	export IP_UPF_N3="$SUBNET_N2N3.222"
+	export NETMASK_UPF_N3="$NETMASK_N2N3"
+	export GW_UPF_N3=""
+	export ROUTES_UPF_N3="[{'dst': '10.8.0.0/24','gw': '172.21.10.254'}]"
+	export IF_NAME_UPF_N3="$IF_NAME_N2N3"
+	export MULTUS_UPF_N4="false"
+	export IP_UPF_N4="" 
+	export NETMASK_UPF_N4=""
+	export GW_UPF_N4=""
+	export ROUTES_UPF_N4=""
+	export IF_NAME_UPF_N4=""
+	export MULTUS_UPF_N6="false"
+	export IP_UPF_N6="" 
+	export NETMASK_UPF_N6=""
+	export GW_UPF_N6=""
+	export ROUTES_UPF_N6=""
+	export IF_NAME_UPF_N6=""
 	# TS
-	ENABLED_TS=false
+	export ENABLED_TS=false
 	# ran charts
 	export HOST_AMF="oai-amf"
-	MULTUS_GNB_N2="true"
-	IP_GNB_N2="$SUBNET_N2N3.223"
-	GNB_N2_IF_NAME="n2"
-	MULTUS_GNB_N3="false"
+	export MULTUS_GNB_N2="true"
+	export IP_GNB_N2="$SUBNET_N2N3.223"
+	export GNB_N2_IF_NAME="n2"
+	export MULTUS_GNB_N3="false"
 	if [[ $GNB_MODE = 'cucpup' ]]; then
-	    F1IFNAME="f1c"
-	    MULTUS_CUUP_N3="true"
-	    IP_GNB_N3="$SUBNET_N2N3.224"
-	    CUUP_N3_IF_NAME="n3"
-	    IP_NRUE="$SUBNET_N2N3.225"
-	    IP_NRUE2="$SUBNET_N2N3.226"
-	    IP_NRUE3="$SUBNET_N2N3.227"
+	    export F1IFNAME="f1c"
+	    export MULTUS_CUUP_N3="true"
+	    export IP_GNB_N3="$SUBNET_N2N3.224"
+	    export CUUP_N3_IF_NAME="n3"
+	    export IP_NRUE="$SUBNET_N2N3.225"
+	    export IP_NRUE2="$SUBNET_N2N3.226"
+	    export IP_NRUE3="$SUBNET_N2N3.227"
 	else
-	    F1IFNAME="f1"
-	    IP_GNB_N3="$IP_GNB_N2"
-	    IP_NRUE="$SUBNET_N2N3.224"
-	    IP_NRUE2="$SUBNET_N2N3.225"
-	    IP_NRUE3="$SUBNET_N2N3.226"
+	    export F1IFNAME="f1"
+	    export IP_GNB_N3="$IP_GNB_N2"
+	    export IP_NRUE="$SUBNET_N2N3.224"
+	    export IP_NRUE2="$SUBNET_N2N3.225"
+	    export IP_NRUE3="$SUBNET_N2N3.226"
 	fi
-	GNB_N3_IF_NAME="n2"
-	ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
-	#ROUTES_GNB_N2="[{'dst': '172.21.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
+	export GNB_N3_IF_NAME="n2"
+	export ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
+	#export ROUTES_GNB_N2="[{'dst': '172.21.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
 	#
 	# ** NRUE specific part **
 	#
-	MULTUS_NRUE="true"
+	export MULTUS_NRUE="true"
     else
         # RUN_MODE=gnb-only
 	# -- Local RAN and external CN
 	#
-        SUBNET_N2N3="10.10.3" # "172.21.10"
+        export SUBNET_N2N3="10.10.3" # "172.21.10"
         export HOST_AMF="$SUBNET_N2N3.200" #${NODE_AMF_UPF%"-v30"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
-        #HOST_AMF=${NODE_AMF_UPF}
+        #export HOST_AMF=${NODE_AMF_UPF}
 	#
 	# ** GNB specific part (also used for CU) **
 	#
-	MULTUS_GNB_N2="false"
-	IP_GNB_N2="$SUBNET_N2N3.205" # "$SUBNET_N2N3.223" 
+	export MULTUS_GNB_N2="false"
+	export IP_GNB_N2="$SUBNET_N2N3.205" # "$SUBNET_N2N3.223" 
         # Set the route to reach AMF
-        ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
-	GNB_N2_IF_NAME="n3" # local pod network interface name for N2 (eth0 or n2 or n3)
+        export ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
+	export GNB_N2_IF_NAME="n3" # local pod network interface name for N2 (eth0 or n2 or n3)
 	#
-	MULTUS_GNB_N3="true"
-	IP_GNB_N3="$IP_GNB_N2" # "$SUBNET_N2N3.224"
-	GNB_N3_IF_NAME="$GNB_N2_IF_NAME" # pod network interface name for N3 (eth0 or n2/n3)
-	NETMASK_N2N3="24"
-        IF_NAME_N2N3="n3br" # host interface used for multus on N2/N3 
+	export MULTUS_GNB_N3="true"
+	export IP_GNB_N3="$IP_GNB_N2" # "$SUBNET_N2N3.224"
+	export GNB_N3_IF_NAME="$GNB_N2_IF_NAME" # pod network interface name for N3 (eth0 or n2/n3)
+	export NETMASK_N2N3="24"
+        export IF_NAME_N2N3="n3br" # host interface used for multus on N2/N3 
 	#
 	#if [[ $GNB_MODE = 'cucpup' ]]; then
-	#    IP_GNB_N3="$SUBNET_N2N3.224"
-	#    IP_NRUE="$SUBNET_N2N3.225"
+	#    export IP_GNB_N3="$SUBNET_N2N3.224"
+	#    export IP_NRUE="$SUBNET_N2N3.225"
 	#else
-	#    IP_GNB_N3="$IP_GNB_N2"
-	#    IP_NRUE="$SUBNET_N2N3.224"
+	#    export IP_GNB_N3="$IP_GNB_N2"
+	#    export IP_NRUE="$SUBNET_N2N3.224"
 	#fi
 	#
 	# ** CU-CP specific part **
 	#
-	MULTUS_CUCP_N2="true"
-	IP_CUCP_N2="$IP_GNB_N2"
-	CUCP_N2_IF_NAME="n2"
+	export MULTUS_CUCP_N2="true"
+	export IP_CUCP_N2="$IP_GNB_N2"
+	export CUCP_N2_IF_NAME="n2"
 	#
 	# ** CU-UP specific part **
 	#
-	MULTUS_CUUP_N3="true"
-	IP_CUUP_N3="$SUBNET_N2N3.206"
-	CUUP_N3_IF_NAME="n3"
+	export MULTUS_CUUP_N3="true"
+	export IP_CUUP_N3="$SUBNET_N2N3.206"
+	export CUUP_N3_IF_NAME="n3"
 	#
 	# ** NRUE specific part **
 	#
-	MULTUS_NRUE="false"
+	export MULTUS_NRUE="false"
     fi
 fi
 
@@ -583,7 +583,7 @@ NRUE_TAG="${RAN_TAG}"
 OPTIONS_NRUE="--rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time" 
 #OPTIONS_NRUE="--sa --rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time" 
 NETMASK_NRUE="$NETMASK_N2N3"
-IF_NAME_NRUE="$IF_NAME_N2N3"
+export IF_NAME_NRUE="$IF_NAME_N2N3"
 NRUE_USRP="rfsim"
 
 ########################### oai-flexric chart parameters #####################
