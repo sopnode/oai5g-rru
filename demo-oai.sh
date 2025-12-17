@@ -589,9 +589,10 @@ NRUE_USRP="rfsim"
 ########################### oai-flexric chart parameters #####################
 FLEXRIC_REPO="ghcr.io/ziyad-mabrouk/oai-flexric"
 #FLEXRIC_REPO="oaisoftwarealliance/oai-flexric"
-FLEXRIC_TAG="test"
+export FLEXRIC_TAG="test"
 #FLEXRIC_TAG="latest"
-FLEXRIC_PULL_POLICY="Always"
+export FLEXRIC_PULL_POLICY="Always"
+export HOST_FLEXRIC="oai-flexric"
 
 
 ########################### sopnode-f3 specific tuning #####################
