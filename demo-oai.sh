@@ -34,7 +34,7 @@ GNB_MODE="@DEF_GNB_MODE@" # in ['monolithic', 'cudu', 'cucpup']
 LOGS="@DEF_LOGS@" # boolean, true if logs are retrieved on pods
 PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
 MONITORING="@DEF_MONITORING@" # boolean, true if prometheus metrics parser is generated on oai-gnb pod (monolithic)
-FLEXRIC="@DEF_FLEXRIC@" # boolean, true if flexRIC is included
+export FLEXRIC="@DEF_FLEXRIC@" # boolean, true if flexRIC is included
 #
 MCC="@DEF_MCC@"
 MNC="@DEF_MNC@"
