@@ -886,7 +886,7 @@ apply-gnb-values-yq() {
     }
 
     echo "Applying yq overlays to $VALUES_FILE"
-    setenv
+    export
     yq -i '
   ############################
   # Image configuration
