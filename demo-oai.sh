@@ -939,7 +939,7 @@ if has("multus") then
   (.multus.interfaces[] | select(.name=="n2") | .hostInterface) = env(IF_NAME_N2N3)
   (.multus.interfaces[] | select(.name=="n2") | .ipAdd) = env(IP_GNB_N2)
 else
-  .
+  .multus.enabled = false
 end
 YAML
 
