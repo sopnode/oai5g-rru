@@ -935,6 +935,27 @@ echo "===== FIN DEBUG ====="
 ########################################
 yq eval -i '
 if has("multus") then
+  # Activer multus
+  .multus.enabled = true |
+
+  # ---- DEBUG ----
+  ({"debug_yaml_n2": (.multus.interfaces[] | select(.name=="n2"))}) |
+  ({"debug_env_IF_NAME_N2N3": env(IF_NAME_N2N3)}) |
+  ({"debug_env_IP_GNB_N2": env(IP_GNB_N2)}) |
+
+  # ---- MODIFICATIONS ----
+  (.multus.interfaces[] | select(.name=="n2") | .hostInterface) = env(IF_NAME_N2N3) |
+  (.multus.interfaces[] | select(.name=="n2") | .ipAdd) = env(IP_GNB_N2)
+else
+  .
+end
+' "$VALUES_FILE"
+
+echo "88888888888888"
+cat "$VALUES_FILE"
+
+yq eval -i '
+if has("multus") then
   .multus.enabled = true |
 
   # n2 interface
