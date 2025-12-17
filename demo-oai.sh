@@ -170,7 +170,7 @@ if [[ $RUN_MODE = "full" ]]; then
     IP_DNS1="138.96.0.210"
     IP_DNS2="193.51.196.138"
     # ran charts
-    HOST_AMF="$IP_AMF_N2"
+    export HOST_AMF="$IP_AMF_N2"
     MULTUS_GNB_N2="true"
     IP_GNB_N2="$SUBNET_N2N3.203"
     GNB_N2_IF_NAME="n2"
@@ -250,7 +250,7 @@ else
 	# TS
 	ENABLED_TS=false
 	# ran charts
-	HOST_AMF="oai-amf"
+	export HOST_AMF="oai-amf"
 	MULTUS_GNB_N2="true"
 	IP_GNB_N2="$SUBNET_N2N3.223"
 	GNB_N2_IF_NAME="n2"
