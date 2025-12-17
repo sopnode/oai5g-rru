@@ -939,7 +939,7 @@ if has("multus") then
   # n2 interface
   (.multus.interfaces[] | select(.name=="n2") | .enabled) = (env(MULTUS_GNB_N2) == "true")
   (.multus.interfaces[] | select(.name=="n2") | .type) = env(TYPE_N2)
-  (.multus.interfaces[] | select(.name=="n2") | .hostInterface) = env(IF_NAME_N2N3)
+  (.multus.interfaces[] | select(.name=="n2") | .hostInterface) = strenv(IF_NAME_N2N3)
   (.multus.interfaces[] | select(.name=="n2") | .ipAdd) = env(IP_GNB_N2)
   (.multus.interfaces[] | select(.name=="n2") | .netmask) = env(NETMASK_GNB_N2)
   (.multus.interfaces[] | select(.name=="n2") | .gateway) = env(GW_GNB_N2)
