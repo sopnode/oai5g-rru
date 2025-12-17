@@ -27,12 +27,12 @@ usage() {
 # do not change them here !
 NS="@DEF_NS@" # k8s namespace
 NODE_AMF_UPF="@DEF_NODE_AMF_UPF@" # node in wich run amf and upf pods
-NODE_GNB="@DEF_NODE_GNB@" # node in which gnb pod runs
-RRU="@DEF_RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
+export NODE_GNB="@DEF_NODE_GNB@" # node in which gnb pod runs
+export RRU="@DEF_RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
 RUN_MODE="@DEF_RUN_MODE@" # in ['full', 'gnb-only', 'gnb-upf']
 GNB_MODE="@DEF_GNB_MODE@" # in ['monolithic', 'cudu', 'cucpup']
-LOGS="@DEF_LOGS@" # boolean, true if logs are retrieved on pods
-PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
+export LOGS="@DEF_LOGS@" # boolean, true if logs are retrieved on pods
+export PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
 MONITORING="@DEF_MONITORING@" # boolean, true if prometheus metrics parser is generated on oai-gnb pod (monolithic)
 export FLEXRIC="@DEF_FLEXRIC@" # boolean, true if flexRIC is included
 #
