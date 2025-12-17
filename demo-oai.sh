@@ -937,28 +937,31 @@ yq eval -i '
 if has("multus") then
   .multus.enabled = true |
 
+  # n2 interface
   (.multus.interfaces[] | select(.name=="n2")) |= (
-    .enabled        = (env(MULTUS_GNB_N2) == "true") |
-    .type           = env(TYPE_N2) |
-    .hostInterface  = strenv(IF_NAME_N2N3) |
-    .ipAdd          = strenv(IP_GNB_N2) |
-    .netmask        = env(NETMASK_GNB_N2) |
-    .gateway        = env(GW_GNB_N2) |
-    .routes         = env(ROUTES_GNB_N2) |
-    .mode           = env(MODE_N2)
+    .enabled       = (env(MULTUS_GNB_N2) == "true") |
+    .type          = env(TYPE_N2) |
+    .hostInterface = strenv(IF_NAME_N2N3) |
+    .ipAdd         = strenv(IP_GNB_N2) |
+    .netmask       = env(NETMASK_GNB_N2) |
+    .gateway       = env(GW_GNB_N2) |
+    .routes        = env(ROUTES_GNB_N2) |
+    .mode          = env(MODE_N2)
   ) |
 
+  # n3 interface
   (.multus.interfaces[] | select(.name=="n3")) |= (
-    .enabled        = (env(MULTUS_GNB_N3) == "true") |
-    .type           = env(TYPE_N3) |
-    .hostInterface  = strenv(IF_NAME_N2N3) |
-    .ipAdd          = strenv(IP_GNB_N3) |
-    .netmask        = env(NETMASK_GNB_N3) |
-    .gateway        = env(GW_GNB_N3) |
-    .routes         = env(ROUTES_GNB_N3) |
-    .mode           = env(MODE_N3)
+    .enabled       = (env(MULTUS_GNB_N3) == "true") |
+    .type          = env(TYPE_N3) |
+    .hostInterface = strenv(IF_NAME_N2N3) |
+    .ipAdd         = strenv(IP_GNB_N3) |
+    .netmask       = env(NETMASK_GNB_N3) |
+    .gateway       = env(GW_GNB_N3) |
+    .routes        = env(ROUTES_GNB_N3) |
+    .mode          = env(MODE_N3)
   ) |
 
+  # uplane1 interface
   (.multus.interfaces[] | select(.name=="uplane1")) |= (
     .enabled               = (env(MULTUS_UPLANE1) == "true") |
     .type                  = "sriov" |
@@ -967,6 +970,7 @@ if has("multus") then
     .vlan                  = env(VLAN_RU1)
   ) |
 
+  # cplane1 interface
   (.multus.interfaces[] | select(.name=="cplane1")) |= (
     .enabled               = (env(MULTUS_CPLANE1) == "true") |
     .type                  = "sriov" |
@@ -978,6 +982,7 @@ if has("multus") then
 else .
 end
 ' "$VALUES_FILE"
+
 
 
 echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
