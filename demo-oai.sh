@@ -1,9 +1,8 @@
 #!/bin/bash
 
-function usage() {
+usage() {
     echo "USAGE:"
-    echo "demo-oai.sh init |"
-    echo "            start |"
+    echo "demo-oai.sh start |"
     echo "            stop |"
     echo "            configure-all |"
     echo "            start-cn |"
@@ -78,12 +77,14 @@ IF_NAME_N2N3_DEFAULT="@DEF_LOCAL_INTERFACE@"
 IF_NAME_N6_DEFAULT="@DEF_LOCAL_INTERFACE@" 
 IF_NAME_E1_DEFAULT="@DEF_LOCAL_INTERFACE@" 
 IF_NAME_F1_DEFAULT="@DEF_LOCAL_INTERFACE@"
-IF_NAME_VLAN_N300_1="net-n300.1"
-IF_NAME_VLAN_N300_2="net-n300.2"
-IF_NAME_VLAN_N320_1="net-n320.1"
-IF_NAME_VLAN_N320_2="net-n320.2"
-IF_NAME_VLAN_JAGUAR="net-jaguar"
-IF_NAME_VLAN_PANTHER="net-panther"
+
+IF_NAME_VLAN_N300_1="r2lab_usrp"
+IF_NAME_VLAN_N300_2="r2lab_usrp"
+IF_NAME_VLAN_N320_1="r2lab_usrp"
+IF_NAME_VLAN_N320_2="r2lab_usrp"
+IF_NAME_VLAN_JAGUAR="r2lab_aw2s"
+IF_NAME_VLAN_PANTHER="r2lab_aw2s"
+IF_NAME_VLAN_BENETEL1="r2lab_benetel"
 
 
 
@@ -333,151 +334,150 @@ OAI5G_CORE="$OAI5G_CHARTS/oai-5g-core"
 OAI5G_BASIC="$OAI5G_CORE/oai-5g-basic"
 OAI5G_ADVANCE="$OAI5G_CORE/oai-5g-advance"
 
-CN_DEFAULT_GW=""
+export CN_DEFAULT_GW=""
 
 ################################ oai-gnb chart parameters ########################
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 MY_REPO="ghcr.io/ziyad-mabrouk/openairinterface5g"
 #
-#RAN_TAG="2024.w48"
-RAN_TAG="2025.w34" # starting from w29 includes "Initial support for RedCap" feature in gNB
-GNB_NAME="gNB-r2lab"
-GNB_PULL_POLICY="IfNotPresent"
+export RAN_TAG="2025.w34" # starting from w29 includes "Initial support for RedCap" feature in gNB
+export GNB_NAME="gNB-r2lab"
+export GNB_PULL_POLICY="IfNotPresent"
 
 # DU/CU SPLIT parameters
 #
-NODE_CU="$NODE_GNB" # same node used for cu/cu-cp/cu-up and du
+export NODE_CU="$NODE_GNB" # same node used for cu/cu-cp/cu-up and du
 
-E1IFNAME="e1"
-F1CUPORT="2152"
-F1DUPORT="2152"
+export E1IFNAME="e1"
+export F1CUPORT="2152"
+export F1DUPORT="2152"
 #
 ########## DU specific part ##############
 #DU_REPO="${R2LAB_REPO}/oai-gnb" DU_REPO must be GNB_REPO to handle aw2s case
-DU_TAG=${RAN_TAG}
-NAME_DU_SA="oai-du-sa"
+export DU_TAG=${RAN_TAG}
+export NAME_DU_SA="oai-du-sa"
 #
-MULTUS_DU_F1="true"
-IP_DU_F1="172.21.16.100"
-NETMASK_DU_F1="22"
-GW_DU_F1=""
-ROUTES_DU_F1=""
-IF_NAME_DU_F1="$IF_NAME_F1_DEFAULT"
+export MULTUS_DU_F1="true"
+export IP_DU_F1="172.21.16.100"
+export NETMASK_DU_F1="22"
+export GW_DU_F1=""
+export ROUTES_DU_F1=""
+export IF_NAME_DU_F1="$IF_NAME_F1_DEFAULT"
 #
-NAME_DU="oai-du"
-QOS_DU_DEF="true"
-NODE_DU="$NODE_GNB"
+export NAME_DU="oai-du"
+export QOS_DU_DEF="true"
+export NODE_DU="$NODE_GNB"
 #
 ########## CU specific part ##############
-CU_REPO="${R2LAB_REPO}/oai-gnb" 
-CU_TAG=${RAN_TAG}
-NAME_CU_SA="oai-cu-sa"
+export CU_REPO="${R2LAB_REPO}/oai-gnb" 
+export CU_TAG=${RAN_TAG}
+export NAME_CU_SA="oai-cu-sa"
 #
-MULTUS_CU_F1="true"
-IP_CU_F1="172.21.16.92"
-NETMASK_CU_F1="22"
-GW_CU_F1="" 
-ROUTES_CU_F1="" 
-IF_NAME_CU_F1="$IF_NAME_F1_DEFAULT"
+export MULTUS_CU_F1="true"
+export IP_CU_F1="172.21.16.92"
+export NETMASK_CU_F1="22"
+export GW_CU_F1="" 
+export ROUTES_CU_F1="" 
+export IF_NAME_CU_F1="$IF_NAME_F1_DEFAULT"
 #
-MULTUS_CU_N2=${MULTUS_CU_N2:=$MULTUS_GNB_N2}
-IP_CU_N2=${IP_CU_N2:=$IP_GNB_N2}
-NETMASK_CU_N2=${NETMASK_CU_N2:=$NETMASK_N2N3}
-GW_CU_N2=${GW_CU_N2:=""}
-ROUTES_CU_N2=${ROUTES_CU_N2:=""}
-IF_NAME_CU_N2=${IF_NAME_CU_N2:=$IF_NAME_N2N3}
+export MULTUS_CU_N2=${MULTUS_CU_N2:=$MULTUS_GNB_N2}
+export IP_CU_N2=${IP_CU_N2:=$IP_GNB_N2}
+export NETMASK_CU_N2=${NETMASK_CU_N2:=$NETMASK_N2N3}
+export GW_CU_N2=${GW_CU_N2:=""}
+export ROUTES_CU_N2=${ROUTES_CU_N2:=""}
+export IF_NAME_CU_N2=${IF_NAME_CU_N2:=$IF_NAME_N2N3}
 #
-MULTUS_CU_N3=${MULTUS_CU_N3:=$MULTUS_GNB_N3}
-IP_CU_N3=${IP_CU_N3:=$IP_GNB_N3}
-NETMASK_CU_N3=${NETMASK_CU_N3:=$NETMASK_N2N3}
-GW_CU_N3=${GW_CU_N3:=""}
-ROUTES_CU_N3=${ROUTES_CU_N3:=""}
-IF_NAME_CU_N3=${IF_NAME_CU_N3:=$IF_NAME_N2N3}
+export MULTUS_CU_N3=${MULTUS_CU_N3:=$MULTUS_GNB_N3}
+export IP_CU_N3=${IP_CU_N3:=$IP_GNB_N3}
+export NETMASK_CU_N3=${NETMASK_CU_N3:=$NETMASK_N2N3}
+export GW_CU_N3=${GW_CU_N3:=""}
+export ROUTES_CU_N3=${ROUTES_CU_N3:=""}
+export IF_NAME_CU_N3=${IF_NAME_CU_N3:=$IF_NAME_N2N3}
 #
-ADD_OPTIONS_CU="--log_config.global_log_options level,nocolor,time"
-NAME_CU="oai-cu"
-QOS_CU_DEF="true"
+export ADD_OPTIONS_CU="--log_config.global_log_options level,nocolor,time"
+export NAME_CU="oai-cu"
+export QOS_CU_DEF="true"
 # NODE_CU is defined above and also the same for CUCP/CUUP
 #
 ########## CU-CP specific part ##############
-CUCP_REPO="${R2LAB_REPO}/oai-gnb" 
-CUCP_TAG=${RAN_TAG}
-NAME_CUCP_SA="oai-cu-cp-sa"
+export CUCP_REPO="${R2LAB_REPO}/oai-gnb" 
+export CUCP_TAG=${RAN_TAG}
+export NAME_CUCP_SA="oai-cu-cp-sa"
 #
-MULTUS_CUCP_E1="true"
-IP_CUCP_E1="192.168.18.12"
-NETMASK_CUCP_E1="24"
-GW_CUCP_E1=""
-ROUTES_CUCP_E1=""
-IF_NAME_CUCP_E1="$IF_NAME_E1_DEFAULT"
+export MULTUS_CUCP_E1="true"
+export IP_CUCP_E1="192.168.18.12"
+export NETMASK_CUCP_E1="24"
+export GW_CUCP_E1=""
+export ROUTES_CUCP_E1=""
+export IF_NAME_CUCP_E1="$IF_NAME_E1_DEFAULT"
 #
-MULTUS_CUCP_N2=${MULTUS_CUCP_N2:=$MULTUS_GNB_N2}
-IP_CUCP_N2=${IP_CUCP_N2:=$IP_GNB_N2} 
-NETMASK_CUCP_N2=${NETMASK_CUCP_N2:=$NETMASK_N2N3}
-GW_CUCP_N2=${GW_CUCP_N2:=""}
-ROUTES_CUCP_N2=${ROUTES_CUCP_N2:=""}
-IF_NAME_CUCP_N2=${IF_NAME_CUCP_N2:=$IF_NAME_N2N3}
-CUCP_N2_IF_NAME=${CUCP_N2_IF_NAME:=$GNB_N2_IF_NAME}
+export MULTUS_CUCP_N2=${MULTUS_CUCP_N2:=$MULTUS_GNB_N2}
+export IP_CUCP_N2=${IP_CUCP_N2:=$IP_GNB_N2} 
+export NETMASK_CUCP_N2=${NETMASK_CUCP_N2:=$NETMASK_N2N3}
+export GW_CUCP_N2=${GW_CUCP_N2:=""}
+export ROUTES_CUCP_N2=${ROUTES_CUCP_N2:=""}
+export IF_NAME_CUCP_N2=${IF_NAME_CUCP_N2:=$IF_NAME_N2N3}
+export CUCP_N2_IF_NAME=${CUCP_N2_IF_NAME:=$GNB_N2_IF_NAME}
 #
-MULTUS_CUCP_F1="true"
-IP_CUCP_F1="172.21.16.92"
-NETMASK_CUCP_F1="24"
-GW_CUCP_F1=""
-ROUTES_CUCP_F1=""
-IF_NAME_CUCP_F1="$IF_NAME_F1_DEFAULT"
+export MULTUS_CUCP_F1="true"
+export IP_CUCP_F1="172.21.16.92"
+export NETMASK_CUCP_F1="24"
+export GW_CUCP_F1=""
+export ROUTES_CUCP_F1=""
+export IF_NAME_CUCP_F1="$IF_NAME_F1_DEFAULT"
 #
-ADD_OPTIONS_CUCP="--log_config.global_log_options level,nocolor,time"
-NAME_CUCP="oai-cu-cp"
-QOS_CUCP_DEF="true"
-NODE_CUCP="$NODE_CU"
+export ADD_OPTIONS_CUCP="--log_config.global_log_options level,nocolor,time"
+export NAME_CUCP="oai-cu-cp"
+export QOS_CUCP_DEF="true"
+export NODE_CUCP="$NODE_CU"
 #
 ########## CU-UP specific part ##############
-CUUP_REPO="$R2LAB_REPO/oai-nr-cuup"
-CUUP_TAG=${RAN_TAG}
-NAME_CUUP_SA="oai-cu-up-sa"
+export CUUP_REPO="$R2LAB_REPO/oai-nr-cuup"
+export CUUP_TAG=${RAN_TAG}
+export NAME_CUUP_SA="oai-cu-up-sa"
 #
-MULTUS_CUUP_E1="true"
-IP_CUUP_E1="192.168.18.13"
-NETMASK_CUUP_E1="24"
-GW_CUUP_E1=""
-ROUTES_CUUP_E1="" 
-IF_NAME_CUUP_E1="$IF_NAME_E1_DEFAULT"
+export MULTUS_CUUP_E1="true"
+export IP_CUUP_E1="192.168.18.13"
+export NETMASK_CUUP_E1="24"
+export GW_CUUP_E1=""
+export ROUTES_CUUP_E1="" 
+export IF_NAME_CUUP_E1="$IF_NAME_E1_DEFAULT"
 #
-MULTUS_CUUP_N3=${MULTUS_CUUP_N3:=$MULTUS_GNB_N3}
-IP_CUUP_N3=${IP_CUUP_N3:=$IP_GNB_N3}
-NETMASK_CUUP_N3=${NETMASK_CUUP_N3:=$NETMASK_N2N3}
-GW_CUUP_N3=${GW_CUUP_N3:=""}
-ROUTES_CUUP_N3=${ROUTES_CUUP_N3:=""}
-IF_NAME_CUUP_N3=${IF_NAME_CUUP_N3:=$IF_NAME_N2N3}
-CUUP_N3_IF_NAME=${CUUP_N3_IF_NAME:=$GNB_N2_IF_NAME}
+export MULTUS_CUUP_N3=${MULTUS_CUUP_N3:=$MULTUS_GNB_N3}
+export IP_CUUP_N3=${IP_CUUP_N3:=$IP_GNB_N3}
+export NETMASK_CUUP_N3=${NETMASK_CUUP_N3:=$NETMASK_N2N3}
+export GW_CUUP_N3=${GW_CUUP_N3:=""}
+export ROUTES_CUUP_N3=${ROUTES_CUUP_N3:=""}
+export IF_NAME_CUUP_N3=${IF_NAME_CUUP_N3:=$IF_NAME_N2N3}
+export CUUP_N3_IF_NAME=${CUUP_N3_IF_NAME:=$GNB_N2_IF_NAME}
 #
-MULTUS_CUUP_F1="true"
-IP_CUUP_F1="172.21.16.93"
-NETMASK_CUUP_F1="22"
-GW_CUUP_F1="" # "172.21.19.254"
-ROUTES_CUUP_F1=""
-IF_NAME_CUUP_F1="$IF_NAME_F1_DEFAULT"  
+export MULTUS_CUUP_F1="true"
+export IP_CUUP_F1="172.21.16.93"
+export NETMASK_CUUP_F1="22"
+export GW_CUUP_F1="" # "172.21.19.254"
+export ROUTES_CUUP_F1=""
+export IF_NAME_CUUP_F1="$IF_NAME_F1_DEFAULT"  
 #
-ADD_OPTIONS_CUUP=""
-NAME_CUUP="oai-cuup"
-HOST_CUCP="$IP_CUCP_E1"   #"oai-cu"
-QOS_CUUP_DEF="true"
-NODE_CUUP="$NODE_CU"
+export ADD_OPTIONS_CUUP=""
+export NAME_CUUP="oai-cuup"
+export HOST_CUCP="$IP_CUCP_E1"   #"oai-cu"
+export QOS_CUUP_DEF="true"
+export NODE_CUUP="$NODE_CU"
 
 if [[ $GNB_MODE = 'cucpup' ]]; then
-    CU_HOST="$IP_CUCP_E1"
-    CU_HOST_FROM_DU="$IP_CUCP_F1"
+    export CU_HOST="$IP_CUCP_E1"
+    export CU_HOST_FROM_DU="$IP_CUCP_F1"
 else
-    CU_HOST="oai-cu"
-    CU_HOST_FROM_DU="$IP_CU_F1"
+    export CU_HOST="oai-cu"
+    export CU_HOST_FROM_DU="$IP_CU_F1"
 fi
 #
 ########## GNB Monolithic specific part ################
 #
-NETMASK_GNB_N2="$NETMASK_N2N3"
-NETMASK_GNB_N3="$NETMASK_N2N3"
-NETMASK_GNB_RU="24"
+export NETMASK_GNB_N2="$NETMASK_N2N3"
+export NETMASK_GNB_N3="$NETMASK_N2N3"
+export NETMASK_GNB_RU="24"
 #
 ################## RRU-dependent part ###################
 #
@@ -485,35 +485,25 @@ RU_MODE="static" # in ['static', 'dhcp']
 #
 #### rfsim RU case ####
 GNB_REPO_rfsim="${R2LAB_REPO}/oai-gnb"
-#GNB_REPO_rfsim="${MY_REPO}/oai-gnb"
 GNB_TAG_rfsim="${RAN_TAG}"
 CONF_rfsim="gnb.sa.band78.106prb.rfsim.conf" 
 CONF_DU_rfsim="du.sa.band78.106prb.rfsim.conf" 
 OPTIONS_rfsim="-E --rfsim --log_config.global_log_options level,nocolor,time"
-#OPTIONS_rfsim="--sa -E --rfsim --log_config.global_log_options level,nocolor,time"
 #
 #### b2xx RU case ####
 GNB_REPO_b2xx="${R2LAB_REPO}/oai-gnb"
-#GNB_REPO_b2xx="${MY_REPO}/oai-gnb"
 GNB_TAG_b2xx="${RAN_TAG}"
 CONF_b210="gnb.sa.band78.fr1.106PRB.usrpb210.conf"
-#CONF_b210="gnb.sa.band78.fr1.51PRB.usrpb210-new.conf"
-#OPTIONS_b2xx="--sa --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 OPTIONS_b2xx="-E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
 
 #### n3xx RU case ####
 GNB_REPO_n3xx="${R2LAB_REPO}/oai-gnb"
-#GNB_REPO_n3xx="${MY_REPO}/oai-gnb"
 GNB_TAG_n3xx="${RAN_TAG}"
 #
-#CONF_n320="gnb.sa.band78.162prb.usrpn310.2x2-r2lab.conf"
 CONF_n320="gnb.sa.band78.106prb.n310.7ds2u.conf"
-#CONF_n320="gnb.sa.band78.106prb.usrpn310.ddsuu-2x2.conf"
-#CONF_DU_n320="du.sa.band78.106prb.usrpn310.ddsuu-2x2-new.conf"
 CONF_DU_n320="du.sa.band78.106prb.n310.7ds2u.conf"
 CONF_n300="$CONF_n320"
 CONF_DU_n300="$CONF_DU_n320"
-#OPTIONS_n3xx="--sa --usrp-tx-thread-config 1 --tune-offset 30000000 --thread-pool 0,2,4,6,8,10,12,14,16 --log_config.global_log_options level,nocolor,time"
 OPTIONS_n3xx="--usrp-tx-thread-config 1 --tune-offset 30000000 --MACRLCs.[0].ul_max_mcs 14 --L1s.[0].max_ldpc_iterations 4 --log_config.global_log_options level,nocolor,time"
 #
 if [[ $RU_MODE = "dhcp" ]]; then
@@ -533,37 +523,30 @@ ADDRS_n320="addr=192.168.235.105" #",second_addr=192.168.235.106"
 
 #### aw2s RU case ####
 GNB_REPO_aw2s="${R2LAB_REPO}/oai-gnb-aw2s"
-#GNB_REPO_aw2s="${MY_REPO}/oai-gnb-aw2s"
 GNB_TAG_aw2s="${RAN_TAG}"
 #
-#CONF_jaguar="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.conf"
 CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
-#CONF_jaguar="gnb.sa.band78.133prb.aw2s.dddsu.50MHz.conf"
 CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
-#CONF_DU_jaguar="du.sa.band78.133prb.aw2s.dddsuu.50MHz.conf"
 CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.1x1.conf" # to test with redcap qhats based on RG255C-GL (qhat20/21/22/23)
-#CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.conf" # to test with redcap qhats based on RG255C-GL (qhat20/21/22/23)
-#CONF_panther="${CONF_jaguar}"
 CONF_DU_panther="${CONF_DU_jaguar}"
 OPTIONS_aw2s="--thread-pool 9,11,13,15,17,19,21,23 --log_config.global_log_options level,nocolor,time"
 if [[ $RU_MODE = "dhcp" ]]; then
-    IP_GNB_jaguar="dhcp"
-    IP_GNB_panther="dhcp"
+    export IP_GNB_jaguar="dhcp"
+    export IP_GNB_panther="dhcp"
 else
-    IP_GNB_jaguar="192.168.236.104" # @IP ADDR_jaguar + 3
-    IP_GNB_panther="192.168.236.106" # @IP ADDR_panther + 3
+    export IP_GNB_jaguar="192.168.236.104" # @IP ADDR_jaguar + 3
+    export IP_GNB_panther="192.168.236.106" # @IP ADDR_panther + 3
 fi
-ADDR_jaguar="192.168.236.101" 
-ADDR_panther="192.168.236.103" 
+export ADDR_jaguar="192.168.236.101" 
+export ADDR_panther="192.168.236.103" 
 
 #### benetel RU case ####
-TYPE_N2="macvlan"
-MODE_N2="bridge"
-TYPE_N3="macvlan"
-MODE_N3="bridge"
+export TYPE_N2="macvlan"
+export MODE_N2="bridge"
+export TYPE_N3="macvlan"
+export MODE_N3="bridge"
 
 GNB_REPO_benetel="${OAISA_REPO}/oai-gnb-fhi72"
-#GNB_TAG_benetel="${RAN_TAG}"
 GNB_TAG_benetel="2025.w50"
 
 #CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x4-benetel550-ci-scripts.conf"
@@ -572,11 +555,11 @@ CONF_DU_benetel1="du.sa.band78.273prb.fhi72.4x4-benetel550.conf"
 #CONF_DU_benetel2="${CONF_DU_benetel1}"
 OPTIONS_benetel="--log_config.global_log_options level,nocolor,time"
 if [[ $RU_MODE = "dhcp" ]]; then
-    IP_GNB_benetel1="dhcp"
-    IP_GNB_benetel2="dhcp"
+    export IP_GNB_benetel1="dhcp"
+    export IP_GNB_benetel2="dhcp"
 else
-    IP_GNB_benetel1="192.168.233.104" # @IP ADDR_jaguar + 3
-    IP_GNB_benetel2="192.168.233.105" # @IP ADDR_panther + 3
+    export IP_GNB_benetel1="192.168.233.104" # @IP ADDR_jaguar + 3
+    export IP_GNB_benetel2="192.168.233.105" # @IP ADDR_panther + 3
 fi
 MTU_benetel="9216"
 MAC_UPLANE1="00:11:22:33:44:66"
@@ -645,7 +628,7 @@ fi
 ##################################################################################
 
 # Generate unique MAC addresses for multus interfaces in oai5g pods
-function gener-mac()
+gener-mac()
 {
     CPTfile="$TMP/cpt-$$.dat"
     PREFIXfile="$TMP/prefix-$$.dat"
@@ -686,21 +669,9 @@ function gener-mac()
     echo "$PREFIX$SUFFIX"
 }
 
-##################################################################################
-
-function init() {
-    # init function should be run once per demo.
-
-    # Install patch command...
-    if [ ! -x "$(command -v patch)" ]; then
-        [[ -f /etc/fedora-release ]] && dnf install -y patch
-        [[ -f /etc/lsb-release ]] && apt-get install -y patch
-    fi
-}
-
 #################################################################################
 
-function configure-oai-5g-@mode@() {
+configure-oai-5g-@mode@() {
 
     # if $LOGS is true, create a tcpdump container with privileges
     # if $PCAP is true, start tcpdump and create a shared volume to store pcap
@@ -822,7 +793,7 @@ EOF
 
 #################################################################################
 
-function configure-mysql() {
+configure-mysql() {
 
     DIR_ORIG_CHART="$OAI5G_CORE/mysql/initialization"
     DIR_PATCHED_CHART="$PREFIX_DEMO/oai5g-rru/patch-mysql"
@@ -838,14 +809,14 @@ function configure-mysql() {
 
 
 
-function patch_snssai() {
+patch_snssai() {
     local file="$1"
 
     awk -v sst1="$SLICE1_SST" \
         -v sd1="$SLICE1_SD" \
         -v sst2="${SLICE2_SST:-}" \
         -v sd2="${SLICE2_SD:-EMPTY}" '
-    function print_snssai(base_indent) {
+    print_snssai(base_indent) {
         # Base indent is the indentation of snssaiList:
         # Items need 2 spaces more
         item_indent = base_indent "  "
@@ -889,7 +860,173 @@ function patch_snssai() {
 }
 
 
-function configure-gnb() {
+load_rru_env() {
+    local file="rru/$1.env"
+    [[ -f "$file" ]] || return 1
+    set -a
+    source "$file"
+    set +a
+}
+
+
+apply-gnb-values-yq() {
+
+    set -euo pipefail
+
+    # Usage:
+    #   apply-gnb-values-yq path/to/values.yaml
+    #
+    # Requires:
+    #   yq v4.x (mikefarah)
+
+    VALUES_FILE="$1"
+
+    [ -f "$VALUES_FILE" ] || {
+	echo "ERROR: values file not found: $VALUES_FILE"
+	exit 1
+    }
+
+    echo "Applying yq overlays to $VALUES_FILE"
+
+    yq -i '
+  ############################
+  # Image configuration
+  ############################
+  .nfimage.repository = env(GNB_REPO) |
+  .nfimage.version = env(GNB_TAG) |
+  .nfimage.pullPolicy = env(GNB_PULL_POLICY) |
+
+  ############################
+  # Common gNB / NF config
+  ############################
+  .config.gnbName = env(GNB_NAME) |
+  .config.amfHost = env(HOST_AMF) |
+  .config.enableE2 = (env(FLEXRIC) == "true") |
+  .config.ricHost = env(HOST_FLEXRIC) |
+  .config.tac = env(TAC) |
+
+  ############################
+  # Scheduling / placement
+  ############################
+  .nodeName = env(NODE_GNB) |
+
+  ############################
+  # Resources (safe if unused)
+  ############################
+  .resources.define = (env(QOS_GNB_DEF) == "true")
+' "$VALUES_FILE"
+
+    ########################################
+    # Multus 
+    ########################################
+    yq -i '
+  if has("multus") then
+    .multus.enabled = true |
+    (.multus.interfaces[] | select(.name=="n2")) |=
+      (.enabled = (env(MULTUS_GNB_N2)=="true") |
+       .type = env(TYPE_N2) |
+       .hostInterface = env(IF_NAME_N2N3) |
+       .ipAdd = env(IP_GNB_N2) |
+       .netmask = env(NETMASK_GNB_N2) |
+       .gateway = env(GW_GNB_N2) |
+       .routes = env(ROUTES_GNB_N2) |
+       .mode = env(MODE_N2)) |
+
+    (.multus.interfaces[] | select(.name=="n3")) |=
+      (.enabled = (env(MULTUS_GNB_N3)=="true") |
+       .type = env(TYPE_N3) |
+       .hostInterface = env(IF_NAME_N2N3) |
+       .ipAdd = env(IP_GNB_N3) |
+       .netmask = env(NETMASK_GNB_N3) |
+       .gateway = env(GW_GNB_N3) |
+       .routes = env(ROUTES_GNB_N3) |
+       .mode = env(MODE_N3)) |
+
+    (.multus.interfaces[] | select(.name=="uplane1")) |=
+      (.enabled = (env(MULTUS_UPLANE1)=="true") |
+       .mac = env(MAC_UPLANE1) |
+       .sriovNetworkNamespace = env(SRIOV_NS) |
+       .vlan = env(VLAN_RU1)) |
+
+    (.multus.interfaces[] | select(.name=="cplane1")) |=
+      (.enabled = (env(MULTUS_CPLANE1)=="true") |
+       .mac = env(MAC_CPLANE1) |
+       .sriovNetworkNamespace = env(SRIOV_NS) |
+       .vlan = env(VLAN_RU1))
+  else
+    .
+  end
+' "$VALUES_FILE"
+
+    ########################################
+    # NSSAI 
+    ########################################
+    yq -i '
+  if has("config") and .config.plmn_list then
+    .config.plmn_list[0].snssaiList =
+      (
+        [
+          {"sst": env(SLICE1_SST)}
+          + (env(SLICE1_SD)!="" ? {"sd": "0x"+env(SLICE1_SD)} : {})
+        ]
+        +
+        (env(SLICE2_SST)!="" ?
+          [
+            {"sst": env(SLICE2_SST)}
+            + (env(SLICE2_SD)!="" ? {"sd": "0x"+env(SLICE2_SD)} : {})
+          ] : [])
+      )
+  else
+    .
+  end
+' "$VALUES_FILE"
+
+    ########################################
+    # Validation (fail fast)
+    ########################################
+    yq eval '.' "$VALUES_FILE" >/dev/null || {
+	echo "ERROR: generated YAML is invalid: $VALUES_FILE"
+	exit 1
+    }
+
+    echo "OK: $VALUES_FILE updated successfully"
+
+}
+
+
+configure-gnb() {
+
+    echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $LOGS"
+
+    DIR_CHARTS="$PREFIX_DEMO/oai-cn5g-fed/charts"
+
+    
+    # First load RU specific parameters
+    load_rru_env "$RRU" || {
+	echo "Unknown RRU: $RRU"
+	exit 1
+    }
+
+    for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
+	VALUES="${OAI5G_RAN}/${nf}/values.yaml"
+
+	cp "$VALUES" "${OAI5G_RAN}/${nf}_values.yaml.orig"
+
+	apply-global-values.sh "$VALUES"
+
+	case "$nf" in
+	    oai-gnb|oai-gnb-fhi-72)
+		apply-gnb-values.sh "$VALUES"
+		;;
+	esac
+
+	diff -u "${OAI5G_RAN}/${nf}_values.yaml.orig" "$VALUES"
+    done
+
+}
+
+
+configure-gnb-old() {
 
     # Prepare mounted.conf and gnb chart files
     echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $LOGS"
@@ -976,8 +1113,8 @@ function configure-gnb() {
     
     GNB_REPO=$(eval echo \"\${GNB_REPO_$RRU_TYPE}\")
     GNB_TAG=$(eval echo \"\${GNB_TAG_$RRU_TYPE}\")
-    GNB_NAME="${GNB_NAME}_${RRU}"
-    NAME_GNB_DU="${NAME_GNB_DU}-${RRU}"
+    export GNB_NAME="${GNB_NAME}_${RRU}"
+    export NAME_GNB_DU="${NAME_GNB_DU}-${RRU}"
 
     if [[ $GNB_MODE = 'monolithic' ]]; then
 	CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_$RRU}\")
@@ -1300,7 +1437,7 @@ EOF
 
 #################################################################################
 
-function configure-nr-ue() {
+configure-nr-ue() {
 
     # will NOT generate PCAP file to avoid wasting all memory resources
     # However, a tcpdump container created e.g., to run iperf client"
@@ -1342,7 +1479,7 @@ EOF
 
 #################################################################################
 
-function configure-nr-ue2() {
+configure-nr-ue2() {
 
     # will NOT generate PCAP file to avoid wasting all memory resources
     # However, a tcpdump container created e.g., to run iperf client"
@@ -1384,7 +1521,7 @@ EOF
 
 #################################################################################
 
-function configure-nr-ue3() {
+configure-nr-ue3() {
 
     # will NOT generate PCAP file to avoid wasting all memory resources
     # However, a tcpdump container created e.g., to run iperf client"
@@ -1426,7 +1563,7 @@ EOF
 
 #################################################################################
 
-function configure-flexric() {
+configure-flexric() {
 
     DIR="$OAI5G_RAN/oai-flexric"
     ORIG_CHART="$DIR"/values.yaml
@@ -1448,7 +1585,7 @@ EOF
 
 #################################################################################
 
-function configure-all() {
+configure-all() {
     echo "configure-all: Applying SophiaNode patches to OAI5G charts located on \"$PREFIX_DEMO/oai-cn5g-fed\""
     echo -e "\t with oai-upf running on \"$NODE_AMF_UPF\""
     echo -e "\t with oai-gnb running on \"$NODE_GNB\""
@@ -1480,7 +1617,7 @@ function configure-all() {
 #################################################################################
 
 
-function start-cn() {
+start-cn() {
     echo "Running start-cn() with namespace=$NS, NODE_AMF_UPF=$NODE_AMF_UPF"
     echo "cd $OAI5G_@MODE@"
     cd "$OAI5G_@MODE@" || { echo "Error: Failed to change directory"; exit 1; }
@@ -1511,7 +1648,7 @@ function start-cn() {
 
 ################################################################################
 
-function start-flexric() {
+start-flexric() {
 
     echo "Running start-flexric() on namespace: $NS, NODE_GNB=$NODE_GNB"
     echo "cd $OAI5G_RAN"
@@ -1527,7 +1664,7 @@ function start-flexric() {
 #################################################################################
 
 
-function start-gnb() {
+start-gnb() {
     echo "Running gNB on $NS namespace with GNB_MODE=$GNB_MODE, NODE_GNB=$NODE_GNB and rru=$RRU"
 
     echo "cd $OAI5G_RAN"
@@ -1566,7 +1703,7 @@ function start-gnb() {
 
 #################################################################################
 
-function start-nr-ue() {
+start-nr-ue() {
 
     echo "Running start-nr-ue() on namespace: $NS, NODE_GNB=$NODE_GNB"
     echo "cd $OAI5G_RAN"
@@ -1594,7 +1731,7 @@ function start-nr-ue() {
 
 ################################################################################
 
-function start-nr-ue2() {
+start-nr-ue2() {
 
     echo "Running start-nr-ue2() on namespace: $NS, NODE_GNB=$NODE_GNB"
     echo "cd $OAI5G_RAN"
@@ -1622,7 +1759,7 @@ function start-nr-ue2() {
 
 #################################################################################
 
-function start-nr-ue3() {
+start-nr-ue3() {
 
     echo "Running start-nr-ue3() on namespace: $NS, NODE_GNB=$NODE_GNB"
     echo "cd $OAI5G_RAN"
@@ -1651,7 +1788,7 @@ function start-nr-ue3() {
 #################################################################################
 
 # Add logging function
-function log() {
+log() {
     local level="$1"
     shift
     local message="$*"
@@ -1661,7 +1798,7 @@ function log() {
 }
 
 # Update logging calls
-function start() {
+start() {
     log "INFO" "Starting all oai5g pods on namespace=$NS"
 
     if [[ $LOGS = "true" ]]; then
@@ -1758,7 +1895,7 @@ EOF
 
 #################################################################################
 
-function run-ping() {
+run-ping() {
     UE_POD_NAME=$(kubectl -n $NS get pods -l app.kubernetes.io/name=oai-nr-ue -o jsonpath="{.items[0].metadata.name}")
     echo "kubectl -n $NS exec -it $UE_POD_NAME -c nr-ue -- /bin/ping --I oaitun_ue1 c4 google.fr"
     kubectl -n $NS exec -it "$UE_POD_NAME" -c nr-ue -- /bin/ping -I oaitun_ue1 -c4 google.fr
@@ -1766,17 +1903,17 @@ function run-ping() {
 
 #################################################################################
 
-function stop-cn(){
+stop-cn(){
     echo "helm --namespace=$NS uninstall oai-5g-@mode@"
     helm --namespace=$NS uninstall oai-5g-@mode@ 
 }
 
-function stop-flexric(){
+stop-flexric(){
     echo "helm -n $NS uninstall flexric"
     helm -n $NS uninstall oai-flexric
 }
 
-function stop-gnb(){
+stop-gnb(){
     if [[ $GNB_MODE = 'monolithic' ]]; then
 	echo "helm -n $NS uninstall oai-gnb"
 	helm -n $NS uninstall oai-gnb
@@ -1797,23 +1934,23 @@ function stop-gnb(){
 }
 
 
-function stop-nr-ue(){
+stop-nr-ue(){
     echo "helm -n $NS uninstall oai-nr-ue"
     helm -n $NS uninstall oai-nr-ue
 }
 
 
-function stop-nr-ue2(){
+stop-nr-ue2(){
     echo "helm -n $NS uninstall oai-nr-ue2"
     helm -n $NS uninstall oai-nr-ue2
 }
 
-function stop-nr-ue3(){
+stop-nr-ue3(){
     echo "helm -n $NS uninstall oai-nr-ue3"
     helm -n $NS uninstall oai-nr-ue3
 }
 
-function stop() {
+stop() {
     echo "Running stop() on $NS namespace, logs=$LOGS"
 
     if [[ "$LOGS" = "true" ]]; then
@@ -1867,7 +2004,7 @@ function stop() {
 #################################################################################
 
 
-function get-all-logs() {
+get-all-logs() {
     prefix=$1; shift
 
     DATE=$(date +"%Y-%m-%dT%H.%M.%S")
@@ -1978,7 +2115,7 @@ function get-all-logs() {
 
 #################################################################################
 
-function get-cn-pcap(){
+get-cn-pcap(){
     prefix=$1; shift
 
     DATE=$(date +"%Y-%m-%dT%H.%M.%S")
@@ -1993,7 +2130,7 @@ function get-cn-pcap(){
 
 #################################################################################
 
-function get-ran-pcap(){
+get-ran-pcap(){
     prefix=$1; shift
 
     DATE=$(date +"%Y-%m-%dT%H.%M.%S")
@@ -2039,7 +2176,7 @@ function get-ran-pcap(){
 #################################################################################
 
 
-function get-all-pcap(){
+get-all-pcap(){
     prefix=$1; shift
 
     get-cn-pcap "$prefix"
@@ -2055,7 +2192,7 @@ if test $# -lt 1; then
     usage
 else
     case $1 in
-	init|start|stop|configure-all|start-cn|start-flexric|start-gnb|start-nr-ue|start-nr-ue2|start-nr-ue3|stop-cn|stop-flexric|stop-gnb|stop-nr-ue|stop-nr-ue2|stop-nr-ue3|run-ping)
+	start|stop|configure-all|start-cn|start-flexric|start-gnb|start-nr-ue|start-nr-ue2|start-nr-ue3|stop-cn|stop-flexric|stop-gnb|stop-nr-ue|stop-nr-ue2|stop-nr-ue3|run-ping)
 	    echo "$0: running $1"
 	    "$1"
 	;;
