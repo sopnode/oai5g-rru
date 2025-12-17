@@ -920,7 +920,7 @@ apply-gnb-values-yq() {
     ########################################
     # Multus 
     ########################################
-    yq eval -i "$VALUES_FILE" <<'YQ'
+    yq eval -i "$VALUES_FILE" <<'YQ1'
   if has("multus") then
     .multus.enabled = true |
     (.multus.interfaces[] | select(.name=="n2")) |=
@@ -957,13 +957,13 @@ apply-gnb-values-yq() {
   else
     .
   end
-YQ
+YQ1
 
 
     ########################################
     # NSSAI 
     ########################################
-    yq -i '
+    yq eval -i "$VALUES_FILE" <<'YQ2'
   if has("config") and .config.plmn_list then
     .config.plmn_list[0].snssaiList =
       (
@@ -981,7 +981,7 @@ YQ
   else
     .
   end
-' "$VALUES_FILE"
+YQ2
 
     ########################################
     # Validation (fail fast)
