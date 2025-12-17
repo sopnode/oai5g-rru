@@ -1012,7 +1012,7 @@ configure-gnb() {
     for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
 	VALUES="${OAI5G_RAN}/${nf}/values.yaml"
 
-	cp "$VALUES" "${OAI5G_RAN}/${nf}_values.yaml.orig"
+	cp "$VALUES" "${OAI5G_RAN}/${nf}/values.yaml.orig"
 
 	apply-gnb-values-yq "$VALUES"
 
@@ -1022,7 +1022,7 @@ configure-gnb() {
 	#;;
 	#esac
 
-	diff -u "${OAI5G_RAN}/${nf}_values.yaml.orig" "$VALUES"
+	diff -u "${OAI5G_RAN}/${nf}/values.yaml.orig" "$VALUES"
     done
 
 }
