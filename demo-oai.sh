@@ -933,15 +933,26 @@ echo "===== FIN DEBUG ====="
 ########################################
 # Multus 
 ########################################
+echo "===== DEBUG Multus avant modification ====="
+yq eval '.multus.interfaces[] | select(.name=="n2")' "$VALUES_FILE"
+echo "IF_NAME_N2N3=$IF_NAME_N2N3"
+echo "IP_GNB_N2=$IP_GNB_N2"
+echo "=========================================="
+
 yq eval -i "$VALUES_FILE" <<'YAML'
 if has("multus") then
   .multus.enabled = true
   (.multus.interfaces[] | select(.name=="n2") | .hostInterface) = env(IF_NAME_N2N3)
   (.multus.interfaces[] | select(.name=="n2") | .ipAdd) = env(IP_GNB_N2)
 else
-  .multus.enabled = false
+  .
 end
 YAML
+
+echo "===== DEBUG Multus après modification ====="
+yq eval '.multus.interfaces[] | select(.name=="n2")' "$VALUES_FILE"
+echo "=========================================="
+
 
 
 echo "88888888888888"
