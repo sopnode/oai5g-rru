@@ -861,7 +861,7 @@ patch_snssai() {
 
 
 load_rru_env() {
-    local file="rru/$1.env"
+    local file="$PREFIX_DEMO/rru/$1.env"
     [[ -f "$file" ]] || return 1
     set -a
     source "$file"
