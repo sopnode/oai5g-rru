@@ -915,49 +915,46 @@ apply-gnb-values-yq() {
   .resources.define = (env(QOS_GNB_DEF) == "true")
 ' "$VALUES_FILE"
 
-
     ########################################
     # Multus 
     ########################################
-    yq eval -i "$VALUES_FILE" <<'YQ1'
-if has("multus") then
-  .multus.enabled = true
+    yq eval -i "$VALUES_FILE" <<YQ1
+  if has("multus") then
+    .multus.enabled = true |
+    (.multus.interfaces[] | select(.name=="n2")) |=
+      (.enabled = (env(MULTUS_GNB_N2)=="true") |
+       .type = env(TYPE_N2) |
+       .hostInterface = env(IF_NAME_N2N3) |
+       .ipAdd = env(IP_GNB_N2) |
+       .netmask = env(NETMASK_GNB_N2) |
+       .gateway = env(GW_GNB_N2) |
+       .routes = env(ROUTES_GNB_N2) |
+       .mode = env(MODE_N2)) |
 
-  # n2 interface
-  (.multus.interfaces[] | select(.name=="n2") | .enabled) = (env(MULTUS_GNB_N2) == "true")
-  (.multus.interfaces[] | select(.name=="n2") | .type) = env(TYPE_N2)
-  (.multus.interfaces[] | select(.name=="n2") | .hostInterface) = env(IF_NAME_N2N3)
-  (.multus.interfaces[] | select(.name=="n2") | .ipAdd) = env(IP_GNB_N2)
-  (.multus.interfaces[] | select(.name=="n2") | .netmask) = env(NETMASK_GNB_N2)
-  (.multus.interfaces[] | select(.name=="n2") | .gateway) = env(GW_GNB_N2)
-  (.multus.interfaces[] | select(.name=="n2") | .routes) = env(ROUTES_GNB_N2)
-  (.multus.interfaces[] | select(.name=="n2") | .mode) = env(MODE_N2)
+    (.multus.interfaces[] | select(.name=="n3")) |=
+      (.enabled = (env(MULTUS_GNB_N3)=="true") |
+       .type = env(TYPE_N3) |
+       .hostInterface = env(IF_NAME_N2N3) |
+       .ipAdd = env(IP_GNB_N3) |
+       .netmask = env(NETMASK_GNB_N3) |
+       .gateway = env(GW_GNB_N3) |
+       .routes = env(ROUTES_GNB_N3) |
+       .mode = env(MODE_N3)) |
 
-  # n3 interface
-  (.multus.interfaces[] | select(.name=="n3") | .enabled) = (env(MULTUS_GNB_N3) == "true")
-  (.multus.interfaces[] | select(.name=="n3") | .type) = env(TYPE_N3)
-  (.multus.interfaces[] | select(.name=="n3") | .hostInterface) = env(IF_NAME_N2N3)
-  (.multus.interfaces[] | select(.name=="n3") | .ipAdd) = env(IP_GNB_N3)
-  (.multus.interfaces[] | select(.name=="n3") | .netmask) = env(NETMASK_GNB_N3)
-  (.multus.interfaces[] | select(.name=="n3") | .gateway) = env(GW_GNB_N3)
-  (.multus.interfaces[] | select(.name=="n3") | .routes) = env(ROUTES_GNB_N3)
-  (.multus.interfaces[] | select(.name=="n3") | .mode) = env(MODE_N3)
+    (.multus.interfaces[] | select(.name=="uplane1")) |=
+      (.enabled = (env(MULTUS_UPLANE1)=="true") |
+       .mac = env(MAC_UPLANE1) |
+       .sriovNetworkNamespace = env(SRIOV_NS) |
+       .vlan = env(VLAN_RU1)) |
 
-  # uplane1 interface
-  (.multus.interfaces[] | select(.name=="uplane1") | .enabled) = (env(MULTUS_UPLANE1) == "true")
-  (.multus.interfaces[] | select(.name=="uplane1") | .mac) = env(MAC_UPLANE1)
-  (.multus.interfaces[] | select(.name=="uplane1") | .sriovNetworkNamespace) = env(SRIOV_NS)
-  (.multus.interfaces[] | select(.name=="uplane1") | .vlan) = env(VLAN_RU1)
-
-  # cplane1 interface
-  (.multus.interfaces[] | select(.name=="cplane1") | .enabled) = (env(MULTUS_CPLANE1) == "true")
-  (.multus.interfaces[] | select(.name=="cplane1") | .mac) = env(MAC_CPLANE1)
-  (.multus.interfaces[] | select(.name=="cplane1") | .sriovNetworkNamespace) = env(SRIOV_NS)
-  (.multus.interfaces[] | select(.name=="cplane1") | .vlan) = env(VLAN_RU1)
-
-else
-  .
-end
+    (.multus.interfaces[] | select(.name=="cplane1")) |=
+      (.enabled = (env(MULTUS_CPLANE1)=="true") |
+       .mac = env(MAC_CPLANE1) |
+       .sriovNetworkNamespace = env(SRIOV_NS) |
+       .vlan = env(VLAN_RU1))
+  else
+    .
+  end
 YQ1
 
 
