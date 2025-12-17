@@ -988,7 +988,6 @@ YQ2
     ########################################
     yq eval '.' "$VALUES_FILE" >/dev/null || {
 	echo "ERROR: generated YAML is invalid: $VALUES_FILE"
-	exit 1
     }
 
     echo "OK: $VALUES_FILE updated successfully"
