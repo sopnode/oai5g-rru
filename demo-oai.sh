@@ -1022,6 +1022,7 @@ configure-gnb() {
 	#esac
 
 	diff -u "${OAI5G_RAN}/${nf}/values.yaml.orig" "$VALUES"
+	echo "@@@@@@ $nf"
     done
 
 }
