@@ -920,7 +920,7 @@ apply-gnb-values-yq() {
     ########################################
     # Multus 
     ########################################
-    yq eval -i '
+    yq eval -i "$VALUES_FILE" <<'YQ'
   if has("multus") then
     .multus.enabled = true |
     (.multus.interfaces[] | select(.name=="n2")) |=
@@ -957,7 +957,8 @@ apply-gnb-values-yq() {
   else
     .
   end
-' "$VALUES_FILE"
+YQ
+
 
     ########################################
     # NSSAI 
