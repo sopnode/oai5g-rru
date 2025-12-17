@@ -872,8 +872,6 @@ load_rru_env() {
 
 apply-gnb-values-yq() {
 
-    set -euo pipefail
-
     # Usage:
     #   apply-gnb-values-yq path/to/values.yaml
     #
@@ -996,7 +994,6 @@ YQ2
 
 
 configure-gnb() {
-    set -x
     echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $LOGS"
 
     DIR_CHARTS="$PREFIX_DEMO/charts"
@@ -1018,9 +1015,7 @@ configure-gnb() {
 	fi	
 	cp "$VALUES" "${OAI5G_RAN}/${nf}/values.yaml.orig"
 	
-	set +u
 	apply-gnb-values-yq "$VALUES"
-	set -u
 
 	diff -u "${OAI5G_RAN}/${nf}/values.yaml.orig" "$VALUES"
     done
