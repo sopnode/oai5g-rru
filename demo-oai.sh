@@ -1017,7 +1017,7 @@ configure-gnb() {
 	
 	apply-gnb-values-yq "$VALUES"
 
-	diff -u "${OAI5G_RAN}/${nf}/values.yaml.orig" "$VALUES"
+	diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/values.yaml.orig) <(yq eval -P '.' $VALUES)
     done
 
 }
