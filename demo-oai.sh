@@ -936,7 +936,6 @@ echo "===== FIN DEBUG ====="
 yq eval -i '
 if has("multus") then
   .multus.enabled = true |
-
   (.multus.interfaces[] | select(.name=="n2")) |=
     .enabled        = (env(MULTUS_GNB_N2) == "true") |
     .type           = env(TYPE_N2) |
@@ -946,7 +945,6 @@ if has("multus") then
     .gateway        = env(GW_GNB_N2) |
     .routes         = env(ROUTES_GNB_N2) |
     .mode           = env(MODE_N2) |
-
   (.multus.interfaces[] | select(.name=="n3")) |=
     .enabled        = (env(MULTUS_GNB_N3) == "true") |
     .type           = env(TYPE_N3) |
@@ -956,21 +954,18 @@ if has("multus") then
     .gateway        = env(GW_GNB_N3) |
     .routes         = env(ROUTES_GNB_N3) |
     .mode           = env(MODE_N3) |
-
   (.multus.interfaces[] | select(.name=="uplane1")) |=
     .enabled                  = (env(MULTUS_UPLANE1) == "true") |
     .type                     = "sriov" |
     .mac                      = env(MAC_UPLANE1) |
     .sriovNetworkNamespace    = env(SRIOV_NS) |
     .vlan                     = env(VLAN_RU1) |
-
   (.multus.interfaces[] | select(.name=="cplane1")) |=
     .enabled                  = (env(MULTUS_CPLANE1) == "true") |
     .type                     = "sriov" |
     .mac                      = env(MAC_CPLANE1) |
     .sriovNetworkNamespace    = env(SRIOV_NS) |
     .vlan                     = env(VLAN_RU1)
-
 else
   .
 end
