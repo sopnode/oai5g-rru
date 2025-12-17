@@ -930,9 +930,9 @@ yq eval 'env(IF_NAME_N2N3)' "$VALUES_FILE"
 echo "===== FIN DEBUG ====="
 
 echo "Avant modification hostInterface:"
-yq eval '.multus.interfaces[] | select(.name=="n2") | .hostInterface' "$VALUES_FILE"
+yq eval '.multus.interfaces[] | select(.name=="n2") | .ipAdd' "$VALUES_FILE"
 
-yq eval -i '(.multus.interfaces[] | select(.name=="n2") | .hostInterface) = strenv(IF_NAME_N2N3)' "$VALUES_FILE"
+yq eval -i '(.multus.interfaces[] | select(.name=="n2") | .ipAdd) = strenv(IP_GNB_N2)' "$VALUES_FILE"
 
 
 ########################################
@@ -980,7 +980,7 @@ end
 YQ1
 
 echo "Après modification hostInterface:"
-yq eval '.multus.interfaces[] | select(.name=="n2") | .hostInterface' "$VALUES_FILE"
+yq eval '.multus.interfaces[] | select(.name=="n2") | .ipAdd' "$VALUES_FILE"
     
     ########################################
     # NSSAI 
