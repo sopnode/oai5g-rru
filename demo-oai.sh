@@ -920,8 +920,7 @@ apply-gnb-values-yq() {
     ########################################
     # Multus 
     ########################################
-    set -x
-    yq -i '
+    yq eval -i '
   if has("multus") then
     .multus.enabled = true |
     (.multus.interfaces[] | select(.name=="n2")) |=
