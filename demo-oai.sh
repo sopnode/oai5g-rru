@@ -1012,13 +1012,13 @@ configure-gnb() {
 
 	cp "$VALUES" "${OAI5G_RAN}/${nf}_values.yaml.orig"
 
-	apply-global-values.sh "$VALUES"
+	apply-gnb-values-yq "$VALUES"
 
-	case "$nf" in
-	    oai-gnb|oai-gnb-fhi-72)
-		apply-gnb-values.sh "$VALUES"
-		;;
-	esac
+	#case "$nf" in
+	#    oai-gnb|oai-gnb-fhi-72)
+	#apply-gnb-values.sh "$VALUES"
+	#;;
+	#esac
 
 	diff -u "${OAI5G_RAN}/${nf}_values.yaml.orig" "$VALUES"
     done
