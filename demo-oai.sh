@@ -928,7 +928,13 @@ yq eval '.multus.interfaces[] | select(.name=="n2")' "$VALUES_FILE"
 echo "----- Vérification valeur env(IF_NAME_N2N3) -----"
 yq eval 'env(IF_NAME_N2N3)' "$VALUES_FILE"
 echo "===== FIN DEBUG ====="
-    
+
+echo "Avant modification hostInterface:"
+yq eval '.multus.interfaces[] | select(.name=="n2") | .hostInterface' "$VALUES_FILE"
+
+yq eval -i '(.multus.interfaces[] | select(.name=="n2") | .hostInterface) = strenv(IF_NAME_N2N3)' "$VALUES_FILE"
+
+
 ########################################
 # Multus 
 ########################################
@@ -973,10 +979,13 @@ else
 end
 YQ1
 
+echo "Après modification hostInterface:"
+yq eval '.multus.interfaces[] | select(.name=="n2") | .hostInterface' "$VALUES_FILE"
+    
     ########################################
     # NSSAI 
     ########################################
-    yq eval -i "$VALUES_FILE" <<'YQ2'
+    yq eval -i "$VALUES_FILE" <<YQ2
   if has("config") and .config.plmn_list then
     .config.plmn_list[0].snssaiList =
       (
