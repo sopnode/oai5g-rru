@@ -933,19 +933,17 @@ echo "===== FIN DEBUG ====="
 ########################################
 # Multus 
 ########################################
-yq eval -i '
-if has("multus") then
+if yq eval 'has("multus")' "$VALUES_FILE" | grep -q true; then
+  yq eval -i '
   .multus.enabled = true
-  .multus.interfaces = [
-    { name: "n2", enabled: (env(MULTUS_GNB_N2)=="true"), type: env(TYPE_N2), hostInterface: env(IF_NAME_N2N3), ipAdd: env(IP_GNB_N2) },
-    { name: "n3", enabled: (env(MULTUS_GNB_N3)=="true"), type: env(TYPE_N3), hostInterface: env(IF_NAME_N2N3), ipAdd: env(IP_GNB_N3) },
-    { name: "uplane1", enabled: (env(MULTUS_UPLANE1)=="true"), type: "sriov", mac: env(MAC_UPLANE1), sriovNetworkNamespace: env(SRIOV_NS), vlan: env(VLAN_RU1) },
-    { name: "cplane1", enabled: (env(MULTUS_CPLANE1)=="true"), type: "sriov", mac: env(MAC_CPLANE1), sriovNetworkNamespace: env(SRIOV_NS), vlan: env(VLAN_RU1) }
-  ]
-else
-  .
-end
-' "$VALUES_FILE"
+  | .multus.interfaces = [
+      { name: "n2", enabled: (env(MULTUS_GNB_N2)=="true"), type: env(TYPE_N2), hostInterface: env(IF_NAME_N2N3), ipAdd: env(IP_GNB_N2) },
+      { name: "n3", enabled: (env(MULTUS_GNB_N3)=="true"), type: env(TYPE_N3), hostInterface: env(IF_NAME_N2N3), ipAdd: env(IP_GNB_N3) },
+      { name: "uplane1", enabled: (env(MULTUS_UPLANE1)=="true"), type: "sriov", mac: env(MAC_UPLANE1), sriovNetworkNamespace: env(SRIOV_NS), vlan: env(VLAN_RU1) },
+      { name: "cplane1", enabled: (env(MULTUS_CPLANE1)=="true"), type: "sriov", mac: env(MAC_CPLANE1), sriovNetworkNamespace: env(SRIOV_NS), vlan: env(VLAN_RU1) }
+    ]
+  ' "$VALUES_FILE"
+fi
 
 
 echo "88888888888888"
