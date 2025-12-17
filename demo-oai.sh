@@ -920,6 +920,7 @@ apply-gnb-values-yq() {
     ########################################
     # Multus 
     ########################################
+    set -x
     yq -i '
   if has("multus") then
     .multus.enabled = true |
