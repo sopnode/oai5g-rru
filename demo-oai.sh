@@ -1426,26 +1426,26 @@ s|@QOS_CUUP_DEF@|$QOS_CUUP_DEF|
 s|@CU_HOST@|$CU_HOST|
 s|@NODE_CUUP@|$NODE_CUUP|
 EOF
-    for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
-	ORIG_CHART="${OAI5G_RAN}/${nf}/values.yaml"
-	cp ${ORIG_CHART} "$TMP"/${nf}_values.yaml-orig
-	echo "(Over)writing $ORIG_CHART"
-	sed -f "$SED_VALUES_FILE" < "$TMP/${nf}_values.yaml-orig" > "$TMP/${nf}_values.yaml-sed"
-	if [[ "$nf" == "oai-gnb-fhi-72" ]]; then
-            patch_snssai "$TMP/${nf}_values.yaml-sed" > "${ORIG_CHART}"
-	else
-            mv "$TMP/${nf}_values.yaml-sed" "${ORIG_CHART}"
-	fi
-	diff "$TMP/${nf}_values.yaml-orig" "${ORIG_CHART}"
-    done
-    for nf in oai-gnb-fhi-72 ; do
-	ORIG_CHART="${OAI5G_RAN}/${nf}/config.yaml"
-	cp ${ORIG_CHART} "$TMP"/${nf}_config.yaml-orig
-	echo "(Over)writing $ORIG_CHART"
-	sed -f "$SED_VALUES_FILE" < "$TMP/${nf}_config.yaml-orig" > "$TMP/${nf}_config.yaml-sed"
-	patch_snssai "$TMP/${nf}_config.yaml-sed" > "${ORIG_CHART}"
-	diff "$TMP/${nf}_config.yaml-orig" "${ORIG_CHART}"
-    done
+#    for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
+#	ORIG_CHART="${OAI5G_RAN}/${nf}/values.yaml"
+#	cp ${ORIG_CHART} "$TMP"/${nf}_values.yaml-orig
+#	echo "(Over)writing $ORIG_CHART"
+#	sed -f "$SED_VALUES_FILE" < "$TMP/${nf}_values.yaml-orig" > "$TMP/${nf}_values.yaml-sed"
+#	if [[ "$nf" == "oai-gnb-fhi-72" ]]; then
+#           patch_snssai "$TMP/${nf}_values.yaml-sed" > "${ORIG_CHART}"
+#	else
+#            mv "$TMP/${nf}_values.yaml-sed" "${ORIG_CHART}"
+#	fi
+#	diff "$TMP/${nf}_values.yaml-orig" "${ORIG_CHART}"
+#    done
+#    for nf in oai-gnb-fhi-72 ; do
+#	ORIG_CHART="${OAI5G_RAN}/${nf}/config.yaml"
+#	cp ${ORIG_CHART} "$TMP"/${nf}_config.yaml-orig
+#	echo "(Over)writing $ORIG_CHART"
+#	sed -f "$SED_VALUES_FILE" < "$TMP/${nf}_config.yaml-orig" > "$TMP/${nf}_config.yaml-sed"
+#	patch_snssai "$TMP/${nf}_config.yaml-sed" > "${ORIG_CHART}"
+#	diff "$TMP/${nf}_config.yaml-orig" "${ORIG_CHART}"
+#    done
 }
 
 #################################################################################
