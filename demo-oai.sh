@@ -922,60 +922,59 @@ apply-gnb-values-yq() {
     # Multus
     ########################################
 
+
+# Assumes VALUES_FILE points to your values.yaml
+# Environment variables must be exported beforehand
+
 yq eval -i '
-  . as $doc
-  | ($doc.multus // empty)
-  | .multus.enabled = true
-  | (.multus.interfaces[] | select(.name=="n2")) |=
-      . + (
-        {
-          enabled:       (strenv(MULTUS_GNB_N2)=="true"),
-          type:          strenv(TYPE_N2),
-          hostInterface: strenv(IF_NAME_N2N3),
-          ipAdd:         strenv(IP_GNB_N2),
-          netmask:       strenv(NETMASK_GNB_N2),
-          gateway:       strenv(GW_GNB_N2),
-          routes:        strenv(ROUTES_GNB_N2),
-          mode:          strenv(MODE_N2)
-        }
-        | with_entries(select(.value != null))
-      )
-  | (.multus.interfaces[] | select(.name=="n3")) |=
-      . + (
-        {
-          enabled:       (strenv(MULTUS_GNB_N3)=="true"),
-          type:          strenv(TYPE_N3),
-          hostInterface: strenv(IF_NAME_N2N3),
-          ipAdd:         strenv(IP_GNB_N3),
-          netmask:       strenv(NETMASK_GNB_N3),
-          gateway:       strenv(GW_GNB_N3),
-          routes:        strenv(ROUTES_GNB_N3),
-          mode:          strenv(MODE_N3)
-        }
-        | with_entries(select(.value != null))
-      )
-  | (.multus.interfaces[] | select(.name=="uplane1")) |=
-      . + (
-        {
-          enabled:               (strenv(MULTUS_UPLANE1)=="true"),
-          type:                  "sriov",
-          mac:                   strenv(MAC_UPLANE1),
-          sriovNetworkNamespace: strenv(SRIOV_NS),
-          vlan:                  strenv(VLAN_RU1)
-        }
-        | with_entries(select(.value != null))
-      )
-  | (.multus.interfaces[] | select(.name=="cplane1")) |=
-      . + (
-        {
-          enabled:               (strenv(MULTUS_CPLANE1)=="true"),
-          type:                  "sriov",
-          mac:                   strenv(MAC_CPLANE1),
-          sriovNetworkNamespace: strenv(SRIOV_NS),
-          vlan:                  strenv(VLAN_RU1)
-        }
-        | with_entries(select(.value != null))
-      )
+  # patch n2
+  (.multus.interfaces[] | select(.name=="n2")) |=
+    . + {
+      enabled:       (strenv(MULTUS_GNB_N2) == "true"),
+      type:          strenv(TYPE_N2),
+      hostInterface: strenv(IF_NAME_N2N3),
+      ipAdd:         strenv(IP_GNB_N2),
+      netmask:       strenv(NETMASK_GNB_N2),
+      defaultRoute:  strenv(GW_GNB_N2),
+      routes:        strenv(ROUTES_GNB_N2),
+      mode:          strenv(MODE_N2)
+    } | with_entries(select(.value != null)) |
+
+  # patch n3
+  (.multus.interfaces[] | select(.name=="n3")) |=
+    . + {
+      enabled:       (strenv(MULTUS_GNB_N3) == "true"),
+      type:          strenv(TYPE_N3),
+      hostInterface: strenv(IF_NAME_N2N3),
+      ipAdd:         strenv(IP_GNB_N3),
+      netmask:       strenv(NETMASK_GNB_N3),
+      defaultRoute:  strenv(GW_GNB_N3),
+      routes:        strenv(ROUTES_GNB_N3),
+      mode:          strenv(MODE_N3)
+    } | with_entries(select(.value != null)) |
+
+  # patch uplane1
+  (.multus.interfaces[] | select(.name=="uplane1")) |=
+    . + {
+      enabled:               (strenv(MULTUS_UPLANE1) == "true"),
+      type:                  "sriov",
+      mac:                   strenv(MAC_UPLANE1),
+      sriovNetworkNamespace: strenv(SRIOV_NS),
+      vlan:                  strenv(VLAN_RU1)
+    } | with_entries(select(.value != null)) |
+
+  # patch cplane1
+  (.multus.interfaces[] | select(.name=="cplane1")) |=
+    . + {
+      enabled:               (strenv(MULTUS_CPLANE1) == "true"),
+      type:                  "sriov",
+      mac:                   strenv(MAC_CPLANE1),
+      sriovNetworkNamespace: strenv(SRIOV_NS),
+      vlan:                  strenv(VLAN_RU1)
+    } | with_entries(select(.value != null)) |
+
+  # ensure multus.enabled = true
+  .multus.enabled = true
 ' "$VALUES_FILE"
     
 
