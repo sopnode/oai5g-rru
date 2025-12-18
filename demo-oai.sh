@@ -930,7 +930,6 @@ yq eval -i '
   # Ensure multus exists
   .multus.enabled = true |
 
-  # n2
   (.multus.interfaces[] | select(.name=="n2")) |=
     (.enabled = (env(MULTUS_GNB_N2) == "true") |
      .type = strenv(TYPE_N2) |
@@ -941,7 +940,6 @@ yq eval -i '
      .routes = strenv(ROUTES_GNB_N2) |
      .mode = strenv(MODE_N2)) |
 
-  # n3
   (.multus.interfaces[] | select(.name=="n3")) |=
     (.enabled = (env(MULTUS_GNB_N3) == "true") |
      .type = strenv(TYPE_N3) |
@@ -952,7 +950,6 @@ yq eval -i '
      .routes = strenv(ROUTES_GNB_N3) |
      .mode = strenv(MODE_N3)) |
 
-  # uplane1
   (.multus.interfaces[] | select(.name=="uplane1")) |=
     (.enabled = (env(MULTUS_UPLANE1) == "true") |
      .type = "sriov" |
@@ -960,7 +957,6 @@ yq eval -i '
      .sriovNetworkNamespace = strenv(SRIOV_NS) |
      .vlan = strenv(VLAN_RU1)) |
 
-  # cplane1
   (.multus.interfaces[] | select(.name=="cplane1")) |=
     (.enabled = (env(MULTUS_CPLANE1) == "true") |
      .type = "sriov" |
