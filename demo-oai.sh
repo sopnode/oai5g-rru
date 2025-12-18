@@ -970,7 +970,9 @@ yq eval -i '
     ########################################
     # NSSAI
     ########################################
-    yq eval -i "$VALUES_FILE" <<'YQ2'
+
+
+yq eval -i '
 if has("config") and .config.plmn_list then
   .config.plmn_list[0].snssaiList =
     (
@@ -988,7 +990,7 @@ if has("config") and .config.plmn_list then
 else
   .
 end
-YQ2
+' "$VALUES_FILE"
 
     ########################################
     # Validation (fail fast)
