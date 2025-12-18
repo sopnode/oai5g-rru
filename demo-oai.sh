@@ -926,7 +926,7 @@ apply-gnb-values-yq() {
 # Assumes VALUES_FILE points to your values.yaml
 # Environment variables must be exported beforehand
 
-yq eval -i '
+    yq eval -i '
   # Ensure multus exists
   .multus.enabled = true |
 
@@ -970,33 +970,24 @@ yq eval -i '
     ########################################
     # NSSAI
     ########################################
-
-yq eval -i '
-. as $doc |
+    yq eval -i '
+.config.plmn_list[0].snssaiList =
 (
-  if has("config") and .config.plmn_list then
-    .config.plmn_list[0].snssaiList =
-      (
-        [
-          {"sst": strenv(SLICE1_SST)}
-          + (strenv(SLICE1_SD) != "" and strenv(SLICE1_SD) != "EMPTY"
-              | if . then {"sd": "0x"+strenv(SLICE1_SD)} else {} end)
-        ]
-        +
-        (strenv(SLICE2_SST) != ""
-          | if .
-            then
-              [
-                {"sst": strenv(SLICE2_SST)}
-                + (strenv(SLICE2_SD) != "" and strenv(SLICE2_SD) != "EMPTY"
-                    | if . then {"sd": "0x"+strenv(SLICE2_SD)} else {} end)
-              ]
-            else [] end)
-      )
-  else
-    $doc
-  end
+  [
+    {
+      "sst": strenv(SLICE1_SST),
+      "sd":  (strenv(SLICE1_SD) | select(. != "" and . != "EMPTY") | "0x"+.)
+    }
+  ]
+  +
+  [
+    {
+      "sst": strenv(SLICE2_SST),
+      "sd":  (strenv(SLICE2_SD) | select(. != "" and . != "EMPTY") | "0x"+.)
+    }
+  ]
 )
+| .config.plmn_list[0].snssaiList |= map(with_entries(select(.value != null)))
 ' "$VALUES_FILE"
 
 
