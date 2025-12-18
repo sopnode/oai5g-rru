@@ -973,28 +973,26 @@ apply-gnb-values-yq() {
     echo "########################## NSSAI: $SLICE1_SST $SLICE1_SD and $SLICE2_SST $SLICE2_SD"
     yq eval -i '
 .config.plmn_list[0].snssaiList =
-(
-  [
-    {
-      "sst": strenv(SLICE1_SST),
-      "sd": (
-        strenv(SLICE1_SD)
-        | if . == "" or . == "EMPTY" then "0xffffff" else "0x"+. end
-      )
-    }
-  ]
-  +
-  [
-    {
-      "sst": strenv(SLICE2_SST),
-      "sd": (
-        strenv(SLICE2_SD)
-        | if . == "" or . == "EMPTY" then "0xffffff" else "0x"+. end
-      )
-    }
-  ]
-)
+[
+  {
+    "sst": strenv(SLICE1_SST),
+    "sd": "0x" + (
+      strenv(SLICE1_SD)
+      | select(. != "" and . != "EMPTY")
+      // "ffffff"
+    )
+  },
+  {
+    "sst": strenv(SLICE2_SST),
+    "sd": "0x" + (
+      strenv(SLICE2_SD)
+      | select(. != "" and . != "EMPTY")
+      // "ffffff"
+    )
+  }
+]
 ' "$VALUES_FILE"
+
 
 
     ########################################
