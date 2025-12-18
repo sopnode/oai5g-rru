@@ -901,11 +901,16 @@ apply-gnb-values-yq() {
       ############################
       # Common gNB / NF config
       ############################
-      .config.gnbName      = env(GNB_NAME) |
-      .config.amfHost      = env(HOST_AMF) |
-      .config.enableE2     = (env(FLEXRIC) == "true") |
-      .config.ricHost      = env(HOST_FLEXRIC) |
-      .config.tac          = env(TAC) |
+      .config.useAdditionalOptions = env(ADD_OPTIONS_GNB) |
+      .config.ruCPlaneMacAdd       = env(MAC_BENETEL) |
+      .config.ruUPlaneMacAdd       = env(MAC_BENETEL) |
+      .config.mcc                  = env(MCC) |
+      .config.mnc                  = env(MNC) |
+      .config.gnbName              = env(GNB_NAME) |
+      .config.amfHost              = env(HOST_AMF) |
+      .config.enableE2             = (env(FLEXRIC) == "true") |
+      .config.ricHost              = env(HOST_FLEXRIC) |
+      .config.tac                  = env(TAC) |
 
       ############################
       # Scheduling / placement
