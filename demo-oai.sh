@@ -970,7 +970,7 @@ apply-gnb-values-yq() {
     ########################################
     # NSSAI
     ########################################
-
+    echo "########################## NSSAI: $SLICE1_SST $SLICE1_SD and $SLICE2_SST $SLICE2_SD"
     yq eval -i '
 .config.plmn_list[0].snssaiList =
 (
