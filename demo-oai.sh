@@ -973,10 +973,11 @@ apply-gnb-values-yq() {
 ' "$VALUES_FILE"
 
     ########################################
-    # NSSAI
+    # PLMN and NSSAI
     ########################################
-    echo "########################## NSSAI: $SLICE1_SST $SLICE1_SD and $SLICE2_SST $SLICE2_SD"
     yq eval -i '
+.config.plmn_list[0].mcc = strenv(MCC) |
+.config.plmn_list[0].mnc = strenv(MNC) |
 .config.plmn_list[0].snssaiList =
 [
   {
@@ -1011,7 +1012,28 @@ apply-gnb-values-yq() {
     echo "OK: $VALUES_FILE updated successfully"
 }
 
+apply-gnb-config-yq() {
 
+    CONFIG_FILE="$1"
+
+    [ -f "$CONFIG_FILE" ] || {
+        echo "ERROR: values file not found: $CONFIG_FILE"
+        exit 1
+    }
+
+    echo "Applying yq overlays to $CONFIG_FILE"
+    yq eval -i '
+# -------------------------
+# gNB config
+# -------------------------
+.Active_gNBs = [ env(GNB_NAME) ] |
+
+.gNBs[0].gNB_ID = env(GNB_ID) |
+.gNBs[0].gNB_name = env(GNB_NAME) |
+.gNBs[0].tracking_area_code = (env(TAC) | tonumber) |
+' "$CONFIG_FILE"
+
+}
 
 configure-gnb() {
     echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $LOGS"
@@ -1026,18 +1048,19 @@ configure-gnb() {
     }
 
     for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
-	VALUES="${OAI5G_RAN}/${nf}/values.yaml"
-	echo "***** nf: $nf, $VALUES"
+	for file in values config; do
+	    file="${OAI5G_RAN}/${nf}/${file}.yaml"
 
-	if [[ ! -f "$VALUES" ]]; then
-            echo "Skipping $nf: file not found"
-            continue
-	fi	
-	cp "$VALUES" "${OAI5G_RAN}/${nf}/values.yaml.orig"
+	    if [[ ! -f "$file" ]]; then
+		echo "Skipping $nf: file not found"
+		continue
+	    fi	
+	    cp "$file" "${OAI5G_RAN}/${nf}/${file}.yaml.orig"
 	
-	apply-gnb-values-yq "$VALUES"
+	    apply-gnb-values-yq "${file}"
 
-	diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/values.yaml.orig) <(yq eval -P '.' $VALUES)
+	    diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/${file}.yaml.orig) <(yq eval -P '.' ${file})
+	done
     done
 
 }
