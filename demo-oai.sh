@@ -975,25 +975,26 @@ apply-gnb-values-yq() {
 .config.plmn_list[0].snssaiList =
 (
   [
-    {"sst": strenv(SLICE1_SST)}
-    + (
+    {
+      "sst": strenv(SLICE1_SST),
+      "sd": (
         strenv(SLICE1_SD)
-        | select(. != "" and . != "EMPTY")
-        | {"sd": "0x"+.}
+        | if . == "" or . == "EMPTY" then "0xffffff" else "0x"+. end
       )
+    }
   ]
   +
   [
-    {"sst": strenv(SLICE2_SST)}
-    + (
+    {
+      "sst": strenv(SLICE2_SST),
+      "sd": (
         strenv(SLICE2_SD)
-        | select(. != "" and . != "EMPTY")
-        | {"sd": "0x"+.}
+        | if . == "" or . == "EMPTY" then "0xffffff" else "0x"+. end
       )
+    }
   ]
 )
 ' "$VALUES_FILE"
-
 
 
     ########################################
