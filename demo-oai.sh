@@ -927,56 +927,47 @@ apply-gnb-values-yq() {
 # Environment variables must be exported beforehand
 
 yq eval -i '
-  # patch n2
+  # Ensure multus exists
+  .multus.enabled = true |
+
+  # n2
   (.multus.interfaces[] | select(.name=="n2")) |=
-    . + {
-      enabled:       (strenv(MULTUS_GNB_N2) == "true"),
-      type:          strenv(TYPE_N2),
-      hostInterface: strenv(IF_NAME_N2N3),
-      ipAdd:         strenv(IP_GNB_N2),
-      netmask:       strenv(NETMASK_GNB_N2),
-      defaultRoute:  strenv(GW_GNB_N2),
-      routes:        strenv(ROUTES_GNB_N2),
-      mode:          strenv(MODE_N2)
-    } | with_entries(select(.value != null)) |
+    (.enabled = (env(MULTUS_GNB_N2) == "true") |
+     .type = strenv(TYPE_N2) |
+     .hostInterface = strenv(IF_NAME_N2N3) |
+     .ipAdd = strenv(IP_GNB_N2) |
+     .netmask = strenv(NETMASK_GNB_N2) |
+     .defaultRoute = strenv(GW_GNB_N2) |
+     .routes = strenv(ROUTES_GNB_N2) |
+     .mode = strenv(MODE_N2)) |
 
-  # patch n3
+  # n3
   (.multus.interfaces[] | select(.name=="n3")) |=
-    . + {
-      enabled:       (strenv(MULTUS_GNB_N3) == "true"),
-      type:          strenv(TYPE_N3),
-      hostInterface: strenv(IF_NAME_N2N3),
-      ipAdd:         strenv(IP_GNB_N3),
-      netmask:       strenv(NETMASK_GNB_N3),
-      defaultRoute:  strenv(GW_GNB_N3),
-      routes:        strenv(ROUTES_GNB_N3),
-      mode:          strenv(MODE_N3)
-    } | with_entries(select(.value != null)) |
+    (.enabled = (env(MULTUS_GNB_N3) == "true") |
+     .type = strenv(TYPE_N3) |
+     .hostInterface = strenv(IF_NAME_N2N3) |
+     .ipAdd = strenv(IP_GNB_N3) |
+     .netmask = strenv(NETMASK_GNB_N3) |
+     .defaultRoute = strenv(GW_GNB_N3) |
+     .routes = strenv(ROUTES_GNB_N3) |
+     .mode = strenv(MODE_N3)) |
 
-  # patch uplane1
+  # uplane1
   (.multus.interfaces[] | select(.name=="uplane1")) |=
-    . + {
-      enabled:               (strenv(MULTUS_UPLANE1) == "true"),
-      type:                  "sriov",
-      mac:                   strenv(MAC_UPLANE1),
-      sriovNetworkNamespace: strenv(SRIOV_NS),
-      vlan:                  strenv(VLAN_RU1)
-    } | with_entries(select(.value != null)) |
+    (.enabled = (env(MULTUS_UPLANE1) == "true") |
+     .type = "sriov" |
+     .mac = strenv(MAC_UPLANE1) |
+     .sriovNetworkNamespace = strenv(SRIOV_NS) |
+     .vlan = strenv(VLAN_RU1)) |
 
-  # patch cplane1
+  # cplane1
   (.multus.interfaces[] | select(.name=="cplane1")) |=
-    . + {
-      enabled:               (strenv(MULTUS_CPLANE1) == "true"),
-      type:                  "sriov",
-      mac:                   strenv(MAC_CPLANE1),
-      sriovNetworkNamespace: strenv(SRIOV_NS),
-      vlan:                  strenv(VLAN_RU1)
-    } | with_entries(select(.value != null)) |
-
-  # ensure multus.enabled = true
-  .multus.enabled = true
+    (.enabled = (env(MULTUS_CPLANE1) == "true") |
+     .type = "sriov" |
+     .mac = strenv(MAC_CPLANE1) |
+     .sriovNetworkNamespace = strenv(SRIOV_NS) |
+     .vlan = strenv(VLAN_RU1))
 ' "$VALUES_FILE"
-    
 
     ########################################
     # NSSAI
