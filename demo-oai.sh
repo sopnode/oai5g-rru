@@ -933,92 +933,68 @@ echo "===== FIN DEBUG ====="
 ########################################
 # Multus 
 ########################################
-if yq eval 'has("multus")' "$VALUES_FILE" | grep -q true; then
-  yq eval -i '
-  .multus.enabled = true
-  | .multus.interfaces = [
-      { name: "n2", enabled: (env(MULTUS_GNB_N2)=="true"), type: env(TYPE_N2), hostInterface: env(IF_NAME_N2N3), ipAdd: env(IP_GNB_N2) },
-      { name: "n3", enabled: (env(MULTUS_GNB_N3)=="true"), type: env(TYPE_N3), hostInterface: env(IF_NAME_N2N3), ipAdd: env(IP_GNB_N3) },
-      { name: "uplane1", enabled: (env(MULTUS_UPLANE1)=="true"), type: "sriov", mac: env(MAC_UPLANE1), sriovNetworkNamespace: env(SRIOV_NS), vlan: env(VLAN_RU1) },
-      { name: "cplane1", enabled: (env(MULTUS_CPLANE1)=="true"), type: "sriov", mac: env(MAC_CPLANE1), sriovNetworkNamespace: env(SRIOV_NS), vlan: env(VLAN_RU1) }
-    ]
-  ' "$VALUES_FILE"
-fi
-
-
-echo "88888888888888"
-cat "$VALUES_FILE"
-
 yq eval -i '
 if has("multus") then
   .multus.enabled = true |
 
-  # n2 interface
-  (.multus.interfaces[] | select(.name=="n2")) |= (
-    .enabled       = (env(MULTUS_GNB_N2) == "true") |
-    .type          = env(TYPE_N2) |
-    .hostInterface = strenv(IF_NAME_N2N3) |
-    .ipAdd         = strenv(IP_GNB_N2) |
-    .netmask       = env(NETMASK_GNB_N2) |
-    .gateway       = env(GW_GNB_N2) |
-    .routes        = env(ROUTES_GNB_N2) |
-    .mode          = env(MODE_N2)
-  ) |
+  (.multus.interfaces[] | select(.name=="n2")) |=
+    . + (
+      {
+        "enabled": (strenv(MULTUS_GNB_N2)=="true"),
+        "type": strenv(TYPE_N2),
+        "hostInterface": strenv(IF_NAME_N2N3),
+        "ipAdd": strenv(IP_GNB_N2),
+        "netmask": strenv(NETMASK_GNB_N2),
+        "gateway": strenv(GW_GNB_N2),
+        "routes": strenv(ROUTES_GNB_N2),
+        "mode": strenv(MODE_N2)
+      }
+      | with_entries(select(.value != null))
+    ) |
 
-  # n3 interface
-  (.multus.interfaces[] | select(.name=="n3")) |= (
-    .enabled       = (env(MULTUS_GNB_N3) == "true") |
-    .type          = env(TYPE_N3) |
-    .hostInterface = strenv(IF_NAME_N2N3) |
-    .ipAdd         = strenv(IP_GNB_N3) |
-    .netmask       = env(NETMASK_GNB_N3) |
-    .gateway       = env(GW_GNB_N3) |
-    .routes        = env(ROUTES_GNB_N3) |
-    .mode          = env(MODE_N3)
-  ) |
+  (.multus.interfaces[] | select(.name=="n3")) |=
+    . + (
+      {
+        "enabled": (strenv(MULTUS_GNB_N3)=="true"),
+        "type": strenv(TYPE_N3),
+        "hostInterface": strenv(IF_NAME_N2N3),
+        "ipAdd": strenv(IP_GNB_N3),
+        "netmask": strenv(NETMASK_GNB_N3),
+        "gateway": strenv(GW_GNB_N3),
+        "routes": strenv(ROUTES_GNB_N3),
+        "mode": strenv(MODE_N3)
+      }
+      | with_entries(select(.value != null))
+    ) |
 
-  # uplane1 interface
-  (.multus.interfaces[] | select(.name=="uplane1")) |= (
-    .enabled               = (env(MULTUS_UPLANE1) == "true") |
-    .type                  = "sriov" |
-    .mac                   = env(MAC_UPLANE1) |
-    .sriovNetworkNamespace = env(SRIOV_NS) |
-    .vlan                  = env(VLAN_RU1)
-  ) |
+  (.multus.interfaces[] | select(.name=="uplane1")) |=
+    . + (
+      {
+        "enabled": (strenv(MULTUS_UPLANE1)=="true"),
+        "type": "sriov",
+        "mac": strenv(MAC_UPLANE1),
+        "sriovNetworkNamespace": strenv(SRIOV_NS),
+        "vlan": strenv(VLAN_RU1)
+      }
+      | with_entries(select(.value != null))
+    ) |
 
-  # cplane1 interface
-  (.multus.interfaces[] | select(.name=="cplane1")) |= (
-    .enabled               = (env(MULTUS_CPLANE1) == "true") |
-    .type                  = "sriov" |
-    .mac                   = env(MAC_CPLANE1) |
-    .sriovNetworkNamespace = env(SRIOV_NS) |
-    .vlan                  = env(VLAN_RU1)
-  )
+  (.multus.interfaces[] | select(.name=="cplane1")) |=
+    . + (
+      {
+        "enabled": (strenv(MULTUS_CPLANE1)=="true"),
+        "type": "sriov",
+        "mac": strenv(MAC_CPLANE1),
+        "sriovNetworkNamespace": strenv(SRIOV_NS),
+        "vlan": strenv(VLAN_RU1)
+      }
+      | with_entries(select(.value != null))
+    )
 
 else .
 end
 ' "$VALUES_FILE"
 
-
-
-echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-cat "$VALUES_FILE"
-
-echo "******************************"
-# variables (ajuste si nécessaire)
-VF=/root/test-oai.v2.2.0/charts/oai-5g-ran/oai-gnb-fhi-72/values.yaml
-
-echo "=== BEFORE ==="
-yq eval '.multus.interfaces[] | select(.name=="n2")' "$VF"
-echo "env(IF_NAME_N2N3)=" "$(env | grep '^IF_NAME_N2N3=' || true)"
-
-# run the command you used (exact)
-yq eval -i '(.multus.interfaces[] | select(.name=="n2") | .hostInterface) = strenv(IF_NAME_N2N3) |
-(.multus.interfaces[] | select(.name=="n2") | .ipAdd) = strenv(IP_GNB_N2)' "$VF"
-echo "yq exit:$?"
-
-echo "=== AFTER ==="
-yq eval '.multus.interfaces[] | select(.name=="n2")' "$VF"
 
     ########################################
     # NSSAI 
