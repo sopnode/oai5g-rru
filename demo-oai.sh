@@ -1027,10 +1027,9 @@ apply-gnb-config-yq() {
 # gNB config
 # -------------------------
 .Active_gNBs = [ env(GNB_NAME) ] |
-
 .gNBs[0].gNB_ID = env(GNB_ID) |
 .gNBs[0].gNB_name = env(GNB_NAME) |
-.gNBs[0].tracking_area_code = (env(TAC) | tonumber) |
+.gNBs[0].tracking_area_code = (env(TAC) | tonumber)
 ' "$CONFIG_FILE"
 
 }
