@@ -971,7 +971,7 @@ yq eval -i '
     # NSSAI
     ########################################
 
-
+echo ">>>>>>>>>>> NSSAI: $SLICE1_SST : $SLICE1_SD and $SLICE2_SST : $SLICE2_SD"
 yq eval -i '
 if has("config") and .config.plmn_list then
   .config.plmn_list[0].snssaiList =
