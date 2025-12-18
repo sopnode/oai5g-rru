@@ -881,154 +881,146 @@ apply-gnb-values-yq() {
     VALUES_FILE="$1"
 
     [ -f "$VALUES_FILE" ] || {
-	echo "ERROR: values file not found: $VALUES_FILE"
-	exit 1
+        echo "ERROR: values file not found: $VALUES_FILE"
+        exit 1
     }
 
     echo "Applying yq overlays to $VALUES_FILE"
-    # export
-    yq -i '
-  ############################
-  # Image configuration
-  ############################
-  .nfimage.repository = env(GNB_REPO) |
-  .nfimage.version = env(GNB_TAG) |
-  .nfimage.pullPolicy = env(GNB_PULL_POLICY) |
-
-  ############################
-  # Common gNB / NF config
-  ############################
-  .config.gnbName = env(GNB_NAME) |
-  .config.amfHost = env(HOST_AMF) |
-  .config.enableE2 = (env(FLEXRIC) == "true") |
-  .config.ricHost = env(HOST_FLEXRIC) |
-  .config.tac = env(TAC) |
-
-  ############################
-  # Scheduling / placement
-  ############################
-  .nodeName = env(NODE_GNB) |
-
-  ############################
-  # Resources (safe if unused)
-  ############################
-  .resources.define = (env(QOS_GNB_DEF) == "true")
-' "$VALUES_FILE"
-
-
-########################################
-# Debug Multus variables
-########################################
-echo "===== DEBUG Multus ====="
-echo "Fichier YAML : $VALUES_FILE"
-echo "Variables exportées :"
-env | grep -E 'MULTUS|TYPE_N2|IF_NAME_N2N3|IP_GNB_N2'
-echo "----- Vérification du select sur n2 -----"
-yq eval '.multus.interfaces[] | select(.name=="n2")' "$VALUES_FILE"
-echo "----- Vérification valeur env(IF_NAME_N2N3) -----"
-yq eval 'env(IF_NAME_N2N3)' "$VALUES_FILE"
-echo "===== FIN DEBUG ====="
-
-
-########################################
-# Multus 
-########################################
-yq eval -i '
-if has("multus") then
-  .multus.enabled = true |
-
-  (.multus.interfaces[] | select(.name=="n2")) |=
-    . + (
-      {
-        "enabled": (strenv(MULTUS_GNB_N2)=="true"),
-        "type": strenv(TYPE_N2),
-        "hostInterface": strenv(IF_NAME_N2N3),
-        "ipAdd": strenv(IP_GNB_N2),
-        "netmask": strenv(NETMASK_GNB_N2),
-        "gateway": strenv(GW_GNB_N2),
-        "routes": strenv(ROUTES_GNB_N2),
-        "mode": strenv(MODE_N2)
-      }
-      | with_entries(select(.value != null))
-    ) |
-
-  (.multus.interfaces[] | select(.name=="n3")) |=
-    . + (
-      {
-        "enabled": (strenv(MULTUS_GNB_N3)=="true"),
-        "type": strenv(TYPE_N3),
-        "hostInterface": strenv(IF_NAME_N2N3),
-        "ipAdd": strenv(IP_GNB_N3),
-        "netmask": strenv(NETMASK_GNB_N3),
-        "gateway": strenv(GW_GNB_N3),
-        "routes": strenv(ROUTES_GNB_N3),
-        "mode": strenv(MODE_N3)
-      }
-      | with_entries(select(.value != null))
-    ) |
-
-  (.multus.interfaces[] | select(.name=="uplane1")) |=
-    . + (
-      {
-        "enabled": (strenv(MULTUS_UPLANE1)=="true"),
-        "type": "sriov",
-        "mac": strenv(MAC_UPLANE1),
-        "sriovNetworkNamespace": strenv(SRIOV_NS),
-        "vlan": strenv(VLAN_RU1)
-      }
-      | with_entries(select(.value != null))
-    ) |
-
-  (.multus.interfaces[] | select(.name=="cplane1")) |=
-    . + (
-      {
-        "enabled": (strenv(MULTUS_CPLANE1)=="true"),
-        "type": "sriov",
-        "mac": strenv(MAC_CPLANE1),
-        "sriovNetworkNamespace": strenv(SRIOV_NS),
-        "vlan": strenv(VLAN_RU1)
-      }
-      | with_entries(select(.value != null))
-    )
-
-else .
-end
-' "$VALUES_FILE"
-
 
     ########################################
-    # NSSAI 
+    # Image / common configuration
     ########################################
-    yq eval -i "$VALUES_FILE" <<YQ2
-  if has("config") and .config.plmn_list then
-    .config.plmn_list[0].snssaiList =
-      (
+    yq eval -i '
+      ############################
+      # Image configuration
+      ############################
+      .nfimage.repository  = env(GNB_REPO) |
+      .nfimage.version     = env(GNB_TAG) |
+      .nfimage.pullPolicy  = env(GNB_PULL_POLICY) |
+
+      ############################
+      # Common gNB / NF config
+      ############################
+      .config.gnbName      = env(GNB_NAME) |
+      .config.amfHost      = env(HOST_AMF) |
+      .config.enableE2     = (env(FLEXRIC) == "true") |
+      .config.ricHost      = env(HOST_FLEXRIC) |
+      .config.tac          = env(TAC) |
+
+      ############################
+      # Scheduling / placement
+      ############################
+      .nodeName            = env(NODE_GNB) |
+
+      ############################
+      # Resources (safe if unused)
+      ############################
+      .resources.define    = (env(QOS_GNB_DEF) == "true")
+    ' "$VALUES_FILE"
+
+    ########################################
+    # Multus
+    ########################################
+    yq eval -i '
+      if has("multus") then
+        .multus.enabled = true |
+
+        # n2
+        (.multus.interfaces[] | select(.name=="n2")) |=
+          . + (
+            {
+              "enabled":       (strenv(MULTUS_GNB_N2)=="true"),
+              "type":          strenv(TYPE_N2),
+              "hostInterface": strenv(IF_NAME_N2N3),
+              "ipAdd":         strenv(IP_GNB_N2),
+              "netmask":       strenv(NETMASK_GNB_N2),
+              "gateway":       strenv(GW_GNB_N2),
+              "routes":        strenv(ROUTES_GNB_N2),
+              "mode":          strenv(MODE_N2)
+            }
+            | with_entries(select(.value != null))
+          ) |
+
+        # n3
+        (.multus.interfaces[] | select(.name=="n3")) |=
+          . + (
+            {
+              "enabled":       (strenv(MULTUS_GNB_N3)=="true"),
+              "type":          strenv(TYPE_N3),
+              "hostInterface": strenv(IF_NAME_N2N3),
+              "ipAdd":         strenv(IP_GNB_N3),
+              "netmask":       strenv(NETMASK_GNB_N3),
+              "gateway":       strenv(GW_GNB_N3),
+              "routes":        strenv(ROUTES_GNB_N3),
+              "mode":          strenv(MODE_N3)
+            }
+            | with_entries(select(.value != null))
+          ) |
+
+        # uplane1
+        (.multus.interfaces[] | select(.name=="uplane1")) |=
+          . + (
+            {
+              "enabled":               (strenv(MULTUS_UPLANE1)=="true"),
+              "type":                  "sriov",
+              "mac":                   strenv(MAC_UPLANE1),
+              "sriovNetworkNamespace": strenv(SRIOV_NS),
+              "vlan":                  strenv(VLAN_RU1)
+            }
+            | with_entries(select(.value != null))
+          ) |
+
+        # cplane1
+        (.multus.interfaces[] | select(.name=="cplane1")) |=
+          . + (
+            {
+              "enabled":               (strenv(MULTUS_CPLANE1)=="true"),
+              "type":                  "sriov",
+              "mac":                   strenv(MAC_CPLANE1),
+              "sriovNetworkNamespace": strenv(SRIOV_NS),
+              "vlan":                  strenv(VLAN_RU1)
+            }
+            | with_entries(select(.value != null))
+          )
+      else
+        .
+      end
+    ' "$VALUES_FILE"
+
+    ########################################
+    # NSSAI
+    ########################################
+    yq eval -i "$VALUES_FILE" <<'YQ2'
+if has("config") and .config.plmn_list then
+  .config.plmn_list[0].snssaiList =
+    (
+      [
+        {"sst": env(SLICE1_SST)}
+        + (env(SLICE1_SD)!="" ? {"sd": "0x"+env(SLICE1_SD)} : {})
+      ]
+      +
+      (env(SLICE2_SST)!="" ?
         [
-          {"sst": env(SLICE1_SST)}
-          + (env(SLICE1_SD)!="" ? {"sd": "0x"+env(SLICE1_SD)} : {})
-        ]
-        +
-        (env(SLICE2_SST)!="" ?
-          [
-            {"sst": env(SLICE2_SST)}
-            + (env(SLICE2_SD)!="" ? {"sd": "0x"+env(SLICE2_SD)} : {})
-          ] : [])
-      )
-  else
-    .
-  end
+          {"sst": env(SLICE2_SST)}
+          + (env(SLICE2_SD)!="" ? {"sd": "0x"+env(SLICE2_SD)} : {})
+        ] : [])
+    )
+else
+  .
+end
 YQ2
 
     ########################################
     # Validation (fail fast)
     ########################################
     yq eval '.' "$VALUES_FILE" >/dev/null || {
-	echo "ERROR: generated YAML is invalid: $VALUES_FILE"
+        echo "ERROR: generated YAML is invalid: $VALUES_FILE"
+        exit 1
     }
 
     echo "OK: $VALUES_FILE updated successfully"
-
 }
+
 
 
 configure-gnb() {
