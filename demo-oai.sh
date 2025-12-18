@@ -973,24 +973,30 @@ yq eval -i '
 
 echo ">>>>>>>>>>> NSSAI: $SLICE1_SST : $SLICE1_SD and $SLICE2_SST : $SLICE2_SD"
 yq eval -i '
-if has("config") and .config.plmn_list then
+(
+  has("config") and .config.plmn_list
+  ?
   .config.plmn_list[0].snssaiList =
     (
       [
-        {"sst": env(SLICE1_SST)}
-        + (env(SLICE1_SD)!="" ? {"sd": "0x"+env(SLICE1_SD)} : {})
+        {"sst": strenv(SLICE1_SST)}
+        + (strenv(SLICE1_SD)!="" and strenv(SLICE1_SD)!="EMPTY"
+            ? {"sd": "0x"+strenv(SLICE1_SD)} : {})
       ]
       +
-      (env(SLICE2_SST)!="" ?
+      (strenv(SLICE2_SST)!=""
+        ?
         [
-          {"sst": env(SLICE2_SST)}
-          + (env(SLICE2_SD)!="" ? {"sd": "0x"+env(SLICE2_SD)} : {})
-        ] : [])
+          {"sst": strenv(SLICE2_SST)}
+          + (strenv(SLICE2_SD)!="" and strenv(SLICE2_SD)!="EMPTY"
+              ? {"sd": "0x"+strenv(SLICE2_SD)} : {})
+        ]
+        : [])
     )
-else
-  .
-end
+  : .
+)
 ' "$VALUES_FILE"
+
 
     ########################################
     # Validation (fail fast)
