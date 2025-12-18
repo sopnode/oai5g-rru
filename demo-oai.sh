@@ -1049,17 +1049,17 @@ configure-gnb() {
 
     for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
 	for file in values config; do
-	    file="${OAI5G_RAN}/${nf}/${file}.yaml"
+	    FILE="${OAI5G_RAN}/${nf}/${file}.yaml"
 
-	    if [[ ! -f "$file" ]]; then
+	    if [[ ! -f "$FILE" ]]; then
 		echo "Skipping $nf: file not found"
 		continue
 	    fi	
-	    cp "$file" "${OAI5G_RAN}/${nf}/${file}.yaml.orig"
+	    cp "$FILE" "${OAI5G_RAN}/${nf}/${file}.yaml.orig"
 	
-	    apply-gnb-values-yq "${file}"
+	    apply-gnb-values-yq "${FILE}"
 
-	    diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/${file}.yaml.orig) <(yq eval -P '.' ${file})
+	    diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/${file}.yaml.orig) <(yq eval -P '.' ${FILE})
 	done
     done
 
