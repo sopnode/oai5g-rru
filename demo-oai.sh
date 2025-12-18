@@ -973,28 +973,28 @@ yq eval -i '
 
 echo ">>>>>>>>>>> NSSAI: $SLICE1_SST : $SLICE1_SD and $SLICE2_SST : $SLICE2_SD"
 yq eval -i '
-(
-  has("config") and .config.plmn_list
-  ?
-  .config.plmn_list[0].snssaiList =
-    (
-      [
-        {"sst": strenv(SLICE1_SST)}
-        + (strenv(SLICE1_SD)!="" and strenv(SLICE1_SD)!="EMPTY"
-            ? {"sd": "0x"+strenv(SLICE1_SD)} : {})
-      ]
-      +
-      (strenv(SLICE2_SST)!=""
-        ?
+. as $doc
+| if has("config") and .config.plmn_list then
+    .config.plmn_list[0].snssaiList =
+      (
         [
-          {"sst": strenv(SLICE2_SST)}
-          + (strenv(SLICE2_SD)!="" and strenv(SLICE2_SD)!="EMPTY"
-              ? {"sd": "0x"+strenv(SLICE2_SD)} : {})
+          {"sst": strenv(SLICE1_SST)}
+          + (strenv(SLICE1_SD)!="" and strenv(SLICE1_SD)!="EMPTY"
+              ? {"sd": "0x"+strenv(SLICE1_SD)} : {})
         ]
-        : [])
-    )
-  : .
-)
+        +
+        (strenv(SLICE2_SST)!=""
+          ?
+          [
+            {"sst": strenv(SLICE2_SST)}
+            + (strenv(SLICE2_SD)!="" and strenv(SLICE2_SD)!="EMPTY"
+                ? {"sd": "0x"+strenv(SLICE2_SD)} : {})
+          ]
+          : [])
+      )
+  else
+    $doc
+  end
 ' "$VALUES_FILE"
 
 
