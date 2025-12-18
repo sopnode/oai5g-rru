@@ -937,6 +937,7 @@ yq eval -i '
      .ipAdd = strenv(IP_GNB_N2) |
      .netmask = strenv(NETMASK_GNB_N2) |
      .defaultRoute = strenv(GW_GNB_N2) |
+     .gateway = strenv(GW_GNB_N2) |
      .routes = strenv(ROUTES_GNB_N2) |
      .mode = strenv(MODE_N2)) |
 
@@ -947,6 +948,7 @@ yq eval -i '
      .ipAdd = strenv(IP_GNB_N3) |
      .netmask = strenv(NETMASK_GNB_N3) |
      .defaultRoute = strenv(GW_GNB_N3) |
+     .gateway = strenv(GW_GNB_N3) |
      .routes = strenv(ROUTES_GNB_N3) |
      .mode = strenv(MODE_N3)) |
 
