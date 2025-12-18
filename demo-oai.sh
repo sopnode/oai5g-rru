@@ -1057,7 +1057,7 @@ configure-gnb() {
 	    fi	
 	    cp "$FILE" "${OAI5G_RAN}/${nf}/${file}.yaml.orig"
 	
-	    apply-gnb-values-yq "${FILE}"
+	    $(eval echo apply-gnb-${file}-yq) "${FILE}"
 
 	    diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/${file}.yaml.orig) <(yq eval -P '.' ${FILE})
 	done
