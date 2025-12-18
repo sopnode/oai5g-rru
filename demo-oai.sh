@@ -924,8 +924,6 @@ apply-gnb-values-yq() {
     yq eval -i '
       if has("multus") then
         .multus.enabled = true |
-
-        # n2
         (.multus.interfaces[] | select(.name=="n2")) |=
           . + (
             {
@@ -940,8 +938,6 @@ apply-gnb-values-yq() {
             }
             | with_entries(select(.value != null))
           ) |
-
-        # n3
         (.multus.interfaces[] | select(.name=="n3")) |=
           . + (
             {
@@ -956,8 +952,6 @@ apply-gnb-values-yq() {
             }
             | with_entries(select(.value != null))
           ) |
-
-        # uplane1
         (.multus.interfaces[] | select(.name=="uplane1")) |=
           . + (
             {
@@ -969,8 +963,6 @@ apply-gnb-values-yq() {
             }
             | with_entries(select(.value != null))
           ) |
-
-        # cplane1
         (.multus.interfaces[] | select(.name=="cplane1")) |=
           . + (
             {
