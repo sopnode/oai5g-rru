@@ -76,6 +76,7 @@ OAISA_REPO="docker.io/oaisoftwarealliance"
 IF_NAME_N2N3_DEFAULT="@DEF_LOCAL_INTERFACE@" 
 IF_NAME_N6_DEFAULT="@DEF_LOCAL_INTERFACE@" 
 IF_NAME_E1_DEFAULT="@DEF_LOCAL_INTERFACE@" 
+IF_NAME_E2_DEFAULT="@DEF_LOCAL_INTERFACE@" 
 IF_NAME_F1_DEFAULT="@DEF_LOCAL_INTERFACE@"
 
 IF_NAME_VLAN_N300_1="r2lab_usrp"
@@ -349,24 +350,6 @@ export GNB_PULL_POLICY="IfNotPresent"
 #
 export NODE_CU="$NODE_GNB" # same node used for cu/cu-cp/cu-up and du
 
-export E1IFNAME="e1"
-export F1CUPORT="2152"
-export F1DUPORT="2152"
-#
-# E2 interface
-#
-export MULTUS_E2="true"
-export IP_DU_E2="192.168.85.91"
-export NETMASK_DU_E2="24"
-export IF_NAME_DU_E2="$IF_NAME_E2_DEFAULT"
-
-###
-# comme DU n a plus les memes interfaces (f1 ou f1c/f1u) 
-# selon mode cu/cp ou cu, il faut rajouter un test sur le mode
-# et selon configurer uniquement le mode selectionné
-#
-#
-
 ########## DU specific part ##############
 #DU_REPO="${R2LAB_REPO}/oai-gnb" DU_REPO must be GNB_REPO to handle aw2s case
 export DU_TAG=${RAN_TAG}
@@ -383,6 +366,13 @@ export IP_DU_F1U="172.21.16.90"
 export GW_DU_F1U=""
 export ROUTES_DU_F1U=""
 export IF_NAME_DU_F1U="$IF_NAME_F1_DEFAULT"
+#
+export MULTUS_DU_E2="true"
+export IP_DU_E2="192.168.85.91"
+export NETMASK_DU_E2="24"
+export GW_DU_E2=""
+export ROUTES_DU_E2="" 
+export IF_NAME_DU_E2="$IF_NAME_E2_DEFAULT"
 #
 export NAME_DU="oai-du"
 export QOS_DU_DEF="true"
@@ -414,6 +404,13 @@ export GW_CU_N3=${GW_CU_N3:=""}
 export ROUTES_CU_N3=${ROUTES_CU_N3:=""}
 export IF_NAME_CU_N3=${IF_NAME_CU_N3:=$IF_NAME_N2N3}
 #
+export MULTUS_CU_E2="true"
+export IP_CU_E2="192.168.85.93"
+export NETMASK_CU_E2="24"
+export GW_CU_E2=""
+export ROUTES_CU_E2="" 
+export IF_NAME_CU_E2="$IF_NAME_E2_DEFAULT"
+#
 export ADD_OPTIONS_CU="--log_config.global_log_options level,nocolor,time"
 export NAME_CU="oai-cu"
 export QOS_CU_DEF="true"
@@ -430,6 +427,13 @@ export NETMASK_CUCP_E1="24"
 export GW_CUCP_E1=""
 export ROUTES_CUCP_E1=""
 export IF_NAME_CUCP_E1="$IF_NAME_E1_DEFAULT"
+#
+export MULTUS_CUCP_E2="true"
+export IP_CUCP_E2="192.168.85.93"
+export NETMASK_CUCP_E2="24"
+export GW_CUCP_E2=""
+export ROUTES_CUCP_E2="" 
+export IF_NAME_CUCP_E2="$IF_NAME_E2_DEFAULT"
 #
 export MULTUS_CUCP_N2=${MULTUS_CUCP_N2:=$MULTUS_GNB_N2}
 export IP_CUCP_N2=${IP_CUCP_N2:=$IP_GNB_N2} 
@@ -462,6 +466,13 @@ export NETMASK_CUUP_E1="24"
 export GW_CUUP_E1=""
 export ROUTES_CUUP_E1="" 
 export IF_NAME_CUUP_E1="$IF_NAME_E1_DEFAULT"
+#
+export MULTUS_CUUP_E2="true"
+export IP_CUUP_E2="192.168.85.92"
+export NETMASK_CUUP_E2="24"
+export GW_CUUP_E2=""
+export ROUTES_CUUP_E2="" 
+export IF_NAME_CUUP_E2="$IF_NAME_E2_DEFAULT"
 #
 export MULTUS_CUUP_N3=${MULTUS_CUUP_N3:=$MULTUS_GNB_N3}
 export IP_CUUP_N3=${IP_CUUP_N3:=$IP_GNB_N3}
@@ -498,6 +509,12 @@ export NETMASK_GNB_N2="$NETMASK_N2N3"
 export NETMASK_GNB_N3="$NETMASK_N2N3"
 export NETMASK_GNB_RU="24"
 #
+export MULTUS_GNB_E2="true"
+export IP_GNB_E2="192.168.85.94"
+export NETMASK_GNB_E2="24"
+export GW_GNB_E2=""
+export ROUTES_GNB_E2="" 
+export IF_NAME_GNB_E2="$IF_NAME_E2_DEFAULT"
 ################## RRU-dependent part ###################
 #
 RU_MODE="static" # in ['static', 'dhcp']
