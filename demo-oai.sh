@@ -439,12 +439,12 @@ export ROUTES_CUCP_N2=${ROUTES_CUCP_N2:=""}
 export IF_NAME_CUCP_N2=${IF_NAME_CUCP_N2:=$IF_NAME_N2N3}
 export CUCP_N2_IF_NAME=${CUCP_N2_IF_NAME:=$GNB_N2_IF_NAME}
 #
-export MULTUS_CUCP_F1="true"
-export IP_CUCP_F1="172.21.16.92"
-export NETMASK_CUCP_F1="24"
-export GW_CUCP_F1=""
-export ROUTES_CUCP_F1=""
-export IF_NAME_CUCP_F1="$IF_NAME_F1_DEFAULT"
+export MULTUS_CUCP_F1C="true"
+export IP_CUCP_F1C="172.21.16.92"
+export NETMASK_CUCP_F1C="24"
+export GW_CUCP_F1C=""
+export ROUTES_CUCP_F1C=""
+export IF_NAME_CUCP_F1C="$IF_NAME_F1_DEFAULT"
 #
 export ADD_OPTIONS_CUCP="--log_config.global_log_options level,nocolor,time"
 export NAME_CUCP="oai-cu-cp"
@@ -471,12 +471,12 @@ export ROUTES_CUUP_N3=${ROUTES_CUUP_N3:=""}
 export IF_NAME_CUUP_N3=${IF_NAME_CUUP_N3:=$IF_NAME_N2N3}
 export CUUP_N3_IF_NAME=${CUUP_N3_IF_NAME:=$GNB_N2_IF_NAME}
 #
-export MULTUS_CUUP_F1="true"
-export IP_CUUP_F1="172.21.16.93"
-export NETMASK_CUUP_F1="22"
-export GW_CUUP_F1="" # "172.21.19.254"
-export ROUTES_CUUP_F1=""
-export IF_NAME_CUUP_F1="$IF_NAME_F1_DEFAULT"  
+export MULTUS_CUUP_F1U="true"
+export IP_CUUP_F1U="172.21.16.93"
+export NETMASK_CUUP_F1U="22"
+export GW_CUUP_F1U="" # "172.21.19.254"
+export ROUTES_CUUP_F1U=""
+export IF_NAME_CUUP_F1U="$IF_NAME_F1_DEFAULT"  
 #
 export ADD_OPTIONS_CUUP=""
 export NAME_CUUP="oai-cuup"
