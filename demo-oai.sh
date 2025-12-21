@@ -353,17 +353,36 @@ export E1IFNAME="e1"
 export F1CUPORT="2152"
 export F1DUPORT="2152"
 #
+# E2 interface
+#
+export MULTUS_E2="true"
+export IP_DU_E2="192.168.85.91"
+export NETMASK_DU_E2="24"
+export IF_NAME_DU_E2="$IF_NAME_E2_DEFAULT"
+
+###
+# comme DU n a plus les memes interfaces (f1 ou f1c/f1u) 
+# selon mode cu/cp ou cu, il faut rajouter un test sur le mode
+# et selon configurer uniquement le mode selectionné
+#
+#
+
 ########## DU specific part ##############
 #DU_REPO="${R2LAB_REPO}/oai-gnb" DU_REPO must be GNB_REPO to handle aw2s case
 export DU_TAG=${RAN_TAG}
 export NAME_DU_SA="oai-du-sa"
 #
-export MULTUS_DU_F1="true"
-export IP_DU_F1="172.21.16.100"
-export NETMASK_DU_F1="22"
-export GW_DU_F1=""
-export ROUTES_DU_F1=""
-export IF_NAME_DU_F1="$IF_NAME_F1_DEFAULT"
+export MULTUS_DU_F1C="true"
+export IP_DU_F1C="172.21.6.90"
+export NETMASK_DU_F1C="22"
+export ROUTES_DU_F1C=""
+export IF_NAME_DU_F1C="$IF_NAME_F1_DEFAULT"
+#
+export MULTUS_DU_F1U="true"
+export IP_DU_F1U="172.21.16.90"
+export GW_DU_F1U=""
+export ROUTES_DU_F1U=""
+export IF_NAME_DU_F1U="$IF_NAME_F1_DEFAULT"
 #
 export NAME_DU="oai-du"
 export QOS_DU_DEF="true"
@@ -904,8 +923,6 @@ apply-gnb-values-yq() {
       .config.useAdditionalOptions = env(ADD_OPTIONS_GNB) |
       .config.ruCPlaneMacAdd       = env(MAC_BENETEL) |
       .config.ruUPlaneMacAdd       = env(MAC_BENETEL) |
-      .config.mcc                  = env(MCC) |
-      .config.mnc                  = env(MNC) |
       .config.gnbName              = env(GNB_NAME) |
       .config.amfHost              = env(HOST_AMF) |
       .config.enableE2             = (env(FLEXRIC) == "true") |
@@ -918,59 +935,12 @@ apply-gnb-values-yq() {
       .nodeName            = env(NODE_GNB) |
 
       ############################
-      # Resources (safe if unused)
+      # Resources
       ############################
       .resources.define    = (env(QOS_GNB_DEF) == "true")
     ' "$VALUES_FILE"
 
-    ########################################
-    # Multus
-    ########################################
 
-
-# Assumes VALUES_FILE points to your values.yaml
-# Environment variables must be exported beforehand
-
-    yq eval -i '
-  # Ensure multus exists
-  .multus.enabled = true |
-
-  (.multus.interfaces[] | select(.name=="n2")) |=
-    (.enabled = (env(MULTUS_GNB_N2) == "true") |
-     .type = strenv(TYPE_N2) |
-     .hostInterface = strenv(IF_NAME_N2N3) |
-     .ipAdd = strenv(IP_GNB_N2) |
-     .netmask = strenv(NETMASK_GNB_N2) |
-     .defaultRoute = strenv(GW_GNB_N2) |
-     .gateway = strenv(GW_GNB_N2) |
-     .routes = strenv(ROUTES_GNB_N2) |
-     .mode = strenv(MODE_N2)) |
-
-  (.multus.interfaces[] | select(.name=="n3")) |=
-    (.enabled = (env(MULTUS_GNB_N3) == "true") |
-     .type = strenv(TYPE_N3) |
-     .hostInterface = strenv(IF_NAME_N2N3) |
-     .ipAdd = strenv(IP_GNB_N3) |
-     .netmask = strenv(NETMASK_GNB_N3) |
-     .defaultRoute = strenv(GW_GNB_N3) |
-     .gateway = strenv(GW_GNB_N3) |
-     .routes = strenv(ROUTES_GNB_N3) |
-     .mode = strenv(MODE_N3)) |
-
-  (.multus.interfaces[] | select(.name=="uplane1")) |=
-    (.enabled = (env(MULTUS_UPLANE1) == "true") |
-     .type = "sriov" |
-     .mac = strenv(MAC_UPLANE1) |
-     .sriovNetworkNamespace = strenv(SRIOV_NS) |
-     .vlan = strenv(VLAN_RU1)) |
-
-  (.multus.interfaces[] | select(.name=="cplane1")) |=
-    (.enabled = (env(MULTUS_CPLANE1) == "true") |
-     .type = "sriov" |
-     .mac = strenv(MAC_CPLANE1) |
-     .sriovNetworkNamespace = strenv(SRIOV_NS) |
-     .vlan = strenv(VLAN_RU1))
-' "$VALUES_FILE"
 
     ########################################
     # PLMN and NSSAI
@@ -1012,27 +982,6 @@ apply-gnb-values-yq() {
     echo "OK: $VALUES_FILE updated successfully"
 }
 
-apply-gnb-config-yq() {
-
-    CONFIG_FILE="$1"
-
-    [ -f "$CONFIG_FILE" ] || {
-        echo "ERROR: values file not found: $CONFIG_FILE"
-        exit 1
-    }
-
-    echo "Applying yq overlays to $CONFIG_FILE"
-    yq eval -i '
-# -------------------------
-# gNB config
-# -------------------------
-.Active_gNBs = [ env(GNB_NAME) ] |
-.gNBs[0].gNB_ID = env(GNB_ID) |
-.gNBs[0].gNB_name = env(GNB_NAME) |
-.gNBs[0].tracking_area_code = (env(TAC) | tonumber)
-' "$CONFIG_FILE"
-
-}
 
 configure-gnb() {
     echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $LOGS"
@@ -1046,20 +995,223 @@ configure-gnb() {
 	exit 1
     }
 
-    for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
-	for file in values config; do
-	    FILE="${OAI5G_RAN}/${nf}/${file}.yaml"
+    declare -A NF_IFS
+    declare -A NF_IFS_START
+    declare -A NF_IFS_END
+
+    NF_IFS[oai-gnb]="
+- name: \"n2\"
+  enabled: $MULTUS_GNB_N2
+  hostInterface: \"$IF_NAME_GNB_N2\"
+  ipAdd: \"$IP_GNB_N2\"
+  netmask: \"$NETMASK_GNB_N2\"
+  defaultRoute: \"$GW_GNB_N2\"
+  routes: \"$ROUTES_GNB_N2\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"n3\"
+  enabled: $MULTUS_GNB_N3
+  hostInterface: \"$IF_NAME_GNB_N3\"
+  ipAdd: \"$IP_GNB_N3\"
+  netmask: \"$NETMASK_GNB_N3\"
+  defaultRoute: \"$GW_GNB_N3\"
+  routes: \"$ROUTES_GNB_N3\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"e2\"
+  enabled: $MULTUS_GNB_E2
+  hostInterface: \"$IF_NAME_GNB_E2\"
+  ipAdd: \"$IP_GNB_E2\"
+  netmask: \"$NETMASK_GNB_E2\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"ru\"
+  enabled: $MULTUS_GNB_RU
+  hostInterface: \"$IF_NAME_GNB_RU\"
+  ipAdd: \"$IP_GNB_RU\"
+  netmask: \"$NETMASK_GNB_RU\"
+  gateway: \"$GW_GNB_RU\"
+  mtu: \"$MTU_GNB_RU\"
+  type: vlan
+  vlan: \"$VLAN_GNB_RU\"
+"
+    NF_IFS_END[oai-du]="
+- name: \"e2\"
+  enabled: $MULTUS_GNB_E2
+  hostInterface: \"$IF_NAME_GNB_E2\"
+  ipAdd: \"$IP_GNB_E2\"
+  netmask: \"$NETMASK_GNB_E2\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"ru\"
+  enabled: $MULTUS_GNB_RU
+  hostInterface: \"$IF_NAME_GNB_RU\"
+  ipAdd: \"$IP_GNB_RU\"
+  netmask: \"$NETMASK_GNB_RU\"
+  gateway: \"$GW_GNB_RU\"
+  mtu: \"$MTU_GNB_RU\"
+  type: vlan
+  vlan: \"$VLAN_GNB_RU\"
+"
+    if [[ "$GNB_MODE" == 'cucpup' ]]; then
+	NF_IFS_START[oai-du]="
+- name: \"f1c\"
+  enabled: $MULTUS_GNB_F1C
+  hostInterface: \"$IF_NAME_GNB_F1C\"
+  ipAdd: \"$IP_GNB_F1C\"
+  netmask: \"$NETMASK_GNB_F1C\"
+  defaultRoute: \"$GW_GNB_F1C\"
+  routes: \"$ROUTES_GNB_F1C\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"f1u\"
+  enabled: $MULTUS_GNB_F1U
+  hostInterface: \"$IF_NAME_GNB_F1U\"
+  ipAdd: \"$IP_GNB_F1U\"
+  netmask: \"$NETMASK_GNB_F1U\"
+  defaultRoute: \"$GW_GNB_F1U\"
+  routes: \"$ROUTES_GNB_F1U\"
+  type: macvlan
+  mode: \"bridge\"
+"
+    else
+	NF_IFS_START[oai-du]="
+- name: \"f1\"
+  enabled: $MULTUS_GNB_F1
+  hostInterface: \"$IF_NAME_GNB_F1\"
+  ipAdd: \"$IP_GNB_F1\"
+  netmask: \"$NETMASK_GNB_F1\"
+  defaultRoute: \"$GW_GNB_F1\"
+  routes: \"$ROUTES_GNB_F1\"
+  type: macvlan
+  mode: \"bridge\"
+"
+    fi
+    NF_IFS[oai-du]="${NF_IFS_START[oai-du]}${NF_IFS_END[oai-du]}"
+    
+    NF_IFS[oai-gnb-fhi-72]="
+- name: \"n2\"
+  enabled: $MULTUS_GNB_N2
+  hostInterface: \"$IF_NAME_GNB_N2\"
+  ipAdd: \"$IP_GNB_N2\"
+  netmask: \"$NETMASK_GNB_N2\"
+  defaultRoute: \"$GW_GNB_N2\"
+  routes: \"$ROUTES_GNB_N2\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"n3\"
+  enabled: $MULTUS_GNB_N3
+  hostInterface: \"$IF_NAME_GNB_N3\"
+  ipAdd: \"$IP_GNB_N3\"
+  netmask: \"$NETMASK_GNB_N3\"
+  defaultRoute: \"$GW_GNB_N3\"
+  routes: \"$ROUTES_GNB_N3\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"e2\"
+  enabled: $MULTUS_GNB_E2
+  hostInterface: \"$IF_NAME_GNB_E2\"
+  ipAdd: \"$IP_GNB_E2\"
+  netmask: \"$NETMASK_GNB_E2\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"uplane1\"
+  enabled: true
+  mac: \"$MAC_UPLANE1\"
+  type: sriov
+  sriovNetworkNamespace: \"sriov-network-operator\"
+  sriovResourceName: \"ruvfiou\"
+  vlan: \"$VLAN_RU1\"
+- name: \"cplane1\"
+  enabled: true
+  mac: \"$MAC_CPLANE1\"
+  type: sriov
+  sriovNetworkNamespace: \"sriov-network-operator\"
+  sriovResourceName: \"ruvfioc\"
+  vlan: \"$VLAN_RU1\"
+"
+
+    NF_IFS_END[oai-du-fhi-72]="
+- name: \"e2\"
+  enabled: $MULTUS_GNB_E2
+  hostInterface: \"$IF_NAME_GNB_E2\"
+  ipAdd: \"$IP_GNB_E2\"
+  netmask: \"$NETMASK_GNB_E2\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"uplane1\"
+  enabled: true
+  mac: \"$MAC_UPLANE1\"
+  type: sriov
+  sriovNetworkNamespace: \"sriov-network-operator\"
+  sriovResourceName: \"ruvfiou\"
+  vlan: \"$VLAN_RU1\"
+- name: \"cplane1\"
+  enabled: true
+  mac: \"$MAC_CPLANE1\"
+  type: sriov
+  sriovNetworkNamespace: \"sriov-network-operator\"
+  sriovResourceName: \"ruvfioc\"
+  vlan: \"$VLAN_RU1\"
+"
+    if [[ "$GNB_MODE" == 'cucpup' ]]; then
+	NF_IFS_START[oai-du-fhi-72]="
+- name: \"f1c\"
+  enabled: $MULTUS_GNB_F1C
+  hostInterface: \"$IF_NAME_GNB_F1C\"
+  ipAdd: \"$IP_GNB_F1C\"
+  netmask: \"$NETMASK_GNB_F1C\"
+  defaultRoute: \"$GW_GNB_F1C\"
+  routes: \"$ROUTES_GNB_F1C\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"f1u\"
+  enabled: $MULTUS_GNB_F1U
+  hostInterface: \"$IF_NAME_GNB_F1U\"
+  ipAdd: \"$IP_GNB_F1U\"
+  netmask: \"$NETMASK_GNB_F1U\"
+  defaultRoute: \"$GW_GNB_F1U\"
+  routes: \"$ROUTES_GNB_F1U\"
+  type: macvlan
+  mode: \"bridge\"
+"
+    else
+	NF_IFS_START[oai-du-fhi-72]="
+- name: \"f1\"
+  enabled: $MULTUS_GNB_F1
+  hostInterface: \"$IF_NAME_GNB_F1\"
+  ipAdd: \"$IP_GNB_F1\"
+  netmask: \"$NETMASK_GNB_F1\"
+  defaultRoute: \"$GW_GNB_F1\"
+  routes: \"$ROUTES_GNB_F1\"
+  type: macvlan
+  mode: \"bridge\"
+"
+    fi
+    NF_IFS[oai-du-fhi-72]="${NF_IFS_START[oai-du-fhi-72]}${NF_IFS_END[oai-du-fhi-72]}"
+  
+    #for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
+    for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-du-fhi-72; do
+	    FILE="${OAI5G_RAN}/${nf}/values.yaml"
 
 	    if [[ ! -f "$FILE" ]]; then
 		echo "Skipping $nf: file not found"
 		continue
 	    fi	
-	    cp "$FILE" "${OAI5G_RAN}/${nf}/${file}.yaml.orig"
+	    cp "$FILE" "${OAI5G_RAN}/${nf}/values.yaml.orig"
+	    
+	    # First remove multus interfaces
+	    yq eval -i 'del(.multus.interfaces)' "$FILE"
 	
-	    $(eval echo apply-gnb-${file}-yq) "${FILE}"
+	    # Inject interfaces
+	    printf "%s\n" "${NF_IFS[$nf]}" \
+		| yq eval-all '.multus.interfaces = .' - \
+		     > "${FILE}.tmp" && mv "${FILE}.tmp" "$FILE"
+
+	    # Update other parameters
+	    apply-gnb-values-yq "${FILE}"
 
 	    diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/${file}.yaml.orig) <(yq eval -P '.' ${FILE})
-	done
     done
 
 }
