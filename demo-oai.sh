@@ -1189,9 +1189,117 @@ configure-gnb() {
 "
     fi
     NF_IFS[oai-du-fhi-72]="${NF_IFS_START[oai-du-fhi-72]}${NF_IFS_END[oai-du-fhi-72]}"
+
+        NF_IFS[oai-cu]="
+- name: \"n2\"
+  enabled: $MULTUS_CU_N2
+  hostInterface: \"$IF_NAME_CU_N2\"
+  ipAdd: \"$IP_CU_N2\"
+  netmask: \"$NETMASK_CU_N2\"
+  defaultRoute: \"$GW_CU_N2\"
+  routes: \"$ROUTES_CU_N2\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"f1\"
+  enabled: $MULTUS_CU_F1
+  hostInterface: \"$IF_NAME_CU_F1\"
+  ipAdd: \"$IP_CU_F1\"
+  netmask: \"$NETMASK_CU_F1\"
+  defaultRoute: \"$GW_CU_F1\"
+  routes: \"$ROUTES_CU_F1\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"n3\"
+  enabled: $MULTUS_CU_N3
+  hostInterface: \"$IF_NAME_CU_N3\"
+  ipAdd: \"$IP_CU_N3\"
+  netmask: \"$NETMASK_CU_N3\"
+  defaultRoute: \"$GW_CU_N3\"
+  routes: \"$ROUTES_CU_N3\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"e2\"
+  enabled: $MULTUS_CU_E2
+  hostInterface: \"$IF_NAME_CU_E2\"
+  ipAdd: \"$IP_CU_E2\"
+  netmask: \"$NETMASK_CU_E2\"
+  type: macvlan
+  mode: \"bridge\"
+"
+	NF_IFS[oai-cu-cp]="
+- name: \"n2\"
+  enabled: $MULTUS_CUCP_N2
+  hostInterface: \"$IF_NAME_CUCP_N2\"
+  ipAdd: \"$IP_CUCP_N2\"
+  netmask: \"$NETMASK_CUCP_N2\"
+  defaultRoute: \"$GW_CUCP_N2\"
+  routes: \"$ROUTES_CUCP_N2\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"f1c\"
+  enabled: $MULTUS_CUCP_F1C
+  hostInterface: \"$IF_NAME_CUCP_F1C\"
+  ipAdd: \"$IP_CUCP_F1C\"
+  netmask: \"$NETMASK_CUCP_F1C\"
+  gateway: \"$GW_CUCP_F1C\"
+  routes: \"$ROUTES_CUCP_F1C\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"e1\"
+  enabled: $MULTUS_CUCP_E1
+  hostInterface: \"$IF_NAME_CUCP_E1\"
+  ipAdd: \"$IP_CUCP_E1\"
+  netmask: \"$NETMASK_CUCP_E1\"
+  gateway: \"$GW_CUCP_E1\"
+  routes: \"$ROUTES_CUCP_E1\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"e2\"
+  enabled: $MULTUS_CUCP_E2
+  hostInterface: \"$IF_NAME_CUCP_E2\"
+  ipAdd: \"$IP_CUCP_E2\"
+  netmask: \"$NETMASK_CUCP_E2\"
+  type: macvlan
+  mode: \"bridge\"
+"
+	NF_IFS[oai-cu-up]="
+- name: \"n3\"
+  enabled: $MULTUS_CUUP_N3
+  hostInterface: \"$IF_NAME_CUUP_N3\"
+  ipAdd: \"$IP_CUUP_N3\"
+  netmask: \"$NETMASK_CUUP_N3\"
+  defaultRoute: \"$GW_CUUP_N3\"
+  routes: \"$ROUTES_CUUP_N3\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"f1u\"
+  enabled: $MULTUS_CUUP_F1U
+  hostInterface: \"$IF_NAME_CUUP_F1U\"
+  ipAdd: \"$IP_CUUP_F1U\"
+  netmask: \"$NETMASK_CUUP_F1U\"
+  gateway: \"$GW_CUUP_F1U\"
+  routes: \"$ROUTES_CUUP_F1U\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"e1\"
+  enabled: $MULTUS_CUUP_E1
+  hostInterface: \"$IF_NAME_CUUP_E1\"
+  ipAdd: \"$IP_CUUP_E1\"
+  netmask: \"$NETMASK_CUUP_E1\"
+  gateway: \"$GW_CUUP_E1\"
+  routes: \"$ROUTES_CUUP_E1\"
+  type: macvlan
+  mode: \"bridge\"
+- name: \"e2\"
+  enabled: $MULTUS_CUUP_E2
+  hostInterface: \"$IF_NAME_CUUP_E2\"
+  ipAdd: \"$IP_CUUP_E2\"
+  netmask: \"$NETMASK_CUUP_E2\"
+  type: macvlan
+  mode: \"bridge\"
+"
   
-    #for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
-    for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-du-fhi-72; do
+    for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
 	    FILE="${OAI5G_RAN}/${nf}/values.yaml"
 
 	    if [[ ! -f "$FILE" ]]; then
