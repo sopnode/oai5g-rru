@@ -1204,13 +1204,10 @@ configure-gnb() {
 	    yq eval -i 'del(.multus.interfaces)' "$FILE"
 	
 	    # Inject interfaces
-	    yq eval -i \
-	       --argyaml ifs "${NF_IFS[$nf]}" \
-	       '
-    	       .multus.enabled = true |
-    	       .multus.interfaces = $ifs
-  	       ' \
-	       "$FILE"
+	    yq eval -i '
+	      .multus.enabled = true |
+	      .multus.interfaces = (strenv(YQ_IFS) | from_yaml)
+	      ' "$FILE"
 
 	    # Update other parameters
 	    apply-gnb-values-yq "${FILE}"
