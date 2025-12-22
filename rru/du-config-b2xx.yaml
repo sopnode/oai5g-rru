@@ -1,0 +1,120 @@
+# du.sa.band78.fr1.106PRB.usrpb210.conf
+Active_gNBs: ["gNB-OAI"]
+Asn1_verbosity: "none"
+
+gNBs:
+  - gNB_ID: 0xe00
+    gNB_DU_ID: 0xe00
+    gNB_name: "gNB-OAI"
+    tracking_area_code: 1
+    plmn_list:
+      - mcc: 208
+        mnc: 99
+        mnc_length: 2
+        snssaiList:
+          - sst: 1
+    nr_cellid: 1
+
+    do_CSIRS: 1
+    do_SRS: 1
+
+    servingCellConfigCommon:
+      - physCellId: 0
+        absoluteFrequencySSB: 641280
+        dl_frequencyBand: 78
+        dl_absoluteFrequencyPointA: 640008
+        dl_offstToCarrier: 0
+        dl_subcarrierSpacing: 1
+        dl_carrierBandwidth: 106
+        initialDLBWPlocationAndBandwidth: 28875
+        initialDLBWPsubcarrierSpacing: 1
+        initialDLBWPcontrolResourceSetZero: 12
+        initialDLBWPsearchSpaceZero: 0
+
+        ul_frequencyBand: 78
+        ul_offstToCarrier: 0
+        ul_subcarrierSpacing: 1
+        ul_carrierBandwidth: 106
+        pMax: 20
+        initialULBWPlocationAndBandwidth: 28875
+        initialULBWPsubcarrierSpacing: 1
+
+        prach_ConfigurationIndex: 98
+        prach_msg1_FDM: 0
+        prach_msg1_FrequencyStart: 0
+        zeroCorrelationZoneConfig: 13
+        preambleReceivedTargetPower: -104
+        preambleTransMax: 6
+        powerRampingStep: 1
+        ssb_perRACH_OccasionAndCB_PreamblesPerSSB_PR: 4
+        ssb_perRACH_OccasionAndCB_PreamblesPerSSB: 14
+        ra_ContentionResolutionTimer: 7
+        rsrp_ThresholdSSB: 19
+        prach_RootSequenceIndex_PR: 2
+        prach_RootSequenceIndex: 1
+        msg1_SubcarrierSpacing: 1
+        restrictedSetConfig: 0
+        msg3_DeltaPreamble: 1
+        p0_NominalWithGrant: -90
+        pucchGroupHopping: 0
+        hoppingId: 40
+        p0_nominal: -90
+        ssb_PositionsInBurst_PR: 2
+        ssb_PositionsInBurst_Bitmap: 1
+        ssb_periodicityServingCell: 2
+        dmrs_TypeA_Position: 0
+        subcarrierSpacing: 1
+        referenceSubcarrierSpacing: 1
+        dl_UL_TransmissionPeriodicity: 6
+        nrofDownlinkSlots: 7
+        nrofDownlinkSymbols: 6
+        nrofUplinkSlots: 2
+        nrofUplinkSymbols: 4
+        ssPBCH_BlockPower: -25
+
+    SCTP:
+      SCTP_INSTREAMS: 2
+      SCTP_OUTSTREAMS: 2
+
+MACRLCs:
+  - num_cc: 1
+    tr_s_preference: "local_L1"
+    tr_n_preference: "f1"
+    local_n_if_name: ""
+    local_n_address: ""
+    remote_n_address: ""
+    local_n_portc: 500
+    local_n_portd: 2153
+    remote_n_portc: 501
+    remote_n_portd: 2153
+    pusch_TargetSNRx10: 150
+    pucch_TargetSNRx10: 200
+
+L1s:
+  - num_cc: 1
+    tr_n_preference: "local_mac"
+    prach_dtx_threshold: 120
+    pucch0_dtx_threshold: 150
+    ofdm_offset_divisor: 8
+
+RUs:
+  - local_rf: "yes"
+    nb_tx: 1
+    nb_rx: 1
+    att_tx: 7
+    att_rx: 9
+    bands: [78]
+    max_pdschReferenceSignalPower: -27
+    max_rxgain: 114
+
+log_config:
+  global_log_level: "info"
+  hw_log_level: "info"
+  phy_log_level: "info"
+  mac_log_level: "info"
+  rlc_log_level: "info"
+  pdcp_log_level: "info"
+  rrc_log_level: "info"
+  ngap_log_level: "info"
+  f1ap_log_level: "info"
+

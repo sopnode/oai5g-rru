@@ -341,7 +341,9 @@ export CN_DEFAULT_GW=""
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 MY_REPO="ghcr.io/ziyad-mabrouk/openairinterface5g"
-#
+
+# Default charts repo & tag
+
 export RAN_TAG="2025.w34" # starting from w29 includes "Initial support for RedCap" feature in gNB
 export GNB_NAME="gNB-r2lab"
 export GNB_PULL_POLICY="IfNotPresent"
