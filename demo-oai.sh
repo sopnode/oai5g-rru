@@ -1351,22 +1351,24 @@ configure-gnb() {
 
 	    local file="$PREFIX_DEMO/rru/"
     done
-    for nf in oai-gnb oai-gnb-fhi-72; do
-	local CONFIG_RRU="$PREFIX_DEMO/rru/gnb-config-${RRU_TYPE}.yaml"
-	local CONFIG="${OAI5G_RAN}/${nf}/config.yaml"
-
-	cp "$CONFIG" "${OAI5G_RAN}/${nf}/config.yaml.orig"
-	cp "$CONFIG_RRU" "$CONFIG"
-	diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
-    done
-    for nf in oai-du oai-du-fhi-72; do
-	local CONFIG_RRU="$PREFIX_DEMO/rru/du-config-${RRU_TYPE}.yaml"
-	local CONFIG="${OAI5G_RAN}/${nf}/config.yaml"
-
-	cp "$CONFIG" "${OAI5G_RAN}/${nf}/config.yaml.orig"
-	cp "$CONFIG_RRU" "$CONFIG"
-	diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
-    done
+    if [[ $GNB_MODE = 'monolithic' ]]; then
+	if [[ "$RRU_TYPE" == "benetel" ]]; then
+	    nf="oai-gnb-fhi-72"; gnb_type="gnb"
+	else
+	    nf="oai-gnb"; gnb_type="gnb"
+	fi
+    else
+	if [[ "$RRU_TYPE" == "benetel" ]]; then
+	    nf="oai-du-fhi-72"; gnb_type="du"
+	else
+	    nf="oai-du"; gnb_type="du"
+	fi
+    fi
+    CONFIG_RRU="$PREFIX_DEMO/rru/${gnb_type}-config-${RRU_TYPE}.yaml"
+    CONFIG="${OAI5G_RAN}/${nf}/config.yaml"
+    cp "$CONFIG" "${OAI5G_RAN}/${nf}/config.yaml.orig"
+    cp "$CONFIG_RRU" "$CONFIG"
+    diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
 }
 
 
