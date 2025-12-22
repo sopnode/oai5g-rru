@@ -1318,17 +1318,18 @@ configure-gnb() {
   mode: \"bridge\"
 "
   
-    for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
-	    FILE="${OAI5G_RAN}/${nf}/values.yaml"
-
-	    if [[ ! -f "$FILE" ]]; then
+    for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-du-fhi-72 oai-cu oai-cu-cp oai-cu-up; do
+	    VALUES="${OAI5G_RAN}/${nf}/values.yaml"
+	    
+	    if [[ ! -f "$VALUES" ]]; then
 		echo "Skipping $nf: file not found"
 		continue
 	    fi	
-	    cp "$FILE" "${OAI5G_RAN}/${nf}/values.yaml.orig"
+	    cp "$VALUES" "${OAI5G_RAN}/${nf}/values.yaml.orig"
+	    
 	    
 	    # First remove multus interfaces
-	    yq eval -i 'del(.multus.interfaces)' "$FILE"
+	    yq eval -i 'del(.multus.interfaces)' "$VALUES"
 	
 	    # Inject interfaces
 	    export YQ_IFS="${NF_IFS[$nf]}"
@@ -1341,15 +1342,31 @@ configure-gnb() {
 	    yq eval -i '
 	      .multus.enabled = true |
 	      .multus.interfaces = (strenv(YQ_IFS) | from_yaml)
-	    ' "$FILE"
-
+	    ' "$VALUES"
 
 	    # Update other parameters
-	    apply-gnb-values-yq "${FILE}"
+	    apply-gnb-values-yq "${VALUES}"
 
-	    diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/values.yaml.orig) <(yq eval -P '.' ${FILE})
+	    diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/values.yaml.orig) <(yq eval -P '.' ${VALUES})
+
+	    local file="$PREFIX_DEMO/rru/"
     done
+    for nf in oai-gnb oai-gnb-fhi-72; do
+	local CONFIG_RRU="$PREFIX_DEMO/rru/gnb-config-${RRU_TYPE}.yaml"
+	local CONFIG="${OAI5G_RAN}/${nf}/config.yaml"
 
+	cp "$CONFIG" "${OAI5G_RAN}/${nf}/config.yaml.orig"
+	cp "$CONFIG_RRU" "$CONFIG"
+	diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
+    done
+    for nf in oai-du oai-du-fhi-72; do
+	local CONFIG_RRU="$PREFIX_DEMO/rru/du-config-${RRU_TYPE}.yaml"
+	local CONFIG="${OAI5G_RAN}/${nf}/config.yaml"
+
+	cp "$CONFIG" "${OAI5G_RAN}/${nf}/config.yaml.orig"
+	cp "$CONFIG_RRU" "$CONFIG"
+	diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
+    done
 }
 
 
