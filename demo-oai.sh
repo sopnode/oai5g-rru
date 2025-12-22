@@ -1319,49 +1319,48 @@ configure-gnb() {
 "
   
     for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-du-fhi-72 oai-cu oai-cu-cp oai-cu-up; do
-	    VALUES="${OAI5G_RAN}/${nf}/values.yaml"
+	VALUES="${OAI5G_RAN}/${nf}/values.yaml"
 	    
-	    if [[ ! -f "$VALUES" ]]; then
-		echo "Skipping $nf: file not found"
-		continue
-	    fi	
-	    cp "$VALUES" "${OAI5G_RAN}/${nf}/values.yaml.orig"
+	if [[ ! -f "$VALUES" ]]; then
+	    echo "Skipping $nf: file not found"
+	    continue
+	fi	
+	cp "$VALUES" "${OAI5G_RAN}/${nf}/values.yaml.orig"
 	    
-	    
-	    # First remove multus interfaces
-	    yq eval -i 'del(.multus.interfaces)' "$VALUES"
+	# First remove multus interfaces
+	yq eval -i 'del(.multus.interfaces)' "$VALUES"
 	
-	    # Inject interfaces
-	    export YQ_IFS="${NF_IFS[$nf]}"
+	# Inject interfaces
+	export YQ_IFS="${NF_IFS[$nf]}"
 
-	    if [[ -z "$YQ_IFS" ]]; then
-		echo "ERROR: NF_IFS[$nf] is empty"
-		continue
-	    fi
+	if [[ -z "$YQ_IFS" ]]; then
+	    echo "ERROR: NF_IFS[$nf] is empty"
+	    continue
+	fi
 
-	    yq eval -i '
-	      .multus.enabled = true |
-	      .multus.interfaces = (strenv(YQ_IFS) | from_yaml)
-	    ' "$VALUES"
+	yq eval -i '
+           .multus.enabled = true |
+	   .multus.interfaces = (strenv(YQ_IFS) | from_yaml)
+        ' "$VALUES"
 
-	    # Update other parameters
-	    apply-gnb-values-yq "${VALUES}"
-
-	    diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/values.yaml.orig) <(yq eval -P '.' ${VALUES})
-
-	    local file="$PREFIX_DEMO/rru/"
+	# Update other parameters
+	apply-gnb-values-yq "${VALUES}"
+	diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/values.yaml.orig) <(yq eval -P '.' ${VALUES})
     done
+    
     if [[ $GNB_MODE = 'monolithic' ]]; then
+	gnb_type="gnb"
 	if [[ "$RRU_TYPE" == "benetel" ]]; then
-	    nf="oai-gnb-fhi-72"; gnb_type="gnb"
+	    nf="oai-gnb-fhi-72"
 	else
-	    nf="oai-gnb"; gnb_type="gnb"
+	    nf="oai-gnb"
 	fi
     else
+	gnb_type="du"
 	if [[ "$RRU_TYPE" == "benetel" ]]; then
-	    nf="oai-du-fhi-72"; gnb_type="du"
+	    nf="oai-du-fhi-72"
 	else
-	    nf="oai-du"; gnb_type="du"
+	    nf="oai-du"
 	fi
     fi
     CONFIG_RRU="$PREFIX_DEMO/rru/${gnb_type}-config-${RRU_TYPE}.yaml"
