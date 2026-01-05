@@ -1437,10 +1437,10 @@ configure-gnb-old() {
 	QOS_GNB_DEF="true"
 	IF_NAME_GNB_RU1="$IF_NAME_VLAN_BENETEL"
 	if [[ "$RRU" = "benetel1" ]]; then
-	    MAC_BENETEL="$MAC_benetel1"
+	    export MAC_BENETEL="$MAC_benetel1"
 	    VLAN_RU1="$VLAN_benetel1"
 	else
-	    MAC_BENETEL="$MAC_benetel2"
+	    export MAC_BENETEL="$MAC_benetel2"
 	    VLAN_RU1="$VLAN_benetel2"
 	fi
 	
