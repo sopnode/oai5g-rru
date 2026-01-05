@@ -948,6 +948,7 @@ apply-gnb-values-yq() {
       .config.enableE2             = (strenv(FLEXRIC) == "true") |
       .config.ricHost              = strenv(HOST_FLEXRIC) |
       .config.tac                  = strenv(TAC) |
+      .config.ruIpAdd              = strenv(ADDR_RU) |
 
       ############################
       # Scheduling / placement
