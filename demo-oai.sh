@@ -2013,40 +2013,37 @@ start-flexric() {
 start-gnb() {
     echo "Running gNB on $NS namespace with GNB_MODE=$GNB_MODE, NODE_GNB=$NODE_GNB and rru=$RRU"
 
+    echo "cd $OAI5G_RAN"
+    cd "$OAI5G_RAN"
+
     if [[ $GNB_MODE = 'monolithic' ]]; then
-	cd "${OAI5G_RAN}/oai-gnb"
-	echo "helm -n $NS install oai-gnb ."
-	helm -n $NS install oai-gnb .
+	echo "helm -n $NS install oai-gnb oai-gnb/"
+	helm -n $NS install oai-gnb oai-gnb/
 	echo "Wait until the gNB pod is READY"
-    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-gnb
+	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-gnb
     elif [[ $GNB_MODE = 'cudu' ]]; then
-	cd "${OAI5G_RAN}/oai-cu"
-	echo "helm -n $NS install oai-cu ."
-	helm -n $NS install oai-cu .
+	echo "helm -n $NS install oai-cu oai-cu/"
+	helm -n $NS install oai-cu oai-cu/
 
 	echo "sleep 5s"; sleep 5
-	cd "${OAI5G_RAN}/oai-du"
 	echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu"
 	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu
-	echo "helm install -n $NS oai-du ."
-	helm install -n $NS oai-du .
+	echo "helm install -n $NS oai-du oai-du/"
+	helm install -n $NS oai-du oai-du/
     else
 	# $GNB_MODE = 'cucpup'
-	cd "${OAI5G_RAN}/oai-cu-cp"
-	echo "helm -n $NS install oai-cu-cp ."
-	helm -n $NS install oai-cu-cp .
+	echo "helm -n $NS install oai-cu-cp oai-cu-cp/"
+	helm -n $NS install oai-cu-cp oai-cu-cp/
 	echo "sleep 10s"; sleep 10
-	cd "${OAI5G_RAN}/oai-cu-up"
 	echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp"
 	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp
-	echo "helm -n $NS install oai-cu-up ."
-	helm -n $NS install oai-cu-up .
+	echo "helm -n $NS install oai-cu-up oai-cu-up/"
+	helm -n $NS install oai-cu-up oai-cu-up/
 	echo "sleep 5s"; sleep 5
-	cd "${OAI5G_RAN}/oai-du"
 	echo "kubectl -n $NS wait pod --for=condition=Ready  -l app.kubernetes.io/instance=oai-cu-up"
 	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-up
-	echo "helm install -n $NS oai-du ."
-	helm install -n $NS oai-du .
+	echo "helm install -n $NS oai-du oai-du/"
+	helm install -n $NS oai-du oai-du/
     fi
 }
 
