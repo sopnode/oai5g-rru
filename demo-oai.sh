@@ -940,8 +940,8 @@ apply-gnb-values-yq() {
       # Common gNB / NF config
       ############################
       .config.useAdditionalOptions = env(ADD_OPTIONS_GNB) |
-      .config.ruCPlaneMacAdd       = env(MAC_BENETEL) |
-      .config.ruUPlaneMacAdd       = env(MAC_BENETEL) |
+      .config.ruCPlaneMacAdd       = (env(MAC_BENETEL) // "") |
+      .config.ruUPlaneMacAdd       = (env(MAC_BENETEL) // "") |
       .config.gnbName              = env(GNB_NAME) |
       .config.amfHost              = env(HOST_AMF) |
       .config.enableE2             = (env(FLEXRIC) == "true") |
