@@ -944,6 +944,7 @@ apply-gnb-values-yq() {
       .config.ruUPlaneMacAdd       = strenv(MAC_BENETEL) |
       .config.gnbName              = strenv(GNB_NAME) |
       .config.amfHost              = strenv(HOST_AMF) |
+      .config.radio                = strenv(RRU) |
       .config.enableE2             = (strenv(FLEXRIC) == "true") |
       .config.ricHost              = strenv(HOST_FLEXRIC) |
       .config.tac                  = strenv(TAC) |
