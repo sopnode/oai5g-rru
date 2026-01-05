@@ -116,7 +116,7 @@ RUs:
     local_portd: 52001
     remote_portd: 52183
     local_rf: "no"
-    tr_preference: "udp_ecpri_if5";
+    tr_preference: "udp_ecpri_if5"
     nb_tx: 2
     nb_rx: 2
     att_tx: 17

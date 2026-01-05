@@ -141,7 +141,7 @@ L1s:
   - num_cc: 1
     tr_n_preference: local_mac
     prach_dtx_threshold: 200
-    # pucch0_dtx_threshold = 150;
+    # pucch0_dtx_threshold = 150
 RUs:
   - local_rf: yes
     nb_tx: 1
