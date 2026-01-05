@@ -1052,8 +1052,9 @@ configure-gnb() {
   netmask: \"$NETMASK_GNB_RU\"
   gateway: \"$GW_GNB_RU\"
   mtu: \"$MTU_GNB_RU\"
-  type: vlan
-  vlan: \"$VLAN_GNB_RU\"
+  type: macvlan
+  mode: \"bridge\"
+  vlan: ""
 "
     NF_IFS_END[oai-du]="
 - name: \"e2\"
@@ -1070,8 +1071,9 @@ configure-gnb() {
   netmask: \"$NETMASK_GNB_RU\"
   gateway: \"$GW_GNB_RU\"
   mtu: \"$MTU_GNB_RU\"
-  type: vlan
-  vlan: \"$VLAN_GNB_RU\"
+  type: macvlan
+  mode: \"bridge\"
+  vlan: ""
 "
     if [[ "$GNB_MODE" == 'cucpup' ]]; then
 	NF_IFS_START[oai-du]="
@@ -1141,14 +1143,14 @@ configure-gnb() {
   type: sriov
   sriovNetworkNamespace: \"sriov-network-operator\"
   sriovResourceName: \"ruvfiou\"
-  vlan: \"$VLAN_RU1\"
+  vlan: \"$VLAN_RU\"
 - name: \"cplane1\"
   enabled: true
   mac: \"$MAC_CPLANE1\"
   type: sriov
   sriovNetworkNamespace: \"sriov-network-operator\"
   sriovResourceName: \"ruvfioc\"
-  vlan: \"$VLAN_RU1\"
+  vlan: \"$VLAN_RU\"
 "
 
     NF_IFS_END[oai-du-fhi-72]="
@@ -1165,14 +1167,14 @@ configure-gnb() {
   type: sriov
   sriovNetworkNamespace: \"sriov-network-operator\"
   sriovResourceName: \"ruvfiou\"
-  vlan: \"$VLAN_RU1\"
+  vlan: \"$VLAN_RU\"
 - name: \"cplane1\"
   enabled: true
   mac: \"$MAC_CPLANE1\"
   type: sriov
   sriovNetworkNamespace: \"sriov-network-operator\"
   sriovResourceName: \"ruvfioc\"
-  vlan: \"$VLAN_RU1\"
+  vlan: \"$VLAN_RU\"
 "
     if [[ "$GNB_MODE" == 'cucpup' ]]; then
 	NF_IFS_START[oai-du-fhi-72]="
