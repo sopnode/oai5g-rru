@@ -932,31 +932,31 @@ apply-gnb-values-yq() {
       ############################
       # Image configuration
       ############################
-      .nfimage.repository  = env(GNB_REPO) |
-      .nfimage.version     = env(GNB_TAG) |
-      .nfimage.pullPolicy  = env(GNB_PULL_POLICY) |
+      .nfimage.repository  = strenv(GNB_REPO) |
+      .nfimage.version     = strenv(GNB_TAG) |
+      .nfimage.pullPolicy  = strenv(GNB_PULL_POLICY) |
 
       ############################
       # Common gNB / NF config
       ############################
-      .config.useAdditionalOptions = env(ADD_OPTIONS_GNB) |
-      .config.ruCPlaneMacAdd       = (env(MAC_BENETEL) // "") |
-      .config.ruUPlaneMacAdd       = (env(MAC_BENETEL) // "") |
-      .config.gnbName              = env(GNB_NAME) |
-      .config.amfHost              = env(HOST_AMF) |
-      .config.enableE2             = (env(FLEXRIC) == "true") |
-      .config.ricHost              = env(HOST_FLEXRIC) |
-      .config.tac                  = env(TAC) |
+      .config.useAdditionalOptions = strenv(ADD_OPTIONS_GNB) |
+      .config.ruCPlaneMacAdd       = strenv(MAC_BENETEL) |
+      .config.ruUPlaneMacAdd       = strenv(MAC_BENETEL) |
+      .config.gnbName              = strenv(GNB_NAME) |
+      .config.amfHost              = strenv(HOST_AMF) |
+      .config.enableE2             = (strenv(FLEXRIC) == "true") |
+      .config.ricHost              = strenv(HOST_FLEXRIC) |
+      .config.tac                  = strenv(TAC) |
 
       ############################
       # Scheduling / placement
       ############################
-      .nodeName            = env(NODE_GNB) |
+      .nodeName            = strenv(NODE_GNB) |
 
       ############################
       # Resources
       ############################
-      .resources.define    = (env(QOS_GNB_DEF) == "true")
+      .resources.define    = (strenv(QOS_GNB_DEF) == "true")
     ' "$VALUES_FILE"
 
 
