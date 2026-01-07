@@ -96,7 +96,6 @@ MACRLCs:
     pusch_TargetSNRx10: 200
     pucch_TargetSNRx10: 200
     ulsch_max_frame_inactivity: 0
-    ul_max_mcs: 25
 
 L1s:
   - num_cc: 1
