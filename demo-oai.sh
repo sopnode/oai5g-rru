@@ -1376,8 +1376,7 @@ configure-gnb() {
     # fix deployment chart in case of AW2S RUs
     if [[ "$RRU_TYPE" == "aw2s" ]]; then
 	for nf in oai-gnb oai-du; do
-	    DEPLOYMENT="${OAI5G_RAN}/${nf}/templates/deployment.yaml"
-	    sed -i 's|/opt/oai-gnb/etc|/opt/oai-gnb-aw2s/etc|' "$DEPLOYMENT"
+	    cp "$PREFIX_DEMO/rru/${nf}-deployment-aw2s.yaml" "${OAI5G_RAN}/${nf}/templates/deployment.yaml"
 	done
     fi
     
