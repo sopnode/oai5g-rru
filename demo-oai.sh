@@ -1372,6 +1372,15 @@ configure-gnb() {
     cp "$CONFIG" "${OAI5G_RAN}/${nf}/config.yaml.orig"
     cp "$CONFIG_RRU" "$CONFIG"
     diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
+
+    # fix deployment chart in case of AW2S RUs
+    if [[ "$RRU_TYPE" == "aw2s" ]]; then
+	for nf in oai-gnb oai-du; do
+	    DEPLOYMENT="${OAI5G_RAN}/${nf}/templates/deployment.yaml"
+	    sed -i 's|/opt/oai-gnb/etc|/opt/oai-gnb-aw2s/etc' "$DEPLOYMENT"
+	done
+    fi
+    
 }
 
 
