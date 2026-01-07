@@ -1373,10 +1373,14 @@ configure-gnb() {
     cp "$CONFIG_RRU" "$CONFIG"
     diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
 
-    # fix deployment chart in case of AW2S RUs
+    # fix deployment charts in the case of AW2S RUs as Eurecom no more support them
     if [[ "$RRU_TYPE" == "aw2s" ]]; then
 	for nf in oai-gnb oai-du; do
 	    cp "$PREFIX_DEMO/rru/${nf}-deployment-aw2s.yaml" "${OAI5G_RAN}/${nf}/templates/deployment.yaml"
+	done
+	for nf in oai-cu oai-cu-cp oai-cu-up; do
+	    DEPLOYMENT="${OAI5G_RAN}/${nf}/templates/deployment.yaml"
+	    sed -i 's|/opt/oai-gnb/etc|/opt/oai-gnb-aw2s/etc|' "$DEPLOYMENT"
 	done
     fi
     
