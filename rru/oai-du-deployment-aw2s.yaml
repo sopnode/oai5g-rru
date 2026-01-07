@@ -4,21 +4,21 @@ metadata:
   name: {{ .Chart.Name }}
   labels:
     app: {{ .Release.Name }}
-    {{- include "oai-gnb.labels" . | nindent 4 }}
+    {{- include "oai-du.labels" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "oai-gnb.selectorLabels" . | nindent 6 }}
+      {{- include "oai-du.selectorLabels" . | nindent 6 }}
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        {{- include "oai-gnb.selectorLabels" . | nindent 8 }}
+        {{- include "oai-du.selectorLabels" . | nindent 8 }}
         app: {{ .Release.Name }}
     {{- if and .Values.multus.enabled .Values.multus.interfaces }}
-      {{- $count := include "oai-gnb.countDefaultRouteInterfaces" . | int }}
+      {{- $count := include "oai-cu.countDefaultRouteInterfaces" . | int }}
       {{- if gt $count 1 }}
       {{- fail (printf "(%d) enabled interfaces are using defaultRoute; only one is allowed." $count) }}
       {{- end }}
@@ -32,11 +32,11 @@ spec:
             {
               "name": "{{ $.Release.Name }}-{{ .name }}",
               "interface": "{{ .name }}"
-              {{- if .defaultRoute }},
-              "default-route": ["{{ .defaultRoute }}"]
-              {{- end }}
               {{- if .mac }},
               "mac": "{{ .mac }}"
+              {{- end }}
+              {{- if .defaultRoute }},
+              "default-route": ["{{ .defaultRoute }}"]
               {{- end }}
               {{- if .gateway }},
               "gateway": "{{ .gateway }}"
@@ -78,17 +78,16 @@ spec:
             requests: { cpu: "1m", memory: "50Mi" }
             limits:   { cpu: "1m", memory: "50Mi" }
       {{- end }}
-      {{- if .Values.global }}{{ if .Values.global.waitForAMF }}
-        - name: wait-for-amf
+        - name: wait-for-cu
           image: docker.io/oaisoftwarealliance/oai-tcpdump-init:alpine-3.20
           imagePullPolicy: IfNotPresent
-          command: [ "/bin/sh", "-c" ]
-          args:
-            - until ncat -zv {{ .Values.config.amfHost }} 38412 --sctp; do echo "Waiting for AMF..."; sleep 1; done
+          command:
+            - /bin/sh
+            - -c
+            - until ncat -zv {{ .Values.config.cuHost }} 38472 --sctp ; do echo waiting for cu or cucp to start; sleep 1; done
           resources:
             requests: { cpu: "1m", memory: "50Mi" }
             limits:   { cpu: "1m", memory: "50Mi" }
-      {{- end }}{{- end }}
         - name: config-patcher
           image: docker.io/mikefarah/yq:4.47.2
           command: [ "sh", "-c" ]
@@ -97,27 +96,26 @@ spec:
               set -e
               echo "Resolving hostnames and patching config..."
               cp /tmp/config/config.yaml /tmp/config_patch/gnb.yaml
-              echo "$N2_IF_NAME $N3_IF_NAME"
               for i in $(seq 1 $MAX_RETRIES); do
-                echo "$AMF_HOST" | grep -Eq '^([0-9]{1,3}\.){3}[0-9]{1,3}$' && { export AMF_IP="$AMF_HOST"; break; }
-                AMF_IP=$(getent hosts "$AMF_HOST" | awk '{print $1}')
-                if [ -n "$AMF_IP" ]; then
-                  echo "Resolved AMF_IP=$AMF_IP"
-                  export AMF_IP
+                echo "$CU_HOST" | grep -Eq '^([0-9]{1,3}\.){3}[0-9]{1,3}$' && { export CU_IP="$CU_HOST"; break; }
+                CU_IP=$(getent hosts "$CU_HOST" | awk '{print $1}')
+                if [ -n "$CU_IP" ]; then
+                  echo "Resolved CU_IP=$CU_IP"
+                  export CU_IP
                   break
                 fi
-                echo "[$i/$MAX_RETRIES] Waiting for $AMF_HOST to resolve..."
+                echo "[$i/$MAX_RETRIES] Waiting for $CU_HOST to resolve..."
                 sleep $SLEEP_TIME
               done
 
-              if [ -z "$AMF_IP" ]; then
-                echo "ERROR: Unable to resolve $AMF_HOST after $((MAX_RETRIES*SLEEP_TIME)) seconds"
+              if [ -z "$CU_IP" ]; then
+                echo "ERROR: Unable to resolve $CU_HOST after $((MAX_RETRIES*SLEEP_TIME)) seconds"
                 exit 1
               fi
 
               {{- if .Values.config.enableE2 }}
               for i in $(seq 1 $MAX_RETRIES); do
-                echo "$AMF_HOST" | grep -Eq '^([0-9]{1,3}\.){3}[0-9]{1,3}$' && { export AMF_IP="$AMF_HOST"; break; }
+                echo "$RIC_HOST" | grep -Eq '^([0-9]{1,3}\.){3}[0-9]{1,3}$' && { export RIC_IP="$RIC_HOST"; break; }
                 RIC_IP=$(getent hosts "$RIC_HOST" | awk '{print $1}')
                 if [ -n "$RIC_IP" ]; then
                   echo "Resolved RIC_IP=$RIC_IP"
@@ -134,15 +132,19 @@ spec:
               fi
               {{- end }}
 
-              export N2_IP=$(ip -f inet addr show $N2_IF_NAME | grep -o "inet [0-9]*\.[0-9]*\.[0-9]*\.[0-9]*" | grep -o "[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*");
-              export N3_IP=$(ip -f inet addr show $N3_IF_NAME | grep -o "inet [0-9]*\.[0-9]*\.[0-9]*\.[0-9]*" | grep -o "[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*");
+              export F1C_IP=$(ip -f inet addr show $F1C_IF_NAME | grep -o "inet [0-9]*\.[0-9]*\.[0-9]*\.[0-9]*" | grep -o "[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*");
+              {{- range .Values.multus.interfaces }}
+              {{- if and (eq .name "f1u") .enabled }}
+              export F1U_IP=$(ip -f inet addr show $F1U_IF_NAME | grep -o "inet [0-9]*\.[0-9]*\.[0-9]*\.[0-9]*" | grep -o "[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*");
+              {{- end }}
+              {{- end }}
               export RU_POD_IP=$(ip -4 addr show ru | grep inet | awk '{ print $2 }' | cut -d/ -f1);
 
-              echo "Resolved: AMF=$AMF_IP N2=$N2_IP N3=$N3_IP RU_POD_IP=$RU_POD_IP"
+              echo "Resolved: AMF=$AMF_IP F1C_IP=$F1C_IP F1U=$F1U_IP RU_POD_IP=$RU_POD_IP"
 
               yq -i '
-                .Active_gNBs[0] = strenv(GNB_NAME) |
-                .gNBs[0].gNB_name = strenv(GNB_NAME) |
+                .Active_gNBs[0] = strenv(DU_NAME) |
+                .gNBs[0].gNB_name = strenv(DU_NAME) |
                 .gNBs[0].tracking_area_code = strenv(TAC) |
                 .gNBs[0].plmn_list = strenv(PLMN_LIST) |
                 .gNBs[].plmn_list |= (from_yaml) |
@@ -153,14 +155,18 @@ spec:
                 {{- end }}
                 .RUs[0].remote_address = strenv(ADDR_RU) |
                 .RUs[0].local_address = strenv(RU_POD_IP) |
-                .gNBs[0].amf_ip_address[0].ipv4 = strenv(AMF_IP) |
-                .gNBs[0].NETWORK_INTERFACES.GNB_IPV4_ADDRESS_FOR_NG_AMF = strenv(N2_IP) |
-                .gNBs[0].NETWORK_INTERFACES.GNB_IPV4_ADDRESS_FOR_NGU = strenv(N3_IP)
+                .MACRLCs[0].local_n_address = strenv(F1C_IP) |
+                {{- range .Values.multus.interfaces }}
+                {{- if and (eq .name "f1u") .enabled }}
+                .MACRLCs[0].local_n_address_f1u = strenv(F1U_IP) |
+                {{- end }}
+                {{- end }}
+                .MACRLCs[0].remote_n_address = strenv(CU_IP)
               ' /tmp/config_patch/gnb.yaml
               cat /tmp/config_patch/gnb.yaml
           env:
-            - name: GNB_NAME
-              value: "{{ .Values.config.gnbName }}"
+            - name: DU_NAME
+              value: "{{ .Values.config.duName }}"
             ## For resolving the hostname
             - name: MAX_RETRIES
               value: "10"
@@ -170,12 +176,16 @@ spec:
             - name: RIC_HOST
               value: "{{ .Values.config.ricHost }}"
               {{- end }}
-            - name: AMF_HOST
-              value: "{{ .Values.config.amfHost }}"
-            - name: N2_IF_NAME
-              value: '{{ include "oai-gnb.n2IfName" . }}'
-            - name: N3_IF_NAME
-              value: '{{ include "oai-gnb.n3IfName" . }}'
+            - name: F1C_IF_NAME
+              value: '{{ include "oai-du.f1cIfName" . }}'
+          {{- range .Values.multus.interfaces }}
+          {{- if and (eq .name "f1u") .enabled }}
+            - name: F1U_IF_NAME
+              value: '{{ include "oai-du.f1uIfName" $ }}'
+          {{- end }}
+          {{- end }}
+            - name: CU_HOST
+              value: "{{ .Values.config.cuHost }}"
             - name: TAC
               value: "{{ .Values.config.tac }}"
             - name: ADDR_RU
@@ -192,41 +202,34 @@ spec:
             requests: { cpu: "1m", memory: "50Mi" }
             limits:   { cpu: "1m", memory: "50Mi" }
       containers:
-        - name: gnb
+        - name: du
           image: "{{ .Values.nfimage.repository }}:{{ .Values.nfimage.version }}"
           imagePullPolicy: {{ .Values.nfimage.pullPolicy }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          {{- if eq .Values.config.radio "vrtsim" }}
-          hostIPC: true
-          {{- end }}
           volumeMounts:
             - name: shared-data
               mountPath: /opt/oai-gnb-aw2s/etc
-          {{- if eq .Values.config.radio "b2xx" }}
-            - name: radio
+          {{- if eq .Values.config.usrp "b2xx" }}
+            - name: usrp
               mountPath: /dev/bus/usb/
-          {{- end }}
-          {{- if eq .Values.config.radio "vrtsim" }}
-            - name: shared-data
-              mountPath: /tmp
           {{- end }}
           env:
           - name: TZ
-            value: {{ .Values.config.timeZone | quote }}
+            value: {{ .Values.config.timeZone }}
           - name: USE_ADDITIONAL_OPTIONS
-            value: {{ .Values.config.useAdditionalOptions | quote }}
+            value: {{ .Values.config.useAdditionalOptions }}
           - name: OAI_GDBSTACKS
             value: "{{ .Values.config.gdbstack }}"
-          {{- if eq .Values.config.radio "b2xx" }}
+          {{- if eq .Values.config.usrp "b2xx" }}
             - name: USE_B2XX
               value: true
           {{- end }}
-          {{- if eq .Values.config.radio "x3xx" }}
+          {{- if eq .Values.config.usrp "x3xx" }}
             - name: USE_X3XX
               value: true
           {{- end }}
-          {{- if eq .Values.config.radio "n3xx" }}
+          {{- if eq .Values.config.usrp "n3xx" }}
             - name: USE_N3XX
               value: true
           {{- end }}
@@ -240,13 +243,13 @@ spec:
               memory: {{ .Values.resources.limits.nf.memory | quote }}
           {{- end }}
           ports:
-            - name: n3
-              containerPort: 2152
-              protocol: UDP
-            - name: n2
-              containerPort: 36412
-              protocol: SCTP
-          {{- if not .Values.start.gnb }}
+          - containerPort: 38472
+            name: f1c
+            protocol: SCTP
+          - containerPort: {{ .Values.config.f1duPort }}
+            name: f1u
+            protocol: UDP
+          {{- if not .Values.start.du }}
           command: [ "/bin/sleep", "infinity" ]
           {{- end }}
           env:
@@ -285,13 +288,8 @@ spec:
             name: {{ .Chart.Name }}-configmap
         - name: shared-data
           emptyDir: {}
-        {{- if eq .Values.config.radio "b2xx" }}
-        - name: radio
+        {{- if eq .Values.config.usrp "b2xx" }}
+        - name: usrp
           hostPath:
             path: /dev/bus/usb/
-        {{- end }}
-        {{- if eq .Values.config.radio "vrtsim" }}
-        - name: shared-volume
-          persistentVolumeClaim:
-            claimName: shared-pvc
         {{- end }}
