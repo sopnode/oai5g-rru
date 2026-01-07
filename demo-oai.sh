@@ -506,11 +506,9 @@ export QOS_CUUP_DEF="true"
 export NODE_CUUP="$NODE_CU"
 
 if [[ $GNB_MODE = 'cucpup' ]]; then
-    export CU_HOST="$IP_CUCP_E1"
-    export CU_HOST_FROM_DU="$IP_CUCP_F1"
+    export CU_HOST="$IP_CUCP_F1C"
 else
-    export CU_HOST="oai-cu"
-    export CU_HOST_FROM_DU="$IP_CU_F1"
+    export CU_HOST="$IP_CU_F1"
 fi
 #
 ########## GNB Monolithic specific part ################
@@ -957,7 +955,7 @@ apply-gnb-values-yq() {
       .config.ricHost              = strenv(HOST_FLEXRIC) |
       .config.tac                  = strenv(TAC) |
       .config.ruIpAdd              = strenv(ADDR_RU) |
-      .config.cuHost               = strenv(CU_HOST_FROM_DU) |
+      .config.cuHost               = strenv(CU_HOST) |
 
       ############################
       # Scheduling / placement
