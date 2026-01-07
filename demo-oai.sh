@@ -506,7 +506,7 @@ export QOS_CUUP_DEF="true"
 export NODE_CUUP="$NODE_CU"
 
 if [[ $GNB_MODE = 'cucpup' ]]; then
-    export CU_HOST_FROM_DU="$IP_CUCP_F1"
+    export CU_HOST_FROM_DU="$IP_CUCP_F1C"
     export CU_HOST_FROM_CUUP="$IP_CUCP_E1"
 else
     export CU_HOST_FROM_DU="$IP_CU_F1"
