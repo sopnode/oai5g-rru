@@ -957,6 +957,7 @@ apply-gnb-values-yq() {
       .config.ricHost              = strenv(HOST_FLEXRIC) |
       .config.tac                  = strenv(TAC) |
       .config.ruIpAdd              = strenv(ADDR_RU) |
+      .config.cuHost               = strenv(CU_HOST_FROM_DU) |
 
       ############################
       # Scheduling / placement
