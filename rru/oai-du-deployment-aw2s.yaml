@@ -18,7 +18,7 @@ spec:
         {{- include "oai-du.selectorLabels" . | nindent 8 }}
         app: {{ .Release.Name }}
     {{- if and .Values.multus.enabled .Values.multus.interfaces }}
-      {{- $count := include "oai-cu.countDefaultRouteInterfaces" . | int }}
+      {{- $count := include "oai-du.countDefaultRouteInterfaces" . | int }}
       {{- if gt $count 1 }}
       {{- fail (printf "(%d) enabled interfaces are using defaultRoute; only one is allowed." $count) }}
       {{- end }}
