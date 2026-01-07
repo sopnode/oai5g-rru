@@ -365,12 +365,14 @@ export IF_NAME_DU_F1C="$IF_NAME_F1_DEFAULT"
 #
 export MULTUS_DU_F1U="true"
 export IP_DU_F1U="172.21.16.90"
+export NETMASK_DU_F1U="22"
 export GW_DU_F1U=""
 export ROUTES_DU_F1U=""
 export IF_NAME_DU_F1U="$IF_NAME_F1_DEFAULT"
 #
 export MULTUS_DU_F1="true"
 export IP_DU_F1="172.21.16.90"
+export NETMASK_DU_F1="22"
 export GW_DU_F1=""
 export ROUTES_DU_F1=""
 export IF_NAME_DU_F1="$IF_NAME_F1_DEFAULT"
@@ -453,7 +455,7 @@ export CUCP_N2_IF_NAME=${CUCP_N2_IF_NAME:=$GNB_N2_IF_NAME}
 #
 export MULTUS_CUCP_F1C="true"
 export IP_CUCP_F1C="172.21.16.92"
-export NETMASK_CUCP_F1C="24"
+export NETMASK_CUCP_F1C="22"
 export GW_CUCP_F1C=""
 export ROUTES_CUCP_F1C=""
 export IF_NAME_CUCP_F1C="$IF_NAME_F1_DEFAULT"
@@ -1085,33 +1087,33 @@ configure-gnb() {
     if [[ "$GNB_MODE" == 'cucpup' ]]; then
 	NF_IFS_START[oai-du]="
 - name: \"f1c\"
-  enabled: $MULTUS_GNB_F1C
-  hostInterface: \"$IF_NAME_GNB_F1C\"
-  ipAdd: \"$IP_GNB_F1C\"
-  netmask: \"$NETMASK_GNB_F1C\"
-  defaultRoute: \"$GW_GNB_F1C\"
-  routes: \"$ROUTES_GNB_F1C\"
+  enabled: $MULTUS_DU_F1C
+  hostInterface: \"$IF_NAME_DU_F1C\"
+  ipAdd: \"$IP_DU_F1C\"
+  netmask: \"$NETMASK_DU_F1C\"
+  defaultRoute: \"$GW_DU_F1C\"
+  routes: \"$ROUTES_DU_F1C\"
   type: macvlan
   mode: \"bridge\"
 - name: \"f1u\"
-  enabled: $MULTUS_GNB_F1U
-  hostInterface: \"$IF_NAME_GNB_F1U\"
-  ipAdd: \"$IP_GNB_F1U\"
-  netmask: \"$NETMASK_GNB_F1U\"
-  defaultRoute: \"$GW_GNB_F1U\"
-  routes: \"$ROUTES_GNB_F1U\"
+  enabled: $MULTUS_DU_F1U
+  hostInterface: \"$IF_NAME_DU_F1U\"
+  ipAdd: \"$IP_DU_F1U\"
+  netmask: \"$NETMASK_DU_F1U\"
+  defaultRoute: \"$GW_DU_F1U\"
+  routes: \"$ROUTES_DU_F1U\"
   type: macvlan
   mode: \"bridge\"
 "
     else
 	NF_IFS_START[oai-du]="
 - name: \"f1\"
-  enabled: $MULTUS_GNB_F1
-  hostInterface: \"$IF_NAME_GNB_F1\"
-  ipAdd: \"$IP_GNB_F1\"
-  netmask: \"$NETMASK_GNB_F1\"
-  defaultRoute: \"$GW_GNB_F1\"
-  routes: \"$ROUTES_GNB_F1\"
+  enabled: $MULTUS_DU_F1
+  hostInterface: \"$IF_NAME_DU_F1\"
+  ipAdd: \"$IP_DU_F1\"
+  netmask: \"$NETMASK_DU_F1\"
+  defaultRoute: \"$GW_DU_F1\"
+  routes: \"$ROUTES_DU_F1\"
   type: macvlan
   mode: \"bridge\"
 "
