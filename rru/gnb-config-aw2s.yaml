@@ -122,7 +122,7 @@ RUs:
     att_tx: 17
     att_rx: 0
     bands: [78]
-    num_tp_cores: 42
+    num_tp_cores: 4
     rxfh_core_id: 12
     txfh_core_id: 14
     tp_cores: [16,18,20,22]
