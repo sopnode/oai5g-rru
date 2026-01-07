@@ -371,7 +371,7 @@ export ROUTES_DU_F1U=""
 export IF_NAME_DU_F1U="$IF_NAME_F1_DEFAULT"
 #
 export MULTUS_DU_F1="true"
-export IP_DU_F1="172.21.16.90"
+export IP_DU_F1="172.21.16.100"
 export NETMASK_DU_F1="22"
 export GW_DU_F1=""
 export ROUTES_DU_F1=""
