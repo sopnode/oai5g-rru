@@ -871,17 +871,19 @@ configure-gnb() {
 	# First remove multus interfaces
 	yq eval -i 'del(.multus.interfaces)' "$VALUES"
 	
-	# Inject interfaces
-	YAML_IFS="$(render_nf_ifs "$nf")"
-	if [[ -z "$YAML_IFS" ]]; then
+	# Inject multus interfaces
+	TMP_IFS="$(mktemp)"
+	render_nf_ifs "$nf" > "$TMP_IFS"
+	if [[ ! -s "$TMP_IFS" ]]; then
 	    echo "ERROR: empty NF_IFS for $nf"
+	    rm -f "$TMP_IFS"
 	    continue
 	fi
-	render_nf_ifs "$nf" | \
-            yq eval -i '
-              .multus.enabled = true |
-              .multus.interfaces = (load_str("stdin") | from_yaml)
-            ' "$VALUES"
+	yq eval -i "
+          .multus.enabled = true |
+          .multus.interfaces = (load(\"$TMP_IFS\") | from_yaml)
+        " "$VALUES"
+	rm -f "$TMP_IFS"
 	
 	# Update remaining parameters
 	apply-gnb-values-yq "${VALUES}" "${PREFIX_DEMO}/oai5g-rru/charts/values/${nf}.yq"
