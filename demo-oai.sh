@@ -855,57 +855,6 @@ configure-mysql() {
 
 
 
-patch_snssai() {
-    local file="$1"
-
-    awk -v sst1="$SLICE1_SST" \
-        -v sd1="$SLICE1_SD" \
-        -v sst2="${SLICE2_SST:-}" \
-        -v sd2="${SLICE2_SD:-EMPTY}" '
-    print_snssai(base_indent) {
-        # Base indent is the indentation of snssaiList:
-        # Items need 2 spaces more
-        item_indent = base_indent "  "
-        subitem_indent = item_indent "  "
-
-        # Slice 1
-        print item_indent "- sst: " sst1
-        if (sd1 != "EMPTY") { print subitem_indent "sd: " sd1 }
-
-        # Slice 2 (optional)
-        if (sst2 != "") {
-            print item_indent "- sst: " sst2
-            if (sd2 != "EMPTY") { print subitem_indent "sd: " sd2 }
-        }
-    }
-
-    BEGIN { in_block = 0 }
-
-    # Match snssaiList and capture indentation
-    /^[[:space:]]*snssaiList:/ {
-        # everything up to "snssaiList:"
-	base_indent = $0
-	sub(/snssaiList:.*/, "", base_indent)
-
-        print $0
-        print_snssai(base_indent)
-        in_block = 1
-        next
-    }
-
-    # Skip existing items of snssaiList
-    in_block && /^[[:space:]]*-/ { next }
-    in_block && /^[[:space:]]*sd:/ { next }
-
-    # Exit block if indentation decreases (next YAML key)
-    in_block && !/^[[:space:]]+/ { in_block = 0 }
-
-    # Print all other lines
-    !in_block { print }
-    ' "$file"
-}
-
-
 load_rru_env() {
     local file="$PREFIX_DEMO/rru/$1.env"
     [[ -f "$file" ]] || return 1
@@ -917,64 +866,24 @@ load_rru_env() {
 
 apply-gnb-values-yq() {
 
-    # Usage:
-    #   apply-gnb-values-yq path/to/values.yaml
-    #
-    # Requires:
-    #   yq v4.x (mikefarah)
-
     VALUES_FILE="$1"
+    YQ_OVERLAY_FILE="$2"
 
     [ -f "$VALUES_FILE" ] || {
         echo "ERROR: values file not found: $VALUES_FILE"
         exit 1
     }
 
-    echo "Applying yq overlays to $VALUES_FILE"
+    [ -f "$YQ_OVERLAY_FILE" ] || {
+        echo "ERROR: yq overlay file not found: $YQ_OVERLAY_FILE"
+        exit 1
+    }
 
-    ########################################
-    # Image / common configuration
-    ########################################
-    yq eval -i '
-      ############################
-      # Image configuration
-      ############################
-      .nfimage.repository  = strenv(GNB_REPO) |
-      .nfimage.version     = strenv(GNB_TAG) |
-      .nfimage.pullPolicy  = strenv(GNB_PULL_POLICY) |
+    echo "Applying yq overlays from $YQ_OVERLAY_FILE to $VALUES_FILE"
 
-      ############################
-      # Common gNB / NF config
-      ############################
-      .config.useAdditionalOptions = strenv(ADD_OPTIONS_GNB) |
-      .config.ruCPlaneMacAdd       = strenv(MAC_BENETEL) |
-      .config.ruUPlaneMacAdd       = strenv(MAC_BENETEL) |
-      .config.gnbName              = strenv(GNB_NAME) |
-      .config.amfHost              = strenv(HOST_AMF) |
-      .config.radio                = strenv(RRU_TYPE) |
-      .config.enableE2             = (strenv(FLEXRIC) == "true") |
-      .config.ricHost              = strenv(HOST_FLEXRIC) |
-      .config.tac                  = strenv(TAC) |
-      .config.ruIpAdd              = strenv(ADDR_RU) |
-      .config.cuHost               = strenv(CU_HOST_FROM_DU) |
-      .config.cucpHost             = strenv(CU_HOST_FROM_CUUP) |
+    yq eval -i "$(cat "$YQ_OVERLAY_FILE")" "$VALUES_FILE"
 
-      ############################
-      # Scheduling / placement
-      ############################
-      .nodeName            = strenv(NODE_GNB) |
-
-      ############################
-      # Resources
-      ############################
-      .resources.define    = (strenv(QOS_GNB_DEF) == "true")
-    ' "$VALUES_FILE"
-
-
-
-    ########################################
-    # PLMN and NSSAI
-    ########################################
+    # Update PLMN and NSSAI
     yq eval -i '
 .config.plmn_list[0].mcc = strenv(MCC) |
 .config.plmn_list[0].mnc = strenv(MNC) |
@@ -998,17 +907,12 @@ apply-gnb-values-yq() {
   }
 ]
 ' "$VALUES_FILE"
-
-
-
-    ########################################
-    # Validation (fail fast)
-    ########################################
+    
+    # Validate new values.yaml configuration
     yq eval '.' "$VALUES_FILE" >/dev/null || {
         echo "ERROR: generated YAML is invalid: $VALUES_FILE"
         exit 1
     }
-
     echo "OK: $VALUES_FILE updated successfully"
 }
 
@@ -1356,11 +1260,12 @@ configure-gnb() {
 	   .multus.interfaces = (strenv(YQ_IFS) | from_yaml)
         ' "$VALUES"
 
-	# Update other parameters
-	apply-gnb-values-yq "${VALUES}"
+	# Update remaining parameters
+	apply-gnb-values-yq "${VALUES}" "${PREFIX_DEMO}/charts/values/${nf}.yq"
 	diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/values.yaml.orig) <(yq eval -P '.' ${VALUES})
     done
-    
+
+    # Update config.yaml charts
     if [[ $GNB_MODE = 'monolithic' ]]; then
 	gnb_type="gnb"
 	if [[ "$RRU_TYPE" == "benetel" ]]; then
@@ -1382,7 +1287,7 @@ configure-gnb() {
     cp "$CONFIG_RRU" "$CONFIG"
     diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
 
-    # fix deployment charts in the case of AW2S RUs as Eurecom no more support them
+    # Fix deployment charts in the case of AW2S RUs as Eurecom no more support AW2S...
     if [[ "$RRU_TYPE" == "aw2s" ]]; then
 	for nf in oai-gnb oai-du; do
 	    cp "$PREFIX_DEMO/rru/${nf}-deployment-aw2s.yaml" "${OAI5G_RAN}/${nf}/templates/deployment.yaml"
@@ -1396,414 +1301,6 @@ configure-gnb() {
 }
 
 
-configure-gnb-old() {
-
-    # Prepare mounted.conf and gnb chart files
-    echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $LOGS"
-
-    DIR_RAN="$PREFIX_DEMO/oai5g-rru/ran-config"
-    DIR_CONF="$DIR_RAN/conf"
-    DIR_CHARTS="$PREFIX_DEMO/oai-cn5g-fed/charts"
-
-    SED_CONF_FILE="${TMP}/gnb_conf.sed"
-    SED_VALUES_FILE="${TMP}/oai-gnb-values.sed"
-
-    # Configure RRU specific parameters for values.yaml chart
-    if [[ "$RRU" = "b210" ]]; then
-	MULTUS_GNB_RU1="false"
-	MULTUS_GNB_RU2="false"
-	RRU_TYPE="b2xx"
-	ADD_OPTIONS_GNB="$OPTIONS_b2xx"
-	QOS_GNB_DEF="false"
-
-    elif [[ "$RRU" = "n300" || "$RRU" = "n320" ]]; then
-	if [[ "$RRU" = "n300" ]]; then
-	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_N300_1"
-	    IF_NAME_GNB_RU2="$IF_NAME_VLAN_N300_2"
-	    IP_GNB_RU1="$IP_GNB_N300_1"
-	    IP_GNB_RU2="$IP_GNB_N300_2"
-	else
-	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_N320_1"
-	    IF_NAME_GNB_RU2="$IF_NAME_VLAN_N320_2"
-	    IP_GNB_RU1="$IP_GNB_N320_1"
-	    IP_GNB_RU2="$IP_GNB_N320_2"
-	fi
-	SDR_ADDRS=$(eval echo \"\${ADDRS_$RRU}\")
-	MULTUS_GNB_RU1="true"
-	MTU_GNB_RU1="$MTU_n3xx"
-	MULTUS_GNB_RU2="true"
-	MTU_GNB_RU2="$MTU_n3xx"
-	RRU_TYPE="n3xx"
-	ADD_OPTIONS_GNB="$OPTIONS_n3xx"
-	QOS_GNB_DEF="false" # avoid OOMKilled problems with k8s 
-
-    elif [[ "$RRU" = "jaguar" || "$RRU" = "panther" ]]; then
-	ADDR_aw2s=$(eval echo \"\${ADDR_$RRU}\")
-	MULTUS_GNB_RU1="true"
-	MULTUS_GNB_RU2="false"
-	RRU_TYPE="aw2s"
-	ADD_OPTIONS_GNB="$OPTIONS_aw2s"
-	QOS_GNB_DEF="true"
-	if [[ "$RRU" = "jaguar" ]]; then
-	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_JAGUAR"
-	    IP_GNB_RU1="$IP_GNB_jaguar"
-	else
-	    IF_NAME_GNB_RU1="$IF_NAME_VLAN_PANTHER"
-	    IP_GNB_RU1="$IP_GNB_panther"
-	fi
-
-    elif [[ "$RRU" = "benetel1" || "$RRU" = "benetel2" ]]; then
-	ADDR_benetel=$(eval echo \"\${ADDR_$RRU}\")
-	MULTUS_UPLANE1="true"
-	MULTUS_CPLANE1="true"
-	MTU_GNB_RU1="$MTU_benetel"
-	RRU_TYPE="benetel"
-	ADD_OPTIONS_GNB="$OPTIONS_benetel"
-	QOS_GNB_DEF="true"
-	IF_NAME_GNB_RU1="$IF_NAME_VLAN_BENETEL"
-	if [[ "$RRU" = "benetel1" ]]; then
-	    export MAC_BENETEL="$MAC_benetel1"
-	    VLAN_RU1="$VLAN_benetel1"
-	else
-	    export MAC_BENETEL="$MAC_benetel2"
-	    VLAN_RU1="$VLAN_benetel2"
-	fi
-	
-    elif [[ "$RRU" = "rfsim" ]]; then
-	MULTUS_GNB_RU1="false"
-	MULTUS_GNB_RU2="false"
-	RRU_TYPE="rfsim"
-	ADD_OPTIONS_GNB="$OPTIONS_rfsim"
-	QOS_GNB_DEF="false"
-
-    else
-	echo "Unknown rru selected: $RRU"
-	usage
-    fi
-    
-    GNB_REPO=$(eval echo \"\${GNB_REPO_$RRU_TYPE}\")
-    GNB_TAG=$(eval echo \"\${GNB_TAG_$RRU_TYPE}\")
-    export GNB_NAME="${GNB_NAME}_${RRU}"
-    export NAME_GNB_DU="${NAME_GNB_DU}-${RRU}"
-
-    if [[ $GNB_MODE = 'monolithic' ]]; then
-	CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_$RRU}\")
-	DIR_TEMPLATES="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-gnb/templates"
-	NB_LINES=8
-	echo "monolithic gNB, conf is $CONF_ORIG"
-    else
-	CONF_ORIG=$DIR_CONF/$(eval echo \"\${CONF_DU_$RRU}\")
-	DIR_TEMPLATES="$PREFIX_DEMO/oai-cn5g-fed/charts/oai-5g-ran/oai-du/templates"
-	NB_LINES=7
-	echo "DU gNB, conf is $CONF_ORIG"
-    fi
-    
-    echo "Insert the right gNB conf file $CONF_ORIG in the right configmap.yaml"
-    # Keep the first ${NB_LINES} lines of configmap.yaml
-    head -${NB_LINES}  "$DIR_TEMPLATES"/configmap.yaml > "$TMP"/configmap.yaml
-    # Add a 6-characters margin to gnb.conf
-    awk '$0="      "$0' "$CONF_ORIG" > "$TMP"/gnb.conf
-    # Append the modified gnb.conf to "$TMP"/configmap.yaml
-    cat "$TMP"/gnb.conf >> "$TMP"/configmap.yaml
-
-    echo "Configure configmap.yaml of oai-gnb/oai-du"
-    if [[ "$SLICE1_SD" != "EMPTY" ]]; then
-	if [[ "$SLICE2_SD" != "EMPTY" ]]; then
-	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = 0x$SLICE1_SD; }, { sst = $SLICE2_SST; sd = 0x$SLICE2_SD; }) });"
-	else
-	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; sd = 0x$SLICE1_SD; }, { sst = $SLICE2_SST; }) });"
-	fi
-    else
-	if [[ "$SLICE2_SD" != "EMPTY" ]]; then
-	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; }, { sst = $SLICE2_SST; sd = 0x$SLICE2_SD; }) });"
-	else
-	    PLMN_LIST="({ mcc = $MCC; mnc = $MNC; mnc_length = 2; snssaiList = ({ sst = $SLICE1_SST; }, { sst = $SLICE2_SST; }) });"
-	fi
-    fi
-    mv "$TMP"/configmap.yaml "$DIR_TEMPLATES"/configmap.yaml
-
-    # Patch snssai values and config charts for fhi scenario
-    
-
-    cat > "$SED_CONF_FILE" <<EOF
-s|@GNB_NAME@|$GNB_NAME|
-s|@GNB_ID@|$GNB_ID|
-s|@GNB_CU_UP_ID@|$GNB_ID|
-s|@GNB_DU_ID@|$GNB_ID|
-s|@TAC@|$TAC|
-s|plmn_list.*|plmn_list = $PLMN_LIST|
-s|@AW2S_IP_ADDRESS@|$ADDR_aw2s|
-s|@GNB_AW2S_LOCAL_IF_NAME@|$IF_NAME_GNB_RU1|
-s|@SDR_ADDRS@|$SDR_ADDRS,clock_source=internal,time_source=internal|
-EOF
-    if [[ $RU_MODE != "dhcp" ]]; then  
-        cat >> "$SED_CONF_FILE" <<EOF
-s|@RU1_IP_ADDRESS@|$IP_GNB_RU1|
-EOF
-    fi  
-    if [[ $GNB_MODE != 'monolithic' ]]; then
-	    echo "With cudu/cucpup modes, set here AMF_IP_ADDRESS, CUCP_IP_ADDRESS and CU_IP_ADDRESS"
-	    cat >> "$SED_CONF_FILE" <<EOF
-s|@CU_IP_ADDRESS@|$IP_CU_F1|
-s|@CU_CP_IP_ADDRESS@|$IP_CUCP_E1|
-EOF
-    else
-	    echo "Monolithic mode, do not set AMF_IP_ADDRESS and CU_IP_ADDRESS"
-    fi
-    
-    for nf in oai-gnb oai-du oai-cu oai-cu-cp oai-cu-up; do
-	    ORIG_CHART="${OAI5G_RAN}/${nf}/templates/configmap.yaml"
-	    cp ${ORIG_CHART} "$TMP"/${nf}_configmap.yaml-orig
-	    echo "(Over)writing $ORIG_CHART"
-	    sed -f "$SED_CONF_FILE" < "$TMP"/${nf}_configmap.yaml-orig > ${ORIG_CHART}
-	    echo "********************* Display modified ${ORIG_CHART} ************************"
-	    cat ${ORIG_CHART}
-    done
-
-    if [[ $FLEXRIC == "true" ]]; then
-        echo "adding FlexRIC-related conf in ${OAI5G_RAN}/oai-gnb/templates/configmap.yaml"
-        cat <<EOF >> "${OAI5G_RAN}/oai-gnb/templates/configmap.yaml"
-
-      e2_agent :
-      {
-        near_ric_ip_addr = "@FLEXRIC_IP@";
-        sm_dir = "/usr/local/lib/flexric/";
-      };
-EOF
-    fi
-
-
-    # Configure gNB values.yaml charts
-
-    if [[ $GNB_MODE == 'monolithic' ]]; then
-        GNB_PULL_POLICY="Always" # for testing purposes
-        # if $MONITORING is true, create and start prometheus log parser container (for now, available only for monolithic gnb)
-        if [[ $MONITORING == "true" ]]; then
-            echo "MONITORING is set to True. A prometheus log parser container will be created besides the gnb"
-        fi
-        if [[ $FLEXRIC == "true" ]]; then
-            echo "FLEXRIC is set to True. FlexRIC configurations will be applied"
-        fi
-        cat >> "$SED_VALUES_FILE" <<EOF
-s|@METRICS_PARSER_CONTAINER@|$MONITORING|
-s|@GNB_PULL_POLICY@|$GNB_PULL_POLICY|
-s|@FLEXRIC@|$FLEXRIC|
-s|@HOST_FLEXRIC@|oai-flexric|
-EOF
-    ORIG_CHART="${OAI5G_RAN}/oai-gnb/values.yaml"
-	cp ${ORIG_CHART} "$TMP"/oai-gnb_values.yaml-orig
-	echo "(Over)writing $ORIG_CHART"
-	sed -f "$SED_VALUES_FILE" < "$TMP"/oai-gnb_values.yaml-orig > ${ORIG_CHART}
-	diff "$TMP"/oai-gnb_values.yaml-orig ${ORIG_CHART}
-    fi
-
-    if [[ ! -z $SLICE1_SD ]]; then
-	    SED_SD1="s|@SD1@|0x$SLICE1_SD|"
-    fi
-    if [[ ! -z $SLICE2_SD ]]; then
-	    SED_SD2="s|@SD2@|0x$SLICE2_SD|"
-    fi
-    
-    echo "Then configure oai-gnb, oai-du, oai-cu, oai-cu-cp, oai-cu-up values charts"
-    cat > "$SED_VALUES_FILE" <<EOF
-s|@GNB_REPO@|$GNB_REPO|
-s|@GNB_TAG@|$GNB_TAG|
-s|@DEFAULT_GW_GNB@|$DEFAULT_GW_GNB|
-s|@MULTUS_GNB_N2@|$MULTUS_GNB_N2|
-s|@TYPE_N2@|$TYPE_N2|
-s|@IP_GNB_N2@|$IP_GNB_N2|
-s|@NETMASK_GNB_N2@|$NETMASK_GNB_N2|
-s|@MAC_GNB_N2@|$(gener-mac)|
-s|@GW_GNB_N2@|$GW_GNB_N2|
-s|@ROUTES_GNB_N2@|$ROUTES_GNB_N2|
-s|@MODE_N2@|$MODE_N2|
-s|@IF_NAME_GNB_N2@|$IF_NAME_N2N3|
-s|@MULTUS_GNB_N3@|$MULTUS_GNB_N3|
-s|@TYPE_N3@|$TYPE_N3|
-s|@VLAN_RU1@|$VLAN_RU1|
-s|@IP_GNB_N3@|$IP_GNB_N3|
-s|@NETMASK_GNB_N3@|$NETMASK_GNB_N3|
-s|@MAC_GNB_N3@|$(gener-mac)|
-s|@GW_GNB_N3@|$GW_GNB_N3|
-s|@ROUTES_GNB_N3@|$ROUTES_GNB_N3|
-s|@MODE_N3@|$MODE_N3|
-s|@IF_NAME_GNB_N3@|$IF_NAME_N2N3|
-s|@MULTUS_GNB_RU1@|$MULTUS_GNB_RU1|
-s|@MULTUS_UPLANE1@|$MULTUS_UPLANE1|
-s|@MULTUS_CPLANE1@|$MULTUS_CPLANE1|
-s|@MAC_BENETEL@|$MAC_BENETEL|
-s|@SRIOV_NS@|$SRIOV_NS|
-s|@MAC_UPLANE1@|$MAC_UPLANE1|
-s|@MAC_CPLANE1@|$MAC_CPLANE1|
-s|@VLAN_RU1@|$VLAN_RU1|
-s|@GNB_PULL_POLICY@|$GNB_PULL_POLICY|
-s|@FLEXRIC@|$FLEXRIC|
-s|@HOST_FLEXRIC@|oai-flexric|
-s|@GNB_ID@|$GNB_ID|
-s|@IP_GNB_RU1@|$IP_GNB_RU1|
-s|@NETMASK_GNB_RU1@|$NETMASK_GNB_RU|
-s|@MAC_GNB_RU1@|$(gener-mac)|
-s|@GW_GNB_RU1@|$GW_GNB_RU1|
-s|@MTU_GNB_RU1@|$MTU_GNB_RU1|
-s|@IF_NAME_GNB_RU1@|$IF_NAME_GNB_RU1|
-s|@MULTUS_GNB_RU2@|$MULTUS_GNB_RU2|
-s|@IP_GNB_RU2@|$IP_GNB_RU2|
-s|@NETMASK_GNB_RU2@|$NETMASK_GNB_RU|
-s|@MAC_GNB_RU2@|$(gener-mac)|
-s|@GW_GNB_RU2@|$GW_GNB_RU2|
-s|@MTU_GNB_RU2@|$MTU_GNB_RU2|
-s|@IF_NAME_GNB_RU2@|$IF_NAME_GNB_RU2|
-s|@SST1@|$SLICE1_SST|
-${SED_SD1}
-s|@SST2@|$SLICE2_SST|
-${SED_SD2}
-s|@RRU_TYPE@|$RRU_TYPE|
-s|@ADD_OPTIONS_GNB@|$ADD_OPTIONS_GNB|
-s|@GNB_NAME@|$GNB_NAME|
-s|@MCC@|$MCC|
-s|@MNC@|$MNC|
-s|@TAC@|$TAC|
-s|@GNB_N2_IF_NAME@|$GNB_N2_IF_NAME|
-s|@CUCP_N2_IF_NAME@|$CUCP_N2_IF_NAME|
-s|@GNB_N3_IF_NAME@|$GNB_N3_IF_NAME|
-s|@CUUP_N3_IF_NAME@|$CUUP_N3_IF_NAME|
-s|@HOST_AMF@|$HOST_AMF|
-s|@START_TCPDUMP@|$PCAP|
-s|@TCPDUMP_CONTAINER@|$LOGS|
-s|@SHAREDVOLUME@|$PCAP|
-s|@QOS_GNB_DEF@|$QOS_GNB_DEF|
-s|@NODE_GNB@|$NODE_GNB|
-
-s|@F1IFNAME@|$F1IFNAME|
-s|@E1IFNAME@|$E1IFNAME|
-s|@F1CUPORT@|$F1CUPORT|
-s|@F1DUPORT@|$F1DUPORT|
-
-s|@DU_REPO@|$GNB_REPO|
-s|@DU_TAG@|$DU_TAG|
-s|@NAME_DU_SA@|$NAME_DU_SA|
-s|@MULTUS_DU_F1@|$MULTUS_DU_F1|
-s|@IP_DU_F1@|$IP_DU_F1|
-s|@NETMASK_DU_F1@|$NETMASK_DU_F1|
-s|@MAC_DU_F1@|$(gener-mac)|
-s|@GW_DU_F1@|$GW_DU_F1|
-s|@ROUTES_DU_F1@|$ROUTES_DU_F1|
-s|@IF_NAME_DU_F1@|$IF_NAME_DU_F1|
-s|@NAME_DU@|$NAME_DU|
-s|@CU_HOST_FROM_DU@|$CU_HOST_FROM_DU|
-s|@QOS_DU_DEF@|$QOS_DU_DEF|
-s|@NODE_DU@|$NODE_DU|
-
-s|@CU_REPO@|$CU_REPO|
-s|@CU_TAG@|$CU_TAG|
-s|@NAME_CU_SA@|$NAME_CU_SA|
-s|@MULTUS_CU_F1@|$MULTUS_CU_F1|
-s|@IP_CU_F1@|$IP_CU_F1|
-s|@NETMASK_CU_F1@|$NETMASK_CU_F1|
-s|@MAC_CU_F1@|$(gener-mac)|
-s|@GW_CU_F1@|$GW_CU_F1|
-s|@ROUTES_CU_F1@|$ROUTES_CU_F1|
-s|@IF_NAME_CU_F1@|$IF_NAME_CU_F1|
-s|@MULTUS_CU_N2@|$MULTUS_CU_N2|
-s|@IP_CU_N2@|$IP_CU_N2|
-s|@NETMASK_CU_N2@|$NETMASK_CU_N2|
-s|@MAC_CU_N2@|$(gener-mac)|
-s|@GW_CU_N2@|$GW_CU_N2|
-s|@ROUTES_CU_N2@|$ROUTES_CU_N2|
-s|@IF_NAME_CU_N2@|$IF_NAME_CU_N2|
-s|@MULTUS_CU_N3@|$MULTUS_CU_N3|
-s|@IP_CU_N3@|$IP_CU_N3|
-s|@NETMASK_CU_N3@|$NETMASK_CU_N3|
-s|@MAC_CU_N3@|$(gener-mac)|
-s|@GW_CU_N3@|$GW_CU_N3|
-s|@ROUTES_CU_N3@|$ROUTES_CU_N3|
-s|@IF_NAME_CU_N3@|$IF_NAME_CU_N3|
-s|@ADD_OPTIONS_CU@|$ADD_OPTIONS_CU|
-s|@NAME_CU@|$NAME_CU|
-s|@QOS_CU_DEF@|$QOS_CU_DEF|
-s|@NODE_CU@|$NODE_CU|
-
-s|@CUCP_REPO@|$CUCP_REPO|
-s|@CUCP_TAG@|$CUCP_TAG|
-s|@NAME_CUCP_SA@|$NAME_CUCP_SA|
-s|@MULTUS_CUCP_E1@|$MULTUS_CUCP_E1|
-s|@IP_CUCP_E1@|$IP_CUCP_E1|
-s|@NETMASK_CUCP_E1@|$NETMASK_CUCP_E1|
-s|@MAC_CUCP_E1@|$(gener-mac)|
-s|@GW_CUCP_E1@|$GW_CUCP_E1|
-s|@ROUTES_CUCP_E1@|$ROUTES_CUCP_E1|
-s|@IF_NAME_CUCP_E1@|$IF_NAME_CUCP_E1|
-s|@MULTUS_CUCP_N2@|$MULTUS_CUCP_N2|
-s|@IP_CUCP_N2@|$IP_CUCP_N2|
-s|@NETMASK_CUCP_N2@|$NETMASK_CUCP_N2|
-s|@MAC_CUCP_N2@|$(gener-mac)|
-s|@GW_CUCP_N2@|$GW_CUCP_N2|
-s|@ROUTES_CUCP_N2@|$ROUTES_CUCP_N2|
-s|@IF_NAME_CUCP_N2@|$IF_NAME_CUCP_N2|
-s|@MULTUS_CUCP_F1@|$MULTUS_CUCP_F1|
-s|@IP_CUCP_F1@|$IP_CUCP_F1|
-s|@NETMASK_CUCP_F1@|$NETMASK_CUCP_F1|
-s|@MAC_CUCP_F1@|$(gener-mac)|
-s|@GW_CUCP_F1@|$GW_CUCP_F1|
-s|@ROUTES_CUCP_F1@|$ROUTES_CUCP_F1|
-s|@IF_NAME_CUCP_F1@|$IF_NAME_CUCP_F1|
-s|@ADD_OPTIONS_CUCP@|$ADD_OPTIONS_CUCP|
-s|@NAME_CUCP@|$NAME_CUCP|
-s|@QOS_CUCP_DEF@|$QOS_CUCP_DEF|
-s|@NODE_CUCP@|$NODE_CUCP|
-
-s|@CUUP_REPO@|$CUUP_REPO|
-s|@CUUP_TAG@|$CUUP_TAG|
-s|@NAME_CUUP_SA@|$NAME_CUUP_SA|
-s|@MULTUS_CUUP_E1@|$MULTUS_CUUP_E1|
-s|@IP_CUUP_E1@|$IP_CUUP_E1|
-s|@NETMASK_CUUP_E1@|$NETMASK_CUUP_E1|
-s|@MAC_CUUP_E1@|$(gener-mac)|
-s|@GW_CUUP_E1@|$GW_CUUP_E1|
-s|@ROUTES_CUUP_E1@|$ROUTES_CUUP_E1|
-s|@IF_NAME_CUUP_E1@|$IF_NAME_CUUP_E1|
-s|@MULTUS_CUUP_N3@|$MULTUS_CUUP_N3|
-s|@IP_CUUP_N3@|$IP_CUUP_N3|
-s|@NETMASK_CUUP_N3@|$NETMASK_CUUP_N3|
-s|@MAC_CUUP_N3@|$(gener-mac)|
-s|@GW_CUUP_N3@|$GW_CUUP_N3|
-s|@ROUTES_CUUP_N3@|$ROUTES_CUUP_N3|
-s|@IF_NAME_CUUP_N3@|$IF_NAME_CUUP_N3|
-s|@MULTUS_CUUP_F1@|$MULTUS_CUUP_F1|
-s|@IP_CUUP_F1@|$IP_CUUP_F1|
-s|@NETMASK_CUUP_F1@|$NETMASK_CUUP_F1|
-s|@MAC_CUUP_F1@|$(gener-mac)|
-s|@GW_CUUP_F1@|$GW_CUUP_F1|
-s|@ROUTES_CUUP_F1@|$ROUTES_CUUP_F1|
-s|@IF_NAME_CUUP_F1@|$IF_NAME_CUUP_F1|
-s|@ADD_OPTIONS_CUUP@|$ADD_OPTIONS_CUUP|
-s|@NAME_CUUP@|$NAME_CUUP|
-s|@HOST_CUCP@|$HOST_CUCP|
-s|@QOS_CUUP_DEF@|$QOS_CUUP_DEF|
-s|@CU_HOST@|$CU_HOST|
-s|@NODE_CUUP@|$NODE_CUUP|
-EOF
-#    for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-cu oai-cu-cp oai-cu-up; do
-#	ORIG_CHART="${OAI5G_RAN}/${nf}/values.yaml"
-#	cp ${ORIG_CHART} "$TMP"/${nf}_values.yaml-orig
-#	echo "(Over)writing $ORIG_CHART"
-#	sed -f "$SED_VALUES_FILE" < "$TMP/${nf}_values.yaml-orig" > "$TMP/${nf}_values.yaml-sed"
-#	if [[ "$nf" == "oai-gnb-fhi-72" ]]; then
-#           patch_snssai "$TMP/${nf}_values.yaml-sed" > "${ORIG_CHART}"
-#	else
-#            mv "$TMP/${nf}_values.yaml-sed" "${ORIG_CHART}"
-#	fi
-#	diff "$TMP/${nf}_values.yaml-orig" "${ORIG_CHART}"
-#    done
-#    for nf in oai-gnb-fhi-72 ; do
-#	ORIG_CHART="${OAI5G_RAN}/${nf}/config.yaml"
-#	cp ${ORIG_CHART} "$TMP"/${nf}_config.yaml-orig
-#	echo "(Over)writing $ORIG_CHART"
-#	sed -f "$SED_VALUES_FILE" < "$TMP/${nf}_config.yaml-orig" > "$TMP/${nf}_config.yaml-sed"
-#	patch_snssai "$TMP/${nf}_config.yaml-sed" > "${ORIG_CHART}"
-#	diff "$TMP/${nf}_config.yaml-orig" "${ORIG_CHART}"
-#    done
-}
 
 #################################################################################
 
