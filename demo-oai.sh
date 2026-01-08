@@ -878,10 +878,11 @@ configure-gnb() {
 	    continue
 	fi
 	render_nf_ifs "$nf" | \
-	    yq eval -i '
+            yq eval -i '
               .multus.enabled = true |
-              .multus.interfaces = (load("-") | from_yaml)
+              .multus.interfaces = (load_str("stdin") | from_yaml)
             ' "$VALUES"
+	
 	# Update remaining parameters
 	apply-gnb-values-yq "${VALUES}" "${PREFIX_DEMO}/oai5g-rru/charts/values/${nf}.yq"
 	diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/values.yaml.orig) <(yq eval -P '.' ${VALUES})
