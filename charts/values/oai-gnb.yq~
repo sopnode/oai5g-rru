@@ -12,6 +12,10 @@
 .config.amfHost              = strenv(HOST_AMF) |
 .config.tac                  = strenv(TAC) |
 .config.ruIpAdd              = strenv(ADDR_RU) |
+.config.cuHost               = strenv(CU_HOST_FROM_DU) |
+.config.cucpHost             = strenv(CU_HOST_FROM_CUUP) |
+.config.ruCPlaneMacAdd       = strenv(MAC_BENETEL) |
+.config.ruUPlaneMacAdd       = strenv(MAC_BENETEL) |
 
 .resources.define            = (strenv(QOS_GNB_DEF) == "true") |
 .nodeName                    = strenv(NODE_GNB)
