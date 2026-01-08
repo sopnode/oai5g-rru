@@ -881,7 +881,7 @@ configure-gnb() {
 	fi
 	yq eval -i "
           .multus.enabled = true |
-          .multus.interfaces = (load(\"$TMP_IFS\") | from_yaml)
+          .multus.interfaces = load(\"$TMP_IFS\")
         " "$VALUES"
 	rm -f "$TMP_IFS"
 	
