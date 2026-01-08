@@ -1261,7 +1261,7 @@ configure-gnb() {
         ' "$VALUES"
 
 	# Update remaining parameters
-	apply-gnb-values-yq "${VALUES}" "${PREFIX_DEMO}/charts/values/${nf}.yq"
+	apply-gnb-values-yq "${VALUES}" "${PREFIX_DEMO}/oai5g-rru/charts/values/${nf}.yq"
 	diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/values.yaml.orig) <(yq eval -P '.' ${VALUES})
     done
 
