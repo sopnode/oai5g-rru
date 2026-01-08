@@ -1,0 +1,37 @@
+- name: f1c
+  enabled: ${MULTUS_DU_F1C}
+  hostInterface: ${IF_NAME_DU_F1C}
+  ipAdd: ${IP_DU_F1C}
+  netmask: ${NETMASK_DU_F1C}
+  defaultRoute: ${GW_DU_F1C}
+  routes: ${ROUTES_DU_F1C}
+  type: macvlan
+  mode: bridge
+
+- name: f1u
+  enabled: ${MULTUS_DU_F1U}
+  hostInterface: ${IF_NAME_DU_F1U}
+  ipAdd: ${IP_DU_F1U}
+  netmask: ${NETMASK_DU_F1U}
+  defaultRoute: ${GW_DU_F1U}
+  routes: ${ROUTES_DU_F1U}
+  type: macvlan
+  mode: bridge
+
+- name: e2
+  enabled: ${MULTUS_GNB_E2}
+  hostInterface: ${IF_NAME_GNB_E2}
+  ipAdd: ${IP_GNB_E2}
+  netmask: ${NETMASK_GNB_E2}
+  type: macvlan
+  mode: bridge
+
+- name: ru
+  enabled: ${MULTUS_GNB_RU}
+  hostInterface: ${IF_NAME_GNB_RU}
+  ipAdd: ${IP_GNB_RU}
+  netmask: ${NETMASK_GNB_RU}
+  gateway: ${GW_GNB_RU}
+  mtu: ${MTU_GNB_RU}
+  type: macvlan
+  mode: bridge

@@ -1,0 +1,33 @@
+- name: f1
+  enabled: ${MULTUS_GNB_F1}
+  hostInterface: ${IF_NAME_GNB_F1}
+  ipAdd: ${IP_GNB_F1}
+  netmask: ${NETMASK_GNB_F1}
+  defaultRoute: ${GW_GNB_F1}
+  routes: ${ROUTES_GNB_F1}
+  type: macvlan
+  mode: bridge
+
+- name: e2
+  enabled: ${MULTUS_GNB_E2}
+  hostInterface: ${IF_NAME_GNB_E2}
+  ipAdd: ${IP_GNB_E2}
+  netmask: ${NETMASK_GNB_E2}
+  type: macvlan
+  mode: bridge
+
+- name: uplane1
+  enabled: true
+  mac: ${MAC_UPLANE1}
+  type: sriov
+  sriovNetworkNamespace: sriov-network-operator
+  sriovResourceName: ruvfiou
+  vlan: ${VLAN_RU}
+
+- name: cplane1
+  enabled: true
+  mac: ${MAC_CPLANE1}
+  type: sriov
+  sriovNetworkNamespace: sriov-network-operator
+  sriovResourceName: ruvfioc
+  vlan: ${VLAN_RU}

@@ -834,6 +834,18 @@ apply-gnb-values-yq() {
 }
 
 
+render_nf_ifs() {
+    local nf="$1"
+    local base="${PREFIX_DEMO}/oai5g-rru/charts/values/nf-ifs"
+
+    if [[ "$nf" == "oai-du" && "$GNB_MODE" == "cucpup" ]]; then
+        envsubst < "${base}/oai-du-cucpup.yaml"
+    else
+        envsubst < "${base}/${nf}.yaml"
+    fi
+}
+
+
 configure-gnb() {
     echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $LOGS"
 
@@ -846,311 +858,6 @@ configure-gnb() {
 	exit 1
     }
 
-    declare -A NF_IFS
-    declare -A NF_IFS_START
-    declare -A NF_IFS_END
-
-    NF_IFS[oai-gnb]="
-- name: \"n2\"
-  enabled: $MULTUS_GNB_N2
-  hostInterface: \"$IF_NAME_GNB_N2\"
-  ipAdd: \"$IP_GNB_N2\"
-  netmask: \"$NETMASK_GNB_N2\"
-  defaultRoute: \"$GW_GNB_N2\"
-  routes: \"$ROUTES_GNB_N2\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"n3\"
-  enabled: $MULTUS_GNB_N3
-  hostInterface: \"$IF_NAME_GNB_N3\"
-  ipAdd: \"$IP_GNB_N3\"
-  netmask: \"$NETMASK_GNB_N3\"
-  defaultRoute: \"$GW_GNB_N3\"
-  routes: \"$ROUTES_GNB_N3\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"e2\"
-  enabled: $MULTUS_GNB_E2
-  hostInterface: \"$IF_NAME_GNB_E2\"
-  ipAdd: \"$IP_GNB_E2\"
-  netmask: \"$NETMASK_GNB_E2\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"ru\"
-  enabled: $MULTUS_GNB_RU
-  hostInterface: \"$IF_NAME_GNB_RU\"
-  ipAdd: \"$IP_GNB_RU\"
-  netmask: \"$NETMASK_GNB_RU\"
-  gateway: \"$GW_GNB_RU\"
-  mtu: \"$MTU_GNB_RU\"
-  type: macvlan
-  mode: \"bridge\"
-  vlan: ""
-"
-    NF_IFS_END[oai-du]="
-- name: \"e2\"
-  enabled: $MULTUS_GNB_E2
-  hostInterface: \"$IF_NAME_GNB_E2\"
-  ipAdd: \"$IP_GNB_E2\"
-  netmask: \"$NETMASK_GNB_E2\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"ru\"
-  enabled: $MULTUS_GNB_RU
-  hostInterface: \"$IF_NAME_GNB_RU\"
-  ipAdd: \"$IP_GNB_RU\"
-  netmask: \"$NETMASK_GNB_RU\"
-  gateway: \"$GW_GNB_RU\"
-  mtu: \"$MTU_GNB_RU\"
-  type: macvlan
-  mode: \"bridge\"
-  vlan: ""
-"
-    if [[ "$GNB_MODE" == 'cucpup' ]]; then
-	NF_IFS_START[oai-du]="
-- name: \"f1c\"
-  enabled: $MULTUS_DU_F1C
-  hostInterface: \"$IF_NAME_DU_F1C\"
-  ipAdd: \"$IP_DU_F1C\"
-  netmask: \"$NETMASK_DU_F1C\"
-  defaultRoute: \"$GW_DU_F1C\"
-  routes: \"$ROUTES_DU_F1C\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"f1u\"
-  enabled: $MULTUS_DU_F1U
-  hostInterface: \"$IF_NAME_DU_F1U\"
-  ipAdd: \"$IP_DU_F1U\"
-  netmask: \"$NETMASK_DU_F1U\"
-  defaultRoute: \"$GW_DU_F1U\"
-  routes: \"$ROUTES_DU_F1U\"
-  type: macvlan
-  mode: \"bridge\"
-"
-    else
-	NF_IFS_START[oai-du]="
-- name: \"f1\"
-  enabled: $MULTUS_DU_F1
-  hostInterface: \"$IF_NAME_DU_F1\"
-  ipAdd: \"$IP_DU_F1\"
-  netmask: \"$NETMASK_DU_F1\"
-  defaultRoute: \"$GW_DU_F1\"
-  routes: \"$ROUTES_DU_F1\"
-  type: macvlan
-  mode: \"bridge\"
-"
-    fi
-    NF_IFS[oai-du]="${NF_IFS_START[oai-du]}${NF_IFS_END[oai-du]}"
-    
-    NF_IFS[oai-gnb-fhi-72]="
-- name: \"n2\"
-  enabled: $MULTUS_GNB_N2
-  hostInterface: \"$IF_NAME_GNB_N2\"
-  ipAdd: \"$IP_GNB_N2\"
-  netmask: \"$NETMASK_GNB_N2\"
-  defaultRoute: \"$GW_GNB_N2\"
-  routes: \"$ROUTES_GNB_N2\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"n3\"
-  enabled: $MULTUS_GNB_N3
-  hostInterface: \"$IF_NAME_GNB_N3\"
-  ipAdd: \"$IP_GNB_N3\"
-  netmask: \"$NETMASK_GNB_N3\"
-  defaultRoute: \"$GW_GNB_N3\"
-  routes: \"$ROUTES_GNB_N3\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"e2\"
-  enabled: $MULTUS_GNB_E2
-  hostInterface: \"$IF_NAME_GNB_E2\"
-  ipAdd: \"$IP_GNB_E2\"
-  netmask: \"$NETMASK_GNB_E2\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"uplane1\"
-  enabled: true
-  mac: \"$MAC_UPLANE1\"
-  type: sriov
-  sriovNetworkNamespace: \"sriov-network-operator\"
-  sriovResourceName: \"ruvfiou\"
-  vlan: \"$VLAN_RU\"
-- name: \"cplane1\"
-  enabled: true
-  mac: \"$MAC_CPLANE1\"
-  type: sriov
-  sriovNetworkNamespace: \"sriov-network-operator\"
-  sriovResourceName: \"ruvfioc\"
-  vlan: \"$VLAN_RU\"
-"
-
-    NF_IFS_END[oai-du-fhi-72]="
-- name: \"e2\"
-  enabled: $MULTUS_GNB_E2
-  hostInterface: \"$IF_NAME_GNB_E2\"
-  ipAdd: \"$IP_GNB_E2\"
-  netmask: \"$NETMASK_GNB_E2\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"uplane1\"
-  enabled: true
-  mac: \"$MAC_UPLANE1\"
-  type: sriov
-  sriovNetworkNamespace: \"sriov-network-operator\"
-  sriovResourceName: \"ruvfiou\"
-  vlan: \"$VLAN_RU\"
-- name: \"cplane1\"
-  enabled: true
-  mac: \"$MAC_CPLANE1\"
-  type: sriov
-  sriovNetworkNamespace: \"sriov-network-operator\"
-  sriovResourceName: \"ruvfioc\"
-  vlan: \"$VLAN_RU\"
-"
-    if [[ "$GNB_MODE" == 'cucpup' ]]; then
-	NF_IFS_START[oai-du-fhi-72]="
-- name: \"f1c\"
-  enabled: $MULTUS_GNB_F1C
-  hostInterface: \"$IF_NAME_GNB_F1C\"
-  ipAdd: \"$IP_GNB_F1C\"
-  netmask: \"$NETMASK_GNB_F1C\"
-  defaultRoute: \"$GW_GNB_F1C\"
-  routes: \"$ROUTES_GNB_F1C\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"f1u\"
-  enabled: $MULTUS_GNB_F1U
-  hostInterface: \"$IF_NAME_GNB_F1U\"
-  ipAdd: \"$IP_GNB_F1U\"
-  netmask: \"$NETMASK_GNB_F1U\"
-  defaultRoute: \"$GW_GNB_F1U\"
-  routes: \"$ROUTES_GNB_F1U\"
-  type: macvlan
-  mode: \"bridge\"
-"
-    else
-	NF_IFS_START[oai-du-fhi-72]="
-- name: \"f1\"
-  enabled: $MULTUS_GNB_F1
-  hostInterface: \"$IF_NAME_GNB_F1\"
-  ipAdd: \"$IP_GNB_F1\"
-  netmask: \"$NETMASK_GNB_F1\"
-  defaultRoute: \"$GW_GNB_F1\"
-  routes: \"$ROUTES_GNB_F1\"
-  type: macvlan
-  mode: \"bridge\"
-"
-    fi
-    NF_IFS[oai-du-fhi-72]="${NF_IFS_START[oai-du-fhi-72]}${NF_IFS_END[oai-du-fhi-72]}"
-
-        NF_IFS[oai-cu]="
-- name: \"n2\"
-  enabled: $MULTUS_CU_N2
-  hostInterface: \"$IF_NAME_CU_N2\"
-  ipAdd: \"$IP_CU_N2\"
-  netmask: \"$NETMASK_CU_N2\"
-  defaultRoute: \"$GW_CU_N2\"
-  routes: \"$ROUTES_CU_N2\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"f1\"
-  enabled: $MULTUS_CU_F1
-  hostInterface: \"$IF_NAME_CU_F1\"
-  ipAdd: \"$IP_CU_F1\"
-  netmask: \"$NETMASK_CU_F1\"
-  defaultRoute: \"$GW_CU_F1\"
-  routes: \"$ROUTES_CU_F1\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"n3\"
-  enabled: $MULTUS_CU_N3
-  hostInterface: \"$IF_NAME_CU_N3\"
-  ipAdd: \"$IP_CU_N3\"
-  netmask: \"$NETMASK_CU_N3\"
-  defaultRoute: \"$GW_CU_N3\"
-  routes: \"$ROUTES_CU_N3\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"e2\"
-  enabled: $MULTUS_CU_E2
-  hostInterface: \"$IF_NAME_CU_E2\"
-  ipAdd: \"$IP_CU_E2\"
-  netmask: \"$NETMASK_CU_E2\"
-  type: macvlan
-  mode: \"bridge\"
-"
-	NF_IFS[oai-cu-cp]="
-- name: \"n2\"
-  enabled: $MULTUS_CUCP_N2
-  hostInterface: \"$IF_NAME_CUCP_N2\"
-  ipAdd: \"$IP_CUCP_N2\"
-  netmask: \"$NETMASK_CUCP_N2\"
-  defaultRoute: \"$GW_CUCP_N2\"
-  routes: \"$ROUTES_CUCP_N2\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"f1c\"
-  enabled: $MULTUS_CUCP_F1C
-  hostInterface: \"$IF_NAME_CUCP_F1C\"
-  ipAdd: \"$IP_CUCP_F1C\"
-  netmask: \"$NETMASK_CUCP_F1C\"
-  gateway: \"$GW_CUCP_F1C\"
-  routes: \"$ROUTES_CUCP_F1C\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"e1\"
-  enabled: $MULTUS_CUCP_E1
-  hostInterface: \"$IF_NAME_CUCP_E1\"
-  ipAdd: \"$IP_CUCP_E1\"
-  netmask: \"$NETMASK_CUCP_E1\"
-  gateway: \"$GW_CUCP_E1\"
-  routes: \"$ROUTES_CUCP_E1\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"e2\"
-  enabled: $MULTUS_CUCP_E2
-  hostInterface: \"$IF_NAME_CUCP_E2\"
-  ipAdd: \"$IP_CUCP_E2\"
-  netmask: \"$NETMASK_CUCP_E2\"
-  type: macvlan
-  mode: \"bridge\"
-"
-	NF_IFS[oai-cu-up]="
-- name: \"n3\"
-  enabled: $MULTUS_CUUP_N3
-  hostInterface: \"$IF_NAME_CUUP_N3\"
-  ipAdd: \"$IP_CUUP_N3\"
-  netmask: \"$NETMASK_CUUP_N3\"
-  defaultRoute: \"$GW_CUUP_N3\"
-  routes: \"$ROUTES_CUUP_N3\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"f1u\"
-  enabled: $MULTUS_CUUP_F1U
-  hostInterface: \"$IF_NAME_CUUP_F1U\"
-  ipAdd: \"$IP_CUUP_F1U\"
-  netmask: \"$NETMASK_CUUP_F1U\"
-  gateway: \"$GW_CUUP_F1U\"
-  routes: \"$ROUTES_CUUP_F1U\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"e1\"
-  enabled: $MULTUS_CUUP_E1
-  hostInterface: \"$IF_NAME_CUUP_E1\"
-  ipAdd: \"$IP_CUUP_E1\"
-  netmask: \"$NETMASK_CUUP_E1\"
-  gateway: \"$GW_CUUP_E1\"
-  routes: \"$ROUTES_CUUP_E1\"
-  type: macvlan
-  mode: \"bridge\"
-- name: \"e2\"
-  enabled: $MULTUS_CUUP_E2
-  hostInterface: \"$IF_NAME_CUUP_E2\"
-  ipAdd: \"$IP_CUUP_E2\"
-  netmask: \"$NETMASK_CUUP_E2\"
-  type: macvlan
-  mode: \"bridge\"
-"
   
     for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-du-fhi-72 oai-cu oai-cu-cp oai-cu-up; do
 	VALUES="${OAI5G_RAN}/${nf}/values.yaml"
@@ -1165,18 +872,16 @@ configure-gnb() {
 	yq eval -i 'del(.multus.interfaces)' "$VALUES"
 	
 	# Inject interfaces
-	export YQ_IFS="${NF_IFS[$nf]}"
-
-	if [[ -z "$YQ_IFS" ]]; then
-	    echo "ERROR: NF_IFS[$nf] is empty"
+	YAML_IFS="$(render_nf_ifs "$nf")"
+	if [[ -z "$YAML_IFS" ]]; then
+	    echo "ERROR: empty NF_IFS for $nf"
 	    continue
 	fi
-
-	yq eval -i '
-           .multus.enabled = true |
-	   .multus.interfaces = (strenv(YQ_IFS) | from_yaml)
-        ' "$VALUES"
-
+	render_nf_ifs "$nf" | \
+	    yq eval -i '
+              .multus.enabled = true |
+              .multus.interfaces = (load("-") | from_yaml)
+            ' "$VALUES"
 	# Update remaining parameters
 	apply-gnb-values-yq "${VALUES}" "${PREFIX_DEMO}/oai5g-rru/charts/values/${nf}.yq"
 	diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/values.yaml.orig) <(yq eval -P '.' ${VALUES})

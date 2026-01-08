@@ -1,0 +1,37 @@
+- name: n3
+  enabled: ${MULTUS_CUUP_N3}
+  hostInterface: ${IF_NAME_CUUP_N3}
+  ipAdd: ${IP_CUUP_N3}
+  netmask: ${NETMASK_CUUP_N3}
+  defaultRoute: ${GW_CUUP_N3}
+  routes: ${ROUTES_CUUP_N3}
+  type: macvlan
+  mode: bridge
+
+- name: f1u
+  enabled: ${MULTUS_CUUP_F1U}
+  hostInterface: ${IF_NAME_CUUP_F1U}
+  ipAdd: ${IP_CUUP_F1U}
+  netmask: ${NETMASK_CUUP_F1U}
+  gateway: ${GW_CUUP_F1U}
+  routes: ${ROUTES_CUUP_F1U}
+  type: macvlan
+  mode: bridge
+
+- name: e1
+  enabled: ${MULTUS_CUUP_E1}
+  hostInterface: ${IF_NAME_CUUP_E1}
+  ipAdd: ${IP_CUUP_E1}
+  netmask: ${NETMASK_CUUP_E1}
+  gateway: ${GW_CUUP_E1}
+  routes: ${ROUTES_CUUP_E1}
+  type: macvlan
+  mode: bridge
+
+- name: e2
+  enabled: ${MULTUS_CUUP_E2}
+  hostInterface: ${IF_NAME_CUUP_E2}
+  ipAdd: ${IP_CUUP_E2}
+  netmask: ${NETMASK_CUUP_E2}
+  type: macvlan
+  mode: bridge
