@@ -10,8 +10,8 @@
 .config.ricHost              = strenv(HOST_FLEXRIC) |
 .config.amfHost              = strenv(HOST_AMF) |
 .config.tac                  = strenv(TAC) |
-.config.ruCPlaneMacAdd       = strenv(MAC_BENETEL) |
-.config.ruUPlaneMacAdd       = strenv(MAC_BENETEL) |
+.config.ruCPlaneMacAdd       = strenv(MAC_RU) |
+.config.ruUPlaneMacAdd       = strenv(MAC_RU) |
 
 .resources.define            = (strenv(QOS_GNB) == "true") |
 .nodeName                    = strenv(NODE_GNB)

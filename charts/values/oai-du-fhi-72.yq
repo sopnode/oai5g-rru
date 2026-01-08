@@ -9,8 +9,8 @@
 .config.enableE2             = (strenv(FLEXRIC) == "true") |
 .config.ricHost              = strenv(HOST_FLEXRIC) |
 .config.tac                  = strenv(TAC) |
-.config.ruCPlaneMacAdd       = strenv(MAC_BENETEL) |
-.config.ruUPlaneMacAdd       = strenv(MAC_BENETEL) |
+.config.ruCPlaneMacAdd       = strenv(MAC_RU) |
+.config.ruUPlaneMacAdd       = strenv(MAC_RU) |
 
 .resources.define            = (strenv(QOS_DU) == "true") |
 .nodeName                    = strenv(NODE_DU)

@@ -840,6 +840,8 @@ render_nf_ifs() {
 
     if [[ "$nf" == "oai-du" && "$GNB_MODE" == "cucpup" ]]; then
         envsubst < "${base}/oai-du-cucpup.yaml"
+    elif [[ "$nf" == "oai-du-fhi-72" && "$GNB_MODE" == "cucpup" ]]; then
+        envsubst < "${base}/oai-du-fhi-72-cucpup.yaml"
     else
         envsubst < "${base}/${nf}.yaml"
     fi

@@ -1,18 +1,18 @@
 - name: f1
-  enabled: ${MULTUS_GNB_F1}
-  hostInterface: ${IF_NAME_GNB_F1}
-  ipAdd: ${IP_GNB_F1}
-  netmask: ${NETMASK_GNB_F1}
-  defaultRoute: ${GW_GNB_F1}
-  routes: ${ROUTES_GNB_F1}
+  enabled: ${MULTUS_DU_F1}
+  hostInterface: ${IF_NAME_DU_F1}
+  ipAdd: ${IP_DU_F1}
+  netmask: ${NETMASK_DU_F1}
+  defaultRoute: ${GW_DU_F1}
+  routes: ${ROUTES_DU_F1}
   type: macvlan
   mode: bridge
 
 - name: e2
-  enabled: ${MULTUS_GNB_E2}
-  hostInterface: ${IF_NAME_GNB_E2}
-  ipAdd: ${IP_GNB_E2}
-  netmask: ${NETMASK_GNB_E2}
+  enabled: ${MULTUS_DU_E2}
+  hostInterface: ${IF_NAME_DU_E2}
+  ipAdd: ${IP_DU_E2}
+  netmask: ${NETMASK_DU_E2}
   type: macvlan
   mode: bridge
 

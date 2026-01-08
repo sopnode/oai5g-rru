@@ -9,10 +9,10 @@
   mode: bridge
 
 - name: e2
-  enabled: ${MULTUS_GNB_E2}
-  hostInterface: ${IF_NAME_GNB_E2}
-  ipAdd: ${IP_GNB_E2}
-  netmask: ${NETMASK_GNB_E2}
+  enabled: ${MULTUS_DU_E2}
+  hostInterface: ${IF_NAME_DU_E2}
+  ipAdd: ${IP_DU_E2}
+  netmask: ${NETMASK_DU_E2}
   type: macvlan
   mode: bridge
 
