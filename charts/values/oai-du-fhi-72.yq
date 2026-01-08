@@ -4,7 +4,7 @@
 .nfimage.pullPolicy          = strenv(DU_FHI72_PULL_POLICY) |
 
 # Common gNB / NF config
-.config.useAdditionalOptions = strenv(ADD_OPTIONS_DU) |
+.config.useAdditionalOptions = strenv(ADD_OPTIONS_GNB) |
 .config.cuHost               = strenv(CU_HOST_FROM_DU) |
 .config.enableE2             = (strenv(FLEXRIC) == "true") |
 .config.ricHost              = strenv(HOST_FLEXRIC) |

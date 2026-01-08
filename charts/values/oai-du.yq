@@ -4,7 +4,7 @@
 .nfimage.pullPolicy          = strenv(DU_PULL_POLICY) |
 
 # Common gNB / NF config
-.config.useAdditionalOptions = strenv(ADD_OPTIONS_DU) |
+.config.useAdditionalOptions = strenv(ADD_OPTIONS_GNB) |
 .config.usrp                 = strenv(RRU_TYPE) |
 .config.radio                = strenv(RRU_TYPE) |
 .config.cuHost               = strenv(CU_HOST_FROM_DU) |

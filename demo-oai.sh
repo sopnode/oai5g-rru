@@ -394,7 +394,6 @@ export GW_DU_E2=""
 export ROUTES_DU_E2="" 
 export IF_NAME_DU_E2="$IF_NAME_E2_DEFAULT"
 #
-export ADD_OPTIONS_DU="$ADD_OPTIONS_GNB"
 export QOS_DU="true"
 export NODE_DU="$NODE_GNB"
 #
