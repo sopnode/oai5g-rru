@@ -5,7 +5,6 @@
 
 # Common gNB / NF config
 .config.useAdditionalOptions = strenv(ADD_OPTIONS_CUCP) |
-.config.cucpHost             = "oai-cu-cp"
 .config.amfHost              = strenv(HOST_AMF) |
 .config.enableE2             = (strenv(FLEXRIC) == "true") |
 .config.ricHost              = strenv(HOST_FLEXRIC) |

@@ -510,7 +510,7 @@ export ROUTES_CUUP_F1U=""
 export IF_NAME_CUUP_F1U="$IF_NAME_F1_DEFAULT"  
 #
 export ADD_OPTIONS_CUUP="--log_config.global_log_options level,nocolor,time"
-export HOST_CUCP="$IP_CUCP_E1"   #"oai-cu"
+export HOST_CUCP="oai-cu-cp" # "$IP_CUCP_E1" 
 export QOS_CUUP="true"
 export NODE_CUUP="$NODE_CU"
 #

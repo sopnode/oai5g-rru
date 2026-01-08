@@ -5,6 +5,7 @@
 
 # Common gNB / NF config
 .config.useAdditionalOptions = strenv(ADD_OPTIONS_CUUP) |
+.config.cucpHost             = strenv(HOST_CUCP) |
 .config.enableE2             = (strenv(FLEXRIC) == "true") |
 .config.ricHost              = strenv(HOST_FLEXRIC) |
 .config.tac                  = strenv(TAC) |
