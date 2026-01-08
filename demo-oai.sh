@@ -342,22 +342,30 @@ export CN_DEFAULT_GW=""
 ################################ oai-gnb chart parameters ########################
 OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
-MY_REPO="ghcr.io/ziyad-mabrouk/openairinterface5g"
 
-# Default charts repo & tag
+export RAN_TAG="2025.w52"
 
-export RAN_TAG="2025.w34" # starting from w29 includes "Initial support for RedCap" feature in gNB
-export GNB_NAME="gNB-r2lab"
+# Default GNB REPO/TAG (can be overrided in rru/${rru}.env)
+export GNB_REPO="${R2LAB_REPO}/oai-gnb"
+export GNB_TAG="$RAN_TAG"
 export GNB_PULL_POLICY="IfNotPresent"
-
-# DU/CU SPLIT parameters
 #
-export NODE_CU="$NODE_GNB" # same node used for cu/cu-cp/cu-up and du
+export GNB_FHI72_REPO="${R2LAB_REPO}/oai-gnb-fhi72"
+export GNB_FHI72_TAG="$RAN_TAG"
+export GNB_FHI72_PULL_POLICY="IfNotPresent"
+
+##########################################
+# DU/CU SPLIT parameters
+##########################################
 
 ########## DU specific part ##############
-#DU_REPO="${R2LAB_REPO}/oai-gnb" DU_REPO must be GNB_REPO to handle aw2s case
+export DU_REPO="${R2LAB_REPO}/oai-gnb" 
 export DU_TAG=${RAN_TAG}
-export NAME_DU_SA="oai-du-sa"
+export DU_PULL_POLICY=${GNB_PULL_POLICY}
+#
+export DU_FHI72_REPO="${R2LAB_REPO}/oai-gnb-fhi72"
+export DU_FHI72_TAG="$DU_TAG"
+export DU_FHI72_PULL_POLICY="$DU_PULL_POLICY"
 #
 export MULTUS_DU_F1C="true"
 export IP_DU_F1C="172.21.6.90"
@@ -386,14 +394,14 @@ export GW_DU_E2=""
 export ROUTES_DU_E2="" 
 export IF_NAME_DU_E2="$IF_NAME_E2_DEFAULT"
 #
-export NAME_DU="oai-du"
-export QOS_DU_DEF="true"
+export ADD_OPTIONS_DU="$ADD_OPTIONS_GNB"
+export QOS_DU="true"
 export NODE_DU="$NODE_GNB"
 #
 ########## CU specific part ##############
 export CU_REPO="${R2LAB_REPO}/oai-gnb" 
 export CU_TAG=${RAN_TAG}
-export NAME_CU_SA="oai-cu-sa"
+export CU_PULL_POLICY=${GNB_PULL_POLICY}
 #
 export MULTUS_CU_F1="true"
 export IP_CU_F1="172.21.16.92"
@@ -424,14 +432,15 @@ export ROUTES_CU_E2=""
 export IF_NAME_CU_E2="$IF_NAME_E2_DEFAULT"
 #
 export ADD_OPTIONS_CU="--log_config.global_log_options level,nocolor,time"
-export NAME_CU="oai-cu"
-export QOS_CU_DEF="true"
+export QOS_CU="true"
+export NODE_CU="$NODE_GNB" 
+
 # NODE_CU is defined above and also the same for CUCP/CUUP
 #
 ########## CU-CP specific part ##############
 export CUCP_REPO="${R2LAB_REPO}/oai-gnb" 
 export CUCP_TAG=${RAN_TAG}
-export NAME_CUCP_SA="oai-cu-cp-sa"
+export CUCP_PULL_POLICY=${GNB_PULL_POLICY}
 #
 export MULTUS_CUCP_E1="true"
 export IP_CUCP_E1="192.168.18.12"
@@ -464,13 +473,13 @@ export IF_NAME_CUCP_F1C="$IF_NAME_F1_DEFAULT"
 #
 export ADD_OPTIONS_CUCP="--log_config.global_log_options level,nocolor,time"
 export NAME_CUCP="oai-cu-cp"
-export QOS_CUCP_DEF="true"
+export QOS_CUCP="true"
 export NODE_CUCP="$NODE_CU"
 #
 ########## CU-UP specific part ##############
 export CUUP_REPO="$R2LAB_REPO/oai-nr-cuup"
 export CUUP_TAG=${RAN_TAG}
-export NAME_CUUP_SA="oai-cu-up-sa"
+export CUUP_PULL_POLICY=${GNB_PULL_POLICY}
 #
 export MULTUS_CUUP_E1="true"
 export IP_CUUP_E1="192.168.18.13"
@@ -501,12 +510,11 @@ export GW_CUUP_F1U="" # "172.21.19.254"
 export ROUTES_CUUP_F1U=""
 export IF_NAME_CUUP_F1U="$IF_NAME_F1_DEFAULT"  
 #
-export ADD_OPTIONS_CUUP=""
-export NAME_CUUP="oai-cuup"
+export ADD_OPTIONS_CUUP="--log_config.global_log_options level,nocolor,time"
 export HOST_CUCP="$IP_CUCP_E1"   #"oai-cu"
-export QOS_CUUP_DEF="true"
+export QOS_CUUP="true"
 export NODE_CUUP="$NODE_CU"
-
+#
 if [[ $GNB_MODE = 'cucpup' ]]; then
     export CU_HOST_FROM_DU="$IP_CUCP_F1C"
     export CU_HOST_FROM_CUUP="$IP_CUCP_E1"
@@ -526,101 +534,8 @@ export NETMASK_GNB_E2="24"
 export GW_GNB_E2=""
 export ROUTES_GNB_E2="" 
 export IF_NAME_GNB_E2="$IF_NAME_E2_DEFAULT"
-################## RRU-dependent part ###################
 #
-RU_MODE="static" # in ['static', 'dhcp']
-#
-#### rfsim RU case ####
-GNB_REPO_rfsim="${R2LAB_REPO}/oai-gnb"
-GNB_TAG_rfsim="${RAN_TAG}"
-CONF_rfsim="gnb.sa.band78.106prb.rfsim.conf" 
-CONF_DU_rfsim="du.sa.band78.106prb.rfsim.conf" 
-OPTIONS_rfsim="-E --rfsim --log_config.global_log_options level,nocolor,time"
-#
-#### b2xx RU case ####
-GNB_REPO_b2xx="${R2LAB_REPO}/oai-gnb"
-GNB_TAG_b2xx="${RAN_TAG}"
-CONF_b210="gnb.sa.band78.fr1.106PRB.usrpb210.conf"
-OPTIONS_b2xx="-E --tune-offset 30000000 --log_config.global_log_options level,nocolor,time"
-
-#### n3xx RU case ####
-GNB_REPO_n3xx="${R2LAB_REPO}/oai-gnb"
-GNB_TAG_n3xx="${RAN_TAG}"
-#
-CONF_n320="gnb.sa.band78.106prb.n310.7ds2u.conf"
-CONF_DU_n320="du.sa.band78.106prb.n310.7ds2u.conf"
-CONF_n300="$CONF_n320"
-CONF_DU_n300="$CONF_DU_n320"
-OPTIONS_n3xx="--usrp-tx-thread-config 1 --tune-offset 30000000 --MACRLCs.[0].ul_max_mcs 14 --L1s.[0].max_ldpc_iterations 4 --log_config.global_log_options level,nocolor,time"
-#
-if [[ $RU_MODE = "dhcp" ]]; then
-    IP_GNB_N300_1="dhcp"
-    IP_GNB_N300_2="dhcp"
-    IP_GNB_N320_1="dhcp"
-    IP_GNB_N320_2="dhcp"
-else
-    IP_GNB_N300_1="192.168.235.120" # @IP N300.1 + 17
-    IP_GNB_N300_2="192.168.235.121" # @IP N300.2 + 17
-    IP_GNB_N320_1="$IP_GNB_N300_1"
-    IP_GNB_N320_2="$IP_GNB_N300_2"
-fi
-MTU_n3xx="9000"
-ADDRS_n300="addr=192.168.235.103,second_addr=192.168.235.104"
-ADDRS_n320="addr=192.168.235.105" #",second_addr=192.168.235.106"
-
-#### aw2s RU case ####
-GNB_REPO_aw2s="${R2LAB_REPO}/oai-gnb-aw2s"
-GNB_TAG_aw2s="${RAN_TAG}"
-#
-CONF_jaguar="gnb.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
-CONF_DU_jaguar="du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf"
-CONF_panther="gnb.sa.band78.51prb.aw2s.ddsuu.20MHz.1x1.conf" # to test with redcap qhats based on RG255C-GL (qhat20/21/22/23)
-CONF_DU_panther="${CONF_DU_jaguar}"
-OPTIONS_aw2s="--thread-pool 9,11,13,15,17,19,21,23 --log_config.global_log_options level,nocolor,time"
-if [[ $RU_MODE = "dhcp" ]]; then
-    export IP_GNB_jaguar="dhcp"
-    export IP_GNB_panther="dhcp"
-else
-    export IP_GNB_jaguar="192.168.236.104" # @IP ADDR_jaguar + 3
-    export IP_GNB_panther="192.168.236.106" # @IP ADDR_panther + 3
-fi
-export ADDR_jaguar="192.168.236.101" 
-export ADDR_panther="192.168.236.103" 
-
-#### benetel RU case ####
-export TYPE_N2="macvlan"
-export MODE_N2="bridge"
-export TYPE_N3="macvlan"
-export MODE_N3="bridge"
-
-GNB_REPO_benetel="${OAISA_REPO}/oai-gnb-fhi72"
-GNB_TAG_benetel="2025.w50"
-
-#CONF_benetel1="gnb.sa.band78.273prb.fhi72.4x4-benetel550-ci-scripts.conf"
-CONF_DU_benetel1="du.sa.band78.273prb.fhi72.4x4-benetel550.conf"
-#CONF_benetel2="${CONF_benetel1}"
-#CONF_DU_benetel2="${CONF_DU_benetel1}"
-OPTIONS_benetel="--log_config.global_log_options level,nocolor,time"
-if [[ $RU_MODE = "dhcp" ]]; then
-    export IP_GNB_benetel1="dhcp"
-    export IP_GNB_benetel2="dhcp"
-else
-    export IP_GNB_benetel1="192.168.233.104" # @IP ADDR_jaguar + 3
-    export IP_GNB_benetel2="192.168.233.105" # @IP ADDR_panther + 3
-fi
-MTU_benetel="9216"
-MAC_UPLANE1="00:11:22:33:44:66"
-MAC_CPLANE1="00:11:22:33:44:67"
-SRIOV_NS="sriov-network-operator"
-VLAN_benetel1="801"
-VLAN_benetel2="802"
-ADDR_benetel1="192.168.233.101" 
-ADDR_benetel2="192.168.233.102"
-MAC_benetel1="8c:1f:64:d1:12:8c"
-MAC_benetel2="8c:1f:64:d1:12:50"
-DPDK_VF_U="0000:3a:09.0" # for sopnode-f3 U_PLANE
-DPDK_VF_C="0000:3a:09.1" # for sopnode-f3 C_PLANE
-
+export QOS_GNB="true"
 
 
 ########################### oai-nr-ue rfsim chart parameters #####################

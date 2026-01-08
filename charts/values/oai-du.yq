@@ -1,21 +1,17 @@
 # Image configuration
-.nfimage.repository          = strenv(GNB_REPO) |
-.nfimage.version             = strenv(GNB_TAG) |
-.nfimage.pullPolicy          = strenv(GNB_PULL_POLICY) |
+.nfimage.repository          = strenv(DU_REPO) |
+.nfimage.version             = strenv(DU_TAG) |
+.nfimage.pullPolicy          = strenv(DU_PULL_POLICY) |
 
 # Common gNB / NF config
-.config.useAdditionalOptions = strenv(ADD_OPTIONS_GNB) |
-.config.gnbName              = strenv(GNB_NAME) |
+.config.useAdditionalOptions = strenv(ADD_OPTIONS_DU) |
+.config.usrp                 = strenv(RRU_TYPE) |
 .config.radio                = strenv(RRU_TYPE) |
+.config.cuHost               = strenv(CU_HOST_FROM_DU) |
 .config.enableE2             = (strenv(FLEXRIC) == "true") |
 .config.ricHost              = strenv(HOST_FLEXRIC) |
-.config.amfHost              = strenv(HOST_AMF) |
 .config.tac                  = strenv(TAC) |
 .config.ruIpAdd              = strenv(ADDR_RU) |
-.config.cuHost               = strenv(CU_HOST_FROM_DU) |
-.config.cucpHost             = strenv(CU_HOST_FROM_CUUP) |
-.config.ruCPlaneMacAdd       = strenv(MAC_BENETEL) |
-.config.ruUPlaneMacAdd       = strenv(MAC_BENETEL) |
 
-.resources.define            = (strenv(QOS_GNB_DEF) == "true") |
-.nodeName                    = strenv(NODE_GNB)
+.resources.define            = (strenv(QOS_DU) == "true") |
+.nodeName                    = strenv(NODE_DU)

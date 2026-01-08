@@ -5,7 +5,6 @@
 
 # Common gNB / NF config
 .config.useAdditionalOptions = strenv(ADD_OPTIONS_GNB) |
-.config.gnbName              = strenv(GNB_NAME) |
 .config.radio                = strenv(RRU_TYPE) |
 .config.enableE2             = (strenv(FLEXRIC) == "true") |
 .config.ricHost              = strenv(HOST_FLEXRIC) |
@@ -13,5 +12,5 @@
 .config.tac                  = strenv(TAC) |
 .config.ruIpAdd              = strenv(ADDR_RU) |
 
-.resources.define            = (strenv(QOS_GNB_DEF) == "true") |
+.resources.define            = (strenv(QOS_GNB) == "true") |
 .nodeName                    = strenv(NODE_GNB)
