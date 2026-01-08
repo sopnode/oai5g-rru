@@ -773,7 +773,7 @@ configure-mysql() {
 
 
 load_rru_env() {
-    local file="$PREFIX_DEMO/rru/$1.env"
+    local file="$PREFIX_DEMO/oai5g-rru/rru/$1.env"
     [[ -f "$file" ]] || return 1
     set -a
     source "$file"
@@ -908,7 +908,7 @@ configure-gnb() {
 	    nf="oai-du"
 	fi
     fi
-    CONFIG_RRU="$PREFIX_DEMO/rru/${gnb_type}-config-${RRU_TYPE}.yaml"
+    CONFIG_RRU="$PREFIX_DEMO/oai5g-rru/rru/${gnb_type}-config-${RRU_TYPE}.yaml"
     CONFIG="${OAI5G_RAN}/${nf}/config.yaml"
     cp "$CONFIG" "${OAI5G_RAN}/${nf}/config.yaml.orig"
     cp "$CONFIG_RRU" "$CONFIG"
@@ -917,7 +917,7 @@ configure-gnb() {
     # Fix deployment charts in the case of AW2S RUs as Eurecom no more support AW2S...
     if [[ "$RRU_TYPE" == "aw2s" ]]; then
 	for nf in oai-gnb oai-du; do
-	    cp "$PREFIX_DEMO/rru/${nf}-deployment-aw2s.yaml" "${OAI5G_RAN}/${nf}/templates/deployment.yaml"
+	    cp "$PREFIX_DEMO/oai5g-rru/rru/${nf}-deployment-aw2s.yaml" "${OAI5G_RAN}/${nf}/templates/deployment.yaml"
 	done
 	for nf in oai-cu oai-cu-cp oai-cu-up; do
 	    DEPLOYMENT="${OAI5G_RAN}/${nf}/templates/deployment.yaml"
