@@ -173,9 +173,11 @@ if [[ $RUN_MODE = "full" ]]; then
     # ran charts
     export HOST_AMF="$IP_AMF_N2"
     export MULTUS_GNB_N2="true"
+    export IF_NAME_GNB_N2="$IF_NAME_N2N3"
     export IP_GNB_N2="$SUBNET_N2N3.203"
     export GNB_N2_IF_NAME="n2"
     export MULTUS_GNB_N3="false"
+    export IF_NAME_GNB_N3="$IF_NAME_N2N3"
     if [[ $GNB_MODE = 'cucpup' ]]; then
 	export F1IFNAME="f1c"
 	export MULTUS_CUUP_N3="true"
