@@ -448,7 +448,7 @@ export GW_CUCP_E1=""
 export ROUTES_CUCP_E1=""
 export IF_NAME_CUCP_E1="$IF_NAME_E1_DEFAULT"
 #
-export MULTUS_CUCP_E2="true"
+export MULTUS_CUCP_E2="$FLEXRIC" # E2 only used if FLEXRIC is true
 export IP_CUCP_E2="192.168.85.93"
 export NETMASK_CUCP_E2="24"
 export GW_CUCP_E2=""
