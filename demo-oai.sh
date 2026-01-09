@@ -931,29 +931,28 @@ configure-gnb() {
 
 configure-nr-ue() {
 
-    # Will NOT generate PCAP file to avoid wasting all memory resources
-    # However, a tcpdump container may be created, e.g., to run iperf client
     DIR="$OAI5G_RAN/oai-nr-ue"
     ORIG_CHART="${DIR}/values.yaml"
 
     cp "$ORIG_CHART" "$TMP"/oai-nr-ue_values.yaml-orig
 
-    # Use yq to update nfimage, config, includeTcpDumpContainer, resources, and insert multus
+    # Insert multus before config and update fields
     yq eval -i '
-      # Insert multus before config
-      with(
-        select(has("config"));
-        .multus = {
+      # Capture all top-level keys in order
+      . as $all |
+      # Remove multus if it exists
+      del(.multus) |
+      # Rebuild top-level mapping with multus inserted before config
+      ({} + . *+ {"multus": {
           "create": strenv(MULTUS_NRUE),
           "ipadd": strenv(IP_NRUE),
           "netmask": strenv(NETMASK_NRUE),
           "mac": strenv(MAC_NRUE),
           "defaultGateway": strenv(DEFAULT_GW_NRUE),
           "hostInterface": strenv(IF_NAME_NRUE)
-        }
-      ) |
+        }} + ($all | select(has("config")) | {"config": .config}) + ($all | with_entries(select(.key != "config")) | del(.multus))) |
 
-      # Update nfimage repository and version
+      # Update nfimage
       .nfimage.repository = strenv(NRUE_REPO) |
       .nfimage.version = strenv(NRUE_TAG) |
 
@@ -971,12 +970,10 @@ configure-nr-ue() {
       .resources.define = (strenv(QOS_NRUE) | test("true"))
     ' "$ORIG_CHART"
 
-    # Replace placeholder 0xEMPTY with actual value
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
-
-    # Show diff for verification
     diff "$TMP"/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
 }
+
 
 
 #################################################################################
