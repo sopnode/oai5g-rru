@@ -937,8 +937,15 @@ configure-nr-ue() {
     ORIG_CHART="${DIR}/values.yaml"
 
     cp "$ORIG_CHART" "$TMP"/oai-nr-ue_values.yaml-orig
-
-      yq -i '
+    yq -i '
+    . as $root
+    |
+    $root.config as $config
+    |
+    del(.multus)
+    |
+    del(.config)
+    |
     .multus = {
       "create": (strenv(MULTUS_NRUE) == "true"),
       "ipadd": strenv(IP_NRUE),
@@ -947,6 +954,8 @@ configure-nr-ue() {
       "defaultGateway": strenv(DEFAULT_GW_NRUE),
       "hostInterface": strenv(IF_NAME_NRUE)
     }
+    |
+    .config = $config
     |
     .nfimage.repository = strenv(NRUE_REPO)
     |
@@ -969,7 +978,7 @@ configure-nr-ue() {
     .resources.define = (strenv(QOS_NRUE) == "true")
     |
     .includeTcpDumpContainer = (strenv(LOGS) == "true")
-  ' "$ORIG_CHART"
+    ' "$ORIG_CHART"
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
     diff "$TMP"/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
 }
