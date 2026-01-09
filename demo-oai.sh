@@ -542,9 +542,10 @@ export NRUE_REPO="${R2LAB_REPO}/oai-nr-ue"
 #NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
 export NRUE_TAG="${RAN_TAG}"
 export ADD_OPTIONS_NRUE="--rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time" 
-#OPTIONS_NRUE="--sa --rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time" 
 export NETMASK_NRUE="$NETMASK_N2N3"
-export export IF_NAME_NRUE="$IF_NAME_N2N3"
+export IF_NAME_NRUE="$IF_NAME_N2N3"
+export QOS_NRUE="false"
+export NODE_NRUE="$NODE_GNB"
 
 ########################### oai-flexric chart parameters #####################
 FLEXRIC_REPO="ghcr.io/ziyad-mabrouk/oai-flexric"
@@ -965,7 +966,8 @@ configure-nr-ue() {
       .config.sd       = ("0x" + strenv(SLICE1_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
       .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
-      .resources.define = (strenv(QOS_NRUE) | test("true"))
+      .resources.define = (strenv(QOS_NRUE) | test("true")) |
+      .nodeName         = strenv(NODE_NRUE)
     ' "$ORIG_CHART"
 
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
