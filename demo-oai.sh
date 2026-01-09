@@ -939,11 +939,16 @@ configure-nr-ue() {
     # Insert the multus block BEFORE the config block
     # Keep indentation and comments intact
     awk -v multus="multus:
-  create: \"$MULTUS_NRUE\"
-  ipadd: \"$IP_NRUE\" # subnet should reach the gNB
-  netmask: \"$NETMASK_NRUE\"
-  defaultGateway: \"$DEFAULT_GW_NRUE\"
-  hostInterface: \"$IF_NAME_NRUE\"
+  enabled: \"$MULTUS_NRUE\"
+  interfaces:
+    - name: net1
+      enabled: \"$MULTUS_NRUE\"
+      hostInterface: \"$IF_NAME_NRUE\"
+      ipAdd: \"$IP_NRUE\"
+      netmask: \"$NETMASK_NRUE\"
+      defaultGateway: \"$DEFAULT_GW_NRUE\"
+      type: macvlan
+      mode: bridge
   " '
     {
         if ($0 ~ /^config:/ && !inserted) {
