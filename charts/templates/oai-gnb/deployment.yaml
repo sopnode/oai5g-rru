@@ -202,7 +202,7 @@ spec:
           {{- end }}
           volumeMounts:
             - name: shared-data
-              mountPath: /opt/oai-gnb-aw2s/etc
+              mountPath: /opt/oai-gnb/etc
           {{- if eq .Values.config.radio "b2xx" }}
             - name: radio
               mountPath: /dev/bus/usb/
