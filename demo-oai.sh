@@ -890,7 +890,7 @@ configure-gnb() {
 	
 	# Update remaining parameters
 	apply-gnb-values-yq "${VALUES}" "${PREFIX_DEMO}/oai5g-rru/charts/values/${nf}.yq"
-	diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/values.yaml.orig) <(yq eval -P '.' ${VALUES})
+	##diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/values.yaml.orig) <(yq eval -P '.' ${VALUES})
     done
 
     # Update config.yaml charts
@@ -913,11 +913,10 @@ configure-gnb() {
     CONFIG="${OAI5G_RAN}/${nf}/config.yaml"
     cp "$CONFIG" "${OAI5G_RAN}/${nf}/config.yaml.orig"
     cp "$CONFIG_RRU" "$CONFIG"
-    diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
+    ##diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
 
     # Update deployment.yaml and nad.yaml templates
     cp -f "${NEW_TEMPLATES}/nad.yaml" "${ORIG_TEMPLATES}"
-    echo "$$$$$$$$$$$$$$$$";diff "${NEW_TEMPLATES}/nad.yaml" "${ORIG_TEMPLATES}"
 
     # Fix deployment charts in the case of AW2S RUs as Eurecom no more support AW2S...
     if [[ "$RRU_TYPE" == "aw2s" ]]; then
@@ -984,7 +983,7 @@ configure-nr-ue() {
     ' "$ORIG_VALUES"
 
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_VALUES"
-    diff "$TMP_VALUES" "$ORIG_VALUES"
+    ##diff "$TMP_VALUES" "$ORIG_VALUES"
 
     # Update deployment.yaml and nad.yaml templates
     cp -f "${NEW_TEMPLATES}/deployment.yaml" "${ORIG_TEMPLATES}"
