@@ -851,6 +851,8 @@ configure-gnb() {
     echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $LOGS"
 
     DIR_CHARTS="$PREFIX_DEMO/charts"
+    ORIG_TEMPLATES="${OAI5G_RAN}/oai-gnb/templates"
+    NEW_TEMPLATES="$PREFIX_DEMO/oai5g-rru/charts/templates/oai-gnb"
 
     
     # First load RU specific parameters
@@ -912,6 +914,11 @@ configure-gnb() {
     cp "$CONFIG" "${OAI5G_RAN}/${nf}/config.yaml.orig"
     cp "$CONFIG_RRU" "$CONFIG"
     diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
+
+    # Update deployment.yaml and nad.yaml templates
+    cp -f "${NEW_TEMPLATES}/deployment.yaml" "${ORIG_TEMPLATES}"
+    cp -f "${NEW_TEMPLATES}/nad.yaml" "${ORIG_TEMPLATES}"
+
 
     # Fix deployment charts in the case of AW2S RUs as Eurecom no more support AW2S...
     if [[ "$RRU_TYPE" == "aw2s" ]]; then
