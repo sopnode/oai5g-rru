@@ -56,9 +56,9 @@ SLICE2_DOWNLINK="@DEF_SLICE2_DOWNLINK@"
 export GNB_ID="@DEF_GNB_ID@"
 #
 ################SST0="@DEF_SST0@"
-FULL_KEY="@DEF_FULL_KEY@"
-OPC="@DEF_OPC@"
-RFSIM_IMSI="@DEF_RFSIM_IMSI@"
+export FULL_KEY="@DEF_FULL_KEY@"
+export OPC="@DEF_OPC@"
+export RFSIM_IMSI="@DEF_RFSIM_IMSI@"
 RFSIM_IMSI_UE2="@DEF_RFSIM_IMSI_UE2@"
 RFSIM_IMSI_UE3="@DEF_RFSIM_IMSI_UE3@"
 #
@@ -538,14 +538,13 @@ export QOS_GNB="true"
 
 
 ########################### oai-nr-ue rfsim chart parameters #####################
-NRUE_REPO="${R2LAB_REPO}/oai-nr-ue"
+export NRUE_REPO="${R2LAB_REPO}/oai-nr-ue"
 #NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
-NRUE_TAG="${RAN_TAG}"
-OPTIONS_NRUE="--rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time" 
+export NRUE_TAG="${RAN_TAG}"
+export OPTIONS_NRUE="--rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time" 
 #OPTIONS_NRUE="--sa --rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time" 
-NETMASK_NRUE="$NETMASK_N2N3"
-export IF_NAME_NRUE="$IF_NAME_N2N3"
-NRUE_USRP="rfsim"
+export NETMASK_NRUE="$NETMASK_N2N3"
+export export IF_NAME_NRUE="$IF_NAME_N2N3"
 
 ########################### oai-flexric chart parameters #####################
 FLEXRIC_REPO="ghcr.io/ziyad-mabrouk/oai-flexric"
