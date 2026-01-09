@@ -1,7 +1,7 @@
 - name: n2
   enabled: ${MULTUS_GNB_N2}
-  hostInterface: ${IF_NAME_GNB_N2}
-  ipAdd: ${IP_GNB_N2}
+  hostInterface: "${IF_NAME_GNB_N2}"
+  ipAdd: \"${IP_GNB_N2}\"
   netmask: ${NETMASK_GNB_N2}
   defaultRoute: ${GW_GNB_N2}
   routes: ${ROUTES_GNB_N2}
