@@ -59,8 +59,8 @@ export GNB_ID="@DEF_GNB_ID@"
 export FULL_KEY="@DEF_FULL_KEY@"
 export OPC="@DEF_OPC@"
 export RFSIM_IMSI="@DEF_RFSIM_IMSI@"
-RFSIM_IMSI_UE2="@DEF_RFSIM_IMSI_UE2@"
-RFSIM_IMSI_UE3="@DEF_RFSIM_IMSI_UE3@"
+export RFSIM_IMSI_UE2="@DEF_RFSIM_IMSI_UE2@"
+export RFSIM_IMSI_UE3="@DEF_RFSIM_IMSI_UE3@"
 #
 PREFIX_DEMO="@DEF_PREFIX_DEMO@" # Directory in which all scripts will be copied on the k8s server to run the demo
 #
