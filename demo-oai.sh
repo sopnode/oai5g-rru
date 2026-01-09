@@ -937,15 +937,7 @@ configure-nr-ue() {
     ORIG_CHART="${DIR}/values.yaml"
 
     cp "$ORIG_CHART" "$TMP"/oai-nr-ue_values.yaml-orig
-    yq -i '
-    . as $root
-    |
-    $root.config as $config
-    |
-    del(.multus)
-    |
-    del(.config)
-    |
+    yq eval-all -i '
     .multus = {
       "create": (strenv(MULTUS_NRUE) == "true"),
       "ipadd": strenv(IP_NRUE),
@@ -953,31 +945,20 @@ configure-nr-ue() {
       "mac": strenv(MAC_NRUE),
       "defaultGateway": strenv(DEFAULT_GW_NRUE),
       "hostInterface": strenv(IF_NAME_NRUE)
-    }
+    } 
     |
-    .config = $config
-    |
-    .nfimage.repository = strenv(NRUE_REPO)
-    |
-    .nfimage.version = strenv(NRUE_TAG)
-    |
-    .config.fullImsi = strenv(RFSIM_IMSI)
-    |
-    .config.fullKey = strenv(FULL_KEY)
-    |
-    .config.opc = strenv(OPC)
-    |
-    .config.dnn = strenv(DNN0)
-    |
-    .config.sst = strenv(SLICE1_SST)
-    |
-    .config.sd = ("0x" + strenv(SLICE1_SD))
-    |
-    .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE)
-    |
-    .resources.define = (strenv(QOS_NRUE) == "true")
-    |
-    .includeTcpDumpContainer = (strenv(LOGS) == "true")
+    # Insert multus before config block
+    with(. as $item
+      | if has("config") then
+          # Extract all before config
+          . as $root
+          | $root | del(.config) | . as $pre
+          | $root.config as $conf
+          | . = ($pre + {"multus": .multus} + {"config": $conf})
+        else
+          .
+        end
+    )
     ' "$ORIG_CHART"
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
     diff "$TMP"/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
