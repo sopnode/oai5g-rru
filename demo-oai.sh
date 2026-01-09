@@ -997,6 +997,8 @@ configure-nr-ue2() {
     rm -rf "$DIR"
     cp -pr "${OAI5G_RAN}/oai-nr-ue" "$DIR"
     find "$DIR" -type f -exec sed -i 's/oai-nr-ue/oai-nr-ue2/g' {} +
+    sed -i 's/oai-nr-ue2\/bin/oai-nr-ue\/bin/g' "$DIR/templates/deployment.yaml"
+    sed -i 's/oai-nr-ue2\/etc/oai-nr-ue\/etc/g' "$DIR/templates/deployment.yaml"
     
     # Then update the variable fields
     yq eval -i '
@@ -1029,6 +1031,8 @@ configure-nr-ue3() {
     rm -rf "$DIR"
     cp -pr "${OAI5G_RAN}/oai-nr-ue" "$DIR"
     find "$DIR" -type f -exec sed -i 's/oai-nr-ue/oai-nr-ue3/g' {} +
+    sed -i 's/oai-nr-ue3\/bin/oai-nr-ue\/bin/g' "$DIR/templates/deployment.yaml"
+    sed -i 's/oai-nr-ue3\/etc/oai-nr-ue\/etc/g' "$DIR/templates/deployment.yaml"
     
     # Then update the variable fields
     yq eval -i '
