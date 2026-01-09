@@ -4,13 +4,13 @@
 .nfimage.pullPolicy          = strenv(GNB_PULL_POLICY) |
 
 # Common gNB / NF config
-.config.useAdditionalOptions = strenv(ADD_OPTIONS_GNB) |
-.config.radio                = strenv(RRU_TYPE) |
+.config.useAdditionalOptions = \"strenv(ADD_OPTIONS_GNB)\" |
+.config.radio                = \"strenv(RRU_TYPE)\" |
 .config.enableE2             = (strenv(FLEXRIC) == "true") |
-.config.ricHost              = strenv(HOST_FLEXRIC) |
-.config.amfHost              = strenv(HOST_AMF) |
-.config.tac                  = strenv(TAC) |
-.config.ruIpAdd              = strenv(ADDR_RU) |
+.config.ricHost              = \"strenv(HOST_FLEXRIC)\" |
+.config.amfHost              = \"strenv(HOST_AMF)\" |
+.config.tac                  = \"strenv(TAC)\" |
+.config.ruIpAdd              = \"strenv(ADDR_RU)\" |
 
 .resources.define            = (strenv(QOS_GNB) == "true") |
 .nodeName                    = strenv(NODE_GNB)
