@@ -1,0 +1,5 @@
+1. Get the application name by running these commands:
+  export NR_UE_POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name=oai-nr-ue,app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+2. Dockerhub images of OpenAirInterface requires AVX2 (for x86)
+3. Note: This helm chart of OAI-NR-UE is only tested in RF-simulator mode, not with hardware on Openshift/Kubernetes Cluster
+4. In case you want to test these charts with USRP then make sure your CPU sleep states are off

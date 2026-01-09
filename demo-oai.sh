@@ -931,10 +931,12 @@ configure-gnb() {
 #################################################################################
 
 configure-nr-ue() {
-    ORIG_CHART="$OAI5G_RAN/oai-nr-ue/values.yaml"
-    TMP_CHART="$TMP/oai-nr-ue_values.yaml-orig"
+    ORIG_VALUES="$OAI5G_RAN/oai-nr-ue/values.yaml"
+    TMP_VALUES="$TMP/oai-nr-ue_values.yaml-orig"
+    ORIG_TEMPLATES="${OAI5G_RAN}/oai-nr-ue/templates"
+    NEW_TEMPLATES="$PREFIX_DEMO/oai5g-rru/charts/templates"
 
-    cp "$ORIG_CHART" "$TMP_CHART"
+    cp "$ORIG_VALUES" "$TMP_VALUES"
 
     # Insert the multus block BEFORE the config block
     # Keep indentation and comments intact
@@ -957,7 +959,7 @@ configure-nr-ue() {
         }
         print
     }
-    ' "$ORIG_CHART" > "$ORIG_CHART.tmp" && mv "$ORIG_CHART.tmp" "$ORIG_CHART"
+    ' "$ORIG_VALUES" > "$ORIG_VALUES.tmp" && mv "$ORIG_VALUES.tmp" "$ORIG_VALUES"
 
     # Then update the variable fields
     yq eval -i '
@@ -973,11 +975,14 @@ configure-nr-ue() {
       .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
       .resources.define = (strenv(QOS_NRUE) | test("true")) |
       .nodeName         = strenv(NODE_NRUE)
-    ' "$ORIG_CHART"
+    ' "$ORIG_VALUES"
 
-    sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
+    sed -i 's/0xEMPTY/16777215/g' "$ORIG_VALUES"
+    diff "$TMP_VALUES" "$ORIG_VALUES"
 
-    diff "$TMP_CHART" "$ORIG_CHART"
+    # Update deployment.yaml and nad.yaml templates
+    cp -f "${NEW_TEMPLATES}/deployment.yaml" "${ORIG_TEMPLATES}"
+    cp -f "${NEW_TEMPLATES}/nad.yaml" "${ORIG_TEMPLATES}"
 }
 
 
@@ -986,7 +991,7 @@ configure-nr-ue() {
 configure-nr-ue2() {
 
     DIR="${OAI5G_RAN}/oai-nr-ue2"
-    ORIG_CHART="${DIR}/values.yaml"
+    ORIG_VALUES="${DIR}/values.yaml"
 
     # First remove oai-nr-ue2 chart if there and create a new one based on oai-nr-ue chart
     rm -rf "$DIR"
@@ -1007,10 +1012,10 @@ configure-nr-ue2() {
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
       .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
       .resources.define = (strenv(QOS_NRUE) | test("true"))
-    ' "$ORIG_CHART"
+    ' "$ORIG_VALUES"
 
-    sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
-    cat "$ORIG_CHART"
+    sed -i 's/0xEMPTY/16777215/g' "$ORIG_VALUES"
+    cat "$ORIG_VALUES"
 }
 
 #################################################################################
@@ -1018,7 +1023,7 @@ configure-nr-ue2() {
 configure-nr-ue3() {
 
     DIR="${OAI5G_RAN}/oai-nr-ue3"
-    ORIG_CHART="${DIR}/values.yaml"
+    ORIG_VALUES="${DIR}/values.yaml"
 
     # First remove oai-nr-ue3 chart if there and create a new one based on oai-nr-ue chart
     rm -rf "$DIR"
@@ -1039,10 +1044,10 @@ configure-nr-ue3() {
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
       .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
       .resources.define = (strenv(QOS_NRUE) | test("true"))
-    ' "$ORIG_CHART"
+    ' "$ORIG_VALUES"
 
-    sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
-    cat "$ORIG_CHART"
+    sed -i 's/0xEMPTY/16777215/g' "$ORIG_VALUES"
+    cat "$ORIG_VALUES"
 }
 
 
