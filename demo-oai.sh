@@ -941,10 +941,9 @@ configure-nr-ue() {
   create: \"$MULTUS_NRUE\"
   ipadd: \"$IP_NRUE\" # subnet should reach the gNB
   netmask: \"$NETMASK_NRUE\"
-  mac: \"$MAC_NRUE\"
   defaultGateway: \"$DEFAULT_GW_NRUE\"
   hostInterface: \"$IF_NAME_NRUE\"
-" '
+  " '
     {
         if ($0 ~ /^config:/ && !inserted) {
             printf "%s\n", multus
