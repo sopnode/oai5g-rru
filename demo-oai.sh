@@ -990,6 +990,7 @@ configure-nr-ue2() {
     yq eval -i '
       .nfimage.repository = strenv(NRUE_REPO) |
       .nfimage.version = strenv(NRUE_TAG) |
+      .multus.ipadd    = strenv(IP_NRUE2) |
       .config.fullImsi = strenv(RFSIM_IMSI_UE2) |
       .config.fullKey  = strenv(FULL_KEY) |
       .config.opc      = strenv(OPC) |
@@ -1009,43 +1010,34 @@ configure-nr-ue2() {
 
 configure-nr-ue3() {
 
-    # will NOT generate PCAP file to avoid wasting all memory resources
-    # However, a tcpdump container created e.g., to run iperf client"
     DIR="${OAI5G_RAN}/oai-nr-ue3"
     ORIG_CHART="${DIR}/values.yaml"
-    SED_FILE="${TMP}/oai-nr-ue3-values.sed"
-    echo "configure-nr-ue3: $ORIG_CHART configuration"
-    ADD_OPTIONS_NRUE="$OPTIONS_NRUE"
-    cat > "$SED_FILE" <<EOF
-s|@NRUE_REPO@|$NRUE_REPO|
-s|@NRUE_TAG@|$NRUE_TAG|
-s|@MULTUS_NRUE3@|$MULTUS_NRUE|
-s|@IP_NRUE3@|$IP_NRUE3|
-s|@NETMASK_NRUE3@|$NETMASK_NRUE|
-s|@MAC_NRUE3@|$(gener-mac)|
-s|@DEFAULT_GW_NRUE3@|$DEFAULT_GW_NRUE|
-s|@IF_NAME_NRUE3@|$IF_NAME_NRUE|
-s|@RFSIM_IMSI_UE3@|$RFSIM_IMSI_UE3|
-s|@FULL_KEY_UE3@|$FULL_KEY|
-s|@OPC_UE3@|$OPC|
-s|@DNN_UE3@|$DNN0|
-s|@SST_UE3@|$SLICE1_SST|
-s|@SD_UE3@|0x$SLICE1_SD|
-s|@NRUE3_USRP@|$NRUE_USRP|
-s|@ADD_OPTIONS_NRUE3@|$ADD_OPTIONS_NRUE|
-s|@START_TCPDUMP@|false|
-s|@TCPDUMP_CONTAINER@|$LOGS|
-s|@QOS_NRUE3_DEF@|false|
-s|@SHAREDVOLUME@|false|
-s|@NODE_NRUE3@||
-EOF
-    cp "$ORIG_CHART" "$TMP"/oai-nr-ue3_values.yaml-orig
-    echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_FILE" < "$TMP"/oai-nr-ue3_values.yaml-orig > "$ORIG_CHART"
-    # if SD NSSAI field is set to "NULL", replace it by "16777215"
+
+    # First remove oai-nr-ue3 chart if there and create a new one based on oai-nr-ue chart
+    rm -rf "$DIR"
+    cp -pr "${OAI5G_RAN}/oai-nr-ue" "$DIR"
+    find "$DIR" -type f -exec sed -i 's/oai-nr-ue/oai-nr-ue3/g' {} +
+    
+    # Then update the variable fields
+    yq eval -i '
+      .nfimage.repository = strenv(NRUE_REPO) |
+      .nfimage.version = strenv(NRUE_TAG) |
+      .multus.ipadd    = strenv(IP_NRUE3) |
+      .config.fullImsi = strenv(RFSIM_IMSI_UE3) |
+      .config.fullKey  = strenv(FULL_KEY) |
+      .config.opc      = strenv(OPC) |
+      .config.dnn      = strenv(DNN1) |
+      .config.sst      = strenv(SLICE2_SST) |
+      .config.sd       = ("0x" + strenv(SLICE2_SD)) |
+      .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
+      .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
+      .resources.define = (strenv(QOS_NRUE) | test("true"))
+    ' "$ORIG_CHART"
+
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
-    diff "$TMP"/oai-nr-ue3_values.yaml-orig "$ORIG_CHART"
+    cat "$ORIG_CHART"
 }
+
 
 #################################################################################
 
