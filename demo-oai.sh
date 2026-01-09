@@ -936,39 +936,32 @@ configure-nr-ue() {
     # However, a tcpdump container created e.g., to run iperf client"
     DIR="$OAI5G_RAN/oai-nr-ue"
     ORIG_CHART="${DIR}/values.yaml"
-    SED_FILE="${TMP}/oai-nr-ue-values.sed"
-    echo "configure-nr-ue: $ORIG_CHART configuration"
-    ADD_OPTIONS_NRUE="$OPTIONS_NRUE"
-    cat > "$SED_FILE" <<EOF
-s|@NRUE_REPO@|$NRUE_REPO|
-s|@NRUE_TAG@|$NRUE_TAG|
-s|@MULTUS_NRUE@|$MULTUS_NRUE|
-s|@IP_NRUE@|$IP_NRUE|
-s|@NETMASK_NRUE@|$NETMASK_NRUE|
-s|@MAC_NRUE@|$(gener-mac)|
-s|@DEFAULT_GW_NRUE@|$DEFAULT_GW_NRUE|
-s|@IF_NAME_NRUE@|$IF_NAME_NRUE|
-s|@RFSIM_IMSI@|$RFSIM_IMSI|
-s|@FULL_KEY@|$FULL_KEY|
-s|@OPC@|$OPC|
-s|@DNN@|$DNN0|
-s|@SST@|$SLICE1_SST|
-s|@SD@|0x$SLICE1_SD|
-s|@NRUE_USRP@|$NRUE_USRP|
-s|@ADD_OPTIONS_NRUE@|$ADD_OPTIONS_NRUE|
-s|@START_TCPDUMP@|false|
-s|@TCPDUMP_CONTAINER@|$LOGS|
-s|@QOS_NRUE_DEF@|false|
-s|@SHAREDVOLUME@|false|
-s|@NODE_NRUE@||
-EOF
+
     cp "$ORIG_CHART" "$TMP"/oai-nr-ue_values.yaml-orig
-    echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_FILE" < "$TMP"/oai-nr-ue_values.yaml-orig > "$ORIG_CHART"
-    # if SD NSSAI field is set to "NULL", replace it by "16777215"
+    yq -i '
+    .nfimage.repository = strenv(NRUE_REPO) |
+    .nfimage.version = strenv(NRUE_TAG) |
+
+    .config.fullImsi = strenv(RFSIM_IMSI) |
+    .config.fullKey  = strenv(FULL_KEY) |
+    .config.opc      = strenv(OPC) |
+    .config.dnn      = strenv(DNN0) |
+    .config.sst      = strenv(SLICE1_SST) |
+    .config.sd       = ("0x" + strenv(SLICE1_SD)) |
+    .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
+
+    .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
+    .resources.define = (strenv(QOS_NRUE) | test("true"))
+  ' "$ORIG_CHART"
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
     diff "$TMP"/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
 }
+#s|@MULTUS_NRUE@|$MULTUS_NRUE|
+#s|@IP_NRUE@|$IP_NRUE|
+#s|@NETMASK_NRUE@|$NETMASK_NRUE|
+#s|@MAC_NRUE@|$(gener-mac)|
+#s|@DEFAULT_GW_NRUE@|$DEFAULT_GW_NRUE|
+#s|@IF_NAME_NRUE@|$IF_NAME_NRUE|
 
 #################################################################################
 
