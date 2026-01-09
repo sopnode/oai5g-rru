@@ -938,46 +938,37 @@ configure-nr-ue() {
 
     cp "$ORIG_CHART" "$TMP"/oai-nr-ue_values.yaml-orig
 
-    # First add multus block as new nr-ue chart doesn't include it
-    yq -i '
-    . as $root |
-    del(.multus) |
-    (
-      with_entries(
-        if .key == "config" then
-          {
-            key: "multus",
-            value: {
-              create: (strenv(MULTUS_NRUE) | test("true")),
-              ipadd: strenv(IP_NRUE),
-              netmask: strenv(NETMASK_NRUE),
-              defaultGateway: strenv(DEFAULT_GW_NRUE),
-              hostInterface: strenv(IF_NAME_NRUE)
-            }
-          },
-          .
-        else
-          .
-        end
-      )
-    )
-  ' "$ORIG_CHART"
-
-    # Then, update other parameters  
-    yq -i '
-    .nfimage.repository = strenv(NRUE_REPO) |
-    .nfimage.version = strenv(NRUE_TAG) |
-
-    .config.fullImsi = strenv(RFSIM_IMSI) |
-    .config.fullKey  = strenv(FULL_KEY) |
-    .config.opc      = strenv(OPC) |
-    .config.dnn      = strenv(DNN0) |
-    .config.sst      = strenv(SLICE1_SST) |
-    .config.sd       = ("0x" + strenv(SLICE1_SD)) |
-    .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
-
-    .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
-    .resources.define = (strenv(QOS_NRUE) | test("true"))
+      yq -i '
+    .multus = {
+      "create": (strenv(MULTUS_NRUE) == "true"),
+      "ipadd": strenv(IP_NRUE),
+      "netmask": strenv(NETMASK_NRUE),
+      "mac": strenv(MAC_NRUE),
+      "defaultGateway": strenv(DEFAULT_GW_NRUE),
+      "hostInterface": strenv(IF_NAME_NRUE)
+    }
+    |
+    .nfimage.repository = strenv(NRUE_REPO)
+    |
+    .nfimage.version = strenv(NRUE_TAG)
+    |
+    .config.fullImsi = strenv(RFSIM_IMSI)
+    |
+    .config.fullKey = strenv(FULL_KEY)
+    |
+    .config.opc = strenv(OPC)
+    |
+    .config.dnn = strenv(DNN0)
+    |
+    .config.sst = strenv(SLICE1_SST)
+    |
+    .config.sd = ("0x" + strenv(SLICE1_SD))
+    |
+    .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE)
+    |
+    .resources.define = (strenv(QOS_NRUE) == "true")
+    |
+    .includeTcpDumpContainer = (strenv(LOGS) == "true")
   ' "$ORIG_CHART"
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
     diff "$TMP"/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
