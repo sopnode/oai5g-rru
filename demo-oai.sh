@@ -916,8 +916,8 @@ configure-gnb() {
     diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
 
     # Update deployment.yaml and nad.yaml templates
-    #cp -f "${NEW_TEMPLATES}/deployment.yaml" "${ORIG_TEMPLATES}"
-    #cp -f "${NEW_TEMPLATES}/nad.yaml" "${ORIG_TEMPLATES}"
+    cp -f "${NEW_TEMPLATES}/nad.yaml" "${ORIG_TEMPLATES}"
+    echo "$$$$$$$$$$$$$$$$";diff "${NEW_TEMPLATES}/nad.yaml" "${ORIG_TEMPLATES}"
 
     # Fix deployment charts in the case of AW2S RUs as Eurecom no more support AW2S...
     if [[ "$RRU_TYPE" == "aw2s" ]]; then
