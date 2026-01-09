@@ -930,33 +930,39 @@ configure-gnb() {
 #################################################################################
 
 configure-nr-ue() {
+    ORIG_CHART="$OAI5G_RAN/oai-nr-ue/values.yaml"
+    TMP_CHART="$TMP/oai-nr-ue_values.yaml-orig"
 
-    DIR="$OAI5G_RAN/oai-nr-ue"
-    ORIG_CHART="${DIR}/values.yaml"
+    cp "$ORIG_CHART" "$TMP_CHART"
 
-    cp "$ORIG_CHART" "$TMP"/oai-nr-ue_values.yaml-orig
+    yq eval-all '
+      # create the multus mapping
+      ({"multus": {
+         "create": strenv(MULTUS_NRUE),
+         "ipadd": strenv(IP_NRUE),
+         "netmask": strenv(NETMASK_NRUE),
+         "mac": strenv(MAC_NRUE),
+         "defaultGateway": strenv(DEFAULT_GW_NRUE),
+         "hostInterface": strenv(IF_NAME_NRUE)
+      }}) as $multus |
 
-    # Insert multus before config and update fields
+      # explode top-level keys as an array
+      [.[]] as $keys |
+
+      # reconstruct: insert multus before config
+      ($keys | map(
+         if has("config") and .config then
+           [$multus, .] | .[]
+         else
+           .
+         end
+      )) | add
+    ' "$ORIG_CHART" > "$ORIG_CHART.tmp" && mv "$ORIG_CHART.tmp" "$ORIG_CHART"
+
+    # Now update the variables in-place
     yq eval -i '
-      # Capture all top-level keys in order
-      . as $all |
-      # Remove multus if it exists
-      del(.multus) |
-      # Rebuild top-level mapping with multus inserted before config
-      ({} + . *+ {"multus": {
-          "create": strenv(MULTUS_NRUE),
-          "ipadd": strenv(IP_NRUE),
-          "netmask": strenv(NETMASK_NRUE),
-          "mac": strenv(MAC_NRUE),
-          "defaultGateway": strenv(DEFAULT_GW_NRUE),
-          "hostInterface": strenv(IF_NAME_NRUE)
-        }} + ($all | select(has("config")) | {"config": .config}) + ($all | with_entries(select(.key != "config")) | del(.multus))) |
-
-      # Update nfimage
       .nfimage.repository = strenv(NRUE_REPO) |
       .nfimage.version = strenv(NRUE_TAG) |
-
-      # Update config parameters
       .config.fullImsi = strenv(RFSIM_IMSI) |
       .config.fullKey  = strenv(FULL_KEY) |
       .config.opc      = strenv(OPC) |
@@ -964,16 +970,14 @@ configure-nr-ue() {
       .config.sst      = strenv(SLICE1_SST) |
       .config.sd       = ("0x" + strenv(SLICE1_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
-
-      # Update flags
       .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
       .resources.define = (strenv(QOS_NRUE) | test("true"))
     ' "$ORIG_CHART"
 
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
-    diff "$TMP"/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
-}
 
+    diff "$TMP_CHART" "$ORIG_CHART"
+}
 
 
 #################################################################################
