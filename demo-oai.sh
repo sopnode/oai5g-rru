@@ -851,8 +851,9 @@ configure-gnb() {
     echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $LOGS"
 
     DIR_CHARTS="$PREFIX_DEMO/charts"
-    ORIG_TEMPLATES="${OAI5G_RAN}/oai-gnb/templates"
-    NEW_TEMPLATES="$PREFIX_DEMO/oai5g-rru/charts/templates/oai-gnb"
+    ORIG_GNB_TEMPLATES="${OAI5G_RAN}/oai-gnb/templates"
+    ORIG_DU_TEMPLATES="${OAI5G_RAN}/oai-du/templates"
+    NEW_TEMPLATES="$PREFIX_DEMO/oai5g-rru/charts/templates"
 
     
     # First load RU specific parameters
@@ -916,7 +917,8 @@ configure-gnb() {
     ##diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
 
     # Update deployment.yaml and nad.yaml templates
-    cp -f "${NEW_TEMPLATES}/nad.yaml" "${ORIG_TEMPLATES}"
+    cp -f "${NEW_TEMPLATES}/oai-gnb/nad.yaml" "${ORIG_GNB_TEMPLATES}"
+    cp -f "${NEW_TEMPLATES}/oai-du/nad.yaml" "${ORIG_DU_TEMPLATES}"
 
     # Fix deployment charts in the case of AW2S RUs as Eurecom no more support AW2S...
     if [[ "$RRU_TYPE" == "aw2s" ]]; then
@@ -1022,7 +1024,7 @@ configure-nr-ue2() {
     ' "$ORIG_VALUES"
 
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_VALUES"
-    cat "$ORIG_VALUES"
+    ##cat "$ORIG_VALUES"
 }
 
 #################################################################################
@@ -1056,7 +1058,7 @@ configure-nr-ue3() {
     ' "$ORIG_VALUES"
 
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_VALUES"
-    cat "$ORIG_VALUES"
+    ##cat "$ORIG_VALUES"
 }
 
 
