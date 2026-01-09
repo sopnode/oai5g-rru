@@ -978,42 +978,31 @@ configure-nr-ue() {
 
 configure-nr-ue2() {
 
-    # will NOT generate PCAP file to avoid wasting all memory resources
-    # However, a tcpdump container created e.g., to run iperf client"
     DIR="${OAI5G_RAN}/oai-nr-ue2"
     ORIG_CHART="${DIR}/values.yaml"
-    SED_FILE="${TMP}/oai-nr-ue2-values.sed"
-    echo "configure-nr-ue2: $ORIG_CHART configuration"
-    ADD_OPTIONS_NRUE="$OPTIONS_NRUE"
-    cat > "$SED_FILE" <<EOF
-s|@NRUE_REPO@|$NRUE_REPO|
-s|@NRUE_TAG@|$NRUE_TAG|
-s|@MULTUS_NRUE2@|$MULTUS_NRUE|
-s|@IP_NRUE2@|$IP_NRUE2|
-s|@NETMASK_NRUE2@|$NETMASK_NRUE|
-s|@MAC_NRUE2@|$(gener-mac)|
-s|@DEFAULT_GW_NRUE2@|$DEFAULT_GW_NRUE|
-s|@IF_NAME_NRUE2@|$IF_NAME_NRUE|
-s|@RFSIM_IMSI_UE2@|$RFSIM_IMSI_UE2|
-s|@FULL_KEY_UE2@|$FULL_KEY|
-s|@OPC_UE2@|$OPC|
-s|@DNN_UE2@|$DNN1|
-s|@SST_UE2@|$SLICE2_SST|
-s|@SD_UE2@|0x$SLICE2_SD|
-s|@NRUE2_USRP@|$NRUE_USRP|
-s|@ADD_OPTIONS_NRUE2@|$ADD_OPTIONS_NRUE|
-s|@START_TCPDUMP@|false|
-s|@TCPDUMP_CONTAINER@|$LOGS|
-s|@QOS_NRUE2_DEF@|false|
-s|@SHAREDVOLUME@|false|
-s|@NODE_NRUE2@||
-EOF
-    cp "$ORIG_CHART" "$TMP"/oai-nr-ue2_values.yaml-orig
-    echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_FILE" < "$TMP"/oai-nr-ue2_values.yaml-orig > "$ORIG_CHART"
-    # if SD NSSAI field is set to "NULL", replace it by "16777215"
+
+    # First remove oai-nr-ue2 chart if there and create a new one based on oai-nr-ue chart
+    rm -rf "$DIR"
+    cp -pr "${OAI5G_RAN}/oai-nr-ue" "$DIR"
+    find "$DIR" -type f -exec sed -i 's/oai-nr-ue/oai-nr-ue2/g' {} +
+    
+    # Then update the variable fields
+    yq eval -i '
+      .nfimage.repository = strenv(NRUE_REPO) |
+      .nfimage.version = strenv(NRUE_TAG) |
+      .config.fullImsi = strenv(RFSIM_IMSI_UE2) |
+      .config.fullKey  = strenv(FULL_KEY) |
+      .config.opc      = strenv(OPC) |
+      .config.dnn      = strenv(DNN1) |
+      .config.sst      = strenv(SLICE2_SST) |
+      .config.sd       = ("0x" + strenv(SLICE2_SD)) |
+      .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
+      .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
+      .resources.define = (strenv(QOS_NRUE) | test("true"))
+    ' "$ORIG_CHART"
+
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
-    diff "$TMP"/oai-nr-ue2_values.yaml-orig "$ORIG_CHART"
+    cat "$ORIG_CHART"
 }
 
 #################################################################################
