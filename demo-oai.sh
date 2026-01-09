@@ -937,28 +937,27 @@ configure-nr-ue() {
     ORIG_CHART="${DIR}/values.yaml"
 
     cp "$ORIG_CHART" "$TMP"/oai-nr-ue_values.yaml-orig
-    yq eval-all -i '
+    yq eval -i '
+    # Create the multus block
     .multus = {
-      "create": (strenv(MULTUS_NRUE) == "true"),
+      "create": strenv(MULTUS_NRUE),
       "ipadd": strenv(IP_NRUE),
       "netmask": strenv(NETMASK_NRUE),
       "mac": strenv(MAC_NRUE),
       "defaultGateway": strenv(DEFAULT_GW_NRUE),
       "hostInterface": strenv(IF_NAME_NRUE)
-    } 
+    }
     |
-    # Insert multus before config block
-    with(. as $item
-      | if has("config") then
-          # Extract all before config
-          . as $root
-          | $root | del(.config) | . as $pre
-          | $root.config as $conf
-          | . = ($pre + {"multus": .multus} + {"config": $conf})
-        else
-          .
-        end
-    )
+    # Reorder keys to put multus before config
+    . as $root
+    | (
+        # Extract all keys
+        $root | keys | . as $keys
+        # Keep only keys that are not multus or config
+        | $keys | map(select(. != "multus" and . != "config")) as $other
+        # Reconstruct the YAML: multus first, config second, then all other keys
+        | {"multus": $root.multus} + {"config": $root.config} + ($other | map({(.): $root[.]}) | add)
+      )
     ' "$ORIG_CHART"
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
     diff "$TMP"/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
