@@ -919,8 +919,8 @@ configure-gnb() {
     # Update deployment.yaml and nad.yaml templates
     cp -f "${NEW_TEMPLATES}/oai-gnb/nad.yaml" "${ORIG_GNB_TEMPLATES}"
     cp -f "${NEW_TEMPLATES}/oai-du/nad.yaml" "${ORIG_DU_TEMPLATES}"
-    # fix also this du template typo
-    sed -i 's/oai-cu.count/oai-du.count/g' "${ORIG_DU_TEMPLATES}"
+    # fix also this typo in the du deployment template 
+    sed -i 's/oai-cu.count/oai-du.count/g' "${ORIG_DU_TEMPLATES}/deployment.yaml"
 
     # Fix deployment charts in the case of AW2S RUs as Eurecom no more support AW2S...
     if [[ "$RRU_TYPE" == "aw2s" ]]; then
