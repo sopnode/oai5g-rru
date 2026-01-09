@@ -937,6 +937,33 @@ configure-nr-ue() {
     ORIG_CHART="${DIR}/values.yaml"
 
     cp "$ORIG_CHART" "$TMP"/oai-nr-ue_values.yaml-orig
+
+    # First add multus block as new nr-ue chart doesn't include it
+    yq -i '
+    . as $root |
+    del(.multus) |
+    (
+      with_entries(
+        if .key == "config" then
+          {
+            key: "multus",
+            value: {
+              create: (strenv(MULTUS_NRUE) | test("true")),
+              ipadd: strenv(IP_NRUE),
+              netmask: strenv(NETMASK_NRUE),
+              defaultGateway: strenv(DEFAULT_GW_NRUE),
+              hostInterface: strenv(IF_NAME_NRUE)
+            }
+          },
+          .
+        else
+          .
+        end
+      )
+    )
+  ' "$ORIG_CHART"
+
+    # Then, update other parameters  
     yq -i '
     .nfimage.repository = strenv(NRUE_REPO) |
     .nfimage.version = strenv(NRUE_TAG) |
@@ -955,12 +982,6 @@ configure-nr-ue() {
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
     diff "$TMP"/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
 }
-#s|@MULTUS_NRUE@|$MULTUS_NRUE|
-#s|@IP_NRUE@|$IP_NRUE|
-#s|@NETMASK_NRUE@|$NETMASK_NRUE|
-#s|@MAC_NRUE@|$(gener-mac)|
-#s|@DEFAULT_GW_NRUE@|$DEFAULT_GW_NRUE|
-#s|@IF_NAME_NRUE@|$IF_NAME_NRUE|
 
 #################################################################################
 
