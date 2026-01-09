@@ -934,7 +934,7 @@ configure-nr-ue() {
     ORIG_VALUES="$OAI5G_RAN/oai-nr-ue/values.yaml"
     TMP_VALUES="$TMP/oai-nr-ue_values.yaml-orig"
     ORIG_TEMPLATES="${OAI5G_RAN}/oai-nr-ue/templates"
-    NEW_TEMPLATES="$PREFIX_DEMO/oai5g-rru/charts/templates"
+    NEW_TEMPLATES="$PREFIX_DEMO/oai5g-rru/charts/templates/oai-nr-ue"
 
     cp "$ORIG_VALUES" "$TMP_VALUES"
 
