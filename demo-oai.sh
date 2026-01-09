@@ -931,37 +931,53 @@ configure-gnb() {
 
 configure-nr-ue() {
 
-    # will NOT generate PCAP file to avoid wasting all memory resources
-    # However, a tcpdump container created e.g., to run iperf client"
+    # Will NOT generate PCAP file to avoid wasting all memory resources
+    # However, a tcpdump container may be created, e.g., to run iperf client
     DIR="$OAI5G_RAN/oai-nr-ue"
     ORIG_CHART="${DIR}/values.yaml"
 
     cp "$ORIG_CHART" "$TMP"/oai-nr-ue_values.yaml-orig
+
+    # Use yq to update nfimage, config, includeTcpDumpContainer, resources, and insert multus
     yq eval -i '
-    # Create the multus block
-    .multus = {
-      "create": strenv(MULTUS_NRUE),
-      "ipadd": strenv(IP_NRUE),
-      "netmask": strenv(NETMASK_NRUE),
-      "mac": strenv(MAC_NRUE),
-      "defaultGateway": strenv(DEFAULT_GW_NRUE),
-      "hostInterface": strenv(IF_NAME_NRUE)
-    }
-    |
-    # Reorder keys to put multus before config
-    . as $root
-    | (
-        # Extract all keys
-        $root | keys | . as $keys
-        # Keep only keys that are not multus or config
-        | $keys | map(select(. != "multus" and . != "config")) as $other
-        # Reconstruct the YAML: multus first, config second, then all other keys
-        | {"multus": $root.multus} + {"config": $root.config} + ($other | map({(.): $root[.]}) | add)
-      )
+      # Insert multus before config
+      with(
+        select(has("config"));
+        .multus = {
+          "create": strenv(MULTUS_NRUE),
+          "ipadd": strenv(IP_NRUE),
+          "netmask": strenv(NETMASK_NRUE),
+          "mac": strenv(MAC_NRUE),
+          "defaultGateway": strenv(DEFAULT_GW_NRUE),
+          "hostInterface": strenv(IF_NAME_NRUE)
+        }
+      ) |
+
+      # Update nfimage repository and version
+      .nfimage.repository = strenv(NRUE_REPO) |
+      .nfimage.version = strenv(NRUE_TAG) |
+
+      # Update config parameters
+      .config.fullImsi = strenv(RFSIM_IMSI) |
+      .config.fullKey  = strenv(FULL_KEY) |
+      .config.opc      = strenv(OPC) |
+      .config.dnn      = strenv(DNN0) |
+      .config.sst      = strenv(SLICE1_SST) |
+      .config.sd       = ("0x" + strenv(SLICE1_SD)) |
+      .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
+
+      # Update flags
+      .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
+      .resources.define = (strenv(QOS_NRUE) | test("true"))
     ' "$ORIG_CHART"
+
+    # Replace placeholder 0xEMPTY with actual value
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
+
+    # Show diff for verification
     diff "$TMP"/oai-nr-ue_values.yaml-orig "$ORIG_CHART"
 }
+
 
 #################################################################################
 
