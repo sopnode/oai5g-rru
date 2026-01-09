@@ -935,31 +935,26 @@ configure-nr-ue() {
 
     cp "$ORIG_CHART" "$TMP_CHART"
 
-    yq eval-all '
-      # create the multus mapping
-      ({"multus": {
-         "create": strenv(MULTUS_NRUE),
-         "ipadd": strenv(IP_NRUE),
-         "netmask": strenv(NETMASK_NRUE),
-         "mac": strenv(MAC_NRUE),
-         "defaultGateway": strenv(DEFAULT_GW_NRUE),
-         "hostInterface": strenv(IF_NAME_NRUE)
-      }}) as $multus |
-
-      # explode top-level keys as an array
-      [.[]] as $keys |
-
-      # reconstruct: insert multus before config
-      ($keys | map(
-         if has("config") and .config then
-           [$multus, .] | .[]
-         else
-           .
-         end
-      )) | add
+    # Insert the multus block BEFORE the config block
+    # Keep indentation and comments intact
+    awk -v multus="multus:
+  create: \"$MULTUS_NRUE\"
+  ipadd: \"$IP_NRUE\" # subnet should reach the gNB
+  netmask: \"$NETMASK_NRUE\"
+  mac: \"$MAC_NRUE\"
+  defaultGateway: \"$DEFAULT_GW_NRUE\"
+  hostInterface: \"$IF_NAME_NRUE\"
+" '
+    {
+        if ($0 ~ /^config:/ && !inserted) {
+            printf "%s\n", multus
+            inserted=1
+        }
+        print
+    }
     ' "$ORIG_CHART" > "$ORIG_CHART.tmp" && mv "$ORIG_CHART.tmp" "$ORIG_CHART"
 
-    # Now update the variables in-place
+    # Then update the variable fields
     yq eval -i '
       .nfimage.repository = strenv(NRUE_REPO) |
       .nfimage.version = strenv(NRUE_TAG) |
