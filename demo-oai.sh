@@ -579,6 +579,16 @@ configure-oai-5g-advance() {
 	printf "%-20s = %s\n" "$var" "${!var}"
     done
     echo "======================="
+    echo "==== DEBUG NF ARRAYS ===="
+    for nf in "${NF_NAMES[@]}"; do
+	NF_UPPER=$(echo "$nf" | tr a-z A-Z)
+	# Crée des variables d'environnement pour strenv()
+	eval "export START_${NF_UPPER}=\${NF_START[${nf}]}"
+	eval "export TCPDUMP_${NF_UPPER}=\${NF_TCPDUMP[${nf}]}"
+	eval "export SHARED_${NF_UPPER}=\${NF_SHARED[${nf}]}"
+	echo "NF=$nf START=${!START_${NF_UPPER}} TCPDUMP=${!TCPDUMP_${NF_UPPER}} SHARED=${!SHARED_${NF_UPPER}}"
+    done
+    echo "======================="
 
 
     # ---- Backup ----
