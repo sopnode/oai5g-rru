@@ -560,92 +560,86 @@ export HOST_FLEXRIC="oai-flexric"
 #################################################################################
 
 configure-oai-5g-advance() {
-    local values_file="${OAI5G_ADVANCE}/values.yaml"
-    local config_file="${OAI5G_ADVANCE}/config.yaml"
+
+    values_file="${OAI5G_ADVANCE}/values.yaml"
+    config_file="${OAI5G_ADVANCE}/config.yaml"
+
     cp "$values_file" "$TMP/values.yaml-orig"
     cp "$config_file" "$TMP/config.yaml-orig"
 
     # ---- GLOBAL ----
     yq -i '.global.IP_NRF = strenv(IP_NRF)' "$values_file"
-    yq -i '.global.IP_NRF = strenv(IP_NRF)' "$config_file"
 
-    # ---- SNSSAI slices ----
-    yq -i '.snssais[0].sst = strenv(SLICE1_SST) | .snssais[0].sd = strenv(SLICE1_SD) |
-           .snssais[1].sst = strenv(SLICE2_SST) | .snssais[1].sd = strenv(SLICE2_SD)' "$config_file"
+    # ---- NF PARAMETERS ----
+    NF_NAMES=(oai-nrf oai-amf oai-smf oai-upf oai-udm oai-udr oai-ausf oai-lmf oai-traffic-server)
 
-    # ---- NF attributes in a single array ----
-    # Format: nf|repo|tag|node|start|tcpdump|shared|multus_json
-    NF_LIST=(
-        "oai-nrf|$NFS_NRF_REPO|$NFS_NRF_TAG|$NODE_NRF|true|false|false|[]"
-        "oai-amf|$GNB_REPO|$GNB_TAG|$NODE_AMF_UPF|true|false|false|[{\"name\":\"n2\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_AMF_N2\",\"netmask\":\"$NETMASK_AMF_N2\",\"defaultRoute\":\"$GW_AMF_N2\",\"enabled\":true}]"
-        "oai-smf|$SMF_REPO|$SMF_TAG|$NODE_SMF|true|false|false|[{\"name\":\"n4\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_SMF_N4\",\"netmask\":\"$NETMASK_SMF_N4\",\"defaultRoute\":\"$GW_SMF_N4\",\"enabled\":true},{\"name\":\"sbi\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_SBI_SMF\",\"netmask\":\"$NETMASK_SBI_SMF\",\"defaultRoute\":\"$GW_SBI_SMF\",\"enabled\":true}]"
-        "oai-upf|$UPF_REPO|$UPF_TAG|$NODE_AMF_UPF|true|false|false|[{\"name\":\"n3\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N3\",\"netmask\":\"$NETMASK_UPF_N3\",\"defaultRoute\":\"$GW_UPF_N3\",\"enabled\":true},{\"name\":\"n4\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N4\",\"netmask\":\"$NETMASK_UPF_N4\",\"enabled\":true},{\"name\":\"n6\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N6\",\"netmask\":\"$NETMASK_UPF_N6\",\"enabled\":true},{\"name\":\"n9\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N9\",\"netmask\":\"$NETMASK_UPF_N9\",\"enabled\":false},{\"name\":\"sbi\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_SBI_UPF\",\"netmask\":\"$NETMASK_SBI_UPF\",\"defaultRoute\":\"$GW_SBI_UPF\",\"enabled\":true}]"
-        "oai-udm|$UDM_REPO|$UDM_TAG|$NODE_UDM|true|false|false|[]"
-        "oai-udr|$UDR_REPO|$UDR_TAG|$NODE_UDR|true|false|false|[]"
-        "oai-ausf|$AUSF_REPO|$AUSF_TAG|$NODE_AUSF|true|false|false|[]"
-        "oai-lmf|$LMF_REPO|$LMF_TAG|$NODE_LMF|true|false|false|[]"
-        "oai-traffic-server|$TS_REPO|$TS_TAG|$NODE_TS|true|false|false|[{\"name\":\"external\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_TS\",\"netmask\":\"$NETMASK_TS\",\"defaultRoute\":\"$GW_TS\",\"enabled\":true}]"
-    )
+    for nf in "${NF_NAMES[@]}"; do
+        # repository, version, nodeName
+        yq -i "
+          .${nf}.nfimage.repository = strenv(${nf^^}_REPO) |
+          .${nf}.nfimage.version = strenv(${nf^^}_TAG) |
+          .${nf}.nodeName = strenv(NODE_${nf^^})
+        " "$values_file"
 
-    # ---- Loop over NFs for values.yaml ----
-    for nf_entry in "${NF_LIST[@]}"; do
-        IFS="|" read -r nf repo tag node start tcpdump shared multus_json <<< "$nf_entry"
+        # start flags and tcpdump
+        yq -i "
+          .${nf}.start.start = strenv(START_${nf^^}) |
+          .${nf}.start.tcpdump = strenv(TCPDUMP_${nf^^})
+        " "$values_file"
 
-        # Apply all NF settings in one yq command
-        yq -i \
-          '.[$nf].nfimage.repository = strenv(repo) |
-           .[$nf].nfimage.version = strenv(tag) |
-           .[$nf].nodeName = strenv(node) |
-           .[$nf].start.start = strenv(start) |
-           .[$nf].start.tcpdump = strenv(tcpdump) |
-           .[$nf].includeTcpDumpContainer = strenv(tcpdump) |
-           .[$nf].persistent.sharedvolume = strenv(shared) |
-           .[$nf].multus.enabled = (length(strenv(multus_json)) > 0) |
-           .[$nf].multus.interfaces = strenv(multus_json) |
-           (.[$nf].multus.interfaces[]?.mac) = null' "$values_file"
+        # includeTcpDumpContainer and sharedvolume
+        yq -i "
+          .${nf}.includeTcpDumpContainer = strenv(TCPDUMP_${nf^^}) |
+          .${nf}.persistent.sharedvolume = strenv(SHARED_${nf^^})
+        " "$values_file"
+
+        # Multus interfaces
+        yq -i "
+          .${nf}.multus.enabled = (strenv(MULTUS_${nf^^}_JSON) != '[]') |
+          .${nf}.multus.interfaces = strenv(MULTUS_${nf^^}_JSON) |
+          del(.${nf}.multus.interfaces[].mac)
+        " "$values_file"
     done
 
-    # ---- config.yaml: adjust SBI interfaces ----
-    declare -A NF_SBI_IFS=(
-      [amf]=$IF_N2
-      [smf]=$IF_N4
-      [upf]=$IF_N3
-      [upf_n4]=$IF_N4
-      [upf_n6]=$IF_N6
-    )
-
-    for nf in "${!NF_SBI_IFS[@]}"; do
-        yq -i \
-          'if has("'"$nf"'") then .["'"$nf"'"].interface_name = strenv(NF_SBI_IFS["'"$nf"'"]) else . end' "$config_file"
-    done
-
-    # ---- config.yaml: AMF served_guami + plmn ----
-    yq -i \
-      '.amf.served_guami_list[0].mcc = strenv(MCC) |
-       .amf.served_guami_list[0].mnc = strenv(MNC) |
-       .amf.plmn_support_list[0].mcc = strenv(MCC) |
-       .amf.plmn_support_list[0].mnc = strenv(MNC) |
-       .amf.plmn_support_list[0].tac = strenv(TAC)' "$config_file"
-
-    # ---- config.yaml: SMF DNNs + QoS ----
-    yq -i \
-      '.smf.smf_info.sNssaiSmfInfoList[0].dnnSmfInfoList[0].dnn = strenv(DNN0) |
-       .smf.smf_info.sNssaiSmfInfoList[1].dnnSmfInfoList[0].dnn = strenv(DNN1) |
-       .smf.local_subscription_infos[0].qos_profile.5qi = strenv(SLICE1_5QI) |
-       .smf.local_subscription_infos[0].qos_profile.session_ambr_ul = strenv(SLICE1_UPLINK) |
-       .smf.local_subscription_infos[0].qos_profile.session_ambr_dl = strenv(SLICE1_DOWNLINK) |
-       .smf.local_subscription_infos[1].qos_profile.5qi = strenv(SLICE2_5QI) |
-       .smf.local_subscription_infos[1].qos_profile.session_ambr_ul = strenv(SLICE2_UPLINK) |
-       .smf.local_subscription_infos[1].qos_profile.session_ambr_dl = strenv(SLICE2_DOWNLINK)' "$config_file"
-
-    # ---- config.yaml: UPF DNNs + SNAT ----
-    yq -i \
-      '.upf.upf_info.sNssaiUpfInfoList[0].dnnUpfInfoList[0].dnn = strenv(DNN0) |
-       .upf.upf_info.sNssaiUpfInfoList[1].dnnUpfInfoList[0].dnn = strenv(DNN1) |
-       .upf.support_features.enable_snat = strenv(ENABLE_SNAT)' "$config_file"
-
-    # ---- Final diff for verification ----
     diff "$TMP/values.yaml-orig" "$values_file"
+
+    # ---- CONFIGURATION ----
+    # Global slices
+    yq -i "
+      .snssais[0].sst = strenv(SLICE1_SST) |
+      .snssais[0].sd = strenv(SLICE1_SD) |
+      .snssais[1].sst = strenv(SLICE2_SST) |
+      .snssais[1].sd = strenv(SLICE2_SD)
+    " "$config_file"
+
+    # AMF PLMN / TAC
+    yq -i "
+      .amf.served_guami_list[0].mcc = strenv(MCC) |
+      .amf.served_guami_list[0].mnc = strenv(MNC) |
+      .amf.plmn_support_list[0].mcc = strenv(MCC) |
+      .amf.plmn_support_list[0].mnc = strenv(MNC) |
+      .amf.plmn_support_list[0].tac = strenv(TAC)
+    " "$config_file"
+
+    # SMF DNN + QoS
+    yq -i "
+      .smf.smf_info.sNssaiSmfInfoList[0].dnnSmfInfoList[0].dnn = strenv(DNN0) |
+      .smf.smf_info.sNssaiSmfInfoList[1].dnnSmfInfoList[0].dnn = strenv(DNN1) |
+      .smf.local_subscription_infos[0].qos_profile.5qi = strenv(SLICE1_5QI) |
+      .smf.local_subscription_infos[0].qos_profile.session_ambr_ul = strenv(SLICE1_UPLINK) |
+      .smf.local_subscription_infos[0].qos_profile.session_ambr_dl = strenv(SLICE1_DOWNLINK) |
+      .smf.local_subscription_infos[1].qos_profile.5qi = strenv(SLICE2_5QI) |
+      .smf.local_subscription_infos[1].qos_profile.session_ambr_ul = strenv(SLICE2_UPLINK) |
+      .smf.local_subscription_infos[1].qos_profile.session_ambr_dl = strenv(SLICE2_DOWNLINK)
+    " "$config_file"
+
+    # UPF DNN + SNAT
+    yq -i "
+      .upf.upf_info.sNssaiUpfInfoList[0].dnnUpfInfoList[0].dnn = strenv(DNN0) |
+      .upf.upf_info.sNssaiUpfInfoList[1].dnnUpfInfoList[0].dnn = strenv(DNN1) |
+      .upf.support_features.enable_snat = strenv(ENABLE_SNAT)
+    " "$config_file"
+
     diff "$TMP/config.yaml-orig" "$config_file"
 }
 
