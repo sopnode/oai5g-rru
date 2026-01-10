@@ -560,7 +560,6 @@ export HOST_FLEXRIC="oai-flexric"
 #################################################################################
 
 configure-oai-5g-advance() {
-
     values_file="${OAI5G_ADVANCE}/values.yaml"
     config_file="${OAI5G_ADVANCE}/config.yaml"
 
@@ -574,42 +573,51 @@ configure-oai-5g-advance() {
     NF_NAMES=(oai-nrf oai-amf oai-smf oai-upf oai-udm oai-udr oai-ausf oai-lmf oai-traffic-server)
 
     for nf in "${NF_NAMES[@]}"; do
-        # repository, version, nodeName
+        nf_upper=$(echo "$nf" | tr 'a-z' 'A-Z')
+
+        # ---- repository, version, nodeName ----
         yq -i "
-          .${nf}.nfimage.repository = strenv(${nf^^}_REPO) |
-          .${nf}.nfimage.version = strenv(${nf^^}_TAG) |
-          .${nf}.nodeName = strenv(NODE_${nf^^})
+          .${nf}.nfimage.repository = strenv(${nf_upper}_REPO) |
+          .${nf}.nfimage.version = strenv(${nf_upper}_TAG) |
+          .${nf}.nodeName = strenv(NODE_${nf_upper})
         " "$values_file"
 
-        # start flags and tcpdump
+        # ---- start and tcpdump flags ----
         yq -i "
-          .${nf}.start.start = strenv(START_${nf^^}) |
-          .${nf}.start.tcpdump = strenv(TCPDUMP_${nf^^})
+          .${nf}.start.start = strenv(NF_START_${nf_upper}) |
+          .${nf}.start.tcpdump = strenv(NF_TCPDUMP_${nf_upper})
         " "$values_file"
 
-        # includeTcpDumpContainer and sharedvolume
+        # ---- includeTcpDumpContainer and sharedvolume ----
         yq -i "
-          .${nf}.includeTcpDumpContainer = strenv(TCPDUMP_${nf^^}) |
-          .${nf}.persistent.sharedvolume = strenv(SHARED_${nf^^})
+          .${nf}.includeTcpDumpContainer = strenv(NF_TCPDUMP_${nf_upper}) |
+          .${nf}.persistent.sharedvolume = strenv(NF_SHARED_${nf_upper})
         " "$values_file"
 
-        # Multus interfaces
-        yq -i "
-          .${nf}.multus.enabled = (strenv(MULTUS_${nf^^}_JSON) != '[]') |
-          .${nf}.multus.interfaces = strenv(MULTUS_${nf^^}_JSON) |
-          del(.${nf}.multus.interfaces[].mac)
-        " "$values_file"
+        # ---- Multus interfaces ----
+        multus_json_var="MULTUS_${nf_upper}_JSON"
+        multus_json=$(eval echo "\$$multus_json_var")
+        if [[ "$multus_json" == "[]" || -z "$multus_json" ]]; then
+            yq -i ".${nf}.multus.enabled = false | .${nf}.multus.interfaces = []" "$values_file"
+        else
+            # Convert JSON string to YAML via yq
+            yq eval -P "$multus_json" > "$TMP/multus.yaml"
+            yq -i ".${nf}.multus.enabled = true | .${nf}.multus.interfaces = load(\"$TMP/multus.yaml\")" "$values_file"
+            # Remove MAC if exists
+            yq -i "del(.${nf}.multus.interfaces[].mac)" "$values_file"
+        fi
     done
 
+    # ---- diff values.yaml ----
     diff "$TMP/values.yaml-orig" "$values_file"
 
     # ---- CONFIGURATION ----
     # Global slices
     yq -i "
       .snssais[0].sst = strenv(SLICE1_SST) |
-      .snssais[0].sd = strenv(SLICE1_SD) |
+      .snssais[0].sd  = strenv(SLICE1_SD)  |
       .snssais[1].sst = strenv(SLICE2_SST) |
-      .snssais[1].sd = strenv(SLICE2_SD)
+      .snssais[1].sd  = strenv(SLICE2_SD)
     " "$config_file"
 
     # AMF PLMN / TAC
@@ -640,6 +648,7 @@ configure-oai-5g-advance() {
       .upf.support_features.enable_snat = strenv(ENABLE_SNAT)
     " "$config_file"
 
+    # ---- diff config.yaml ----
     diff "$TMP/config.yaml-orig" "$config_file"
 }
 
