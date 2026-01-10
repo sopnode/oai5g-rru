@@ -563,66 +563,81 @@ configure-oai-5g-advance() {
     values_file="${OAI5G_ADVANCE}/values.yaml"
     config_file="${OAI5G_ADVANCE}/config.yaml"
 
+    # Backup
     cp "$values_file" "$TMP/values.yaml-orig"
     cp "$config_file" "$TMP/config.yaml-orig"
 
     # ---- GLOBAL ----
-    yq -i '.global.IP_NRF = strenv(IP_NRF)' "$values_file"
+    yq -i '.global.IP_NRF = strenv(NFS_NRF_HOST) |
+           .global.ENABLED_MYSQL = strenv(ENABLED_MYSQL) |
+           .global.ENABLED_NRF = strenv(ENABLED_NRF) |
+           .global.ENABLED_NSSF = strenv(ENABLED_NSSF) |
+           .global.ENABLED_UDM = strenv(ENABLED_UDM) |
+           .global.ENABLED_UDR = strenv(ENABLED_UDR) |
+           .global.ENABLED_AUSF = strenv(ENABLED_AUSF) |
+           .global.ENABLED_AMF = strenv(ENABLED_AMF) |
+           .global.ENABLED_UPF = strenv(ENABLED_UPF) |
+           .global.ENABLED_TS = strenv(ENABLED_TS) |
+           .global.ENABLED_SMF = strenv(ENABLED_SMF)
+           ' "$values_file"
 
+    # ---- NF PARAMETERS ----
     NF_NAMES=(oai-nrf oai-amf oai-smf oai-upf oai-udm oai-udr oai-ausf oai-lmf oai-traffic-server)
 
     for nf in "${NF_NAMES[@]}"; do
-        nf_var=$(echo "$nf" | tr 'a-z-' 'A-Z_')
+        upper_nf=$(echo "$nf" | tr '[:lower:]-' '[:upper:]_')
 
-        # ---- nfimage, nodeName ----
+        # Repository, version, nodeName
         yq -i "
-          .${nf}.nfimage.repository = strenv(${nf_var}_REPO) |
-          .${nf}.nfimage.version    = strenv(${nf_var}_TAG) |
-          .${nf}.nodeName           = strenv(NODE_${nf_var})
+          .${nf}.nfimage.repository = strenv(${upper_nf}_REPO) |
+          .${nf}.nfimage.version = strenv(${upper_nf}_TAG) |
+          .${nf}.nodeName = strenv(NODE_${upper_nf})
         " "$values_file"
 
-        # ---- start + tcpdump ----
+        # Start and tcpdump
         yq -i "
-          .${nf}.start.start  = strenv(NF_START_${nf_var}) |
-          .${nf}.start.tcpdump = strenv(NF_TCPDUMP_${nf_var}) |
-          .${nf}.includeTcpDumpContainer = strenv(NF_TCPDUMP_${nf_var}) |
-          .${nf}.persistent.sharedvolume = strenv(NF_SHARED_${nf_var})
+          .${nf}.start.start = strenv(START_${upper_nf}) |
+          .${nf}.start.tcpdump = strenv(TCPDUMP_${upper_nf})
         " "$values_file"
 
-        # ---- multus interfaces ----
-        multus_var="${nf_var}_JSON"
-        multus_json=$(eval echo "\$$multus_var")
+        # Include tcpdump container and shared volume
+        yq -i "
+          .${nf}.includeTcpDumpContainer = strenv(TCPDUMP_${upper_nf}) |
+          .${nf}.persistent.sharedvolume = strenv(SHARED_${upper_nf})
+        " "$values_file"
 
-        if [[ -z "$multus_json" || "$multus_json" == "[]" ]]; then
-            yq -i ".${nf}.multus.enabled = false | .${nf}.multus.interfaces = []" "$values_file"
-        else
-            echo "$multus_json" | yq eval -P - > "$TMP/multus_${nf}.yaml"
-            yq -i ".${nf}.multus.enabled = true | .${nf}.multus.interfaces = load(\"$TMP/multus_${nf}.yaml\")" "$values_file"
-            yq -i "del(.${nf}.multus.interfaces[].mac)" "$values_file"
-        fi
+        # Multus interfaces
+        yq -i "
+          .${nf}.multus.enabled = (strenv(MULTUS_${upper_nf}) == \"true\") |
+          .${nf}.multus.interfaces = [
+            {
+              name: strenv(IF_NAME_${upper_nf}),
+              hostInterface: strenv(IF_${upper_nf}),
+              ipAdd: strenv(IP_${upper_nf}),
+              netmask: strenv(NETMASK_${upper_nf}),
+              defaultRoute: strenv(GW_${upper_nf}),
+              routes: strenv(ROUTES_${upper_nf}),
+              enabled: true,
+              mac: null
+            }
+          ]
+        " "$values_file"
     done
 
     # ---- DIFF values.yaml ----
     diff "$TMP/values.yaml-orig" "$values_file"
 
-    # ---- config.yaml ----
+    # ---- CONFIGURATION ----
     yq -i "
       .snssais[0].sst = strenv(SLICE1_SST) |
-      .snssais[0].sd  = strenv(SLICE1_SD)  |
+      .snssais[0].sd = strenv(SLICE1_SD) |
       .snssais[1].sst = strenv(SLICE2_SST) |
-      .snssais[1].sd  = strenv(SLICE2_SD)
-    " "$config_file"
-
-    yq -i "
+      .snssais[1].sd = strenv(SLICE2_SD) |
       .amf.served_guami_list[0].mcc = strenv(MCC) |
       .amf.served_guami_list[0].mnc = strenv(MNC) |
-      .amf.plmn_support_list[0].mcc  = strenv(MCC) |
-      .amf.plmn_support_list[0].mnc  = strenv(MNC) |
-      .amf.plmn_support_list[0].tac  = strenv(TAC)
-    " "$config_file"
-
-    # ---- SMF DNN + QoS ----
-    yq -i "
+      .amf.plmn_support_list[0].mcc = strenv(MCC) |
+      .amf.plmn_support_list[0].mnc = strenv(MNC) |
+      .amf.plmn_support_list[0].tac = strenv(TAC) |
       .smf.smf_info.sNssaiSmfInfoList[0].dnnSmfInfoList[0].dnn = strenv(DNN0) |
       .smf.smf_info.sNssaiSmfInfoList[1].dnnSmfInfoList[0].dnn = strenv(DNN1) |
       .smf.local_subscription_infos[0].qos_profile.5qi = strenv(SLICE1_5QI) |
@@ -630,14 +645,12 @@ configure-oai-5g-advance() {
       .smf.local_subscription_infos[0].qos_profile.session_ambr_dl = strenv(SLICE1_DOWNLINK) |
       .smf.local_subscription_infos[1].qos_profile.5qi = strenv(SLICE2_5QI) |
       .smf.local_subscription_infos[1].qos_profile.session_ambr_ul = strenv(SLICE2_UPLINK) |
-      .smf.local_subscription_infos[1].qos_profile.session_ambr_dl = strenv(SLICE2_DOWNLINK)
-    " "$config_file"
-
-    # ---- UPF DNN + SNAT ----
-    yq -i "
+      .smf.local_subscription_infos[1].qos_profile.session_ambr_dl = strenv(SLICE2_DOWNLINK) |
       .upf.upf_info.sNssaiUpfInfoList[0].dnnUpfInfoList[0].dnn = strenv(DNN0) |
       .upf.upf_info.sNssaiUpfInfoList[1].dnnUpfInfoList[0].dnn = strenv(DNN1) |
-      .upf.support_features.enable_snat = strenv(ENABLE_SNAT)
+      .upf.support_features.enable_snat = strenv(ENABLE_SNAT) |
+      .ip_dns1 = strenv(IP_DNS1) |
+      .ip_dns2 = strenv(IP_DNS2)
     " "$config_file"
 
     # ---- DIFF config.yaml ----
