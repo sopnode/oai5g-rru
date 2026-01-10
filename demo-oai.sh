@@ -560,10 +560,27 @@ export HOST_FLEXRIC="oai-flexric"
 #################################################################################
 
 configure-oai-5g-advance() {
+
     values_file="${OAI5G_ADVANCE}/values.yaml"
     config_file="${OAI5G_ADVANCE}/config.yaml"
 
-    # Backup
+    echo "==== DEBUG EXPORTS ===="
+    # Affiche toutes les variables exportées que tu m'as fournies
+    for var in ENABLED_MYSQL ENABLED_NRF NFS_NRF_HOST ENABLED_NSSF \
+           ENABLED_UDM NFS_UDM_HOST ENABLED_UDR NFS_UDR_HOST \
+           ENABLED_AUSF NFS_AUSF_HOST ENABLED_AMF NFS_AMF_HOST IF_N2 MULTUS_AMF_N2 IP_AMF_N2 NETMASK_AMF_N2 GW_AMF_N2 ROUTES_AMF_N2 IF_NAME_AMF_N2 \
+           ENABLED_UPF NFS_UPF_HOST IF_SBI IF_N3 IF_N4 IF_N6 ENABLE_SNAT \
+           MULTUS_UPF_N3 IP_UPF_N3 NETMASK_UPF_N3 GW_UPF_N3 ROUTES_UPF_N3 IF_NAME_UPF_N3 \
+           MULTUS_UPF_N4 IP_UPF_N4 NETMASK_UPF_N4 GW_UPF_N4 ROUTES_UPF_N4 IF_NAME_UPF_N4 \
+           MULTUS_UPF_N6 IP_UPF_N6 NETMASK_UPF_N6 GW_UPF_N6 ROUTES_UPF_N6 IF_NAME_UPF_N6 \
+           ENABLED_TS MULTUS_TS IP_TS NETMASK_TS GW_TS IF_NAME_TS UPF_HOST NODE_TS \
+           ENABLED_SMF NFS_SMF_HOST MULTUS_SMF_N4 IP_SMF_N4 NETMASK_SMF_N4 GW_SMF_N4 ROUTES_SMF_N4 IF_NAME_SMF_N4 \
+           HOST_AMF MULTUS_GNB_N2 IF_NAME_GNB_N2 IP_GNB_N2 GNB_N2_IF_NAME MULTUS_GNB_N3 IF_NAME_GNB_N3; do
+        printf "%-20s = %s\n" "$var" "${!var}"
+    done
+    echo "======================="
+
+    # ---- Backup ----
     cp "$values_file" "$TMP/values.yaml-orig"
     cp "$config_file" "$TMP/config.yaml-orig"
 
@@ -576,68 +593,87 @@ configure-oai-5g-advance() {
     for nf in "${NF_NAMES[@]}"; do
         NF_UPPER=$(echo "$nf" | tr a-z A-Z)
 
-        # repository / version / nodeName
+        # ---- repository / version / nodeName ----
         yq -i "
           .${nf}.nfimage.repository = strenv(${NF_UPPER}_REPO) |
           .${nf}.nfimage.version = strenv(${NF_UPPER}_TAG) |
           .${nf}.nodeName = strenv(NODE_${NF_UPPER})
         " "$values_file"
 
-        # start / tcpdump / includeTcpDumpContainer / sharedvolume
+        # ---- start / tcpdump / sharedvolume / includeTcpDumpContainer ----
         yq -i "
-          .${nf}.start.start = strenv(NF_START[$nf]) |
-          .${nf}.start.tcpdump = strenv(NF_TCPDUMP[$nf]) |
-          .${nf}.includeTcpDumpContainer = strenv(NF_TCPDUMP[$nf]) |
-          .${nf}.persistent.sharedvolume = strenv(NF_SHARED[$nf])
+          .${nf}.start.start = strenv(START_${NF_UPPER}) |
+          .${nf}.start.tcpdump = strenv(TCPDUMP_${NF_UPPER}) |
+          .${nf}.includeTcpDumpContainer = strenv(TCPDUMP_${NF_UPPER}) |
+          .${nf}.persistent.sharedvolume = strenv(SHARED_${NF_UPPER})
         " "$values_file"
 
         # ---- MULTUS ----
-        # Ici on génère le bloc multus.interfaces pour chaque NF en utilisant les variables exportées
-        # Exemple: MULTUS_UPF_N3, IP_UPF_N3, NETMASK_UPF_N3, GW_UPF_N3, ROUTES_UPF_N3, IF_NAME_UPF_N3
-        # On suppose que tu as défini toutes les interfaces exportées
-        MULTUS_JSON="[]"
-        for if_suffix in N2 N3 N4 N6 SBI; do
-            MULTUS_VAR="MULTUS_${NF_UPPER}_${if_suffix}"
-            IP_VAR="IP_${NF_UPPER}_${if_suffix}"
-            NETMASK_VAR="NETMASK_${NF_UPPER}_${if_suffix}"
-            GW_VAR="GW_${NF_UPPER}_${if_suffix}"
-            ROUTES_VAR="ROUTES_${NF_UPPER}_${if_suffix}"
-            IFNAME_VAR="IF_NAME_${NF_UPPER}_${if_suffix}"
+        case "$nf" in
+            oai-amf)
+                yq -i "
+                  .${nf}.multus.enabled = strenv(MULTUS_AMF_N2) |
+                  .${nf}.multus.interfaces[0].name = strenv(IF_N2) |
+                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_AMF_N2) |
+                  .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_AMF_N2) |
+                  .${nf}.multus.interfaces[0].gateway = strenv(GW_AMF_N2) |
+                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_AMF_N2)
+                " "$values_file"
+                ;;
+            oai-upf)
+                yq -i "
+                  .${nf}.multus.enabled = true |
+                  .${nf}.multus.interfaces[0].name = strenv(IF_N3) |
+                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_UPF_N3) |
+                  .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_UPF_N3) |
+                  .${nf}.multus.interfaces[0].gateway = strenv(GW_UPF_N3) |
+                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_UPF_N3) |
+                  .${nf}.multus.interfaces[1].name = strenv(IF_N4) |
+                  .${nf}.multus.interfaces[1].ipAdd = strenv(IP_UPF_N4) |
+                  .${nf}.multus.interfaces[1].netmask = strenv(NETMASK_UPF_N4) |
+                  .${nf}.multus.interfaces[1].gateway = strenv(GW_UPF_N4) |
+                  .${nf}.multus.interfaces[1].routes = strenv(ROUTES_UPF_N4) |
+                  .${nf}.multus.interfaces[2].name = strenv(IF_N6) |
+                  .${nf}.multus.interfaces[2].ipAdd = strenv(IP_UPF_N6) |
+                  .${nf}.multus.interfaces[2].netmask = strenv(NETMASK_UPF_N6) |
+                  .${nf}.multus.interfaces[2].gateway = strenv(GW_UPF_N6) |
+                  .${nf}.multus.interfaces[2].routes = strenv(ROUTES_UPF_N6)
+                " "$values_file"
+                ;;
+            oai-smf)
+                yq -i "
+                  .${nf}.multus.enabled = strenv(MULTUS_SMF_N4) |
+                  .${nf}.multus.interfaces[0].name = strenv(IF_N4) |
+                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_SMF_N4) |
+                  .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_SMF_N4) |
+                  .${nf}.multus.interfaces[0].gateway = strenv(GW_SMF_N4) |
+                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_SMF_N4)
+                " "$values_file"
+                ;;
+            oai-traffic-server)
+                yq -i "
+                  .${nf}.multus.enabled = strenv(MULTUS_TS) |
+                  .${nf}.multus.interfaces[0].name = strenv(IF_NAME_TS) |
+                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_TS) |
+                  .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_TS) |
+                  .${nf}.multus.interfaces[0].gateway = strenv(GW_TS)
+                " "$values_file"
+                ;;
+            oai-gnb)
+                yq -i "
+                  .${nf}.multus.enabled = strenv(MULTUS_GNB_N2) |
+                  .${nf}.multus.interfaces[0].name = strenv(IF_NAME_GNB_N2) |
+                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_GNB_N2)
+                " "$values_file"
+                ;;
+        esac
 
-            # Si l'interface est activée
-            if [[ "${!MULTUS_VAR}" == "true" ]]; then
-                MULTUS_JSON=$(echo "$MULTUS_JSON" | jq \
-                    --arg name "${!IFNAME_VAR}" \
-                    --arg hostIF "${!IFNAME_VAR}" \
-                    --arg ip "${!IP_VAR}" \
-                    --arg netmask "${!NETMASK_VAR}" \
-                    --arg gw "${!GW_VAR}" \
-                    --arg routes "${!ROUTES_VAR}" \
-                    '.[. | length] = {
-                        name: $name,
-                        hostInterface: $hostIF,
-                        ipAdd: $ip,
-                        netmask: $netmask,
-                        gateway: $gw,
-                        routes: $routes,
-                        enabled: true
-                    }'
-                )
-            fi
-        done
-
-        # Écrire le bloc multus dans le YAML
-        yq -i "
-          .${nf}.multus.enabled = any([${NF_UPPER}_N2, ${NF_UPPER}_N3, ${NF_UPPER}_N4, ${NF_UPPER}_N6, ${NF_UPPER}_SBI] == [\"true\"]) |
-          .${nf}.multus.interfaces = strenv(MULTUS_JSON)
-        " "$values_file"
     done
 
-    # ---- DIFF VALUES ----
+    # ---- Diff values.yaml ----
     diff "$TMP/values.yaml-orig" "$values_file"
 
     # ---- CONFIGURATION ----
-    # SNSSAI slices
     yq -i "
       .snssais[0].sst = strenv(SLICE1_SST) |
       .snssais[0].sd = strenv(SLICE1_SD) |
@@ -645,7 +681,6 @@ configure-oai-5g-advance() {
       .snssais[1].sd = strenv(SLICE2_SD)
     " "$config_file"
 
-    # AMF PLMN / TAC
     yq -i "
       .amf.served_guami_list[0].mcc = strenv(MCC) |
       .amf.served_guami_list[0].mnc = strenv(MNC) |
@@ -654,7 +689,6 @@ configure-oai-5g-advance() {
       .amf.plmn_support_list[0].tac = strenv(TAC)
     " "$config_file"
 
-    # SMF DNN + QoS
     yq -i "
       .smf.smf_info.sNssaiSmfInfoList[0].dnnSmfInfoList[0].dnn = strenv(DNN0) |
       .smf.smf_info.sNssaiSmfInfoList[1].dnnSmfInfoList[0].dnn = strenv(DNN1) |
@@ -666,14 +700,13 @@ configure-oai-5g-advance() {
       .smf.local_subscription_infos[1].qos_profile.session_ambr_dl = strenv(SLICE2_DOWNLINK)
     " "$config_file"
 
-    # UPF DNN + SNAT
     yq -i "
       .upf.upf_info.sNssaiUpfInfoList[0].dnnUpfInfoList[0].dnn = strenv(DNN0) |
       .upf.upf_info.sNssaiUpfInfoList[1].dnnUpfInfoList[0].dnn = strenv(DNN1) |
       .upf.support_features.enable_snat = strenv(ENABLE_SNAT)
     " "$config_file"
 
-    # ---- DIFF CONFIG ----
+    # ---- Diff config.yaml ----
     diff "$TMP/config.yaml-orig" "$config_file"
 }
 
