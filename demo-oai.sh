@@ -565,45 +565,57 @@ configure-oai-5g-values() {
     cp "${values_file}" "$TMP/values.yaml-orig"
 
     # ---- GLOBAL ----
-    yq -i '.global.IP_NRF = strenv(IP_NRF)' "$values_file"
+    yq -i '
+      .global.IP_NRF = strenv(IP_NRF)
+    ' "$values_file"
 
     # ---- NF PARAMETERS ----
-    # Format: nf_name|repo|tag|node|start|tcpdump|shared|multus_interfaces_json
+    # nf_name|repo|tag|node|start|tcpdump|sharedvolume|multus_json
     NF_LIST=(
-        "oai-nrf|$NFS_NRF_REPO|$NFS_NRF_TAG|$NODE_NRF|true|false|false|[]"
-        "oai-amf|$GNB_REPO|$GNB_TAG|$NODE_AMF_UPF|true|false|false|[{\"name\":\"n2\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_AMF_N2\",\"netmask\":\"$NETMASK_AMF_N2\",\"defaultRoute\":\"$GW_AMF_N2\",\"enabled\":true}]"
-        "oai-smf|$SMF_REPO|$SMF_TAG|$NODE_SMF|true|false|false|[{\"name\":\"n4\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_SMF_N4\",\"netmask\":\"$NETMASK_SMF_N4\",\"defaultRoute\":\"$GW_SMF_N4\",\"enabled\":true},{\"name\":\"sbi\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_SBI_SMF\",\"netmask\":\"$NETMASK_SBI_SMF\",\"defaultRoute\":\"$GW_SBI_SMF\",\"enabled\":true}]"
-        "oai-upf|$UPF_REPO|$UPF_TAG|$NODE_AMF_UPF|true|false|false|[{\"name\":\"n3\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N3\",\"netmask\":\"$NETMASK_UPF_N3\",\"defaultRoute\":\"$GW_UPF_N3\",\"enabled\":true},{\"name\":\"n4\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N4\",\"netmask\":\"$NETMASK_UPF_N4\",\"enabled\":true},{\"name\":\"n6\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N6\",\"netmask\":\"$NETMASK_UPF_N6\",\"enabled\":true},{\"name\":\"n9\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N9\",\"netmask\":\"$NETMASK_UPF_N9\",\"enabled\":false},{\"name\":\"sbi\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_SBI_UPF\",\"netmask\":\"$NETMASK_SBI_UPF\",\"defaultRoute\":\"$GW_SBI_UPF\",\"enabled\":true}]"
-        "oai-udm|$UDM_REPO|$UDM_TAG|$NODE_UDM|true|false|false|[]"
-        "oai-udr|$UDR_REPO|$UDR_TAG|$NODE_UDR|true|false|false|[]"
-        "oai-ausf|$AUSF_REPO|$AUSF_TAG|$NODE_AUSF|true|false|false|[]"
-        "oai-lmf|$LMF_REPO|$LMF_TAG|$NODE_LMF|true|false|false|[]"
-        "oai-traffic-server|$TS_REPO|$TS_TAG|$NODE_TS|true|false|false|[{\"name\":\"external\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_TS\",\"netmask\":\"$NETMASK_TS\",\"defaultRoute\":\"$GW_TS\",\"enabled\":true}]"
+      "oai-nrf|$NFS_NRF_REPO|$NFS_NRF_TAG|$NODE_NRF|true|false|false|[]"
+      "oai-amf|$GNB_REPO|$GNB_TAG|$NODE_AMF_UPF|true|false|false|[{\"name\":\"n2\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_AMF_N2\",\"netmask\":\"$NETMASK_AMF_N2\",\"defaultRoute\":\"$GW_AMF_N2\",\"enabled\":true}]"
+      "oai-smf|$SMF_REPO|$SMF_TAG|$NODE_SMF|true|false|false|[{\"name\":\"n4\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_SMF_N4\",\"netmask\":\"$NETMASK_SMF_N4\",\"defaultRoute\":\"$GW_SMF_N4\",\"enabled\":true},{\"name\":\"sbi\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_SBI_SMF\",\"netmask\":\"$NETMASK_SBI_SMF\",\"defaultRoute\":\"$GW_SBI_SMF\",\"enabled\":true}]"
+      "oai-upf|$UPF_REPO|$UPF_TAG|$NODE_AMF_UPF|true|false|false|[{\"name\":\"n3\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N3\",\"netmask\":\"$NETMASK_UPF_N3\",\"defaultRoute\":\"$GW_UPF_N3\",\"enabled\":true},{\"name\":\"n4\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N4\",\"netmask\":\"$NETMASK_UPF_N4\",\"enabled\":true},{\"name\":\"n6\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N6\",\"netmask\":\"$NETMASK_UPF_N6\",\"enabled\":true},{\"name\":\"n9\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N9\",\"netmask\":\"$NETMASK_UPF_N9\",\"enabled\":false},{\"name\":\"sbi\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_SBI_UPF\",\"netmask\":\"$NETMASK_SBI_UPF\",\"defaultRoute\":\"$GW_SBI_UPF\",\"enabled\":true}]"
+      "oai-udm|$UDM_REPO|$UDM_TAG|$NODE_UDM|true|false|false|[]"
+      "oai-udr|$UDR_REPO|$UDR_TAG|$NODE_UDR|true|false|false|[]"
+      "oai-ausf|$AUSF_REPO|$AUSF_TAG|$NODE_AUSF|true|false|false|[]"
+      "oai-lmf|$LMF_REPO|$LMF_TAG|$NODE_LMF|true|false|false|[]"
+      "oai-traffic-server|$TS_REPO|$TS_TAG|$NODE_TS|true|false|false|[{\"name\":\"external\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_TS\",\"netmask\":\"$NETMASK_TS\",\"defaultRoute\":\"$GW_TS\",\"enabled\":true}]"
     )
 
     for nf_entry in "${NF_LIST[@]}"; do
         IFS="|" read -r nf repo tag node start tcpdump shared multus_json <<< "$nf_entry"
 
-        # ---- repository and version ----
-        yq -i '.[$nf].nfimage.repository = strenv(repo) | .[$nf].nfimage.version = strenv(tag)' "$values_file"
+        # ---- nfimage ----
+        yq -i '
+          .["'"$nf"'"].nfimage.repository = strenv(repo) |
+          .["'"$nf"'"].nfimage.version = strenv(tag)
+        ' "$values_file"
 
         # ---- nodeName ----
-        yq -i '.[$nf].nodeName = strenv(node)' "$values_file"
+        yq -i '.["'"$nf"'"].nodeName = strenv(node)' "$values_file"
 
-        # ---- start and tcpdump flags ----
-        yq -i '.[$nf].start.start = strenv(start) | .[$nf].start.tcpdump = strenv(tcpdump)' "$values_file"
+        # ---- start and tcpdump ----
+        yq -i '
+          .["'"$nf"'"].start.start = strenv(start) |
+          .["'"$nf"'"].start.tcpdump = strenv(tcpdump)
+        ' "$values_file"
 
         # ---- includeTcpDumpContainer and persistent.sharedvolume ----
-        yq -i '.[$nf].includeTcpDumpContainer = strenv(tcpdump) | .[$nf].persistent.sharedvolume = strenv(shared)' "$values_file"
+        yq -i '
+          .["'"$nf"'"].includeTcpDumpContainer = strenv(tcpdump) |
+          .["'"$nf"'"].persistent.sharedvolume = strenv(shared)
+        ' "$values_file"
 
         # ---- multus interfaces ----
-        yq -i '.[$nf].multus.enabled = (length(strenv(multus_json)) > 0) | .[$nf].multus.interfaces = strenv(multus_json)' "$values_file"
-
-        # ---- remove MAC fields if present ----
-        yq -i '(.[$nf].multus.interfaces[]?.mac) = null' "$values_file"
+        yq -i '
+          .["'"$nf"'"].multus.enabled = (strenv(multus_json) != "[]") |
+          .["'"$nf"'"].multus.interfaces = strenv(multus_json) | 
+          del(.["'"$nf"'"].multus.interfaces[].mac)
+        ' "$values_file"
     done
 
-    diff "$TMP/values.yaml-orig" "${values_file}"
+    diff "$TMP/values.yaml-orig" "$values_file"
 }
 
 
@@ -611,55 +623,38 @@ configure-oai-5g-config() {
     config_file="${OAI5G_ADVANCE}/config.yaml"
     cp "${config_file}" "$TMP/config.yaml-orig"
 
-    # ---- Global IP_NRF ----
+    # ---- GLOBAL IP_NRF ----
     yq -i '.global.IP_NRF = strenv(IP_NRF)' "$config_file"
 
-    # ---- SNSSAI slices ----
+    # ---- slices ----
     yq -i '
       .snssais[0].sst = strenv(SLICE1_SST) |
-      .snssais[0].sd  = strenv(SLICE1_SD)  |
+      .snssais[0].sd = strenv(SLICE1_SD) |
       .snssais[1].sst = strenv(SLICE2_SST) |
-      .snssais[1].sd  = strenv(SLICE2_SD)
+      .snssais[1].sd = strenv(SLICE2_SD)
     ' "$config_file"
 
-    # ---- Loop over NFs for SBI / interfaces ----
-    declare -A NF_SBI_IFS=(
-      [amf]=$IF_N2
-      [smf]=$IF_N4
-      [upf]=$IF_N3
-    )
-
-    for nf in amf smf upf; do
-      yq -i '
-        if has("'"$nf"'") then
-          .nfs["'"$nf"'"][] |=
-          (select(has("n2")).n2.interface_name = strenv(IF_N2) // 
-           select(has("n3")).n3.interface_name = strenv(IF_N3) // 
-           select(has("n4")).n4.interface_name = strenv(IF_N4))
-        else .
-        end
-      ' "$config_file"
-    done
-
-    # ---- DNN configuration ----
-    yq -i '
-      .smf.smf_info.sNssaiSmfInfoList[0].dnnSmfInfoList[0].dnn = strenv(DNN0) |
-      .smf.smf_info.sNssaiSmfInfoList[1].dnnSmfInfoList[0].dnn = strenv(DNN1) |
-      .smf.local_subscription_infos[0].qos_profile.5qi = strenv(SLICE1_5QI) |
-      .smf.local_subscription_infos[0].qos_profile.session_ambr_ul = strenv(SLICE1_UPLINK) |
-      .smf.local_subscription_infos[0].qos_profile.session_ambr_dl = strenv(SLICE1_DOWNLINK) |
-      .smf.local_subscription_infos[1].qos_profile.5qi = strenv(SLICE2_5QI) |
-      .smf.local_subscription_infos[1].qos_profile.session_ambr_ul = strenv(SLICE2_UPLINK) |
-      .smf.local_subscription_infos[1].qos_profile.session_ambr_dl = strenv(SLICE2_DOWNLINK)
-    ' "$config_file"
-
-    # ---- AMF configuration ----
+    # ---- AMF config ----
     yq -i '
       .amf.served_guami_list[0].mcc = strenv(MCC) |
       .amf.served_guami_list[0].mnc = strenv(MNC) |
       .amf.plmn_support_list[0].mcc = strenv(MCC) |
       .amf.plmn_support_list[0].mnc = strenv(MNC) |
       .amf.plmn_support_list[0].tac = strenv(TAC)
+    ' "$config_file"
+
+    # ---- SMF DNNs ----
+    yq -i '
+      .smf.smf_info.sNssaiSmfInfoList[0].dnnSmfInfoList[0].dnn = strenv(DNN0) |
+      .smf.smf_info.sNssaiSmfInfoList[1].dnnSmfInfoList[0].dnn = strenv(DNN1) |
+      .smf.local_subscription_infos[0].dnn = strenv(DNN0) |
+      .smf.local_subscription_infos[1].dnn = strenv(DNN1) |
+      .smf.local_subscription_infos[0].qos_profile.5qi = strenv(SLICE1_5QI) |
+      .smf.local_subscription_infos[0].qos_profile.session_ambr_ul = strenv(SLICE1_UPLINK) |
+      .smf.local_subscription_infos[0].qos_profile.session_ambr_dl = strenv(SLICE1_DOWNLINK) |
+      .smf.local_subscription_infos[1].qos_profile.5qi = strenv(SLICE2_5QI) |
+      .smf.local_subscription_infos[1].qos_profile.session_ambr_ul = strenv(SLICE2_UPLINK) |
+      .smf.local_subscription_infos[1].qos_profile.session_ambr_dl = strenv(SLICE2_DOWNLINK)
     ' "$config_file"
 
     # ---- UPF DNNs ----
@@ -671,8 +666,23 @@ configure-oai-5g-config() {
     # ---- UPF SNAT ----
     yq -i '.upf.support_features.enable_snat = strenv(ENABLE_SNAT)' "$config_file"
 
-    diff "$TMP/config.yaml-orig" "${config_file}"
+    # ---- NFS SBI interfaces ----
+    declare -A NF_IFS=(
+      [amf]=IF_N2
+      [smf]=IF_N4
+      [upf]=IF_N3
+    )
+    for nf in "${!NF_IFS[@]}"; do
+      yq -i '
+        .nfs["'"$nf"'"].n2.interface_name = strenv('"${NF_IFS[$nf]}"') // 
+        .nfs["'"$nf"'"].n4.interface_name = strenv('"${NF_IFS[$nf]}"') // 
+        .nfs["'"$nf"'"].n3.interface_name = strenv('"${NF_IFS[$nf]}"')
+      ' "$config_file"
+    done
+
+    diff "$TMP/config.yaml-orig" "$config_file"
 }
+
 
 configure-oai-5g-advance() {
     configure-oai-5g-values
