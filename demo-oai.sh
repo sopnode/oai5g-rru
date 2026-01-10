@@ -564,6 +564,23 @@ configure-oai-5g-advance() {
     values_file="${OAI5G_ADVANCE}/values.yaml"
     config_file="${OAI5G_ADVANCE}/config.yaml"
 
+    echo "==== DEBUG EXPORTS ===="
+    # Liste de toutes les variables que tu m'as fournies
+    for var in ENABLED_MYSQL ENABLED_NRF NFS_NRF_HOST ENABLED_NSSF \
+           ENABLED_UDM NFS_UDM_HOST ENABLED_UDR NFS_UDR_HOST \
+           ENABLED_AUSF NFS_AUSF_HOST ENABLED_AMF NFS_AMF_HOST IF_N2 MULTUS_AMF_N2 IP_AMF_N2 NETMASK_AMF_N2 GW_AMF_N2 ROUTES_AMF_N2 IF_NAME_AMF_N2 \
+           ENABLED_UPF NFS_UPF_HOST IF_SBI IF_N3 IF_N4 IF_N6 ENABLE_SNAT \
+           MULTUS_UPF_N3 IP_UPF_N3 NETMASK_UPF_N3 GW_UPF_N3 ROUTES_UPF_N3 IF_NAME_UPF_N3 \
+           MULTUS_UPF_N4 IP_UPF_N4 NETMASK_UPF_N4 GW_UPF_N4 ROUTES_UPF_N4 IF_NAME_UPF_N4 \
+           MULTUS_UPF_N6 IP_UPF_N6 NETMASK_UPF_N6 GW_UPF_N6 ROUTES_UPF_N6 IF_NAME_UPF_N6 \
+           ENABLED_TS MULTUS_TS IP_TS NETMASK_TS GW_TS IF_NAME_TS UPF_HOST NODE_TS \
+           ENABLED_SMF NFS_SMF_HOST MULTUS_SMF_N4 IP_SMF_N4 NETMASK_SMF_N4 GW_SMF_N4 ROUTES_SMF_N4 IF_NAME_SMF_N4 \
+           HOST_AMF MULTUS_GNB_N2 IF_NAME_GNB_N2 IP_GNB_N2 GNB_N2_IF_NAME MULTUS_GNB_N3 IF_NAME_GNB_N3; do
+	printf "%-20s = %s\n" "$var" "${!var}"
+    done
+    echo "======================="
+
+
     # ---- Backup ----
     cp "$values_file" "$TMP/values.yaml-orig"
     cp "$config_file" "$TMP/config.yaml-orig"
