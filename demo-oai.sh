@@ -586,7 +586,7 @@ configure-oai-5g-advance() {
     yq -i '.global.IP_NRF = strenv(NFS_NRF_HOST)' "$values_file"
 
     # ---- NETWORK FUNCTIONS ----
-    declare -A NF_START=(
+    declare -A NF_ENABLED=(
         [oai-nrf]=$ENABLED_NRF
         [oai-amf]=$ENABLED_AMF
         [oai-smf]=$ENABLED_SMF
@@ -598,29 +598,6 @@ configure-oai-5g-advance() {
         [oai-traffic-server]=$ENABLED_TS
     )
 
-    declare -A NF_TCPDUMP=(
-        [oai-nrf]=false
-        [oai-amf]=false
-        [oai-smf]=false
-        [oai-upf]=false
-        [oai-udm]=false
-        [oai-udr]=false
-        [oai-ausf]=false
-        [oai-lmf]=false
-        [oai-traffic-server]=false
-    )
-
-    declare -A NF_SHARED=(
-        [oai-nrf]=false
-        [oai-amf]=false
-        [oai-smf]=false
-        [oai-upf]=false
-        [oai-udm]=false
-        [oai-udr]=false
-        [oai-ausf]=false
-        [oai-lmf]=false
-        [oai-traffic-server]=false
-    )
 
     NF_NAMES=(oai-nrf oai-amf oai-smf oai-upf oai-udm oai-udr oai-ausf oai-lmf oai-traffic-server)
 
@@ -636,10 +613,10 @@ configure-oai-5g-advance() {
 
         # ---- start / tcpdump / shared volume ----
         yq -i "
-          .${nf}.start.start = strenv(NF_START[${nf}]) |
-          .${nf}.start.tcpdump = strenv(NF_TCPDUMP[${nf}]) |
-          .${nf}.includeTcpDumpContainer = strenv(NF_TCPDUMP[${nf}]) |
-          .${nf}.persistent.sharedvolume = strenv(NF_SHARED[${nf}])
+          .${nf}.start.enabled = (strenv(NF_ENABLED[${nf}]) == \"true\") |
+          .${nf}.start.tcpdump = (strenv($PCAP) == \"true\") |
+          .${nf}.includeTcpDumpContainer = (strenv($LOGS) == \"true\") |
+          .${nf}.persistent.sharedvolume = (strenv($PCAP) == \"true\")
         " "$values_file"
 
         # ---- multus interfaces ----
