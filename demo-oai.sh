@@ -45,14 +45,14 @@ export DNN1="@DEF_DNN1@"
 export DNN1_PDU_TYPE="@DEF_DNN1_PDU_TYPE@"
 export SLICE1_SST="@DEF_SLICE1_SST@"
 export SLICE1_SD="@DEF_SLICE1_SD@"
-SLICE1_5QI="@DEF_SLICE1_5QI@"
-SLICE1_UPLINK="@DEF_SLICE1_UPLINK@"
-SLICE1_DOWNLINK="@DEF_SLICE1_DOWNLINK@"
+export SLICE1_5QI="@DEF_SLICE1_5QI@"
+export SLICE1_UPLINK="@DEF_SLICE1_UPLINK@"
+export SLICE1_DOWNLINK="@DEF_SLICE1_DOWNLINK@"
 export SLICE2_SST="@DEF_SLICE2_SST@"
 export SLICE2_SD="@DEF_SLICE2_SD@"
-SLICE2_5QI="@DEF_SLICE2_5QI@"
-SLICE2_UPLINK="@DEF_SLICE2_UPLINK@"
-SLICE2_DOWNLINK="@DEF_SLICE2_DOWNLINK@"
+export SLICE2_5QI="@DEF_SLICE2_5QI@"
+export SLICE2_UPLINK="@DEF_SLICE2_UPLINK@"
+export SLICE2_DOWNLINK="@DEF_SLICE2_DOWNLINK@"
 export GNB_ID="@DEF_GNB_ID@"
 #
 ################SST0="@DEF_SST0@"
@@ -334,7 +334,6 @@ fi
 #
 OAI5G_CHARTS="$PREFIX_DEMO/charts"
 OAI5G_CORE="$OAI5G_CHARTS/oai-5g-core"
-OAI5G_BASIC="$OAI5G_CORE/oai-5g-basic"
 OAI5G_ADVANCE="$OAI5G_CORE/oai-5g-advance"
 
 export CN_DEFAULT_GW=""
@@ -556,84 +555,169 @@ export FLEXRIC_PULL_POLICY="Always"
 export HOST_FLEXRIC="oai-flexric"
 
 
-########################### sopnode-f3 specific tuning #####################
-
-if [[ "$NODE_GNB" == "sopnode-f3" ]]; then
-  echo "Configuring core affinity for sopnode-f3..."
-
-  # Set new AW2S options
-  OPTIONS_aw2s="--thread-pool 48,50,52,54,56,58,60,62 --log_config.global_log_options level,nocolor,time"
-
-  # Path to the gNB config file
-  CONF_FILE="$PREFIX_DEMO/oai5g-rru/ran-config/conf/$CONF_jaguar"
-
-  if [[ -f "$CONF_FILE" ]]; then
-    echo "Patching $CONF_FILE..."
-
-    # Replace rxfh_core_id
-    sed -i 's/^\s*rxfh_core_id\s*=.*/        rxfh_core_id   = 48;/' "$CONF_FILE"
-
-    # Replace txfh_core_id
-    sed -i 's/^\s*txfh_core_id\s*=.*/        txfh_core_id   = 50;/' "$CONF_FILE"
-
-    # Replace tp_cores
-    sed -i 's/^\s*tp_cores\s*=.*/        tp_cores       = [52,54,56,58,60,62,96,98];/' "$CONF_FILE"
-
-    # Replace num_tp_cores
-    sed -i 's/^\s*num_tp_cores\s*=.*/        num_tp_cores   = 8;/' "$CONF_FILE"
-  else
-    echo "Warning: Config file $CONF_FILE not found."
-  fi
-fi
-
-
-##################################################################################
-
-# Generate unique MAC addresses for multus interfaces in oai5g pods
-gener-mac()
-{
-    CPTfile="$TMP/cpt-$$.dat"
-    PREFIXfile="$TMP/prefix-$$.dat"
-    if [ ! -f "$CPTfile" ]; then
-	CPT=0
-    else
-	CPT=$(cat "$CPTfile")
-    fi
-    if [ ! -f "$PREFIXfile" ]; then
-	# GNB_ID should be of following format "0x1234", use this as MAC prefix
-	if [[ ${GNB_ID:0:2} == "0x" ]] ; then
-	    PREFIX="${GNB_ID:2:2}:${GNB_ID:4:2}:"
-	else
-	    PREFIX="12:34:"
-	fi
-	PREFIX="12:34:00:"
-	case $NODE_AMF_UPF in
-	    "sopnode-l1-v30")
-		PREFIX=$PREFIX"00:";;
-	    "sopnode-w1-v30")
-		PREFIX=$PREFIX"01:";;
-	    *)  PREFIX=$PREFIX"02:";;
-	esac
-	case $NODE_GNB in
-	    "sopnode-l1-v30")
-		PREFIX=$PREFIX"00:";;	
-	    "sopnode-w1-v30")
-		PREFIX=$PREFIX"01:";;	
-	    *)  PREFIX=$PREFIX"02:";;
-	esac
-	echo "${PREFIX}" > "$PREFIXfile"
-    else
-	PREFIX=$(cat "$PREFIXfile")
-    fi
-    (( CPT++ ))
-    echo "${CPT}" > "$CPTfile"
-    SUFFIX=$(printf "%02x" $CPT)
-    echo "$PREFIX$SUFFIX"
-}
-
+#################################################################################
+#                       OAI-CN charts configuration
 #################################################################################
 
-configure-oai-5g-@mode@() {
+configure-oai-5g-values() {
+    values_file="${OAI5G_ADVANCE}/values.yaml"
+    cp "${values_file}" "$TMP/values.yaml-orig"
+
+
+    # ---- GLOBAL ----
+    yq -i --arg ip_nrf "$IP_NRF" \
+      '.global.IP_NRF = $ip_nrf' "$values_file"
+
+    # ---- NF PARAMETERS ----
+    # Format: nf_name|repo|tag|node|start|tcpdump|shared|multus_interfaces_json
+    NF_LIST=(
+        "oai-nrf|$NFS_NRF_REPO|$NFS_NRF_TAG|$NODE_NRF|true|false|false|[]"
+        "oai-amf|$GNB_REPO|$GNB_TAG|$NODE_AMF_UPF|true|false|false|[{\"name\":\"n2\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_AMF_N2\",\"netmask\":\"$NETMASK_AMF_N2\",\"defaultRoute\":\"$GW_AMF_N2\",\"enabled\":true}]"
+        "oai-smf|$SMF_REPO|$SMF_TAG|$NODE_SMF|true|false|false|[{\"name\":\"n4\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_SMF_N4\",\"netmask\":\"$NETMASK_SMF_N4\",\"defaultRoute\":\"$GW_SMF_N4\",\"enabled\":true},{\"name\":\"sbi\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_SBI_SMF\",\"netmask\":\"$NETMASK_SBI_SMF\",\"defaultRoute\":\"$GW_SBI_SMF\",\"enabled\":true}]"
+        "oai-upf|$UPF_REPO|$UPF_TAG|$NODE_AMF_UPF|true|false|false|[{\"name\":\"n3\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N3\",\"netmask\":\"$NETMASK_UPF_N3\",\"defaultRoute\":\"$GW_UPF_N3\",\"enabled\":true},{\"name\":\"n4\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N4\",\"netmask\":\"$NETMASK_UPF_N4\",\"enabled\":true},{\"name\":\"n6\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N6\",\"netmask\":\"$NETMASK_UPF_N6\",\"enabled\":true},{\"name\":\"n9\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_UPF_N9\",\"netmask\":\"$NETMASK_UPF_N9\",\"enabled\":false},{\"name\":\"sbi\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_SBI_UPF\",\"netmask\":\"$NETMASK_SBI_UPF\",\"defaultRoute\":\"$GW_SBI_UPF\",\"enabled\":true}]"
+        "oai-udm|$UDM_REPO|$UDM_TAG|$NODE_UDM|true|false|false|[]"
+        "oai-udr|$UDR_REPO|$UDR_TAG|$NODE_UDR|true|false|false|[]"
+        "oai-ausf|$AUSF_REPO|$AUSF_TAG|$NODE_AUSF|true|false|false|[]"
+        "oai-lmf|$LMF_REPO|$LMF_TAG|$NODE_LMF|true|false|false|[]"
+        "oai-traffic-server|$TS_REPO|$TS_TAG|$NODE_TS|true|false|false|[{\"name\":\"external\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_TS\",\"netmask\":\"$NETMASK_TS\",\"defaultRoute\":\"$GW_TS\",\"enabled\":true}]"
+    )
+
+    for nf_entry in "${NF_LIST[@]}"; do
+        IFS="|" read -r nf repo tag node start tcpdump shared multus_json <<< "$nf_entry"
+
+        # ---- repository and version ----
+        yq -i --arg repo "$repo" --arg tag "$tag" --arg nf "$nf" \
+            '.[$nf].nfimage.repository = $repo | .[$nf].nfimage.version = $tag' "$values_file"
+
+        # ---- nodeName ----
+        yq -i --arg node "$node" --arg nf "$nf" \
+            '.[$nf].nodeName = $node' "$values_file"
+
+        # ---- start and tcpdump flags ----
+        yq -i --argjson start "$start" --argjson tcpdump "$tcpdump" --arg nf "$nf" \
+            '.[$nf].start |= (.[$nf] = $start) | .[$nf].start.tcpdump = $tcpdump' "$values_file"
+
+        # ---- includeTcpDumpContainer and persistent.sharedvolume ----
+        yq -i --argjson tcpdump "$tcpdump" --argjson shared "$shared" --arg nf "$nf" \
+            '.[$nf].includeTcpDumpContainer = $tcpdump | .[$nf].persistent.sharedvolume = $shared' "$values_file"
+
+        # ---- multus interfaces ----
+        yq -i --argjson multus "$multus_json" --arg nf "$nf" \
+            '.[$nf].multus.enabled = (length($multus) > 0) | .[$nf].multus.interfaces = $multus' "$values_file"
+
+        # ---- remove MAC fields if present ----
+        yq -i --arg nf "$nf" '(.[$nf].multus.interfaces[]?.mac) = null' "$values_file"
+    done
+    diff "$TMP/values.yaml-orig" "${values_file}"
+}
+
+
+configure-oai-5g-config() {
+    config_file="${OAI5G_ADVANCE}/config.yaml"
+
+    echo "Configuring $config with yq..."
+    cp "${config_file}" "$TMP/config.yaml-orig"
+
+    # ---- Global placeholders ----
+    yq -i \
+      --arg ip_nrf "$IP_NRF" \
+      '
+      .global.IP_NRF = $ip_nrf
+      ' "$config_file"
+
+    # ---- Common slices ----
+    yq -i \
+      --arg slice1_sst "$SLICE1_SST" \
+      --arg slice1_sd "$SLICE1_SD" \
+      --arg slice2_sst "$SLICE2_SST" \
+      --arg slice2_sd "$SLICE2_SD" \
+      '
+      .snssais[0].sst = $slice1_sst |
+      .snssais[0].sd = $slice1_sd |
+      .snssais[1].sst = $slice2_sst |
+      .snssais[1].sd = $slice2_sd
+      ' "$config_file"
+
+    # ---- Loop over NFs for SBI / interfaces ----
+    declare -A NF_SBI_IFS=(
+      [amf]=$IF_N2
+      [smf]=$IF_N4
+      [upf]=$IF_N3
+    )
+
+    for nf in amf smf upf; do
+      if [[ -n "${NF_SBI_IFS[$nf]}" ]]; then
+	yq -i \
+          --arg if_name "${NF_SBI_IFS[$nf]}" \
+          '
+          .nfs[$nf].'"$nf"' | .n2.interface_name = $if_name // .n4.interface_name = $if_name // .n3.interface_name = $if_name
+          ' "$config_file"
+      fi
+    done
+
+    # ---- Loop over DNNs ----
+    declare -A NF_DNNS=(
+      [smf0]=$DNN0
+      [smf1]=$DNN1
+    )
+
+    yq -i \
+      --arg dnn0 "$DNN0" \
+      --arg dnn1 "$DNN1" \
+      --arg slice1_5qi "$SLICE1_5QI" \
+      --arg slice2_5qi "$SLICE2_5QI" \
+      --arg slice1_ul "$SLICE1_UPLINK" \
+      --arg slice1_dl "$SLICE1_DOWNLINK" \
+      --arg slice2_ul "$SLICE2_UPLINK" \
+      --arg slice2_dl "$SLICE2_DOWNLINK" \
+     '
+     .smf.smf_info.sNssaiSmfInfoList[0].dnnSmfInfoList[0].dnn = $dnn0 |
+     .smf.smf_info.sNssaiSmfInfoList[1].dnnSmfInfoList[0].dnn = $dnn1 |
+     .smf.local_subscription_infos[0].qos_profile.5qi = $slice1_5qi |
+     .smf.local_subscription_infos[0].qos_profile.session_ambr_ul = $slice1_ul |
+     .smf.local_subscription_infos[0].qos_profile.session_ambr_dl = $slice1_dl |
+     .smf.local_subscription_infos[1].qos_profile.5qi = $slice2_5qi |
+     .smf.local_subscription_infos[1].qos_profile.session_ambr_ul = $slice2_ul |
+     .smf.local_subscription_infos[1].qos_profile.session_ambr_dl = $slice2_dl
+     ' "$config_file"
+
+    # ---- AMF specific ----
+    yq -i \
+      --arg mcc "$MCC" \
+      --arg mnc "$MNC" \
+      --arg tac "$TAC" \
+     '
+     .amf.served_guami_list[0].mcc = $mcc |
+     .amf.served_guami_list[0].mnc = $mnc |
+     .amf.plmn_support_list[0].mcc = $mcc |
+     .amf.plmn_support_list[0].mnc = $mnc |
+     .amf.plmn_support_list[0].tac = $tac
+     ' "$config_file"
+
+    # ---- UPF DNNs ----
+    yq -i \
+      --arg dnn0 "$DNN0" \
+      --arg dnn1 "$DNN1" \
+      '
+      .upf.upf_info.sNssaiUpfInfoList[0].dnnUpfInfoList[0].dnn = $dnn0 |
+      .upf.upf_info.sNssaiUpfInfoList[1].dnnUpfInfoList[0].dnn = $dnn1
+      ' "$config_file"
+
+    # ---- UPF SNAT ----
+    yq -i \
+      --arg enable_snat "$ENABLE_SNAT" \
+      '
+      .upf.support_features.enable_snat = $enable_snat
+      ' "$config_file"
+    diff "$TMP/config.yaml-orig" "${config_file}"
+}
+
+configure-oai-5g-advance() {
+    configure-oai-5g-values
+    configure-oai-5g-config
+}
+    
+configure-oai-5g-@mode@-old() {
 
     # if $LOGS is true, create a tcpdump container with privileges
     # if $PCAP is true, start tcpdump and create a shared volume to store pcap
@@ -782,22 +866,22 @@ load_rru_env() {
 
 apply-gnb-values-yq() {
 
-    VALUES_FILE="$1"
-    YQ_OVERLAY_FILE="$2"
+    values_file="$1"
+    yq_overlay_file="$2"
 
-    [ -f "$VALUES_FILE" ] || {
-        echo "ERROR: values file not found: $VALUES_FILE"
+    [ -f "$values_file" ] || {
+        echo "ERROR: values file not found: $values_file"
         exit 1
     }
 
-    [ -f "$YQ_OVERLAY_FILE" ] || {
-        echo "ERROR: yq overlay file not found: $YQ_OVERLAY_FILE"
+    [ -f "$yq_overlay_file" ] || {
+        echo "ERROR: yq overlay file not found: $yq_overlay_file"
         exit 1
     }
 
-    echo "Applying yq overlays from $YQ_OVERLAY_FILE to $VALUES_FILE"
+    echo "Applying yq overlays from $yq_overlay_file to $values_file"
 
-    yq eval -i "$(cat "$YQ_OVERLAY_FILE")" "$VALUES_FILE"
+    yq eval -i "$(cat "$yq_overlay_file")" "$values_file"
 
     # Update PLMN and NSSAI
     yq eval -i '
@@ -822,14 +906,14 @@ apply-gnb-values-yq() {
     )
   }
 ]
-' "$VALUES_FILE"
+' "$values_file"
     
     # Validate new values.yaml configuration
-    yq eval '.' "$VALUES_FILE" >/dev/null || {
-        echo "ERROR: generated YAML is invalid: $VALUES_FILE"
+    yq eval '.' "$values_file" >/dev/null || {
+        echo "ERROR: generated YAML is invalid: $values_file"
         exit 1
     }
-    echo "OK: $VALUES_FILE updated successfully"
+    echo "OK: $values_file updated successfully"
 }
 
 
