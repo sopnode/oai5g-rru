@@ -559,17 +559,16 @@ export HOST_FLEXRIC="oai-flexric"
 #                       OAI-CN charts configuration
 #################################################################################
 
+
 configure-oai-5g-values() {
     values_file="${OAI5G_ADVANCE}/values.yaml"
     cp "${values_file}" "$TMP/values.yaml-orig"
 
-
-    # ---- GLOBAL ----
-    yq -i --arg ip_nrf "$IP_NRF" \
-      '.global.IP_NRF = $ip_nrf' "$values_file"
+    # ---- Global ----
+    export IP_NRF="$IP_NRF"
+    yq e -i '.global.IP_NRF = env(IP_NRF)' "$values_file"
 
     # ---- NF PARAMETERS ----
-    # Format: nf_name|repo|tag|node|start|tcpdump|shared|multus_interfaces_json
     NF_LIST=(
         "oai-nrf|$NFS_NRF_REPO|$NFS_NRF_TAG|$NODE_NRF|true|false|false|[]"
         "oai-amf|$GNB_REPO|$GNB_TAG|$NODE_AMF_UPF|true|false|false|[{\"name\":\"n2\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_AMF_N2\",\"netmask\":\"$NETMASK_AMF_N2\",\"defaultRoute\":\"$GW_AMF_N2\",\"enabled\":true}]"
@@ -584,138 +583,91 @@ configure-oai-5g-values() {
 
     for nf_entry in "${NF_LIST[@]}"; do
         IFS="|" read -r nf repo tag node start tcpdump shared multus_json <<< "$nf_entry"
+        export nf repo tag node start tcpdump shared multus_json
 
-        # ---- repository and version ----
-        yq -i --arg repo "$repo" --arg tag "$tag" --arg nf "$nf" \
-            '.[$nf].nfimage.repository = $repo | .[$nf].nfimage.version = $tag' "$values_file"
+        # Repository & version
+        yq e -i '.["'"$nf"'"].nfimage.repository = env(repo) | .["'"$nf"'"].nfimage.version = env(tag)' "$values_file"
 
-        # ---- nodeName ----
-        yq -i --arg node "$node" --arg nf "$nf" \
-            '.[$nf].nodeName = $node' "$values_file"
+        # Node name
+        yq e -i '.["'"$nf"'"].nodeName = env(node)' "$values_file"
 
-        # ---- start and tcpdump flags ----
-        yq -i --argjson start "$start" --argjson tcpdump "$tcpdump" --arg nf "$nf" \
-            '.[$nf].start |= (.[$nf] = $start) | .[$nf].start.tcpdump = $tcpdump' "$values_file"
+        # Start & tcpdump
+        yq e -i '.["'"$nf"'"].start = {"'"$nf"'": env(start), "tcpdump": env(tcpdump)}' "$values_file"
 
-        # ---- includeTcpDumpContainer and persistent.sharedvolume ----
-        yq -i --argjson tcpdump "$tcpdump" --argjson shared "$shared" --arg nf "$nf" \
-            '.[$nf].includeTcpDumpContainer = $tcpdump | .[$nf].persistent.sharedvolume = $shared' "$values_file"
+        # Include tcpdump & persistent.sharedvolume
+        yq e -i '.["'"$nf"'"].includeTcpDumpContainer = env(tcpdump) | .["'"$nf"'"].persistent.sharedvolume = env(shared)' "$values_file"
 
-        # ---- multus interfaces ----
-        yq -i --argjson multus "$multus_json" --arg nf "$nf" \
-            '.[$nf].multus.enabled = (length($multus) > 0) | .[$nf].multus.interfaces = $multus' "$values_file"
+        # Multus interfaces
+        yq e -i '.["'"$nf"'"].multus.enabled = (env(MULTUS_JSON) != "[]") | .["'"$nf"'"].multus.interfaces = (env(MULTUS_JSON) | fromjson)' "$values_file"
 
-        # ---- remove MAC fields if present ----
-        yq -i --arg nf "$nf" '(.[$nf].multus.interfaces[]?.mac) = null' "$values_file"
+        # Remove MAC if present
+        yq e -i '(.["'"$nf"'"].multus.interfaces[]?.mac) = null' "$values_file"
     done
-    diff "$TMP/values.yaml-orig" "${values_file}"
-}
 
+    diff "$TMP/values.yaml-orig" "$values_file"
+}
 
 configure-oai-5g-config() {
     config_file="${OAI5G_ADVANCE}/config.yaml"
-
-    echo "Configuring $config with yq..."
     cp "${config_file}" "$TMP/config.yaml-orig"
 
-    # ---- Global placeholders ----
-    yq -i \
-      --arg ip_nrf "$IP_NRF" \
-      '
-      .global.IP_NRF = $ip_nrf
-      ' "$config_file"
+    # Global variable
+    export IP_NRF="$IP_NRF"
+    yq e -i '.global.IP_NRF = env(IP_NRF)' "$config_file"
 
-    # ---- Common slices ----
-    yq -i \
-      --arg slice1_sst "$SLICE1_SST" \
-      --arg slice1_sd "$SLICE1_SD" \
-      --arg slice2_sst "$SLICE2_SST" \
-      --arg slice2_sd "$SLICE2_SD" \
-      '
-      .snssais[0].sst = $slice1_sst |
-      .snssais[0].sd = $slice1_sd |
-      .snssais[1].sst = $slice2_sst |
-      .snssais[1].sd = $slice2_sd
-      ' "$config_file"
+    # Common slices
+    export SLICE1_SST="$SLICE1_SST" SLICE1_SD="$SLICE1_SD" SLICE2_SST="$SLICE2_SST" SLICE2_SD="$SLICE2_SD"
+    yq e -i '.snssais[0].sst = env(SLICE1_SST) | .snssais[0].sd = env(SLICE1_SD) | .snssais[1].sst = env(SLICE2_SST) | .snssais[1].sd = env(SLICE2_SD)' "$config_file"
 
-    # ---- Loop over NFs for SBI / interfaces ----
-    declare -A NF_SBI_IFS=(
-      [amf]=$IF_N2
-      [smf]=$IF_N4
-      [upf]=$IF_N3
-    )
-
-    for nf in amf smf upf; do
-      if [[ -n "${NF_SBI_IFS[$nf]}" ]]; then
-	yq -i \
-          --arg if_name "${NF_SBI_IFS[$nf]}" \
-          '
-          .nfs[$nf].'"$nf"' | .n2.interface_name = $if_name // .n4.interface_name = $if_name // .n3.interface_name = $if_name
-          ' "$config_file"
-      fi
+    # NF interface names
+    declare -A NF_IFS=( [amf]=$IF_N2 [smf]=$IF_N4 [upf]=$IF_N3 )
+    for nf in "${!NF_IFS[@]}"; do
+        export if_name="${NF_IFS[$nf]}"
+        yq e -i '.nfs["'"$nf"'"] |= (.n2.interface_name = env(if_name) // .n4.interface_name = env(if_name) // .n3.interface_name = env(if_name))' "$config_file"
     done
 
-    # ---- Loop over DNNs ----
-    declare -A NF_DNNS=(
-      [smf0]=$DNN0
-      [smf1]=$DNN1
-    )
+    # DNNs
+    export DNN0="$DNN0" DNN1="$DNN1" SLICE1_5QI="$SLICE1_5QI" SLICE2_5QI="$SLICE2_5QI"
+    export SLICE1_UPLINK="$SLICE1_UPLINK" SLICE1_DOWNLINK="$SLICE1_DOWNLINK" SLICE2_UPLINK="$SLICE2_UPLINK" SLICE2_DOWNLINK="$SLICE2_DOWNLINK"
+    yq e -i '
+      .smf.smf_info.sNssaiSmfInfoList[0].dnnSmfInfoList[0].dnn = env(DNN0) |
+      .smf.smf_info.sNssaiSmfInfoList[1].dnnSmfInfoList[0].dnn = env(DNN1) |
+      .smf.local_subscription_infos[0].qos_profile.5qi = env(SLICE1_5QI) |
+      .smf.local_subscription_infos[0].qos_profile.session_ambr_ul = env(SLICE1_UPLINK) |
+      .smf.local_subscription_infos[0].qos_profile.session_ambr_dl = env(SLICE1_DOWNLINK) |
+      .smf.local_subscription_infos[1].qos_profile.5qi = env(SLICE2_5QI) |
+      .smf.local_subscription_infos[1].qos_profile.session_ambr_ul = env(SLICE2_UPLINK) |
+      .smf.local_subscription_infos[1].qos_profile.session_ambr_dl = env(SLICE2_DOWNLINK)
+    ' "$config_file"
 
-    yq -i \
-      --arg dnn0 "$DNN0" \
-      --arg dnn1 "$DNN1" \
-      --arg slice1_5qi "$SLICE1_5QI" \
-      --arg slice2_5qi "$SLICE2_5QI" \
-      --arg slice1_ul "$SLICE1_UPLINK" \
-      --arg slice1_dl "$SLICE1_DOWNLINK" \
-      --arg slice2_ul "$SLICE2_UPLINK" \
-      --arg slice2_dl "$SLICE2_DOWNLINK" \
-     '
-     .smf.smf_info.sNssaiSmfInfoList[0].dnnSmfInfoList[0].dnn = $dnn0 |
-     .smf.smf_info.sNssaiSmfInfoList[1].dnnSmfInfoList[0].dnn = $dnn1 |
-     .smf.local_subscription_infos[0].qos_profile.5qi = $slice1_5qi |
-     .smf.local_subscription_infos[0].qos_profile.session_ambr_ul = $slice1_ul |
-     .smf.local_subscription_infos[0].qos_profile.session_ambr_dl = $slice1_dl |
-     .smf.local_subscription_infos[1].qos_profile.5qi = $slice2_5qi |
-     .smf.local_subscription_infos[1].qos_profile.session_ambr_ul = $slice2_ul |
-     .smf.local_subscription_infos[1].qos_profile.session_ambr_dl = $slice2_dl
-     ' "$config_file"
+    # AMF parameters
+    export MCC="$MCC" MNC="$MNC" TAC="$TAC"
+    yq e -i '
+      .amf.served_guami_list[0].mcc = env(MCC) |
+      .amf.served_guami_list[0].mnc = env(MNC) |
+      .amf.plmn_support_list[0].mcc = env(MCC) |
+      .amf.plmn_support_list[0].mnc = env(MNC) |
+      .amf.plmn_support_list[0].tac = env(TAC)
+    ' "$config_file"
 
-    # ---- AMF specific ----
-    yq -i \
-      --arg mcc "$MCC" \
-      --arg mnc "$MNC" \
-      --arg tac "$TAC" \
-     '
-     .amf.served_guami_list[0].mcc = $mcc |
-     .amf.served_guami_list[0].mnc = $mnc |
-     .amf.plmn_support_list[0].mcc = $mcc |
-     .amf.plmn_support_list[0].mnc = $mnc |
-     .amf.plmn_support_list[0].tac = $tac
-     ' "$config_file"
+    # UPF DNNs
+    yq e -i '
+      .upf.upf_info.sNssaiUpfInfoList[0].dnnUpfInfoList[0].dnn = env(DNN0) |
+      .upf.upf_info.sNssaiUpfInfoList[1].dnnUpfInfoList[0].dnn = env(DNN1)
+    ' "$config_file"
 
-    # ---- UPF DNNs ----
-    yq -i \
-      --arg dnn0 "$DNN0" \
-      --arg dnn1 "$DNN1" \
-      '
-      .upf.upf_info.sNssaiUpfInfoList[0].dnnUpfInfoList[0].dnn = $dnn0 |
-      .upf.upf_info.sNssaiUpfInfoList[1].dnnUpfInfoList[0].dnn = $dnn1
-      ' "$config_file"
+    # UPF SNAT
+    export ENABLE_SNAT="$ENABLE_SNAT"
+    yq e -i '.upf.support_features.enable_snat = env(ENABLE_SNAT)' "$config_file"
 
-    # ---- UPF SNAT ----
-    yq -i \
-      --arg enable_snat "$ENABLE_SNAT" \
-      '
-      .upf.support_features.enable_snat = $enable_snat
-      ' "$config_file"
-    diff "$TMP/config.yaml-orig" "${config_file}"
+    diff "$TMP/config.yaml-orig" "$config_file"
 }
 
 configure-oai-5g-advance() {
     configure-oai-5g-values
     configure-oai-5g-config
 }
+
     
 configure-oai-5g-@mode@-old() {
 
