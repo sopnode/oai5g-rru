@@ -593,6 +593,7 @@ configure-oai-5g-advance() {
     for nf in "${NF_NAMES[@]}"; do
         NF_UPPER=$(echo "$nf" | tr a-z A-Z | tr '-' '_')
 	echo "** DEBUG:: .${nf}.nfimage.repository = strenv(${NF_UPPER}_REPO)"
+	echo "strenv(${NF_UPPER}_REPO) = strenv(OAI_NRF_REPO)"
 
         # ---- repository / version / nodeName ----
         yq -i "
