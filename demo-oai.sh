@@ -597,7 +597,7 @@ configure-oai-5g-advance() {
 
         # ---- repository / version / nodeName ----
         yq -i "
-          .${nf}.nfimage.repository = strenv(${NF_UPPER}_REPO) |
+          .${nf}.nfimage.repository = strenv(\"${NF_UPPER}_\" + \"REPO\") |
           .${nf}.nfimage.version = strenv(${NF_UPPER}_TAG) |
           .${nf}.nodeName = strenv(NODE_${NF_UPPER})
         " "$values_file"
