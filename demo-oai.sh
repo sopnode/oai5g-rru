@@ -560,7 +560,6 @@ export HOST_FLEXRIC="oai-flexric"
 #################################################################################
 
 
-
 configure-oai-5g-values() {
     values_file="${OAI5G_ADVANCE}/values.yaml"
     cp "${values_file}" "$TMP/values.yaml-orig"
@@ -569,7 +568,7 @@ configure-oai-5g-values() {
     yq -i '.global.IP_NRF = strenv(IP_NRF)' "$values_file"
 
     # ---- NF PARAMETERS ----
-    # Format: nf_name|repo|tag|node|start|tcpdump|shared|multus_json
+    # Format: nf_name|repo|tag|node|start|tcpdump|shared|multus_interfaces_json
     NF_LIST=(
         "oai-nrf|$NFS_NRF_REPO|$NFS_NRF_TAG|$NODE_NRF|true|false|false|[]"
         "oai-amf|$GNB_REPO|$GNB_TAG|$NODE_AMF_UPF|true|false|false|[{\"name\":\"n2\",\"hostInterface\":\"eth0\",\"ipAdd\":\"$IP_AMF_N2\",\"netmask\":\"$NETMASK_AMF_N2\",\"defaultRoute\":\"$GW_AMF_N2\",\"enabled\":true}]"
@@ -592,13 +591,13 @@ configure-oai-5g-values() {
         yq -i '.[$nf].nodeName = strenv(node)' "$values_file"
 
         # ---- start and tcpdump flags ----
-        yq -i '.[$nf].start |= (.[$nf] = strenv(start)) | .[$nf].start.tcpdump = strenv(tcpdump)' "$values_file"
+        yq -i '.[$nf].start.start = strenv(start) | .[$nf].start.tcpdump = strenv(tcpdump)' "$values_file"
 
         # ---- includeTcpDumpContainer and persistent.sharedvolume ----
         yq -i '.[$nf].includeTcpDumpContainer = strenv(tcpdump) | .[$nf].persistent.sharedvolume = strenv(shared)' "$values_file"
 
         # ---- multus interfaces ----
-        yq -i '.[$nf].multus.enabled = (length(strenv(multus_json) | fromjson) > 0) | .[$nf].multus.interfaces = strenv(multus_json) | fromjson' "$values_file"
+        yq -i '.[$nf].multus.enabled = (length(strenv(multus_json)) > 0) | .[$nf].multus.interfaces = strenv(multus_json)' "$values_file"
 
         # ---- remove MAC fields if present ----
         yq -i '(.[$nf].multus.interfaces[]?.mac) = null' "$values_file"
@@ -607,19 +606,20 @@ configure-oai-5g-values() {
     diff "$TMP/values.yaml-orig" "${values_file}"
 }
 
+
 configure-oai-5g-config() {
     config_file="${OAI5G_ADVANCE}/config.yaml"
     cp "${config_file}" "$TMP/config.yaml-orig"
 
-    # ---- Global placeholders ----
+    # ---- Global IP_NRF ----
     yq -i '.global.IP_NRF = strenv(IP_NRF)' "$config_file"
 
-    # ---- Common slices ----
+    # ---- SNSSAI slices ----
     yq -i '
       .snssais[0].sst = strenv(SLICE1_SST) |
-      .snssais[0].sd = strenv(SLICE1_SD) |
+      .snssais[0].sd  = strenv(SLICE1_SD)  |
       .snssais[1].sst = strenv(SLICE2_SST) |
-      .snssais[1].sd = strenv(SLICE2_SD)
+      .snssais[1].sd  = strenv(SLICE2_SD)
     ' "$config_file"
 
     # ---- Loop over NFs for SBI / interfaces ----
@@ -629,14 +629,19 @@ configure-oai-5g-config() {
       [upf]=$IF_N3
     )
 
-    for nf in "${!NF_SBI_IFS[@]}"; do
+    for nf in amf smf upf; do
       yq -i '
-        .nfs[$nf].'"$nf"' | 
-        (.n2.interface_name // .n4.interface_name // .n3.interface_name) = strenv(IF_NAME)
+        if has("'"$nf"'") then
+          .nfs["'"$nf"'"][] |=
+          (select(has("n2")).n2.interface_name = strenv(IF_N2) // 
+           select(has("n3")).n3.interface_name = strenv(IF_N3) // 
+           select(has("n4")).n4.interface_name = strenv(IF_N4))
+        else .
+        end
       ' "$config_file"
     done
 
-    # ---- DNNs ----
+    # ---- DNN configuration ----
     yq -i '
       .smf.smf_info.sNssaiSmfInfoList[0].dnnSmfInfoList[0].dnn = strenv(DNN0) |
       .smf.smf_info.sNssaiSmfInfoList[1].dnnSmfInfoList[0].dnn = strenv(DNN1) |
@@ -648,7 +653,7 @@ configure-oai-5g-config() {
       .smf.local_subscription_infos[1].qos_profile.session_ambr_dl = strenv(SLICE2_DOWNLINK)
     ' "$config_file"
 
-    # ---- AMF specific ----
+    # ---- AMF configuration ----
     yq -i '
       .amf.served_guami_list[0].mcc = strenv(MCC) |
       .amf.served_guami_list[0].mnc = strenv(MNC) |
