@@ -596,9 +596,10 @@ configure-oai-5g-advance() {
 	echo "strenv(${NF_UPPER}_REPO) = strenv(OAI_NRF_REPO)"
 
         # ---- nodeName ----
-        yq -i "
-          .${nf}.nodeName = strenv(\"NODE_\" + \"${NF_UPPER}\")
-        " "$values_file"
+	yq -i '.[env(NF)].nodeName = env(VAL)' NF="$nf" VAL="NODE_${NF_UPPER}" "$values_file"
+        #yq -i "
+        #  .${nf}.nodeName = strenv(\"NODE_\" + \"${NF_UPPER}\")
+        #" "$values_file"
 
         # ---- start / tcpdump / sharedvolume ----
         yq -i "
