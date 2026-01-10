@@ -601,7 +601,7 @@ configure-oai-5g-advance() {
 
 	# Use indirect expansion to get its value
 	export TMP_NODE_NAME="${VAR_NAME}"
-	echo "TMP_NODE_NAME= ${VAR_NAME}"
+	echo "TMP_NODE_NAME= eval(${VAR_NAME})"
 
 	# Proceed with your yq command
 	yq -i ".${nf}.nodeName = strenv(TMP_NODE_NAME)" "$values_file"
