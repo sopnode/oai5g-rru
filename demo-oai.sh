@@ -565,7 +565,7 @@ configure-oai-5g-advance() {
     config_file="${OAI5G_ADVANCE}/config.yaml"
 
     echo "==== DEBUG EXPORTS ===="
-    # Affiche toutes tes variables exportées
+    # Liste de toutes les variables exportées
     for var in ENABLED_MYSQL ENABLED_NRF NFS_NRF_HOST ENABLED_NSSF \
            ENABLED_UDM NFS_UDM_HOST ENABLED_UDR NFS_UDR_HOST \
            ENABLED_AUSF NFS_AUSF_HOST ENABLED_AMF NFS_AMF_HOST IF_N2 MULTUS_AMF_N2 IP_AMF_N2 NETMASK_AMF_N2 GW_AMF_N2 ROUTES_AMF_N2 IF_NAME_AMF_N2 \
@@ -600,85 +600,29 @@ configure-oai-5g-advance() {
           .${nf}.nodeName = strenv(NODE_${NF_UPPER})
         " "$values_file"
 
-        # ---- start / tcpdump / sharedvolume ----
+        # ---- start / tcpdump / shared volume ----
+        START_VAR="${NF_START[$nf]}"
+        TCPDUMP_VAR="${NF_TCPDUMP[$nf]}"
+        SHARED_VAR="${NF_SHARED[$nf]}"
+        export START_VAR TCPDUMP_VAR SHARED_VAR
+
         yq -i "
-          .${nf}.start.start = strenv(NF_START[${nf}]) |
-          .${nf}.start.tcpdump = strenv(NF_TCPDUMP[${nf}]) |
-          .${nf}.includeTcpDumpContainer = strenv(NF_TCPDUMP[${nf}]) |
-          .${nf}.persistent.sharedvolume = strenv(NF_SHARED[${nf}])
+          .${nf}.start.start = strenv(START_VAR) |
+          .${nf}.start.tcpdump = strenv(TCPDUMP_VAR) |
+          .${nf}.includeTcpDumpContainer = strenv(TCPDUMP_VAR) |
+          .${nf}.persistent.sharedvolume = strenv(SHARED_VAR)
         " "$values_file"
 
-        # ---- Multus interfaces ----
-        case "$nf" in
-            oai-amf)
-                yq -i "
-                  .${nf}.multus.enabled = (strenv(MULTUS_AMF_N2) == \"true\") |
-                  .${nf}.multus.interfaces[0].name = strenv(IF_N2) |
-                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_AMF_N2) |
-                  .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_AMF_N2) |
-                  .${nf}.multus.interfaces[0].gateway = strenv(GW_AMF_N2) |
-                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_AMF_N2)
-                " "$values_file"
-                ;;
-            oai-upf)
-                yq -i "
-                  .${nf}.multus.enabled = true |
-                  .${nf}.multus.interfaces[0].name = strenv(IF_N3) |
-                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_UPF_N3) |
-                  .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_UPF_N3) |
-                  .${nf}.multus.interfaces[0].gateway = strenv(GW_UPF_N3) |
-                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_UPF_N3)
-                " "$values_file"
-                yq -i "
-                  .${nf}.multus.interfaces[1].name = strenv(IF_N4) |
-                  .${nf}.multus.interfaces[1].ipAdd = strenv(IP_UPF_N4) |
-                  .${nf}.multus.interfaces[1].netmask = strenv(NETMASK_UPF_N4) |
-                  .${nf}.multus.interfaces[1].gateway = strenv(GW_UPF_N4) |
-                  .${nf}.multus.interfaces[1].routes = strenv(ROUTES_UPF_N4)
-                " "$values_file"
-                yq -i "
-                  .${nf}.multus.interfaces[2].name = strenv(IF_N6) |
-                  .${nf}.multus.interfaces[2].ipAdd = strenv(IP_UPF_N6) |
-                  .${nf}.multus.interfaces[2].netmask = strenv(NETMASK_UPF_N6) |
-                  .${nf}.multus.interfaces[2].gateway = strenv(GW_UPF_N6) |
-                  .${nf}.multus.interfaces[2].routes = strenv(ROUTES_UPF_N6)
-                " "$values_file"
-                ;;
-            oai-traffic-server)
-                yq -i "
-                  .${nf}.multus.enabled = (strenv(MULTUS_TS) == \"true\") |
-                  .${nf}.multus.interfaces[0].name = strenv(IF_NAME_TS) |
-                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_TS) |
-                  .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_TS) |
-                  .${nf}.multus.interfaces[0].gateway = strenv(GW_TS)
-                " "$values_file"
-                ;;
-            oai-smf)
-                yq -i "
-                  .${nf}.multus.enabled = (strenv(MULTUS_SMF_N4) == \"true\") |
-                  .${nf}.multus.interfaces[0].name = strenv(IF_N4) |
-                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_SMF_N4) |
-                  .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_SMF_N4) |
-                  .${nf}.multus.interfaces[0].gateway = strenv(GW_SMF_N4) |
-                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_SMF_N4)
-                " "$values_file"
-                ;;
-            oai-gnb)
-                yq -i "
-                  .${nf}.multus.enabled = (strenv(MULTUS_GNB_N2) == \"true\") |
-                  .${nf}.multus.interfaces[0].name = strenv(IF_NAME_GNB_N2) |
-                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_GNB_N2)
-                " "$values_file"
-                ;;
-        esac
+        # ---- multus interfaces ----
+        MULTUS_VAR="MULTUS_${NF_UPPER}"
+        MULTUS_JSON_VAR="${NF_UPPER}_MULTUS_JSON"
+        export MULTUS_VAR MULTUS_JSON_VAR
 
-        # Supprime les MAC si présents
-        yq -i "del(.${nf}.multus.interfaces[].mac)" "$values_file"
-
-        # ---- DEBUG AFTER NF ----
-        echo "==== DEBUG $nf ===="
-        yq e ".${nf}" "$values_file"
-        echo "==================="
+        yq -i "
+          .${nf}.multus.enabled = (strenv(${MULTUS_VAR}) == \"true\") |
+          .${nf}.multus.interfaces = strenv(${MULTUS_JSON_VAR}) |
+          del(.${nf}.multus.interfaces[].mac)
+        " "$values_file"
     done
 
     # ---- Diff values.yaml ----
