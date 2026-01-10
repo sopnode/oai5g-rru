@@ -595,11 +595,9 @@ configure-oai-5g-advance() {
 	echo "** DEBUG:: .${nf}.nfimage.repository = strenv(${NF_UPPER}_REPO)"
 	echo "strenv(${NF_UPPER}_REPO) = strenv(OAI_NRF_REPO)"
 
-        # ---- repository / version / nodeName ----
+        # ---- nodeName ----
         yq -i "
-          .${nf}.nfimage.repository = strenv(\"${NF_UPPER}_\" + \"REPO\") |
-          .${nf}.nfimage.version = strenv(${NF_UPPER}_TAG) |
-          .${nf}.nodeName = strenv(NODE_${NF_UPPER})
+          .${nf}.nodeName = strenv(\"NODE_\" + \"${NF_UPPER}\")
         " "$values_file"
 
         # ---- start / tcpdump / sharedvolume ----
