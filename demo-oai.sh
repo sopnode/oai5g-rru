@@ -569,50 +569,43 @@ configure-oai-5g-advance() {
     # ---- GLOBAL ----
     yq -i '.global.IP_NRF = strenv(IP_NRF)' "$values_file"
 
-    # ---- NF PARAMETERS ----
     NF_NAMES=(oai-nrf oai-amf oai-smf oai-upf oai-udm oai-udr oai-ausf oai-lmf oai-traffic-server)
 
     for nf in "${NF_NAMES[@]}"; do
-        nf_upper=$(echo "$nf" | tr 'a-z' 'A-Z')
+        nf_var=$(echo "$nf" | tr 'a-z-' 'A-Z_')
 
-        # ---- repository, version, nodeName ----
+        # ---- nfimage, nodeName ----
         yq -i "
-          .${nf}.nfimage.repository = strenv(${nf_upper}_REPO) |
-          .${nf}.nfimage.version = strenv(${nf_upper}_TAG) |
-          .${nf}.nodeName = strenv(NODE_${nf_upper})
+          .${nf}.nfimage.repository = strenv(${nf_var}_REPO) |
+          .${nf}.nfimage.version    = strenv(${nf_var}_TAG) |
+          .${nf}.nodeName           = strenv(NODE_${nf_var})
         " "$values_file"
 
-        # ---- start and tcpdump flags ----
+        # ---- start + tcpdump ----
         yq -i "
-          .${nf}.start.start = strenv(NF_START_${nf_upper}) |
-          .${nf}.start.tcpdump = strenv(NF_TCPDUMP_${nf_upper})
+          .${nf}.start.start  = strenv(NF_START_${nf_var}) |
+          .${nf}.start.tcpdump = strenv(NF_TCPDUMP_${nf_var}) |
+          .${nf}.includeTcpDumpContainer = strenv(NF_TCPDUMP_${nf_var}) |
+          .${nf}.persistent.sharedvolume = strenv(NF_SHARED_${nf_var})
         " "$values_file"
 
-        # ---- includeTcpDumpContainer and sharedvolume ----
-        yq -i "
-          .${nf}.includeTcpDumpContainer = strenv(NF_TCPDUMP_${nf_upper}) |
-          .${nf}.persistent.sharedvolume = strenv(NF_SHARED_${nf_upper})
-        " "$values_file"
+        # ---- multus interfaces ----
+        multus_var="${nf_var}_JSON"
+        multus_json=$(eval echo "\$$multus_var")
 
-        # ---- Multus interfaces ----
-        multus_json_var="MULTUS_${nf_upper}_JSON"
-        multus_json=$(eval echo "\$$multus_json_var")
-        if [[ "$multus_json" == "[]" || -z "$multus_json" ]]; then
+        if [[ -z "$multus_json" || "$multus_json" == "[]" ]]; then
             yq -i ".${nf}.multus.enabled = false | .${nf}.multus.interfaces = []" "$values_file"
         else
-            # Convert JSON string to YAML via yq
-            yq eval -P "$multus_json" > "$TMP/multus.yaml"
-            yq -i ".${nf}.multus.enabled = true | .${nf}.multus.interfaces = load(\"$TMP/multus.yaml\")" "$values_file"
-            # Remove MAC if exists
+            echo "$multus_json" | yq eval -P - > "$TMP/multus_${nf}.yaml"
+            yq -i ".${nf}.multus.enabled = true | .${nf}.multus.interfaces = load(\"$TMP/multus_${nf}.yaml\")" "$values_file"
             yq -i "del(.${nf}.multus.interfaces[].mac)" "$values_file"
         fi
     done
 
-    # ---- diff values.yaml ----
+    # ---- DIFF values.yaml ----
     diff "$TMP/values.yaml-orig" "$values_file"
 
-    # ---- CONFIGURATION ----
-    # Global slices
+    # ---- config.yaml ----
     yq -i "
       .snssais[0].sst = strenv(SLICE1_SST) |
       .snssais[0].sd  = strenv(SLICE1_SD)  |
@@ -620,16 +613,15 @@ configure-oai-5g-advance() {
       .snssais[1].sd  = strenv(SLICE2_SD)
     " "$config_file"
 
-    # AMF PLMN / TAC
     yq -i "
       .amf.served_guami_list[0].mcc = strenv(MCC) |
       .amf.served_guami_list[0].mnc = strenv(MNC) |
-      .amf.plmn_support_list[0].mcc = strenv(MCC) |
-      .amf.plmn_support_list[0].mnc = strenv(MNC) |
-      .amf.plmn_support_list[0].tac = strenv(TAC)
+      .amf.plmn_support_list[0].mcc  = strenv(MCC) |
+      .amf.plmn_support_list[0].mnc  = strenv(MNC) |
+      .amf.plmn_support_list[0].tac  = strenv(TAC)
     " "$config_file"
 
-    # SMF DNN + QoS
+    # ---- SMF DNN + QoS ----
     yq -i "
       .smf.smf_info.sNssaiSmfInfoList[0].dnnSmfInfoList[0].dnn = strenv(DNN0) |
       .smf.smf_info.sNssaiSmfInfoList[1].dnnSmfInfoList[0].dnn = strenv(DNN1) |
@@ -641,17 +633,16 @@ configure-oai-5g-advance() {
       .smf.local_subscription_infos[1].qos_profile.session_ambr_dl = strenv(SLICE2_DOWNLINK)
     " "$config_file"
 
-    # UPF DNN + SNAT
+    # ---- UPF DNN + SNAT ----
     yq -i "
       .upf.upf_info.sNssaiUpfInfoList[0].dnnUpfInfoList[0].dnn = strenv(DNN0) |
       .upf.upf_info.sNssaiUpfInfoList[1].dnnUpfInfoList[0].dnn = strenv(DNN1) |
       .upf.support_features.enable_snat = strenv(ENABLE_SNAT)
     " "$config_file"
 
-    # ---- diff config.yaml ----
+    # ---- DIFF config.yaml ----
     diff "$TMP/config.yaml-orig" "$config_file"
 }
-
 
     
 configure-oai-5g-@mode@-old() {
