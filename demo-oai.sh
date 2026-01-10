@@ -565,7 +565,7 @@ configure-oai-5g-advance() {
     config_file="${OAI5G_ADVANCE}/config.yaml"
 
     echo "==== DEBUG EXPORTS ===="
-    # Liste de toutes les variables exportées
+    # Affiche toutes les variables exportées pour vérification
     for var in ENABLED_MYSQL ENABLED_NRF NFS_NRF_HOST ENABLED_NSSF \
            ENABLED_UDM NFS_UDM_HOST ENABLED_UDR NFS_UDR_HOST \
            ENABLED_AUSF NFS_AUSF_HOST ENABLED_AMF NFS_AMF_HOST IF_N2 MULTUS_AMF_N2 IP_AMF_N2 NETMASK_AMF_N2 GW_AMF_N2 ROUTES_AMF_N2 IF_NAME_AMF_N2 \
@@ -600,27 +600,18 @@ configure-oai-5g-advance() {
           .${nf}.nodeName = strenv(NODE_${NF_UPPER})
         " "$values_file"
 
-        # ---- start / tcpdump / shared volume ----
-        START_VAR="${NF_START[$nf]}"
-        TCPDUMP_VAR="${NF_TCPDUMP[$nf]}"
-        SHARED_VAR="${NF_SHARED[$nf]}"
-        export START_VAR TCPDUMP_VAR SHARED_VAR
-
+        # ---- start / tcpdump / includeTcpDumpContainer / sharedvolume ----
         yq -i "
-          .${nf}.start.start = strenv(START_VAR) |
-          .${nf}.start.tcpdump = strenv(TCPDUMP_VAR) |
-          .${nf}.includeTcpDumpContainer = strenv(TCPDUMP_VAR) |
-          .${nf}.persistent.sharedvolume = strenv(SHARED_VAR)
+          .${nf}.start.start = strenv(NF_START[${nf}]) |
+          .${nf}.start.tcpdump = strenv(NF_TCPDUMP[${nf}]) |
+          .${nf}.includeTcpDumpContainer = strenv(NF_TCPDUMP[${nf}]) |
+          .${nf}.persistent.sharedvolume = strenv(NF_SHARED[${nf}])
         " "$values_file"
 
         # ---- multus interfaces ----
-        MULTUS_VAR="MULTUS_${NF_UPPER}"
-        MULTUS_JSON_VAR="${NF_UPPER}_MULTUS_JSON"
-        export MULTUS_VAR MULTUS_JSON_VAR
-
         yq -i "
-          .${nf}.multus.enabled = (strenv(${MULTUS_VAR}) == \"true\") |
-          .${nf}.multus.interfaces = strenv(${MULTUS_JSON_VAR}) |
+          .${nf}.multus.enabled = (strenv(MULTUS_${NF_UPPER}) == \"true\") |
+          .${nf}.multus.interfaces = strenv(${NF_UPPER}_MULTUS_JSON) |
           del(.${nf}.multus.interfaces[].mac)
         " "$values_file"
     done
