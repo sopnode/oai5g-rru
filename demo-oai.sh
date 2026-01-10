@@ -596,7 +596,7 @@ configure-oai-5g-advance() {
 	echo "strenv(${NF_UPPER}_REPO) = strenv(OAI_NRF_REPO)"
 
         # ---- nodeName ----
-	export TMP_NODE_NAME="NODE_${NF_UPPER}"
+	export TMP_NODE_NAME=eval(NODE_${NF_UPPER})
         yq -i "
           .${nf}.nodeName = strenv(TMP_NODE_NAME)
         " "$values_file"
