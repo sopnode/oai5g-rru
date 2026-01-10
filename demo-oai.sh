@@ -604,10 +604,10 @@ configure-oai-5g-advance() {
 
         # ---- start / tcpdump / sharedvolume ----
         yq -i "
-          .${nf}.start.enabled = (strenv(NF_ENABLED[${nf}]) == \"true\") |
-          .${nf}.start.tcpdump = (strenv($PCAP) == \"true\") |
-          .${nf}.includeTcpDumpContainer = (strenv($LOGS) == \"true\") |
-          .${nf}.persistent.sharedvolume = (strenv($PCAP) == \"true\")
+          .${nf}.start.enabled = (strenv(\"ENABLED_\" + \"${NF_UPPER}\") == \"true\") |
+          .${nf}.start.tcpdump = (strenv(PCAP) == \"true\") |
+          .${nf}.includeTcpDumpContainer = (strenv(LOGS) == \"true\") |
+          .${nf}.persistent.sharedvolume = (strenv(PCAP) == \"true\")
         " "$values_file"
 
         # ---- Multus interfaces ----
