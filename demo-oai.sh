@@ -596,10 +596,15 @@ configure-oai-5g-advance() {
 	echo "strenv(${NF_UPPER}_REPO) = strenv(OAI_NRF_REPO)"
 
         # ---- nodeName ----
-	export TMP_NODE_NAME=eval(NODE_${NF_UPPER})
-        yq -i "
-          .${nf}.nodeName = strenv(TMP_NODE_NAME)
-        " "$values_file"
+	# Form the name of the variable you want to reference
+	VAR_NAME="NODE_${NF_UPPER}"
+
+	# Use indirect expansion to get its value
+	export TMP_NODE_NAME="${!VAR_NAME}"
+
+	# Proceed with your yq command
+	yq -i ".${nf}.nodeName = strenv(TMP_NODE_NAME)" "$values_file"
+
 
         # ---- start / tcpdump / sharedvolume ----
         yq -i "
