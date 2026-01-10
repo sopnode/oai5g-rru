@@ -564,32 +564,21 @@ configure-oai-5g-advance() {
     values_file="${OAI5G_ADVANCE}/values.yaml"
     config_file="${OAI5G_ADVANCE}/config.yaml"
 
+    # ---- DEBUG EXPORTS ----
     echo "==== DEBUG EXPORTS ===="
-    # Liste de toutes les variables que tu m'as fournies
     for var in ENABLED_MYSQL ENABLED_NRF NFS_NRF_HOST ENABLED_NSSF \
-           ENABLED_UDM NFS_UDM_HOST ENABLED_UDR NFS_UDR_HOST \
-           ENABLED_AUSF NFS_AUSF_HOST ENABLED_AMF NFS_AMF_HOST IF_N2 MULTUS_AMF_N2 IP_AMF_N2 NETMASK_AMF_N2 GW_AMF_N2 ROUTES_AMF_N2 IF_NAME_AMF_N2 \
-           ENABLED_UPF NFS_UPF_HOST IF_SBI IF_N3 IF_N4 IF_N6 ENABLE_SNAT \
-           MULTUS_UPF_N3 IP_UPF_N3 NETMASK_UPF_N3 GW_UPF_N3 ROUTES_UPF_N3 IF_NAME_UPF_N3 \
-           MULTUS_UPF_N4 IP_UPF_N4 NETMASK_UPF_N4 GW_UPF_N4 ROUTES_UPF_N4 IF_NAME_UPF_N4 \
-           MULTUS_UPF_N6 IP_UPF_N6 NETMASK_UPF_N6 GW_UPF_N6 ROUTES_UPF_N6 IF_NAME_UPF_N6 \
-           ENABLED_TS MULTUS_TS IP_TS NETMASK_TS GW_TS IF_NAME_TS UPF_HOST NODE_TS \
-           ENABLED_SMF NFS_SMF_HOST MULTUS_SMF_N4 IP_SMF_N4 NETMASK_SMF_N4 GW_SMF_N4 ROUTES_SMF_N4 IF_NAME_SMF_N4 \
-           HOST_AMF MULTUS_GNB_N2 IF_NAME_GNB_N2 IP_GNB_N2 GNB_N2_IF_NAME MULTUS_GNB_N3 IF_NAME_GNB_N3; do
-	printf "%-20s = %s\n" "$var" "${!var}"
+               ENABLED_UDM NFS_UDM_HOST ENABLED_UDR NFS_UDR_HOST \
+               ENABLED_AUSF NFS_AUSF_HOST ENABLED_AMF NFS_AMF_HOST IF_N2 MULTUS_AMF_N2 IP_AMF_N2 NETMASK_AMF_N2 GW_AMF_N2 ROUTES_AMF_N2 IF_NAME_AMF_N2 \
+               ENABLED_UPF NFS_UPF_HOST IF_SBI IF_N3 IF_N4 IF_N6 ENABLE_SNAT \
+               MULTUS_UPF_N3 IP_UPF_N3 NETMASK_UPF_N3 GW_UPF_N3 ROUTES_UPF_N3 IF_NAME_UPF_N3 \
+               MULTUS_UPF_N4 IP_UPF_N4 NETMASK_UPF_N4 GW_UPF_N4 ROUTES_UPF_N4 IF_NAME_UPF_N4 \
+               MULTUS_UPF_N6 IP_UPF_N6 NETMASK_UPF_N6 GW_UPF_N6 ROUTES_UPF_N6 IF_NAME_UPF_N6 \
+               ENABLED_TS MULTUS_TS IP_TS NETMASK_TS GW_TS IF_NAME_TS UPF_HOST NODE_TS \
+               ENABLED_SMF NFS_SMF_HOST MULTUS_SMF_N4 IP_SMF_N4 NETMASK_SMF_N4 GW_SMF_N4 ROUTES_SMF_N4 IF_NAME_SMF_N4 \
+               HOST_AMF MULTUS_GNB_N2 IF_NAME_GNB_N2 IP_GNB_N2 GNB_N2_IF_NAME MULTUS_GNB_N3 IF_NAME_GNB_N3; do
+        printf "%-20s = %s\n" "$var" "${!var}"
     done
     echo "======================="
-    echo "==== DEBUG NF ARRAYS ===="
-    for nf in "${NF_NAMES[@]}"; do
-	NF_UPPER=$(echo "$nf" | tr a-z A-Z)
-	# Crée des variables d'environnement pour strenv()
-	eval "export START_${NF_UPPER}=\${NF_START[${nf}]}"
-	eval "export TCPDUMP_${NF_UPPER}=\${NF_TCPDUMP[${nf}]}"
-	eval "export SHARED_${NF_UPPER}=\${NF_SHARED[${nf}]}"
-	echo "NF=$nf START=${!START_${NF_UPPER}} TCPDUMP=${!TCPDUMP_${NF_UPPER}} SHARED=${!SHARED_${NF_UPPER}}"
-    done
-    echo "======================="
-
 
     # ---- Backup ----
     cp "$values_file" "$TMP/values.yaml-orig"
@@ -604,26 +593,53 @@ configure-oai-5g-advance() {
     for nf in "${NF_NAMES[@]}"; do
         NF_UPPER=$(echo "$nf" | tr a-z A-Z)
 
-        # ---- repository / version / nodeName ----
+        # repository / version / nodeName
         yq -i "
           .${nf}.nfimage.repository = strenv(${NF_UPPER}_REPO) |
           .${nf}.nfimage.version = strenv(${NF_UPPER}_TAG) |
           .${nf}.nodeName = strenv(NODE_${NF_UPPER})
         " "$values_file"
 
-        # ---- start / tcpdump / shared volume ----
+        # start / tcpdump / shared volume
         yq -i "
           .${nf}.start.start = strenv(NF_START[${nf}]) |
           .${nf}.start.tcpdump = strenv(NF_TCPDUMP[${nf}]) |
           .${nf}.includeTcpDumpContainer = strenv(NF_TCPDUMP[${nf}]) |
           .${nf}.persistent.sharedvolume = strenv(NF_SHARED[${nf}])
         " "$values_file"
+    done
 
-        # ---- multus interfaces ----
+    # ---- MULTUS INTERFACES ----
+    declare -A NF_MULTUS_IFS=(
+        [oai-amf]="IF_N2"
+        [oai-smf]="IF_N4"
+        [oai-upf]="IF_N3 IF_N4 IF_N6 IF_SBI"
+        [oai-traffic-server]="IF_NAME_TS"
+        [oai-gnb]="IF_N2 IF_N3"
+    )
+
+    for nf in "${!NF_MULTUS_IFS[@]}"; do
+        NF_UPPER=$(echo "$nf" | tr a-z A-Z)
+        IFS=' ' read -r -a if_list <<< "${NF_MULTUS_IFS[$nf]}"
+        json_interfaces="[]"
+
+        for if_var in "${if_list[@]}"; do
+            enabled_var="MULTUS_${NF_UPPER}_${if_var#IF_}"
+            if [[ "${!enabled_var}" == "true" ]]; then
+                ip_var="IP_${NF_UPPER}_${if_var#IF_}"
+                mask_var="NETMASK_${NF_UPPER}_${if_var#IF_}"
+                gw_var="GW_${NF_UPPER}_${if_var#IF_}"
+                routes_var="ROUTES_${NF_UPPER}_${if_var#IF_}"
+                host_if_var="$if_var"
+
+                iface_json="{\"name\":\"${!host_if_var}\",\"hostInterface\":\"${!host_if_var}\",\"ipAdd\":\"${!ip_var}\",\"netmask\":\"${!mask_var}\",\"defaultRoute\":\"${!gw_var}\",\"routes\":\"${!routes_var}\",\"enabled\":true}"
+                json_interfaces=$(echo "$json_interfaces" | yq e ". + [$iface_json]" -)
+            fi
+        done
+
         yq -i "
           .${nf}.multus.enabled = (strenv(MULTUS_${NF_UPPER}) == \"true\") |
-          .${nf}.multus.interfaces = strenv(${NF_UPPER}_MULTUS_JSON) |
-          del(.${nf}.multus.interfaces[].mac)
+          .${nf}.multus.interfaces = $json_interfaces
         " "$values_file"
     done
 
