@@ -205,7 +205,7 @@ generate_dynamic_sql() {
     cp "$DB" "$DB".orig
     AS_DB=${TMP}/TableAS.sql
     SMSD_DB=${TMP}/TableSMSD.sql
-    rm -f "AS_DB" "$SMSD_DB"
+    rm -f "$AS_DB" "$SMSD_DB"
     touch "$AS_DB" "$SMSD_DB"
     echo "Generating new database at $DB"
 
