@@ -281,7 +281,8 @@ EOF
 	# append tail of DB (indexes, commit)
 	cat "$PREFIX_DEMO/oai5g-rru/patch-mysql/oai_db-basic-template-tail.sql"
     }   >> "$DB"
-    
+    echo "cat file  >>>>>>"
+    cat "$DB"
 }
 
 
