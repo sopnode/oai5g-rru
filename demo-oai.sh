@@ -97,6 +97,16 @@ IF_NAME_VLAN_BENETEL1="r2lab_benetel"
 
 ############# Running-mode dependent parameters configuration ###############
 #
+set_if_name() {
+    local multus=$1
+    local default_if=$2
+    local multus_if=$3
+    if [ "$multus" = "true" ]; then
+        echo "$multus_if"
+    else
+        echo "$default_if"
+    fi
+}
 
 if [[ $RUN_MODE = "full" ]]; then
     # Local RAN, Local CN
@@ -126,14 +136,14 @@ if [[ $RUN_MODE = "full" ]]; then
     export MULTUS_AMF="true"
     ## amf n2 IF
     export MULTUS_AMF_N2="true"
-    export IF_NAME_AMF_N2="${IF_NAME_N2N3}"
+    export IF_NAME_AMF_N2=$(set_if_name "$MULTUS_AMF_N2" "eth0" "$IF_NAME_N2N3")
     export IP_AMF_N2="${SUBNET_N2N3}.201"
     export NETMASK_AMF_N2="${NETMASK_N2N3}"
     export ROUTES_AMF_N2=""
     export DEF_ROUTE_AMF_N2=""
     ## amf sbi IF
     export MULTUS_AMF_SBI="false"
-    export IF_NAME_AMF_SBI="${IF_NAME_SBI}"
+    export IF_NAME_AMF_SBI=$(set_if_name "$MULTUS_AMF_SBI" "eth0" "$IF_NAME_SBI")
     export IP_AMF_SBI="${SUBNET_SBI}.91"
     export NETMASK_AMF_SBI="${NETMASK_SBI}"
     export GW_AMF_SBI=""
@@ -142,28 +152,28 @@ if [[ $RUN_MODE = "full" ]]; then
     export MULTUS_UPF="true"
     ## upf n3 IF
     export MULTUS_UPF_N3="true"
-    export IF_NAME_UPF_N3="${IF_NAME_N2N3}"
+    export IF_NAME_UPF_N3=$(set_if_name "$MULTUS_UPF_N3" "eth0" "$IF_NAME_N2N3")
     export IP_UPF_N3="${SUBNET_N2N3}.202"
     export NETMASK_UPF_N3="${NETMASK_N2N3}"
     export DEF_ROUTE_UPF_N3=""
     ## upf n4 IF
     export MULTUS_UPF_N4="true"
-    export IF_NAME_UPF_N4="${IF_NAME_N4}"
+    export IF_NAME_UPF_N4=$(set_if_name "$MULTUS_UPF_N4" "eth0" "$IF_NAME_N4")
     export IP_UPF_N4="${SUBNET_N4}.2"
     export NETMASK_UPF_N4="${NETMASK_N4}"
     ## upf n6 IF
     export MULTUS_UPF_N6="true"
-    export IF_NAME_UPF_N6="${IF_NAME_N6}"
+    export IF_NAME_UPF_N6=$(set_if_name "$MULTUS_UPF_N6" "eth0" "$IF_NAME_N6")
     export IP_UPF_N6="${SUBNET_N6}.2"
     export NETMASK_UPF_N6="${NETMASK_N6}"
     ## upf n9 IF
     export MULTUS_UPF_N9="false"
-    export IF_NAME_UPF_N9="$IF_NAME_N9"
+    export IF_NAME_UPF_N9=$(set_if_name "$MULTUS_UPF_N9" "eth0" "$IF_NAME_N9")
     export IP_UPF_N9="${SUBNET_N9}.2"
     export NETMASK_UPF_N9="${NETMASK_N9}"
     ## upf sbi IF
     export MULTUS_UPF_SBI="false"
-    export IF_NAME_UPF_SBI="${IF_NAME_SBI}"
+    export IF_NAME_UPF_SBI=$(set_if_name "$MULTUS_UPF_SBI" "eth0" "$IF_NAME_SBI")
     export IP_UPF_SBI="${SUBNET_SBI}.91"
     export NETMASK_UPF_SBI="${NETMASK_SBI}"
     export GW_UPF_SBI=""
@@ -175,7 +185,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export MULTUS_TS="true"
     export IP_TS="$SUBNET_TS.99"
     export NETMASK_TS
-    export IF_NAME_TS
+    export IF_NAME_TS=$(set_if_name "$MULTUS_TS" "eth0" "$IF_NAME_TS")
     export DEF_ROUTE_TS=""
     export NODE_TS="$NODE_AMF_UPF"
     # smf chart
@@ -183,13 +193,13 @@ if [[ $RUN_MODE = "full" ]]; then
     export MULTUS_SMF="true"
     ## n4 IF
     export MULTUS_SMF_N4="true"
+    export IF_NAME_SMF_N4=$(set_if_name "$MULTUS_SMF_N4" "eth0" "$IF_NAME_N4")
     export IP_SMF_N4="${SUBNET_N4}.3" 
     export NETMASK_SMF_N4="${NETMASK_N4}"
     export DEF_ROUTE_SMF_N4=""
-    export IF_NAME_SMF_N4="${IF_NAME_N4}"
     ## smf sbi IF
     export MULTUS_SMF_SBI="false"
-    export IF_NAME_SMF_SBI="${IF_NAME_SBI}"
+    export IF_NAME_SMF_SBI=$(set_if_name "$MULTUS_SMF_SBI" "eth0" "$IF_NAME_SBI")
     export IP_SMF_SBI="${SUBNET_SBI}.92"
     export NETMASK_SMF_SBI="${NETMASK_SBI}"
     export GW_SMF_SBI=""
