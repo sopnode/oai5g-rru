@@ -183,7 +183,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export IP_SMF_N4="${SUBNET_N4}.3" 
     export NETMASK_SMF_N4="${NETMASK_N4}"
     export DEF_ROUTE_SMF_N4=""
-    export IF_NAME_SMF_N4=""
+    export IF_NAME_SMF_N4="${IF_NAME_N4}"
     ## smf sbi IF
     export MULTUS_SMF_SBI="true"
     export IF_NAME_SMF_SBI="${IF_NAME_SBI}"
