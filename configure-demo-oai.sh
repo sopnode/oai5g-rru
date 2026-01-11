@@ -214,10 +214,14 @@ generate_dynamic_sql() {
 
     IP=$START_IP
 
+    echo "## ue_slice_map: ${UE_SLICE_MAP[@]}"
+
     for entry in "${UE_SLICE_MAP[@]}"; do
         UE=${entry%%:*}
         SLICE=${entry##*:}
         IMSI="${DEF_MCC}${DEF_MNC}${UE}"
+
+	echo "## UE $UE: SLICE: ${entry##*:}, IMSI:${DEF_MCC}${DEF_MNC}${UE} "
 
         # Slice parameters selection
         if [[ "$SLICE" == "1" ]]; then
