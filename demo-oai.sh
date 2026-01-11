@@ -626,7 +626,8 @@ configure-oai-5g-advance() {
                   .${nf}.multus.interfaces[0].defaultRoute = \
 		  strenv(DEF_ROUTE_AMF_N2) |
                   .${nf}.multus.interfaces[0].enabled = \
-		  (strenv(MULTUS_AMF_N2) == \"true\") 
+		  (strenv(MULTUS_AMF_N2) == \"true\") |
+                  .${nf}.multus.interfaces[0].type = macvlan
                 " "$values_file"
                 yq -i "
                   .${nf}.multus.interfaces[1].hostInterface = \
@@ -635,7 +636,8 @@ configure-oai-5g-advance() {
                   .${nf}.multus.interfaces[1].netmask = strenv(NETMASK_AMF_SBI) |
                   .${nf}.multus.interfaces[1].gateway = strenv(GW_AMF_SBI) |
                   .${nf}.multus.interfaces[1].enabled = \
-		  (strenv(MULTUS_AMF_SBI) == \"true\") 
+		  (strenv(MULTUS_AMF_SBI) == \"true\") |
+                  .${nf}.multus.interfaces[1].type = macvlan
                 " "$values_file"
                 ;;
             oai-upf)
@@ -650,7 +652,8 @@ configure-oai-5g-advance() {
                   .${nf}.multus.interfaces[0].defaultRoute = \
 		  strenv(DEF_ROUTE_UPF_N3) |
                   .${nf}.multus.interfaces[0].enabled = \
-                  (strenv(MULTUS_UPF_N3) == \"true\") 
+                  (strenv(MULTUS_UPF_N3) == \"true\") |
+                  .${nf}.multus.interfaces[0].type = macvlan
                 " "$values_file"
                 yq -i "
                   .${nf}.multus.interfaces[1].hostInterface = \
@@ -660,7 +663,8 @@ configure-oai-5g-advance() {
                   .${nf}.multus.interfaces[1].gateway = strenv(GW_UPF_N4) |
                   .${nf}.multus.interfaces[1].routes = strenv(ROUTES_UPF_N4) |
                   .${nf}.multus.interfaces[1].enabled = \
-                  (strenv(MULTUS_UPF_N4) == \"true\") 
+                  (strenv(MULTUS_UPF_N4) == \"true\") |
+                  .${nf}.multus.interfaces[1].type = macvlan
                 " "$values_file"
                 yq -i "
                   .${nf}.multus.interfaces[2].hostInterface = \
@@ -670,7 +674,8 @@ configure-oai-5g-advance() {
                   .${nf}.multus.interfaces[2].gateway = strenv(GW_UPF_N6) |
                   .${nf}.multus.interfaces[2].routes = strenv(ROUTES_UPF_N6) |
                   .${nf}.multus.interfaces[2].enabled = \
-                  (strenv(MULTUS_UPF_N6) == \"true\") 
+                  (strenv(MULTUS_UPF_N6) == \"true\") |
+                  .${nf}.multus.interfaces[2].type = macvlan
                 " "$values_file"
                 yq -i "
                   .${nf}.multus.interfaces[3].hostInterface = \
@@ -680,7 +685,8 @@ configure-oai-5g-advance() {
                   .${nf}.multus.interfaces[3].gateway = strenv(GW_UPF_N9) |
                   .${nf}.multus.interfaces[3].routes = strenv(ROUTES_UPF_N9) |
                   .${nf}.multus.interfaces[3].enabled = \
-                  (strenv(MULTUS_UPF_N9) == \"true\") 
+                  (strenv(MULTUS_UPF_N9) == \"true\") |
+                  .${nf}.multus.interfaces[3].type = macvlan
                 " "$values_file"
                 yq -i "
                   .${nf}.multus.interfaces[4].hostInterface = \
@@ -689,7 +695,8 @@ configure-oai-5g-advance() {
                   .${nf}.multus.interfaces[4].netmask = strenv(NETMASK_UPF_SBI) |
                   .${nf}.multus.interfaces[4].gateway = strenv(GW_UPF_SBI) |
                   .${nf}.multus.interfaces[4].enabled = \
-		  (strenv(MULTUS_UPF_SBI) == \"true\") 
+		  (strenv(MULTUS_UPF_SBI) == \"true\") |
+                  .${nf}.multus.interfaces[4].type = macvlan
                 " "$values_file"
                 ;;
             oai-traffic-server)
