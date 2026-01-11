@@ -750,7 +750,7 @@ configure-oai-5g-advance() {
       .nfs.upf.n3.interface_name = strenv(IF_NAME_UPF_N3) |
       .nfs.upf.n4.interface_name = strenv(IF_NAME_UPF_N4) |
       .nfs.upf.n6.interface_name = strenv(IF_NAME_UPF_N6) |
-      .nfs.upf.n9.interface_name = strenv(IF_NAME_UPF_N9) |
+      .nfs.upf.n9.interface_name = strenv(IF_NAME_UPF_N9)
     " "$config_file"
     
     
