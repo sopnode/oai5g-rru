@@ -119,14 +119,14 @@ if [[ $RUN_MODE = "full" ]]; then
     # amf chart
     export ENABLED_AMF="true"
     export MULTUS_AMF="true"
-    ## n2 IF
+    ## amf n2 IF
     export MULTUS_AMF_N2="true"
     export IF_NAME_AMF_N2="${IF_NAME_N2N3}"
     export IP_AMF_N2="${SUBNET_N2N3}.201"
     export NETMASK_AMF_N2="${NETMASK_N2N3}"
     export ROUTES_AMF_N2=""
     export DEF_ROUTE_AMF_N2=""
-    ## sbi IF
+    ## amf sbi IF
     export MULTUS_AMF_SBI="true"
     export IF_NAME_AMF_SBI="${IF_NAME_SBI}"
     export IP_AMF_SBI="${SUBNET_SBI}.91"
@@ -135,28 +135,28 @@ if [[ $RUN_MODE = "full" ]]; then
     # upf chart
     export ENABLED_UPF=true
     export ENABLE_SNAT="yes"
-    ## n3 IF
+    ## upf n3 IF
     export MULTUS_UPF_N3="true"
     export IF_NAME_UPF_N3="${IF_NAME_N2N3}"
     export IP_UPF_N3="${SUBNET_N2N3}.202"
     export NETMASK_UPF_N3="${NETMASK_N2N3}"
     export DEF_ROUTE_UPF_N3=""
-    ## n4 IF
+    ## upf n4 IF
     export MULTUS_UPF_N4="true"
     export IF_NAME_UPF_N4="${IF_NAME_N4}"
     export IP_UPF_N4="${SUBNET_N4}.2"
     export NETMASK_UPF_N4="${NETMASK_N4}"
-    ## n6 IF
+    ## upf n6 IF
     export MULTUS_UPF_N6="true"
     export IF_NAME_UPF_N6="${IF_NAME_N6}"
     export IP_UPF_N6="${SUBNET_N6}.2"
     export NETMASK_UPF_N6="${NETMASK_N6}"
-    ## n9 IF
+    ## upf n9 IF
     export MULTUS_UPF_N9="false"
     export IF_NAME_UPF_N9="$IF_NAME_N9"
     export IP_UPF_N9="${SUBNET_N9}.2"
     export NETMASK_UPF_N9="${NETMASK_N9}"
-    ## sbi IF
+    ## upf sbi IF
     export MULTUS_UPF_SBI="true"
     export IF_NAME_UPF_SBI="${IF_NAME_SBI}"
     export IP_UPF_SBI="${SUBNET_SBI}.91"
@@ -577,20 +577,6 @@ configure-oai-5g-advance() {
     values_file="${OAI5G_ADVANCE}/values.yaml"
     config_file="${OAI5G_ADVANCE}/config.yaml"
 
-    echo "==== DEBUG EXPORTS ===="
-    # Affiche toutes tes variables exportées
-    for var in ENABLED_MYSQL ENABLED_NRF NFS_NRF_HOST ENABLED_NSSF \
-           ENABLED_UDM NFS_UDM_HOST ENABLED_UDR NFS_UDR_HOST \
-           ENABLED_AUSF NFS_AUSF_HOST ENABLED_AMF NFS_AMF_HOST IF_N2 MULTUS_AMF_N2 IP_AMF_N2 NETMASK_AMF_N2 GW_AMF_N2 ROUTES_AMF_N2 IF_NAME_AMF_N2 \
-           ENABLED_UPF NFS_UPF_HOST IF_SBI IF_N3 IF_N4 IF_N6 ENABLE_SNAT \
-           MULTUS_UPF_N3 IP_UPF_N3 NETMASK_UPF_N3 GW_UPF_N3 ROUTES_UPF_N3 IF_NAME_UPF_N3 \
-           MULTUS_UPF_N4 IP_UPF_N4 NETMASK_UPF_N4 GW_UPF_N4 ROUTES_UPF_N4 IF_NAME_UPF_N4 \
-           MULTUS_UPF_N6 IP_UPF_N6 NETMASK_UPF_N6 GW_UPF_N6 ROUTES_UPF_N6 IF_NAME_UPF_N6 \
-           ENABLED_TS MULTUS_TS IP_TS NETMASK_TS GW_TS IF_NAME_TS UPF_HOST NODE_TS \
-           ENABLED_SMF NFS_SMF_HOST MULTUS_SMF_N4 IP_SMF_N4 NETMASK_SMF_N4 GW_SMF_N4 ROUTES_SMF_N4 IF_NAME_SMF_N4 \
-           HOST_AMF MULTUS_GNB_N2 IF_NAME_GNB_N2 IP_GNB_N2 GNB_N2_IF_NAME MULTUS_GNB_N3 IF_NAME_GNB_N3; do
-        printf "%-20s = %s\n" "$var" "${!var}"
-    done
     echo "======================="
 
     # ---- Backup ----
