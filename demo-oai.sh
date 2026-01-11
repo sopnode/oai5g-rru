@@ -709,7 +709,8 @@ configure-oai-5g-advance() {
                   .${nf}.multus.interfaces[0].defaultRoute = \
                   strenv(DEF_ROUTE_TS) |
                   .${nf}.multus.interfaces[0].enabled = \
-                  (strenv(MULTUS_TS) == \"true\") 
+                  (strenv(MULTUS_TS) == \"true\") |
+                  .${nf}.multus.interfaces[0].type = macvlan
                 " "$values_file"
                 ;;
             oai-smf)
@@ -723,7 +724,8 @@ configure-oai-5g-advance() {
                   strenv(DEF_ROUTE_SMF_N4) |
                   .${nf}.multus.interfaces[0].routes = strenv(ROUTES_SMF_N4) |
                   .${nf}.multus.interfaces[0].enabled = \
-                  (strenv(MULTUS_SMF_N4) == \"true\") 
+                  (strenv(MULTUS_SMF_N4) == \"true\") |
+                  .${nf}.multus.interfaces[0].type = macvlan
                 " "$values_file"
                 yq -i "
                   .${nf}.multus.interfaces[1].hostInterface = \
@@ -732,9 +734,9 @@ configure-oai-5g-advance() {
                   .${nf}.multus.interfaces[1].netmask = strenv(NETMASK_SMF_SBI) |
                   .${nf}.multus.interfaces[1].gateway = strenv(GW_SMF_SBI) |
                   .${nf}.multus.interfaces[1].enabled = \
-		  (strenv(MULTUS_SMF_SBI) == \"true\") 
+		  (strenv(MULTUS_SMF_SBI) == \"true\") |
+                  .${nf}.multus.interfaces[1].type = macvlan
                 " "$values_file"
-
                 ;;
         esac
 
