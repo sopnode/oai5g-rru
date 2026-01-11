@@ -202,7 +202,6 @@ if [[ $RUN_MODE = "full" ]]; then
     export MULTUS_GNB_N3="false"
     export IF_NAME_GNB_N3="$IF_NAME_N2N3"
     if [[ $GNB_MODE = 'cucpup' ]]; then
-	export F1IFNAME="f1c"
 	export MULTUS_CUUP_N3="true"
 	export IP_GNB_N3="$SUBNET_N2N3.204"
 	export CUUP_N3_IF_NAME="n3"
@@ -210,7 +209,6 @@ if [[ $RUN_MODE = "full" ]]; then
 	export IP_NRUE2="$SUBNET_N2N3.206"
 	export IP_NRUE3="$SUBNET_N2N3.207"
     else
-	export F1IFNAME="f1"
 	export IP_GNB_N3="$IP_GNB_N2"
 	export IP_NRUE="$SUBNET_N2N3.204"
 	export IP_NRUE2="$SUBNET_N2N3.205"
@@ -235,19 +233,10 @@ else
 	export NFS_NRF_HOST="$SUBNET_N2N3.203"
 	export ENABLED_NSSF=false
 	export ENABLED_UDR=false
-	export NFS_UDR_HOST="oai-udr"
 	export ENABLED_UDM=false
-	export NFS_UDM_HOST="oai-udm"
 	export ENABLED_AUSF=false
-	export NFS_AUSF_HOST="oai-ausf"
-	# amf 
-	export ENABLED_AMF=false
-	export NFS_AMF_HOST="$SUBNET_N2N3.200"
-	export IP_AMF_N2=""
-	export IF_N2="" # unused
-	# smf
 	export ENABLED_SMF=false
-	export NFS_SMF_HOST="$SUBNET_N2N3.202"
+	export ENABLED_AMF=false
 	# upf
 	export ENABLED_UPF=true
 	export NFS_UPF_HOST="oai-upf"
@@ -282,7 +271,6 @@ else
 	export GNB_N2_IF_NAME="n2"
 	export MULTUS_GNB_N3="false"
 	if [[ $GNB_MODE = 'cucpup' ]]; then
-	    export F1IFNAME="f1c"
 	    export MULTUS_CUUP_N3="true"
 	    export IP_GNB_N3="$SUBNET_N2N3.224"
 	    export CUUP_N3_IF_NAME="n3"
@@ -290,7 +278,6 @@ else
 	    export IP_NRUE2="$SUBNET_N2N3.226"
 	    export IP_NRUE3="$SUBNET_N2N3.227"
 	else
-	    export F1IFNAME="f1"
 	    export IP_GNB_N3="$IP_GNB_N2"
 	    export IP_NRUE="$SUBNET_N2N3.224"
 	    export IP_NRUE2="$SUBNET_N2N3.225"
@@ -593,6 +580,10 @@ configure-oai-5g-advance() {
     cp "$values_file" "$TMP/values.yaml-orig"
     cp "$config_file" "$TMP/config.yaml-orig"
 
+    #####################################
+    # ---- values.yaml CONFIGURATION ----
+    #####################################
+    
     # ---- GLOBAL ----
     yq -i '.global.IP_NRF = strenv(NFS_NRF_HOST)' "$values_file"
 
@@ -745,7 +736,24 @@ configure-oai-5g-advance() {
     # ---- Diff values.yaml ----
     diff "$TMP/values.yaml-orig" "$values_file"
 
-    # ---- CONFIGURATION ----
+    #####################################
+    # ---- config.yaml CONFIGURATION ----
+    #####################################
+
+    # NF interfaces
+    yq -i "
+      .nfs.amf.sbi.interface_name = strenv(IF_NAME_AMF_SBI) |
+      .nfs.amf.n2.interface_name = strenv(IF_NAME_AMF_N2) |
+      .nfs.smf.sbi.interface_name = strenv(IF_NAME_SMF_SBI) |
+      .nfs.smf.n4.interface_name = strenv(IF_NAME_SMF_N4) |
+      .nfs.upf.sbi.interface_name = strenv(IF_NAME_UPF_SBI) |
+      .nfs.upf.n3.interface_name = strenv(IF_NAME_UPF_N3) |
+      .nfs.upf.n4.interface_name = strenv(IF_NAME_UPF_N4) |
+      .nfs.upf.n6.interface_name = strenv(IF_NAME_UPF_N6) |
+      .nfs.upf.n9.interface_name = strenv(IF_NAME_UPF_N9) |
+    " "$config_file"
+    
+    
     # SNSSAI slices
     yq -i "
       .snssais[0].sst = strenv(SLICE1_SST) |
@@ -767,19 +775,25 @@ configure-oai-5g-advance() {
     yq -i "
       .smf.smf_info.sNssaiSmfInfoList[0].dnnSmfInfoList[0].dnn = strenv(DNN0) |
       .smf.smf_info.sNssaiSmfInfoList[1].dnnSmfInfoList[0].dnn = strenv(DNN1) |
+      .smf.local_subscription_infos[0].dnn = strenv(DNN0) |
       .smf.local_subscription_infos[0].qos_profile.5qi = strenv(SLICE1_5QI) |
       .smf.local_subscription_infos[0].qos_profile.session_ambr_ul = strenv(SLICE1_UPLINK) |
       .smf.local_subscription_infos[0].qos_profile.session_ambr_dl = strenv(SLICE1_DOWNLINK) |
+      .smf.local_subscription_infos[1].dnn = strenv(DNN1) |
       .smf.local_subscription_infos[1].qos_profile.5qi = strenv(SLICE2_5QI) |
       .smf.local_subscription_infos[1].qos_profile.session_ambr_ul = strenv(SLICE2_UPLINK) |
       .smf.local_subscription_infos[1].qos_profile.session_ambr_dl = strenv(SLICE2_DOWNLINK)
     " "$config_file"
 
-    # UPF DNN + SNAT
+    # UPF DNN + SNAT and DNNs
     yq -i "
       .upf.upf_info.sNssaiUpfInfoList[0].dnnUpfInfoList[0].dnn = strenv(DNN0) |
       .upf.upf_info.sNssaiUpfInfoList[1].dnnUpfInfoList[0].dnn = strenv(DNN1) |
-      .upf.support_features.enable_snat = strenv(ENABLE_SNAT)
+      .upf.support_features.enable_snat = strenv(ENABLE_SNAT) |
+      .dnns[0].dnn = strenv(DNN0) |
+      .dnns[0].pdu_session_type = strenv(DNN0_PDU_TYPE) |
+      .dnns[1].dnn = strenv(DNN1) |
+      .dnns[1].pdu_session_type = strenv(DNN1_PDU_TYPE) 
     " "$config_file"
 
     # if SD NSSAI field is set to "NULL", erase the sd line
@@ -794,127 +808,6 @@ configure-oai-5g-advance() {
     helm dependency update
 }
 
-
-    
-configure-oai-5g-@mode@-old() {
-
-    # if $LOGS is true, create a tcpdump container with privileges
-    # if $PCAP is true, start tcpdump and create a shared volume to store pcap
-    echo "Configuring chart $OAI5G_@MODE@/values.yaml for R2lab"
-    cat > "$TMP"/@mode@-values.sed <<EOF
-s|@PRIVILEGED@|$LOGS|
-s|@TCPDUMP_CONTAINER@|$LOGS|
-s|@START_TCPDUMP@|$PCAP|
-s|@SHAREDVOLUME@|$PCAP|
-s|@IP_NRF@|$NFS_NRF_HOST|
-s|@ENABLED_MYSQL@|$ENABLED_MYSQL|
-s|@ENABLED_NRF@|$ENABLED_NRF|
-s|@ENABLED_NSSF@|$ENABLED_NSSF|
-s|@ENABLED_UDR@|$ENABLED_UDR|
-s|@ENABLED_UDM@|$ENABLED_UDM|
-s|@ENABLED_AUSF@|$ENABLED_AUSF|
-s|@ENABLED_AMF@|$ENABLED_AMF|
-s|@CN_DEFAULT_GW@|$CN_DEFAULT_GW|
-s|@MULTUS_AMF_N2@|$MULTUS_AMF_N2|
-s|@IP_AMF_N2@|$IP_AMF_N2|
-s|@NETMASK_AMF_N2@|$NETMASK_AMF_N2|
-s|@MAC_AMF_N2@|$(gener-mac)|
-s|@GW_AMF_N2@|$GW_AMF_N2|
-s|@ROUTES_AMF_N2@|$ROUTES_AMF_N2|
-s|@IF_NAME_AMF_N2@|$IF_NAME_AMF_N2|
-s|@NODE_AMF@|"$NODE_AMF_UPF"|
-s|@ENABLED_UPF@|$ENABLED_UPF|
-s|@MULTUS_UPF_N3@|$MULTUS_UPF_N3|
-s|@IP_UPF_N3@|$IP_UPF_N3|
-s|@NETMASK_UPF_N3@|$NETMASK_UPF_N3|
-s|@MAC_UPF_N3@|$(gener-mac)|
-s|@GW_UPF_N3@|$GW_UPF_N3|
-s|@ROUTES_UPF_N3@|$ROUTES_UPF_N3|
-s|@IF_NAME_UPF_N3@|$IF_NAME_UPF_N3|
-s|@MULTUS_UPF_N4@|$MULTUS_UPF_N4|
-s|@IP_UPF_N4@|$IP_UPF_N4|
-s|@NETMASK_UPF_N4@|$NETMASK_UPF_N4|
-s|@MAC_UPF_N4@|$(gener-mac)|
-s|@GW_UPF_N4@|$GW_UPF_N4|
-s|@ROUTES_UPF_N4@|$ROUTES_UPF_N4|
-s|@IF_NAME_UPF_N4@|$IF_NAME_UPF_N4|
-s|@MULTUS_UPF_N6@|$MULTUS_UPF_N6|
-s|@IP_UPF_N6@|$IP_UPF_N6|
-s|@NETMASK_UPF_N6@|$NETMASK_UPF_N6|
-s|@MAC_UPF_N6@|$(gener-mac)|
-s|@GW_UPF_N6@|$GW_UPF_N6|
-s|@ROUTES_UPF_N6@|$ROUTES_UPF_N6|
-s|@IF_NAME_UPF_N6@|$IF_NAME_UPF_N6|
-s|@NODE_UPF@|"$NODE_AMF_UPF"|
-s|@ENABLED_TS@|$ENABLED_TS|
-s|@MULTUS_TS@|$MULTUS_TS|
-s|@IP_TS@|$IP_TS|
-s|@NETMASK_TS@|$NETMASK_TS|
-s|@MAC_TS@|$(gener-mac)|
-s|@GW_TS@|$GW_TS|
-s|@IF_NAME_TS@|$IF_NAME_TS|
-s|@UPF_HOST@|"$UPF_HOST"|
-s|@NODE_TS@|"$NODE_TS"|
-s|@ENABLED_SMF@|$ENABLED_SMF|
-s|@MULTUS_SMF_N4@|$MULTUS_SMF_N4|
-s|@IP_SMF_N4@|$IP_SMF_N4|
-s|@NETMASK_SMF_N4@|$NETMASK_SMF_N4|
-s|@MAC_SMF_N4@|$(gener-mac)|
-s|@GW_SMF_N4@|$GW_SMF_N4|
-s|@ROUTES_SMF_N4@|$ROUTES_SMF_N4|
-s|@IF_NAME_SMF_N4@|$IF_NAME_SMF_N4|
-s|@NODE_SMF@||
-EOF
-    cp "$OAI5G_@MODE@"/values.yaml "$TMP"/@mode@_values.yaml-orig
-    echo "(Over)writing $OAI5G_@MODE@/values.yaml"
-    sed -f "$TMP"/@mode@-values.sed < "$TMP"/@mode@_values.yaml-orig > "$OAI5G_@MODE@"/values.yaml
-    diff "$TMP"/@mode@_values.yaml-orig "$OAI5G_@MODE@"/values.yaml
-
-    echo "Configuring chart $OAI5G_@MODE@/config.yaml for R2lab"
-    cat > "$TMP"/@mode@-config.sed <<EOF
-s|@NFS_AMF_HOST@|$NFS_AMF_HOST|
-s|@NFS_SMF_HOST@|$NFS_SMF_HOST|
-s|@NFS_UPF_HOST@|$NFS_UPF_HOST|
-s|@NFS_UDM_HOST@|$NFS_UDM_HOST|
-s|@NFS_UDR_HOST@|$NFS_UDR_HOST|
-s|@NFS_AUSF_HOST@|$NFS_AUSF_HOST|
-s|@NFS_NRF_HOST@|$NFS_NRF_HOST|
-s|@IF_SBI@|$IF_SBI|
-s|@IF_N2@|$IF_N2|
-s|@IF_N3@|$IF_N3|
-s|@IF_N4@|$IF_N4|
-s|@IF_N6@|$IF_N6|
-s|@MCC@|$MCC|
-s|@MNC@|$MNC|
-s|@TAC@|0x0001|
-s|@ENABLE_SNAT@|$ENABLE_SNAT|
-s|@DNN0@|$DNN0|
-s|@DNN0_PDU_TYPE@|$DNN0_PDU_TYPE|
-s|@DNN1@|$DNN1|
-s|@DNN1_PDU_TYPE@|$DNN1_PDU_TYPE|
-s|@SLICE1_SST@|$SLICE1_SST|
-s|@SLICE1_SD@|$SLICE1_SD|
-s|@SLICE1_5QI@|$SLICE1_5QI|
-s|@SLICE1_UPLINK@|$SLICE1_UPLINK|
-s|@SLICE1_DOWNLINK@|$SLICE1_DOWNLINK|
-s|@SLICE2_SST@|$SLICE2_SST|
-s|@SLICE2_SD@|$SLICE2_SD|
-s|@SLICE2_5QI@|$SLICE2_5QI|
-s|@SLICE2_UPLINK@|$SLICE2_UPLINK|
-s|@SLICE2_DOWNLINK@|$SLICE2_DOWNLINK|
-s|@IP_DNS1@|$IP_DNS1|
-s|@IP_DNS2@|$IP_DNS2|
-EOF
-    cp "$OAI5G_@MODE@"/config.yaml "$TMP"/@mode@_config.yaml-orig
-    echo "(Over)writing $OAI5G_@MODE@/config.yaml"
-    sed -f "$TMP"/@mode@-config.sed < "$TMP"/@mode@_config.yaml-orig > "$OAI5G_@MODE@"/config.yaml
-    # if SD NSSAI field is set to "NULL", erase the sd line
-    awk '!/EMPTY/' "$OAI5G_@MODE@"/config.yaml > /tmp/temp && mv /tmp/temp "$OAI5G_@MODE@"/config.yaml
-    diff "$TMP"/@mode@_config.yaml-orig "$OAI5G_@MODE@"/config.yaml
-    cd "$OAI5G_@MODE@"
-    echo "helm dependency update"
-    helm dependency update
-}
 
 #################################################################################
 
