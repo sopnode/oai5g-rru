@@ -600,13 +600,14 @@ configure-oai-5g-advance() {
         # ---- nodeName ----
 	# Form the name of the variable you want to reference
 	export NODE_NAME=$(eval echo \"\${NODE_$NF_UPPER}\")
+	export ENABLED=$(eval echo \"\${ENABLED_$NF_UPPER}\")
 
 	# Proceed with your yq command
 	yq -i ".${nf}.nodeName = strenv(NODE_NAME)" "$values_file"
 
         # ---- start / tcpdump / sharedvolume ----
         yq -i "
-          .${nf}.enabled = (strenv(\"ENABLED_\" + \"${NF_UPPER}\") == \"true\") |
+          .${nf}.enabled = (strenv(ENABLED) == \"true\") |
           .${nf}.start.tcpdump = (strenv(PCAP) == \"true\") |
           .${nf}.includeTcpDumpContainer = (strenv(LOGS) == \"true\") |
           .${nf}.persistent.sharedvolume = (strenv(PCAP) == \"true\")
