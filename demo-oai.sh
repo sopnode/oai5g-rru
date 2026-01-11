@@ -83,6 +83,7 @@ IF_NAME_E1="@DEF_LOCAL_INTERFACE@"
 IF_NAME_E2="@DEF_LOCAL_INTERFACE@" 
 IF_NAME_F1="@DEF_LOCAL_INTERFACE@"
 IF_NAME_SBI="@DEF_LOCAL_INTERFACE@"
+IF_NAME_TS="@DEF_LOCAL_INTERFACE@"
 
 IF_NAME_VLAN_N300_1="r2lab_usrp"
 IF_NAME_VLAN_N300_2="r2lab_usrp"
@@ -104,11 +105,13 @@ if [[ $RUN_MODE = "full" ]]; then
     SUBNET_N6="192.168.22"
     SUBNET_N9="192.168.23"
     SUBNET_SBI="172.21.8"
+    SUBNET_TS="172.21.6"
     NETMASK_N2N3="24"
     NETMASK_N4="24"
     NETMASK_N6="24"
     NETMASK_N9="24"
     NETMASK_SBI="22"
+    NETMASK_TS="22"
     #
     export ENABLED_MYSQL="true"
     export ENABLED_NRF="true"
@@ -163,25 +166,31 @@ if [[ $RUN_MODE = "full" ]]; then
     export NETMASK_UPF_SBI="${NETMASK_SBI}"
     export GW_UPF_SBI=""
     ## 
-    # TS chart
+    # TS (Traffic Server) chart
     export ENABLE_SNAT="yes"
     export ENABLED_TS=true
-    export MULTUS_TS="$MULTUS_UPF_N6"
-    export IP_TS="$SUBNET_N6.208"
-    export NETMASK_TS="$NETMASK_N6"
-    export GW_TS=""
-    export IF_NAME_TS="$IF_NAME_N6"
-    export UPF_HOST="$IP_UPF_N6"
+    ## "external" IF
+    export MULTUS_TS="true"
+    export IP_TS="$SUBNET_TS.99"
+    export NETMASK_TS
+    export IF_NAME_TS
+    export DEF_ROUTE_TS=""
     export NODE_TS="$NODE_AMF_UPF"
     # smf chart
     export ENABLED_SMF=true
-    export NFS_SMF_HOST="oai-smf"
-    export MULTUS_SMF_N4="false"
-    export IP_SMF_N4="" 
-    export NETMASK_SMF_N4=""
-    export GW_SMF_N4=""
-    export ROUTES_SMF_N4=""
-    export IF_NAME_SMF_N4="" 
+    ## n4 IF
+    export MULTUS_SMF_N4="true"
+    export IP_SMF_N4="${SUBNET_N4}.3" 
+    export NETMASK_SMF_N4="${NETMASK_N4}"
+    export DEF_ROUTE_SMF_N4=""
+    export IF_NAME_SMF_N4=""
+    ## smf sbi IF
+    export MULTUS_SMF_SBI="true"
+    export IF_NAME_SMF_SBI="${IF_NAME_SBI}"
+    export IP_SMF_SBI="${SUBNET_SBI}.92"
+    export NETMASK_SMF_SBI="${NETMASK_SBI}"
+    export GW_SMF_SBI=""
+    #
     export IP_DNS1="138.96.0.210"
     export IP_DNS2="193.51.196.138"
     # ran charts
@@ -691,28 +700,39 @@ configure-oai-5g-advance() {
             oai-traffic-server)
                 yq -i "
                   .${nf}.multus.enabled = (strenv(MULTUS_TS) == \"true\") |
-                  .${nf}.multus.interfaces[0].name = strenv(IF_NAME_TS) |
+                  .${nf}.multus.interfaces[0].hostInterface = \
+		  strenv(IF_NAME_TS) |
                   .${nf}.multus.interfaces[0].ipAdd = strenv(IP_TS) |
                   .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_TS) |
-                  .${nf}.multus.interfaces[0].gateway = strenv(GW_TS)
+                  .${nf}.multus.interfaces[0].defaultRoute = \
+                  strenv(DEF_ROUTE_TS) |
+                  .${nf}.multus.interfaces[0].enabled = \
+                  (strenv(MULTUS_TS) == \"true\") 
                 " "$values_file"
                 ;;
             oai-smf)
                 yq -i "
-                  .${nf}.multus.enabled = (strenv(MULTUS_SMF_N4) == \"true\") |
-                  .${nf}.multus.interfaces[0].name = strenv(IF_N4) |
+                  .${nf}.multus.enabled = (strenv(MULTUS_SMF) == \"true\") |
+                  .${nf}.multus.interfaces[0].hostInterface = \
+		  strenv(IF_NAME_SMF_N4) |
                   .${nf}.multus.interfaces[0].ipAdd = strenv(IP_SMF_N4) |
                   .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_SMF_N4) |
-                  .${nf}.multus.interfaces[0].gateway = strenv(GW_SMF_N4) |
-                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_SMF_N4)
+                  .${nf}.multus.interfaces[0].defaultRoute = \
+                  strenv(DEF_ROUTE_SMF_N4) |
+                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_SMF_N4) |
+                  .${nf}.multus.interfaces[0].enabled = \
+                  (strenv(MULTUS_SMF_N4) == \"true\") 
                 " "$values_file"
-                ;;
-            oai-gnb)
                 yq -i "
-                  .${nf}.multus.enabled = (strenv(MULTUS_GNB_N2) == \"true\") |
-                  .${nf}.multus.interfaces[0].name = strenv(IF_NAME_GNB_N2) |
-                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_GNB_N2)
+                  .${nf}.multus.interfaces[1].hostInterface = \
+		  strenv(IF_NAME_SMF_SBI) |
+                  .${nf}.multus.interfaces[1].ipAdd = strenv(IP_SMF_SBI) |
+                  .${nf}.multus.interfaces[1].netmask = strenv(NETMASK_SMF_SBI) |
+                  .${nf}.multus.interfaces[1].gateway = strenv(GW_SMF_SBI) |
+                  .${nf}.multus.interfaces[1].enabled = \
+		  (strenv(MULTUS_SMF_SBI) == \"true\") 
                 " "$values_file"
+
                 ;;
         esac
 
