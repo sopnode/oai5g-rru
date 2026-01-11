@@ -736,13 +736,10 @@ configure-oai-5g-advance() {
                 ;;
         esac
 
-        # Supprime les MAC si présents
-        yq -i "del(.${nf}.multus.interfaces[].mac)" "$values_file"
-
         # ---- DEBUG AFTER NF ----
-        echo "==== DEBUG $nf ===="
-        yq e ".${nf}" "$values_file"
-        echo "==================="
+        #echo "==== DEBUG $nf ===="
+        #yq e ".${nf}" "$values_file"
+        #echo "==================="
     done
 
     # ---- Diff values.yaml ----
@@ -785,8 +782,15 @@ configure-oai-5g-advance() {
       .upf.support_features.enable_snat = strenv(ENABLE_SNAT)
     " "$config_file"
 
+    # if SD NSSAI field is set to "NULL", erase the sd line
+    awk '!/EMPTY/' "$OAI5G_@MODE@"/config.yaml > /tmp/temp && mv /tmp/temp "$config_file"
     # ---- Diff config.yaml ----
     diff "$TMP/config.yaml-orig" "$config_file"
+
+    
+    cd "${OAI5G_ADVANCE}"
+    echo "run helm dependency update"
+    helm dependency update
 }
 
 
