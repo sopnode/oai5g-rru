@@ -598,6 +598,7 @@ configure-oai-5g-advance() {
 	export NODE_NAME=$(eval echo \"\${NODE_$NF_UPPER}\")
 	echo "############ NODE_NAME is $NODE_NAME, eval: $NF_UPPER}"
 	echo " --> \"\${NODE_$NF_UPPER}\" "
+	A=$(eval echo \"\${NODE_$NF_UPPER}\"); echo "A=$A"
 
 	# Proceed with your yq command
 	yq -i ".${nf}.nodeName = strenv(NODE_NAME)" "$values_file"
