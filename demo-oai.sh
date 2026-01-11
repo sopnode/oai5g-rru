@@ -137,7 +137,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export GW_AMF_SBI=""
     # upf chart
     export ENABLED_UPF=true
-    export MULTUS_AMF="true"
+    export MULTUS_UPF="true"
     ## upf n3 IF
     export MULTUS_UPF_N3="true"
     export IF_NAME_UPF_N3="${IF_NAME_N2N3}"
