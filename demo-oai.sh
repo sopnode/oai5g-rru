@@ -75,11 +75,13 @@ OAISA_REPO="docker.io/oaisoftwarealliance"
 
 # Interfaces names of VLANs in sopnode servers
 # Local network interface is defined in prepare-demo-oai.sh ("net-30" for sopnode-{l1|w1})
-IF_NAME_N2N3_DEFAULT="@DEF_LOCAL_INTERFACE@" 
-IF_NAME_N6_DEFAULT="@DEF_LOCAL_INTERFACE@" 
-IF_NAME_E1_DEFAULT="@DEF_LOCAL_INTERFACE@" 
-IF_NAME_E2_DEFAULT="@DEF_LOCAL_INTERFACE@" 
-IF_NAME_F1_DEFAULT="@DEF_LOCAL_INTERFACE@"
+IF_NAME_N2N3="@DEF_LOCAL_INTERFACE@" 
+IF_NAME_N4="@DEF_LOCAL_INTERFACE@" 
+IF_NAME_N6="@DEF_LOCAL_INTERFACE@" 
+IF_NAME_N9="@DEF_LOCAL_INTERFACE@" 
+IF_NAME_E1="@DEF_LOCAL_INTERFACE@" 
+IF_NAME_E2="@DEF_LOCAL_INTERFACE@" 
+IF_NAME_F1="@DEF_LOCAL_INTERFACE@"
 IF_NAME_SBI="@DEF_LOCAL_INTERFACE@"
 
 IF_NAME_VLAN_N300_1="r2lab_usrp"
@@ -98,13 +100,15 @@ IF_NAME_VLAN_BENETEL1="r2lab_benetel"
 if [[ $RUN_MODE = "full" ]]; then
     # Local RAN, Local CN
     SUBNET_N2N3="192.168.3"
-    SUBNET_N6="192.168.3"
-    NETMASK_N2N3="24"
-    NETMASK_N6="24"
+    SUBNET_N4="192.168.24"
+    SUBNET_N6="192.168.22"
+    SUBNET_N9="192.168.23"
     SUBNET_SBI="172.21.8"
+    NETMASK_N2N3="24"
+    NETMASK_N4="24"
+    NETMASK_N6="24"
+    NETMASK_N9="24"
     NETMASK_SBI="22"
-    export IF_NAME_N2N3="$IF_NAME_N2N3_DEFAULT"
-    IF_NAME_N6="$IF_NAME_N6_DEFAULT"
     #
     export ENABLED_MYSQL="true"
     export ENABLED_NRF="true"
@@ -130,30 +134,35 @@ if [[ $RUN_MODE = "full" ]]; then
     export GW_AMF_SBI=""
     # upf chart
     export ENABLED_UPF=true
-    export NFS_UPF_HOST="oai-upf"
-    export IF_SBI="eth0"
-    export IF_N3="n3"
-    export IF_N4="eth0"
-    export IF_N6="eth0"
     export ENABLE_SNAT="yes"
+    ## n3 IF
     export MULTUS_UPF_N3="true"
-    export IP_UPF_N3="$SUBNET_N2N3.202"
-    export NETMASK_UPF_N3="$NETMASK_N2N3"
-    export GW_UPF_N3=""
-    export ROUTES_UPF_N3=""
-    export IF_NAME_UPF_N3="$IF_NAME_N2N3"
-    export MULTUS_UPF_N4="false"
-    export IP_UPF_N4="" 
-    export NETMASK_UPF_N4=""
-    export GW_UPF_N4=""
-    export ROUTES_UPF_N4=""
-    export IF_NAME_UPF_N4=""
+    export IF_NAME_UPF_N3="${IF_NAME_N2N3}"
+    export IP_UPF_N3="${SUBNET_N2N3}.202"
+    export NETMASK_UPF_N3="${NETMASK_N2N3}"
+    export DEF_ROUTE_UPF_N3=""
+    ## n4 IF
+    export MULTUS_UPF_N4="true"
+    export IF_NAME_UPF_N4="${IF_NAME_N4}"
+    export IP_UPF_N4="${SUBNET_N4}.2"
+    export NETMASK_UPF_N4="${NETMASK_N4}"
+    ## n6 IF
     export MULTUS_UPF_N6="true"
-    export IP_UPF_N6="$SUBNET_N6.207" 
-    export NETMASK_UPF_N6="$NETMASK_N6"
-    export GW_UPF_N6=""
-    export ROUTES_UPF_N6=""
-    export IF_NAME_UPF_N6="$IF_NAME_N6"
+    export IF_NAME_UPF_N6="${IF_NAME_N6}"
+    export IP_UPF_N6="${SUBNET_N6}.2"
+    export NETMASK_UPF_N6="${NETMASK_N6}"
+    ## n9 IF
+    export MULTUS_UPF_N9="false"
+    export IF_NAME_UPF_N9="$IF_NAME_N9"
+    export IP_UPF_N9="${SUBNET_N9}.2"
+    export NETMASK_UPF_N9="${NETMASK_N9}"
+    ## sbi IF
+    export MULTUS_UPF_SBI="true"
+    export IF_NAME_UPF_SBI="${IF_NAME_SBI}"
+    export IP_UPF_SBI="${SUBNET_SBI}.91"
+    export NETMASK_UPF_SBI="${NETMASK_SBI}"
+    export GW_UPF_SBI=""
+    ## 
     # TS chart
     export ENABLED_TS=true
     export MULTUS_TS="$MULTUS_UPF_N6"
@@ -374,28 +383,28 @@ export MULTUS_DU_F1C="true"
 export IP_DU_F1C="172.21.6.90"
 export NETMASK_DU_F1C="22"
 export ROUTES_DU_F1C=""
-export IF_NAME_DU_F1C="$IF_NAME_F1_DEFAULT"
+export IF_NAME_DU_F1C="$IF_NAME_F1"
 #
 export MULTUS_DU_F1U="true"
 export IP_DU_F1U="172.21.16.90"
 export NETMASK_DU_F1U="22"
 export GW_DU_F1U=""
 export ROUTES_DU_F1U=""
-export IF_NAME_DU_F1U="$IF_NAME_F1_DEFAULT"
+export IF_NAME_DU_F1U="$IF_NAME_F1"
 #
 export MULTUS_DU_F1="true"
 export IP_DU_F1="172.21.16.100"
 export NETMASK_DU_F1="22"
 export GW_DU_F1=""
 export ROUTES_DU_F1=""
-export IF_NAME_DU_F1="$IF_NAME_F1_DEFAULT"
+export IF_NAME_DU_F1="$IF_NAME_F1"
 #
 export MULTUS_DU_E2="true"
 export IP_DU_E2="192.168.85.91"
 export NETMASK_DU_E2="24"
 export GW_DU_E2=""
 export ROUTES_DU_E2="" 
-export IF_NAME_DU_E2="$IF_NAME_E2_DEFAULT"
+export IF_NAME_DU_E2="$IF_NAME_E2"
 #
 export QOS_DU="true"
 export NODE_DU="$NODE_GNB"
@@ -410,7 +419,7 @@ export IP_CU_F1="172.21.16.92"
 export NETMASK_CU_F1="22"
 export GW_CU_F1="" 
 export ROUTES_CU_F1="" 
-export IF_NAME_CU_F1="$IF_NAME_F1_DEFAULT"
+export IF_NAME_CU_F1="$IF_NAME_F1"
 #
 export MULTUS_CU_N2=${MULTUS_CU_N2:=$MULTUS_GNB_N2}
 export IP_CU_N2=${IP_CU_N2:=$IP_GNB_N2}
@@ -431,7 +440,7 @@ export IP_CU_E2="192.168.85.93"
 export NETMASK_CU_E2="24"
 export GW_CU_E2=""
 export ROUTES_CU_E2="" 
-export IF_NAME_CU_E2="$IF_NAME_E2_DEFAULT"
+export IF_NAME_CU_E2="$IF_NAME_E2"
 #
 export ADD_OPTIONS_CU="--log_config.global_log_options level,nocolor,time"
 export QOS_CU="true"
@@ -449,14 +458,14 @@ export IP_CUCP_E1="192.168.18.12"
 export NETMASK_CUCP_E1="24"
 export GW_CUCP_E1=""
 export ROUTES_CUCP_E1=""
-export IF_NAME_CUCP_E1="$IF_NAME_E1_DEFAULT"
+export IF_NAME_CUCP_E1="$IF_NAME_E1"
 #
 export MULTUS_CUCP_E2="$FLEXRIC" # E2 only used if FLEXRIC is true
 export IP_CUCP_E2="192.168.85.93"
 export NETMASK_CUCP_E2="24"
 export GW_CUCP_E2=""
 export ROUTES_CUCP_E2="" 
-export IF_NAME_CUCP_E2="$IF_NAME_E2_DEFAULT"
+export IF_NAME_CUCP_E2="$IF_NAME_E2"
 #
 export MULTUS_CUCP_N2=${MULTUS_CUCP_N2:=$MULTUS_GNB_N2}
 export IP_CUCP_N2=${IP_CUCP_N2:=$IP_GNB_N2} 
@@ -471,7 +480,7 @@ export IP_CUCP_F1C="172.21.16.92"
 export NETMASK_CUCP_F1C="22"
 export GW_CUCP_F1C=""
 export ROUTES_CUCP_F1C=""
-export IF_NAME_CUCP_F1C="$IF_NAME_F1_DEFAULT"
+export IF_NAME_CUCP_F1C="$IF_NAME_F1"
 #
 export ADD_OPTIONS_CUCP="--log_config.global_log_options level,nocolor,time"
 export NAME_CUCP="oai-cu-cp"
@@ -488,14 +497,14 @@ export IP_CUUP_E1="192.168.18.13"
 export NETMASK_CUUP_E1="24"
 export GW_CUUP_E1=""
 export ROUTES_CUUP_E1="" 
-export IF_NAME_CUUP_E1="$IF_NAME_E1_DEFAULT"
+export IF_NAME_CUUP_E1="$IF_NAME_E1"
 #
 export MULTUS_CUUP_E2="true"
 export IP_CUUP_E2="192.168.85.92"
 export NETMASK_CUUP_E2="24"
 export GW_CUUP_E2=""
 export ROUTES_CUUP_E2="" 
-export IF_NAME_CUUP_E2="$IF_NAME_E2_DEFAULT"
+export IF_NAME_CUUP_E2="$IF_NAME_E2"
 #
 export MULTUS_CUUP_N3=${MULTUS_CUUP_N3:=$MULTUS_GNB_N3}
 export IP_CUUP_N3=${IP_CUUP_N3:=$IP_GNB_N3}
@@ -510,7 +519,7 @@ export IP_CUUP_F1U="172.21.16.93"
 export NETMASK_CUUP_F1U="22"
 export GW_CUUP_F1U="" # "172.21.19.254"
 export ROUTES_CUUP_F1U=""
-export IF_NAME_CUUP_F1U="$IF_NAME_F1_DEFAULT"  
+export IF_NAME_CUUP_F1U="$IF_NAME_F1"
 #
 export ADD_OPTIONS_CUUP="--log_config.global_log_options level,nocolor,time"
 export HOST_CUCP="$IP_CUCP_E1" # "oai-cu-cp" 
@@ -535,7 +544,7 @@ export IP_GNB_E2="192.168.85.94"
 export NETMASK_GNB_E2="24"
 export GW_GNB_E2=""
 export ROUTES_GNB_E2="" 
-export IF_NAME_GNB_E2="$IF_NAME_E2_DEFAULT"
+export IF_NAME_GNB_E2="$IF_NAME_E2"
 #
 export QOS_GNB="true"
 
@@ -640,11 +649,13 @@ configure-oai-5g-advance() {
                 ;;
             oai-upf)
                 yq -i "
-                  .${nf}.multus.enabled = (strenv(MULTUS_UPF_N3) == \"true\") |
+                  .${nf}.multus.interfaces[0].hostInterface = \
+		  strenv(IF_NAME_UPF_N3) |
                   .${nf}.multus.interfaces[0].ipAdd = strenv(IP_UPF_N3) |
                   .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_UPF_N3) |
                   .${nf}.multus.interfaces[0].gateway = strenv(GW_UPF_N3) |
-                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_UPF_N3)
+                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_UPF_N3) |
+                  .${nf}.multus.enabled = (strenv(MULTUS_UPF_N3) == \"true\") 
                 " "$values_file"
                 yq -i "
                   .${nf}.multus.enabled = (strenv(MULTUS_UPF_N4) == \"true\") |
