@@ -134,7 +134,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export GW_AMF_SBI=""
     # upf chart
     export ENABLED_UPF=true
-    export ENABLE_SNAT="yes"
+    export MULTUS_AMF="true"
     ## upf n3 IF
     export MULTUS_UPF_N3="true"
     export IF_NAME_UPF_N3="${IF_NAME_N2N3}"
@@ -164,6 +164,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export GW_UPF_SBI=""
     ## 
     # TS chart
+    export ENABLE_SNAT="yes"
     export ENABLED_TS=true
     export MULTUS_TS="$MULTUS_UPF_N6"
     export IP_TS="$SUBNET_N6.208"
@@ -635,29 +636,56 @@ configure-oai-5g-advance() {
                 ;;
             oai-upf)
                 yq -i "
+                  .${nf}.multus.enabled = (strenv(MULTUS_UPF) == \"true\") |
                   .${nf}.multus.interfaces[0].hostInterface = \
 		  strenv(IF_NAME_UPF_N3) |
                   .${nf}.multus.interfaces[0].ipAdd = strenv(IP_UPF_N3) |
                   .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_UPF_N3) |
                   .${nf}.multus.interfaces[0].gateway = strenv(GW_UPF_N3) |
                   .${nf}.multus.interfaces[0].routes = strenv(ROUTES_UPF_N3) |
-                  .${nf}.multus.enabled = (strenv(MULTUS_UPF_N3) == \"true\") 
+                  .${nf}.multus.interfaces[0].defaultRoute = \
+		  strenv(DEF_ROUTE_UPF_N3) |
+                  .${nf}.multus.interfaces[0].enabled = \
+                  (strenv(MULTUS_UPF_N3) == \"true\") 
                 " "$values_file"
                 yq -i "
-                  .${nf}.multus.enabled = (strenv(MULTUS_UPF_N4) == \"true\") |
-                  .${nf}.multus.interfaces[1].name = strenv(IF_N4) |
+                  .${nf}.multus.interfaces[1].hostInterface = \
+		  strenv(IF_NAME_UPF_N4) |
                   .${nf}.multus.interfaces[1].ipAdd = strenv(IP_UPF_N4) |
                   .${nf}.multus.interfaces[1].netmask = strenv(NETMASK_UPF_N4) |
                   .${nf}.multus.interfaces[1].gateway = strenv(GW_UPF_N4) |
-                  .${nf}.multus.interfaces[1].routes = strenv(ROUTES_UPF_N4)
+                  .${nf}.multus.interfaces[1].routes = strenv(ROUTES_UPF_N4) |
+                  .${nf}.multus.interfaces[1].enabled = \
+                  (strenv(MULTUS_UPF_N4) == \"true\") 
                 " "$values_file"
                 yq -i "
-                  .${nf}.multus.enabled = (strenv(MULTUS_UPF_N6) == \"true\") |
-                  .${nf}.multus.interfaces[2].name = strenv(IF_N6) |
+                  .${nf}.multus.interfaces[2].hostInterface = \
+		  strenv(IF_NAME_UPF_N6) |
                   .${nf}.multus.interfaces[2].ipAdd = strenv(IP_UPF_N6) |
                   .${nf}.multus.interfaces[2].netmask = strenv(NETMASK_UPF_N6) |
                   .${nf}.multus.interfaces[2].gateway = strenv(GW_UPF_N6) |
-                  .${nf}.multus.interfaces[2].routes = strenv(ROUTES_UPF_N6)
+                  .${nf}.multus.interfaces[2].routes = strenv(ROUTES_UPF_N6) |
+                  .${nf}.multus.interfaces[2].enabled = \
+                  (strenv(MULTUS_UPF_N6) == \"true\") 
+                " "$values_file"
+                yq -i "
+                  .${nf}.multus.interfaces[3].hostInterface = \
+		  strenv(IF_NAME_UPF_N9) |
+                  .${nf}.multus.interfaces[3].ipAdd = strenv(IP_UPF_N9) |
+                  .${nf}.multus.interfaces[3].netmask = strenv(NETMASK_UPF_N9) |
+                  .${nf}.multus.interfaces[3].gateway = strenv(GW_UPF_N9) |
+                  .${nf}.multus.interfaces[3].routes = strenv(ROUTES_UPF_N9) |
+                  .${nf}.multus.interfaces[3].enabled = \
+                  (strenv(MULTUS_UPF_N9) == \"true\") 
+                " "$values_file"
+                yq -i "
+                  .${nf}.multus.interfaces[4].hostInterface = \
+		  strenv(IF_NAME_UPF_SBI) |
+                  .${nf}.multus.interfaces[4].ipAdd = strenv(IP_UPF_SBI) |
+                  .${nf}.multus.interfaces[4].netmask = strenv(NETMASK_UPF_SBI) |
+                  .${nf}.multus.interfaces[4].gateway = strenv(GW_UPF_SBI) |
+                  .${nf}.multus.interfaces[4].enabled = \
+		  (strenv(MULTUS_UPF_SBI) == \"true\") 
                 " "$values_file"
                 ;;
             oai-traffic-server)
