@@ -27,6 +27,8 @@ usage() {
 # do not change them here !
 NS="@DEF_NS@" # k8s namespace
 NODE_AMF_UPF="@DEF_NODE_AMF_UPF@" # node in wich run amf and upf pods
+export NODE_AMF=${NODE_AMF_UPF}
+export NODE_UPF=${NODE_AMF_UPF}
 export NODE_GNB="@DEF_NODE_GNB@" # node in which gnb pod runs
 export RRU="@DEF_RRU@" # in ['b210', 'n300', 'n320', 'jaguar', 'panther', 'rfsim']
 RUN_MODE="@DEF_RUN_MODE@" # in ['full', 'gnb-only', 'gnb-upf']
