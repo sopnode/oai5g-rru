@@ -787,7 +787,8 @@ configure-oai-5g-advance() {
     # ---- Diff config.yaml ----
     diff "$TMP/config.yaml-orig" "$config_file"
 
-    
+    # Fix Chart.yaml and run helm dependency update
+    sed -i 's/version: v2.2.0.0/version: 2.2.0/g' "${OAI5G_ADVANCE}/Chart.yaml"
     cd "${OAI5G_ADVANCE}"
     echo "run helm dependency update"
     helm dependency update
