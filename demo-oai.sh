@@ -130,13 +130,13 @@ if [[ $RUN_MODE = "full" ]]; then
     export ROUTES_AMF_N2=""
     export DEF_ROUTE_AMF_N2=""
     ## amf sbi IF
-    export MULTUS_AMF_SBI="true"
+    export MULTUS_AMF_SBI="false"
     export IF_NAME_AMF_SBI="${IF_NAME_SBI}"
     export IP_AMF_SBI="${SUBNET_SBI}.91"
     export NETMASK_AMF_SBI="${NETMASK_SBI}"
     export GW_AMF_SBI=""
     # upf chart
-    export ENABLED_UPF=true
+    export ENABLED_UPF="true"
     export MULTUS_UPF="true"
     ## upf n3 IF
     export MULTUS_UPF_N3="true"
@@ -160,7 +160,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export IP_UPF_N9="${SUBNET_N9}.2"
     export NETMASK_UPF_N9="${NETMASK_N9}"
     ## upf sbi IF
-    export MULTUS_UPF_SBI="true"
+    export MULTUS_UPF_SBI="false"
     export IF_NAME_UPF_SBI="${IF_NAME_SBI}"
     export IP_UPF_SBI="${SUBNET_SBI}.91"
     export NETMASK_UPF_SBI="${NETMASK_SBI}"
@@ -185,7 +185,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export DEF_ROUTE_SMF_N4=""
     export IF_NAME_SMF_N4="${IF_NAME_N4}"
     ## smf sbi IF
-    export MULTUS_SMF_SBI="true"
+    export MULTUS_SMF_SBI="false"
     export IF_NAME_SMF_SBI="${IF_NAME_SBI}"
     export IP_SMF_SBI="${SUBNET_SBI}.92"
     export NETMASK_SMF_SBI="${NETMASK_SBI}"
