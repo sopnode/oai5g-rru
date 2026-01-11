@@ -80,6 +80,7 @@ IF_NAME_N6_DEFAULT="@DEF_LOCAL_INTERFACE@"
 IF_NAME_E1_DEFAULT="@DEF_LOCAL_INTERFACE@" 
 IF_NAME_E2_DEFAULT="@DEF_LOCAL_INTERFACE@" 
 IF_NAME_F1_DEFAULT="@DEF_LOCAL_INTERFACE@"
+IF_NAME_SBI="@DEF_LOCAL_INTERFACE@"
 
 IF_NAME_VLAN_N300_1="r2lab_usrp"
 IF_NAME_VLAN_N300_2="r2lab_usrp"
@@ -100,32 +101,34 @@ if [[ $RUN_MODE = "full" ]]; then
     SUBNET_N6="192.168.3"
     NETMASK_N2N3="24"
     NETMASK_N6="24"
+    SUBNET_SBI="172.21.8"
+    NETMASK_SBI="22"
+    IF_NAME_SBI=""
     export IF_NAME_N2N3="$IF_NAME_N2N3_DEFAULT"
     IF_NAME_N6="$IF_NAME_N6_DEFAULT"
     #
-    export ENABLED_MYSQL=true
-    #
-    export ENABLED_NRF=true
-    export  NFS_NRF_HOST="oai-nrf"
-    #
-    export ENABLED_NSSF=true
-    #
-    export ENABLED_UDM=true
-    export NFS_UDM_HOST="oai-udm"
-    export ENABLED_UDR=true
-    export NFS_UDR_HOST="oai-udr"
-    export ENABLED_AUSF=true
-    export NFS_AUSF_HOST="oai-ausf"
+    export ENABLED_MYSQL="true"
+    export ENABLED_NRF="true"
+    export ENABLED_NSSF="true"
+    export ENABLED_UDM="true"
+    export ENABLED_UDR="true"
+    export ENABLED_AUSF="true"
     # amf chart
-    export ENABLED_AMF=true
-    export NFS_AMF_HOST="oai-amf"
-    export IF_N2="n2"
+    export ENABLED_AMF="true"
+    export MULTUS_AMF="true"
+    # n2 IF
     export MULTUS_AMF_N2="true"
-    export IP_AMF_N2="$SUBNET_N2N3.201"
-    export NETMASK_AMF_N2="$NETMASK_N2N3"
-    export GW_AMF_N2=""
+    export IF_NAME_AMF_N2="${IF_NAME_N2N3}"
+    export IP_AMF_N2="${SUBNET_N2N3}.201"
+    export NETMASK_AMF_N2="${NETMASK_N2N3}"
     export ROUTES_AMF_N2=""
-    export IF_NAME_AMF_N2="$IF_NAME_N2N3"
+    export DEF_ROUTE_AMF_N2=""
+    # sbi IF
+    export MULTUS_AMF_SBI="true"
+    export IF_NAME_AMF_SBI="${IF_NAME_SBI}"
+    export IP_AMF_SBI="${SUBNET_SBI}.91"
+    export NETMASK_AMF_SBI="${NETMASK_SBI}"
+    export GW_AMF_SBI=""
     # upf chart
     export ENABLED_UPF=true
     export NFS_UPF_HOST="oai-upf"
@@ -598,17 +601,14 @@ configure-oai-5g-advance() {
         # ---- nodeName ----
 	# Form the name of the variable you want to reference
 	export NODE_NAME=$(eval echo \"\${NODE_$NF_UPPER}\")
-	echo "############ NODE_NAME is $NODE_NAME, eval: $NF_UPPER}"
-	echo " --> \"\${NODE_$NF_UPPER}\" "
-	A=$(eval echo \"\${NODE_$NF_UPPER}\"); echo "A=$A"
-
+1
 	# Proceed with your yq command
 	yq -i ".${nf}.nodeName = strenv(NODE_NAME)" "$values_file"
 
         # ---- start / tcpdump / sharedvolume ----
         yq -i "
-          .${nf}.start.enabled = (strenv(\"ENABLED_\" + \"${NF_UPPER}\") == \"true\") |
-          .${nf}.start.tcpdump = (strenv(PCAP) == \"true\") |
+          .${nf}.enabled = (strenv(\"ENABLED_\" + \"${NF_UPPER}\") == \"true\") |
+          .${nf}.testing.tcpdump = (strenv(PCAP) == \"true\") |
           .${nf}.includeTcpDumpContainer = (strenv(LOGS) == \"true\") |
           .${nf}.persistent.sharedvolume = (strenv(PCAP) == \"true\")
         " "$values_file"
@@ -617,24 +617,37 @@ configure-oai-5g-advance() {
         case "$nf" in
             oai-amf)
                 yq -i "
-                  .${nf}.multus.enabled = (strenv(MULTUS_AMF_N2) == \"true\") |
-                  .${nf}.multus.interfaces[0].name = strenv(IF_N2) |
+                  .${nf}.multus.enabled = (strenv(MULTUS_AMF) == \"true\") |
+                  .${nf}.multus.interfaces[0].hostInterface = \
+		  strenv(IF_NAME_AMF_N2) |
                   .${nf}.multus.interfaces[0].ipAdd = strenv(IP_AMF_N2) |
                   .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_AMF_N2) |
-                  .${nf}.multus.interfaces[0].gateway = strenv(GW_AMF_N2) |
-                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_AMF_N2)
+                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_AMF_N2) |
+                  .${nf}.multus.interfaces[0].defaultRoute = \
+		  strenv(DEF_ROUTE_AMF_N2) |
+                  .${nf}.multus.interfaces[0].enabled = \
+		  (strenv(MULTUS_AMF_N2) == \"true\") 
+                " "$values_file"
+                yq -i "
+                  .${nf}.multus.interfaces[1].hostInterface = \
+		  strenv(IF_NAME_AMF_SBI) |
+                  .${nf}.multus.interfaces[1].ipAdd = strenv(IP_AMF_SBI) |
+                  .${nf}.multus.interfaces[1].netmask = strenv(NETMASK_AMF_SBI) |
+                  .${nf}.multus.interfaces[1].gateway = strenv(GW_AMF_SBI) |
+                  .${nf}.multus.interfaces[1].enabled = \
+		  (strenv(MULTUS_AMF_SBI) == \"true\") 
                 " "$values_file"
                 ;;
             oai-upf)
                 yq -i "
-                  .${nf}.multus.enabled = true |
-                  .${nf}.multus.interfaces[0].name = strenv(IF_N3) |
+                  .${nf}.multus.enabled = (strenv(MULTUS_UPF_N3) == \"true\") |
                   .${nf}.multus.interfaces[0].ipAdd = strenv(IP_UPF_N3) |
                   .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_UPF_N3) |
                   .${nf}.multus.interfaces[0].gateway = strenv(GW_UPF_N3) |
                   .${nf}.multus.interfaces[0].routes = strenv(ROUTES_UPF_N3)
                 " "$values_file"
                 yq -i "
+                  .${nf}.multus.enabled = (strenv(MULTUS_UPF_N4) == \"true\") |
                   .${nf}.multus.interfaces[1].name = strenv(IF_N4) |
                   .${nf}.multus.interfaces[1].ipAdd = strenv(IP_UPF_N4) |
                   .${nf}.multus.interfaces[1].netmask = strenv(NETMASK_UPF_N4) |
@@ -642,6 +655,7 @@ configure-oai-5g-advance() {
                   .${nf}.multus.interfaces[1].routes = strenv(ROUTES_UPF_N4)
                 " "$values_file"
                 yq -i "
+                  .${nf}.multus.enabled = (strenv(MULTUS_UPF_N6) == \"true\") |
                   .${nf}.multus.interfaces[2].name = strenv(IF_N6) |
                   .${nf}.multus.interfaces[2].ipAdd = strenv(IP_UPF_N6) |
                   .${nf}.multus.interfaces[2].netmask = strenv(NETMASK_UPF_N6) |
