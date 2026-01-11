@@ -103,7 +103,6 @@ if [[ $RUN_MODE = "full" ]]; then
     NETMASK_N6="24"
     SUBNET_SBI="172.21.8"
     NETMASK_SBI="22"
-    IF_NAME_SBI=""
     export IF_NAME_N2N3="$IF_NAME_N2N3_DEFAULT"
     IF_NAME_N6="$IF_NAME_N6_DEFAULT"
     #
@@ -116,14 +115,14 @@ if [[ $RUN_MODE = "full" ]]; then
     # amf chart
     export ENABLED_AMF="true"
     export MULTUS_AMF="true"
-    # n2 IF
+    ## n2 IF
     export MULTUS_AMF_N2="true"
     export IF_NAME_AMF_N2="${IF_NAME_N2N3}"
     export IP_AMF_N2="${SUBNET_N2N3}.201"
     export NETMASK_AMF_N2="${NETMASK_N2N3}"
     export ROUTES_AMF_N2=""
     export DEF_ROUTE_AMF_N2=""
-    # sbi IF
+    ## sbi IF
     export MULTUS_AMF_SBI="true"
     export IF_NAME_AMF_SBI="${IF_NAME_SBI}"
     export IP_AMF_SBI="${SUBNET_SBI}.91"
@@ -608,7 +607,7 @@ configure-oai-5g-advance() {
         # ---- start / tcpdump / sharedvolume ----
         yq -i "
           .${nf}.enabled = (strenv(\"ENABLED_\" + \"${NF_UPPER}\") == \"true\") |
-          .${nf}.testing.tcpdump = (strenv(PCAP) == \"true\") |
+          .${nf}.start.tcpdump = (strenv(PCAP) == \"true\") |
           .${nf}.includeTcpDumpContainer = (strenv(LOGS) == \"true\") |
           .${nf}.persistent.sharedvolume = (strenv(PCAP) == \"true\")
         " "$values_file"
