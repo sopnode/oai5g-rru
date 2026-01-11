@@ -179,7 +179,8 @@ if [[ $RUN_MODE = "full" ]]; then
     export DEF_ROUTE_TS=""
     export NODE_TS="$NODE_AMF_UPF"
     # smf chart
-    export ENABLED_SMF=true
+    export ENABLED_SMF="true"
+    export MULTUS_SMF="true"
     ## n4 IF
     export MULTUS_SMF_N4="true"
     export IP_SMF_N4="${SUBNET_N4}.3" 
