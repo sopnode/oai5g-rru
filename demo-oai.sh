@@ -160,7 +160,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export NETMASK_UPF_N3="${NETMASK_N2N3}"
     export DEF_ROUTE_UPF_N3=""
     ## upf n4 IF
-    export MULTUS_UPF_N4="true"
+    export MULTUS_UPF_N4="false"
     export IF_NAME_UPF_N4="$IF_NAME_N4"
     export NAME_UPF_N4=$(set_if_name "$MULTUS_UPF_N4" "eth0" "n4")
     export IP_UPF_N4="${SUBNET_N4}.2"
@@ -198,7 +198,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export NODE_TS="$NODE_AMF_UPF"
     # smf chart
     export ENABLED_SMF="true"
-    export MULTUS_SMF="true"
+    export MULTUS_SMF="false"
     ## n4 IF
     export MULTUS_SMF_N4="true"
     export IF_NAME_SMF_N4="$IF_NAME_N4"
