@@ -154,7 +154,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export MULTUS_UPF="true"
     ## upf n3 IF
     export MULTUS_UPF_N3="true"
-    export IF_NAME_UPF_N3="$IF_NAME_N2N3")
+    export IF_NAME_UPF_N3="$IF_NAME_N2N3"
     export NAME_UPF_N3=$(set_if_name "$MULTUS_UPF_N3" "eth0" "n3")
     export IP_UPF_N3="${SUBNET_N2N3}.202"
     export NETMASK_UPF_N3="${NETMASK_N2N3}"
