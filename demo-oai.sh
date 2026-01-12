@@ -200,7 +200,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export ENABLED_SMF="true"
     export MULTUS_SMF="false"
     ## n4 IF
-    export MULTUS_SMF_N4="true"
+    export MULTUS_SMF_N4="false"
     export IF_NAME_SMF_N4="$IF_NAME_N4"
     export NAME_SMF_N4=$(set_if_name "$MULTUS_SMF_N4" "eth0" "n4")
     export IP_SMF_N4="${SUBNET_N4}.3" 
