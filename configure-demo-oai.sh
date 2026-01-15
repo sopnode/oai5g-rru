@@ -95,7 +95,8 @@ function update() {
     PCAP=$1; shift # boolean in [true, false]
     MONITORING=$1; shift # boolean in [true, false]
     FLEXRIC=$1; shift # boolean
-    LOCAL_INTERFACE=$1; shift
+    LOCAL_CORE_INTERFACE=$1; shift
+    LOCAL_RAN_INTERFACE=$1; shift
     PREFIX_DEMO=$1; shift
     CN_MODE=$1; shift
     GNB_MODE=$1; shift
@@ -140,7 +141,8 @@ s|@DEF_LOGS@|$LOGS|
 s|@DEF_PCAP@|$PCAP|
 s|@DEF_MONITORING@|$MONITORING|
 s|@DEF_FLEXRIC@|$FLEXRIC|
-s|@DEF_LOCAL_INTERFACE@|$LOCAL_INTERFACE|
+s|@DEF_LOCAL_CORE_INTERFACE@|$LOCAL_CORE_INTERFACE|
+s|@DEF_LOCAL_RAN_INTERFACE@|$LOCAL_RAN_INTERFACE|
 s|@DEF_MCC@|${MCC}|g
 s|@DEF_MNC@|${MNC}|g
 s|@DEF_TAC@|${TAC}|g
@@ -286,8 +288,8 @@ EOF
 }
 
 
-if test $# -ne 19; then
-    echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap monitoring flexric local_interface prefix_demo cn_mode gnb_mode DNN0 DNN1 regcred_name regcred_password regcred_email "
+if test $# -ne 20; then
+    echo "USAGE: configure-demo-oai.sh namespace node_amf_upf node_gnb rru gnb_only logs pcap monitoring flexric local_core_interface local_ran_interface prefix_demo cn_mode gnb_mode DNN0 DNN1 regcred_name regcred_password regcred_email "
     exit 1
 else
     shift

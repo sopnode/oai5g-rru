@@ -75,15 +75,16 @@ OAISA_REPO="docker.io/oaisoftwarealliance"
 
 # Interfaces names of VLANs in sopnode servers
 # Local network interface is defined in prepare-demo-oai.sh ("net-30" for sopnode-{l1|w1})
-IF_NAME_N2N3="@DEF_LOCAL_INTERFACE@" 
-IF_NAME_N4="@DEF_LOCAL_INTERFACE@" 
-IF_NAME_N6="@DEF_LOCAL_INTERFACE@" 
-IF_NAME_N9="@DEF_LOCAL_INTERFACE@" 
-IF_NAME_E1="@DEF_LOCAL_INTERFACE@" 
-IF_NAME_E2="@DEF_LOCAL_INTERFACE@" 
-IF_NAME_F1="@DEF_LOCAL_INTERFACE@"
-IF_NAME_SBI="@DEF_LOCAL_INTERFACE@"
-IF_NAME_TS="@DEF_LOCAL_INTERFACE@"
+IF_NAME_CORE_N2N3="@DEF_LOCAL_INTERFACE@" 
+IF_NAME_RAN_N2N3="@DEF_LOCAL_INTERFACE@" 
+IF_NAME_N4="@DEF_LOCAL_CORE_INTERFACE@" 
+IF_NAME_N6="@DEF_LOCAL_CORE_INTERFACE@" 
+IF_NAME_N9="@DEF_LOCAL_CORE_INTERFACE@" 
+IF_NAME_E1="@DEF_LOCAL_RAN_INTERFACE@" 
+IF_NAME_E2="@DEF_LOCAL_RAN_INTERFACE@" 
+IF_NAME_F1="@DEF_LOCAL_RAN_INTERFACE@"
+IF_NAME_SBI="@DEF_LOCAL_CORE_INTERFACE@"
+IF_NAME_TS="@DEF_LOCAL_CORE_INTERFACE@"
 
 IF_NAME_VLAN_N300_1="r2lab_usrp"
 IF_NAME_VLAN_N300_2="r2lab_usrp"
@@ -136,7 +137,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export MULTUS_AMF="true"
     ## amf n2 IF
     export MULTUS_AMF_N2="true"
-    export IF_NAME_AMF_N2="$IF_NAME_N2N3"
+    export IF_NAME_AMF_N2="$IF_NAME_CORE_N2N2"
     export NAME_AMF_N2=$(set_if_name "$MULTUS_AMF_N2" "eth0" "n2")
     export IP_AMF_N2="${SUBNET_N2N3}.201"
     export NETMASK_AMF_N2="${NETMASK_N2N3}"
@@ -154,7 +155,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export MULTUS_UPF="true"
     ## upf n3 IF
     export MULTUS_UPF_N3="true"
-    export IF_NAME_UPF_N3="$IF_NAME_N2N3"
+    export IF_NAME_UPF_N3="$IF_NAME_CORE_N2N2"
     export NAME_UPF_N3=$(set_if_name "$MULTUS_UPF_N3" "eth0" "n3")
     export IP_UPF_N3="${SUBNET_N2N3}.202"
     export NETMASK_UPF_N3="${NETMASK_N2N3}"
@@ -219,11 +220,11 @@ if [[ $RUN_MODE = "full" ]]; then
     # ran charts
     export HOST_AMF="$IP_AMF_N2"
     export MULTUS_GNB_N2="true"
-    export IF_NAME_GNB_N2="$IF_NAME_N2N3"
+    export IF_NAME_GNB_N2="$IF_NAME_RAN_N2N3"
     export IP_GNB_N2="$SUBNET_N2N3.203"
     export GNB_N2_IF_NAME="n2"
     export MULTUS_GNB_N3="false"
-    export IF_NAME_GNB_N3="$IF_NAME_N2N3"
+    export IF_NAME_GNB_N3="$IF_NAME_RAN_N2N3"
     if [[ $GNB_MODE = 'cucpup' ]]; then
 	export MULTUS_CUUP_N3="true"
 	export IP_GNB_N3="$SUBNET_N2N3.204"
@@ -249,7 +250,7 @@ else
 	# Local RAN and local UPF
 	export SUBNET_N2N3="172.21.10"
 	export NETMASK_N2N3="26"
-	export IF_NAME_N2N3="br-slices"
+	IF_NAME_RAN_N2N3="br-slices"
 	#
 	export ENABLED_MYSQL=false
 	export ENABLED_NRF=false
@@ -272,7 +273,7 @@ else
 	export NETMASK_UPF_N3="$NETMASK_N2N3"
 	export GW_UPF_N3=""
 	export ROUTES_UPF_N3="[{'dst': '10.8.0.0/24','gw': '172.21.10.254'}]"
-	export IF_NAME_UPF_N3="$IF_NAME_N2N3"
+	export IF_NAME_UPF_N3="$IF_NAME_CORE_N2N2"
 	export MULTUS_UPF_N4="false"
 	export IP_UPF_N4="" 
 	export NETMASK_UPF_N4=""
@@ -333,7 +334,7 @@ else
 	export IP_GNB_N3="$IP_GNB_N2" # "$SUBNET_N2N3.224"
 	export GNB_N3_IF_NAME="$GNB_N2_IF_NAME" # pod network interface name for N3 (eth0 or n2/n3)
 	export NETMASK_N2N3="24"
-        export IF_NAME_N2N3="n3br" # host interface used for multus on N2/N3 
+        IF_NAME_RAN_N2N3="n3br" # host interface used for multus on N2/N3 
 	#
 	#if [[ $GNB_MODE = 'cucpup' ]]; then
 	#    export IP_GNB_N3="$SUBNET_N2N3.224"
@@ -446,14 +447,14 @@ export IP_CU_N2=${IP_CU_N2:=$IP_GNB_N2}
 export NETMASK_CU_N2=${NETMASK_CU_N2:=$NETMASK_N2N3}
 export GW_CU_N2=${GW_CU_N2:=""}
 export ROUTES_CU_N2=${ROUTES_CU_N2:=""}
-export IF_NAME_CU_N2=${IF_NAME_CU_N2:=$IF_NAME_N2N3}
+export IF_NAME_CU_N2=${IF_NAME_CU_N2:=$IF_NAME_RAN_N2N3}
 #
 export MULTUS_CU_N3=${MULTUS_CU_N3:=$MULTUS_GNB_N3}
 export IP_CU_N3=${IP_CU_N3:=$IP_GNB_N3}
 export NETMASK_CU_N3=${NETMASK_CU_N3:=$NETMASK_N2N3}
 export GW_CU_N3=${GW_CU_N3:=""}
 export ROUTES_CU_N3=${ROUTES_CU_N3:=""}
-export IF_NAME_CU_N3=${IF_NAME_CU_N3:=$IF_NAME_N2N3}
+export IF_NAME_CU_N3=${IF_NAME_CU_N3:=$IF_NAME_RAN_N2N3}
 #
 export MULTUS_CU_E2="true"
 export IP_CU_E2="192.168.85.93"
@@ -492,7 +493,7 @@ export IP_CUCP_N2=${IP_CUCP_N2:=$IP_GNB_N2}
 export NETMASK_CUCP_N2=${NETMASK_CUCP_N2:=$NETMASK_N2N3}
 export GW_CUCP_N2=${GW_CUCP_N2:=""}
 export ROUTES_CUCP_N2=${ROUTES_CUCP_N2:=""}
-export IF_NAME_CUCP_N2=${IF_NAME_CUCP_N2:=$IF_NAME_N2N3}
+export IF_NAME_CUCP_N2=${IF_NAME_CUCP_N2:=$IF_NAME_RAN_N2N3}
 export CUCP_N2_IF_NAME=${CUCP_N2_IF_NAME:=$GNB_N2_IF_NAME}
 #
 export MULTUS_CUCP_F1C="true"
@@ -531,7 +532,7 @@ export IP_CUUP_N3=${IP_CUUP_N3:=$IP_GNB_N3}
 export NETMASK_CUUP_N3=${NETMASK_CUUP_N3:=$NETMASK_N2N3}
 export GW_CUUP_N3=${GW_CUUP_N3:=""}
 export ROUTES_CUUP_N3=${ROUTES_CUUP_N3:=""}
-export IF_NAME_CUUP_N3=${IF_NAME_CUUP_N3:=$IF_NAME_N2N3}
+export IF_NAME_CUUP_N3=${IF_NAME_CUUP_N3:=$IF_NAME_RAN_N2N3}
 export CUUP_N3_IF_NAME=${CUUP_N3_IF_NAME:=$GNB_N2_IF_NAME}
 #
 export MULTUS_CUUP_F1U="true"
@@ -575,7 +576,7 @@ export NRUE_REPO="${R2LAB_REPO}/oai-nr-ue"
 export NRUE_TAG="${RAN_TAG}"
 export ADD_OPTIONS_NRUE="--rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time" 
 export NETMASK_NRUE="$NETMASK_N2N3"
-export IF_NAME_NRUE="$IF_NAME_N2N3"
+export IF_NAME_NRUE="$IF_NAME_RAN_N2N3"
 export QOS_NRUE="false"
 export NODE_NRUE="$NODE_GNB"
 
