@@ -5,8 +5,10 @@
 #
 
 # server used for following OAI5G functions
-HOST_AMF_UPF="sopnode-w1" # use this parameter to set up external AMF IP address when using RUN_MODE="gnb-only"
+# use HOST_AMF_UPF parameter to set up external AMF IP address when using RUN_MODE="gnb-only"
+HOST_AMF_UPF="sopnode-w1" 
 #HOST_AMF_UPF="10.10.3.200" # AMF IP used with open5gs
+
 HOST_GNB="sopnode-w1"
 
 # k8s namespace
@@ -14,10 +16,10 @@ NS="open5gs"
 
 # Repo/Branch/TAG for code
 REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
-#TAG_OAI5G_RRU="2025.w46"
-TAG_OAI5G_RRU="combine-gen-cn2-into-develop-r2lab" # "develop-r2lab"
-REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git"
-TAG_OAI_CN5G_FED="gen-cn2" # "develop-r2lab"
+TAG_OAI5G_RRU="v2.2.0-r2lab"
+
+REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/orchestration/charts.git"
+TAG_OAI_CN5G_FED="main"
 
 # CN mode
 CN_MODE="advance"
@@ -41,7 +43,7 @@ GNB_MODE="monolithic"
 
 # DNNs 
 DNN0="internet"
-DNN1="streaming" # "none"
+DNN1="streaming" 
 
 # logs configuration
 # logs and pcap are automatically retrieved when running demo-oai.sh stop in /tmp/tmp.root/oai5g-stats.tgz
@@ -50,15 +52,14 @@ LOGS="false"
 PCAP="false"
 MONITORING="false"
 FLEXRIC="false"
+
 LOCAL_CORE_INTERFACE="net-30" # "net-30" is used to possibly reach R2lab k8s workers from sopnode-{l1|w1}
 LOCAL_RAN_INTERFACE="net-30" # "net-30" is used to possibly reach R2lab k8s workers from sopnode-{l1|w1}
-#PCAP="true"
 
 # identity used to git pull
 RC_NAME="r2labuser"
 RC_PWD="r2labuser-pwd"
 RC_MAIL="r2labuser@turletti.com"
-
 
 DIR="$(pwd)"
 COMMAND=$(basename "$0")
