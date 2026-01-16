@@ -4,7 +4,7 @@
 if [ -f /etc/oai/5g-env.sh ]; then
     source /etc/oai/5g-env.sh
 else
-    echo "/etc/oai/5g-env.sh not found", using following default parameters"
+    echo "/etc/oai/5g-env.sh not found, using following default parameters:"
     MCC="001" 
     MNC="01" 
     TAC="1" 
