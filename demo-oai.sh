@@ -621,7 +621,6 @@ configure-oai-5g-advance() {
 	# Form the name of the variable you want to reference
 	export NODE_NAME=$(eval echo \"\${NODE_$NF_UPPER}\")
 	export ENABLED=$(eval echo \"\${ENABLED_$NF_UPPER}\")
-	echo "********** ENABLED for $nf is $ENABLED"
 
 	# Proceed with your yq command
 	yq -i ".${nf}.nodeName = strenv(NODE_NAME)" "$values_file"
