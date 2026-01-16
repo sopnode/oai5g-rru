@@ -935,7 +935,7 @@ apply-gnb-values-yq() {
 
 render_nf_ifs() {
     local nf="$1"
-    local base="${PREFIX_DEMO}/oai5g-rru/charts/values/nf-ifs"
+    local base="${PREFIX_DEMO}/oai5g-rru/demo_charts/values/nf-ifs"
 
     if [[ "$nf" == "oai-du" && "$GNB_MODE" == "cucpup" ]]; then
         envsubst < "${base}/oai-du-cucpup.yaml"
@@ -953,7 +953,7 @@ configure-gnb() {
     DIR_CHARTS="$PREFIX_DEMO/charts"
     ORIG_GNB_TEMPLATES="${OAI5G_RAN}/oai-gnb/templates"
     ORIG_DU_TEMPLATES="${OAI5G_RAN}/oai-du/templates"
-    NEW_TEMPLATES="$PREFIX_DEMO/oai5g-rru/charts/templates"
+    NEW_TEMPLATES="$PREFIX_DEMO/oai5g-rru/demo_charts/templates"
 
     
     # First load RU specific parameters
@@ -990,7 +990,7 @@ configure-gnb() {
 	rm -f "$TMP_IFS"
 	
 	# Update remaining parameters
-	apply-gnb-values-yq "${VALUES}" "${PREFIX_DEMO}/oai5g-rru/charts/values/${nf}.yq"
+	apply-gnb-values-yq "${VALUES}" "${PREFIX_DEMO}/oai5g-rru/demo_charts/values/${nf}.yq"
 	##diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/values.yaml.orig) <(yq eval -P '.' ${VALUES})
     done
 
@@ -1045,7 +1045,7 @@ configure-nr-ue() {
     ORIG_VALUES="$OAI5G_RAN/oai-nr-ue/values.yaml"
     TMP_VALUES="$TMP/oai-nr-ue_values.yaml-orig"
     ORIG_TEMPLATES="${OAI5G_RAN}/oai-nr-ue/templates"
-    NEW_TEMPLATES="$PREFIX_DEMO/oai5g-rru/charts/templates/oai-nr-ue"
+    NEW_TEMPLATES="$PREFIX_DEMO/oai5g-rru/demo_charts/templates/oai-nr-ue"
 
     cp "$ORIG_VALUES" "$TMP_VALUES"
 

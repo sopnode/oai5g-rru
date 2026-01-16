@@ -54,7 +54,7 @@ MONITORING="false"
 FLEXRIC="false"
 
 LOCAL_CORE_INTERFACE="net-30" # "net-30" is used to possibly reach R2lab k8s workers from sopnode-{l1|w1}
-LOCAL_RAN_INTERFACE="net-30" # "net-30" is used to possibly reach R2lab k8s workers from sopnode-{l1|w1}
+LOCAL_RAN_INTERFACE="net-30"  # "net-30" is used to possibly reach R2lab k8s workers from sopnode-{l1|w1}
 
 # identity used to git pull
 RC_NAME="r2labuser"
@@ -68,7 +68,7 @@ function git_pull(){
 
     echo "Step 1: clean up previous oai5g-rru and oai-cn5g-fed.git local directories if any"
     cd "$DIR" || exit
-    rm -rf oai5g-rru oai-cn5g-fed
+    rm -rf oai5g-rru charts
     echo "$0: Clone oai5g-rru and oai-cn5g-fed.git and configure charts and scripts"
     TAG=${OAI_BRANCH:-$TAG_OAI5G_RRU}
     echo "git clone -b $TAG $REPO_OAI5G_RRU"
