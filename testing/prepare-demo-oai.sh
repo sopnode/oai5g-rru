@@ -88,8 +88,6 @@ function configure_all_scripts(){
     echo "./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $MONITORING $FLEXRIC $LOCAL_CORE_INTERFACE $LOCAL_RAN_INTERFACE $DIR $CN_MODE $GNB_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL"
     ./configure-demo-oai.sh update "$NS" "$HOST_AMF_UPF" "$HOST_GNB" "$RRU" "$RUN_MODE" "$LOGS" "$PCAP" "$MONITORING" "$FLEXRIC" "$LOCAL_CORE_INTERFACE" "$LOCAL_RAN_INTERFACE" "$DIR" "$CN_MODE" "$GNB_MODE" "$DNN0" "$DNN1" "$RC_NAME" "$RC_PWD" "$RC_MAIL"
     echo "Step 2: configure OAI5G charts to match the target scenario"
-    echo "run init"
-    ./demo-oai.sh init
     echo "./demo-oai.sh configure-all"
     ./demo-oai.sh configure-all
     echo "OAI5G charts are now configured for your scenario, you can use the start.sh script to launch your scenario."
