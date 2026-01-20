@@ -103,9 +103,9 @@ set_if_name() {
     local default_if=$2
     local multus_if=$3
     if [ "$multus" = "true" ]; then
-        echo "$multus_if"
+        echo "${multus_if}"
     else
-        echo "$default_if"
+        echo "${default_if}"
     fi
 }
 
@@ -137,16 +137,16 @@ if [[ $RUN_MODE = "full" ]]; then
     export MULTUS_AMF="true"
     ## amf n2 IF
     export MULTUS_AMF_N2="true"
-    export IF_NAME_AMF_N2="$IF_NAME_CORE_N2N2"
-    export NAME_AMF_N2=$(set_if_name "$MULTUS_AMF_N2" "eth0" "n2")
+    export IF_NAME_AMF_N2="${IF_NAME_CORE_N2N3}"
+    export NAME_AMF_N2=$(set_if_name "${MULTUS_AMF_N2}" "eth0" "n2")
     export IP_AMF_N2="${SUBNET_N2N3}.201"
     export NETMASK_AMF_N2="${NETMASK_N2N3}"
     export ROUTES_AMF_N2=""
     export DEF_ROUTE_AMF_N2=""
     ## amf sbi IF
     export MULTUS_AMF_SBI="false"
-    export IF_NAME_AMF_SBI="$IF_NAME_SBI"
-    export NAME_AMF_SBI=$(set_if_name "$MULTUS_AMF_SBI" "eth0" "sbi")
+    export IF_NAME_AMF_SBI="${IF_NAME_SBI}"
+    export NAME_AMF_SBI=$(set_if_name "${MULTUS_AMF_SBI}" "eth0" "sbi")
     export IP_AMF_SBI="${SUBNET_SBI}.91"
     export NETMASK_AMF_SBI="${NETMASK_SBI}"
     export GW_AMF_SBI=""
@@ -155,62 +155,62 @@ if [[ $RUN_MODE = "full" ]]; then
     export MULTUS_UPF="true"
     ## upf n3 IF
     export MULTUS_UPF_N3="true"
-    export IF_NAME_UPF_N3="$IF_NAME_CORE_N2N2"
-    export NAME_UPF_N3=$(set_if_name "$MULTUS_UPF_N3" "eth0" "n3")
+    export IF_NAME_UPF_N3="${IF_NAME_CORE_N2N3}"
+    export NAME_UPF_N3=$(set_if_name "${MULTUS_UPF_N3}" "eth0" "n3")
     export IP_UPF_N3="${SUBNET_N2N3}.202"
     export NETMASK_UPF_N3="${NETMASK_N2N3}"
     export DEF_ROUTE_UPF_N3=""
     ## upf n4 IF
     export MULTUS_UPF_N4="false"
-    export IF_NAME_UPF_N4="$IF_NAME_N4"
-    export NAME_UPF_N4=$(set_if_name "$MULTUS_UPF_N4" "eth0" "n4")
+    export IF_NAME_UPF_N4="${IF_NAME_N4}"
+    export NAME_UPF_N4=$(set_if_name "${MULTUS_UPF_N4}" "eth0" "n4")
     export IP_UPF_N4="${SUBNET_N4}.2"
     export NETMASK_UPF_N4="${NETMASK_N4}"
     ## upf n6 IF
     export MULTUS_UPF_N6="true"
-    export IF_NAME_UPF_N6="$IF_NAME_N6"
-    export NAME_UPF_N6=$(set_if_name "$MULTUS_UPF_N6" "eth0" "n6")
+    export IF_NAME_UPF_N6="${IF_NAME_N6}"
+    export NAME_UPF_N6=$(set_if_name "${MULTUS_UPF_N6}" "eth0" "n6")
     export IP_UPF_N6="${SUBNET_N6}.2"
     export NETMASK_UPF_N6="${NETMASK_N6}"
     ## upf n9 IF
     export MULTUS_UPF_N9="false"
-    export IF_NAME_UPF_N9="$IF_NAME_N9"
-    export NAME_UPF_N9=$(set_if_name "$MULTUS_UPF_N9" "eth0" "n9")
+    export IF_NAME_UPF_N9="${IF_NAME_N9}"
+    export NAME_UPF_N9=$(set_if_name "${MULTUS_UPF_N9}" "eth0" "n9")
     export IP_UPF_N9="${SUBNET_N9}.2"
     export NETMASK_UPF_N9="${NETMASK_N9}"
     ## upf sbi IF
     export MULTUS_UPF_SBI="false"
-    export IF_NAME_UPF_SBI="$IF_NAME_SBI"
-    export NAME_UPF_SBI=$(set_if_name "$MULTUS_UPF_SBI" "eth0" "sbi")
+    export IF_NAME_UPF_SBI="${IF_NAME_SBI}"
+    export NAME_UPF_SBI=$(set_if_name "${MULTUS_UPF_SBI}" "eth0" "sbi")
     export IP_UPF_SBI="${SUBNET_SBI}.91"
     export NETMASK_UPF_SBI="${NETMASK_SBI}"
     export GW_UPF_SBI=""
     ## 
     # TS (Traffic Server) chart
     export ENABLE_SNAT="yes"
-    export ENABLED_TS=true
+    export ENABLED_TS="true"
     ## "external" IF
     export MULTUS_TS="true"
-    export IP_TS="$SUBNET_TS.99"
-    export NETMASK_TS
-    export IF_NAME_TS="$IF_NAME_TS"
-    export NAME_TS=$(set_if_name "$MULTUS_TS" "eth0" "external")
+    export IP_TS="${SUBNET_TS}.99"
+    export NETMASK_TS="22"
+    export IF_NAME_TS="${IF_NAME_TS}"
+    export NAME_TS=$(set_if_name "${MULTUS_TS}" "eth0" "external")
     export DEF_ROUTE_TS=""
-    export NODE_TS="$NODE_AMF_UPF"
+    export NODE_TS="${NODE_AMF_UPF}"
     # smf chart
     export ENABLED_SMF="true"
     export MULTUS_SMF="false"
     ## n4 IF
     export MULTUS_SMF_N4="false"
-    export IF_NAME_SMF_N4="$IF_NAME_N4"
-    export NAME_SMF_N4=$(set_if_name "$MULTUS_SMF_N4" "eth0" "n4")
+    export IF_NAME_SMF_N4="${IF_NAME_N4}"
+    export NAME_SMF_N4=$(set_if_name "${MULTUS_SMF_N4}" "eth0" "n4")
     export IP_SMF_N4="${SUBNET_N4}.3" 
     export NETMASK_SMF_N4="${NETMASK_N4}"
     export DEF_ROUTE_SMF_N4=""
     ## smf sbi IF
     export MULTUS_SMF_SBI="false"
-    export IF_NAME_SMF_SBI="$IF_NAME_SBI"
-    export NAME_SMF_SBI=$(set_if_name "$MULTUS_SMF_SBI" "eth0" "sbi")
+    export IF_NAME_SMF_SBI="${IF_NAME_SBI}"
+    export NAME_SMF_SBI=$(set_if_name "${MULTUS_SMF_SBI}" "eth0" "sbi")
     export IP_SMF_SBI="${SUBNET_SBI}.92"
     export NETMASK_SMF_SBI="${NETMASK_SBI}"
     export GW_SMF_SBI=""
@@ -218,33 +218,22 @@ if [[ $RUN_MODE = "full" ]]; then
     export IP_DNS1="138.96.0.210"
     export IP_DNS2="193.51.196.138"
     # ran charts
-    export HOST_AMF="$IP_AMF_N2"
+    export HOST_AMF="${IP_AMF_N2}"
     export MULTUS_GNB_N2="true"
-    export IF_NAME_GNB_N2="$IF_NAME_RAN_N2N3"
-    export IP_GNB_N2="$SUBNET_N2N3.203"
-    export GNB_N2_IF_NAME="n2"
+    export IF_NAME_GNB_N2="${IF_NAME_RAN_N2N3}"
+    export IP_GNB_N2="${SUBNET_N2N3}.203"
     export MULTUS_GNB_N3="false"
-    export IF_NAME_GNB_N3="$IF_NAME_RAN_N2N3"
+    export IF_NAME_GNB_N3="${IF_NAME_RAN_N2N3}"
     if [[ $GNB_MODE = 'cucpup' ]]; then
 	export MULTUS_CUUP_N3="true"
-	export IP_GNB_N3="$SUBNET_N2N3.204"
-	export CUUP_N3_IF_NAME="n3"
-	export IP_NRUE="$SUBNET_N2N3.205"
-	export IP_NRUE2="$SUBNET_N2N3.206"
-	export IP_NRUE3="$SUBNET_N2N3.207"
+	export IP_GNB_N3="${SUBNET_N2N3}.204"
+	export IF_NAME_CUUP_N3="${IF_NAME_RAN_N2N3}"
     else
 	export IP_GNB_N3="$IP_GNB_N2"
-	export IP_NRUE="$SUBNET_N2N3.204"
-	export IP_NRUE2="$SUBNET_N2N3.205"
-	export IP_NRUE3="$SUBNET_N2N3.206"
     fi
-    GNB_N3_IF_NAME="n2"
-	#
-	# ** NRUE specific part **
-	#
-	export MULTUS_NRUE="true"
+
 else
-    # Local RAN, External MYSQL/UDR/UDM/AUSF/AMF/SMF
+    # Local RAN, External MYSQL/UDR/UDM/AUSF/AMF/SMF/UPF
     ENABLE_SNAT="off" # "yes" or "off"
     if [[ $RUN_MODE = "gnb-upf" ]]; then
 	# Local RAN and local UPF
@@ -252,28 +241,28 @@ else
 	export NETMASK_N2N3="26"
 	IF_NAME_RAN_N2N3="br-slices"
 	#
-	export ENABLED_MYSQL=false
-	export ENABLED_NRF=false
-	export NFS_NRF_HOST="$SUBNET_N2N3.203"
-	export ENABLED_NSSF=false
-	export ENABLED_UDR=false
-	export ENABLED_UDM=false
-	export ENABLED_AUSF=false
-	export ENABLED_SMF=false
-	export ENABLED_AMF=false
+	export ENABLED_MYSQL="false"
+	export ENABLED_NRF="false"
+	export NFS_NRF_HOST="${SUBNET_N2N3}.203"
+	export ENABLED_NSSF="false"
+	export ENABLED_UDR="false"
+	export ENABLED_UDM="false"
+	export ENABLED_AUSF="false"
+	export ENABLED_SMF="false"
+	export ENABLED_AMF="false"
 	# upf
-	export ENABLED_UPF=true
+	export ENABLED_UPF="true"
 	export NFS_UPF_HOST="oai-upf"
 	export IF_SBI="n3"
 	export IF_N3="n3"
 	export IF_N4="n3"
 	export IF_N6="eth0"
 	export MULTUS_UPF_N3="true"
-	export IP_UPF_N3="$SUBNET_N2N3.222"
-	export NETMASK_UPF_N3="$NETMASK_N2N3"
+	export IP_UPF_N3="${SUBNET_N2N3}.222"
+	export NETMASK_UPF_N3="${NETMASK_N2N3}"
 	export GW_UPF_N3=""
 	export ROUTES_UPF_N3="[{'dst': '10.8.0.0/24','gw': '172.21.10.254'}]"
-	export IF_NAME_UPF_N3="$IF_NAME_CORE_N2N2"
+	export IF_NAME_UPF_N3="${IF_NAME_CORE_N2N3}"
 	export MULTUS_UPF_N4="false"
 	export IP_UPF_N4="" 
 	export NETMASK_UPF_N4=""
@@ -287,27 +276,21 @@ else
 	export ROUTES_UPF_N6=""
 	export IF_NAME_UPF_N6=""
 	# TS
-	export ENABLED_TS=false
+	export ENABLED_TS="false"
 	# ran charts
 	export HOST_AMF="oai-amf"
 	export MULTUS_GNB_N2="true"
-	export IP_GNB_N2="$SUBNET_N2N3.223"
-	export GNB_N2_IF_NAME="n2"
+	export IP_GNB_N2="${SUBNET_N2N3}.223"
+	export IF_NAME_GNB_N2="n2"
 	export MULTUS_GNB_N3="false"
 	if [[ $GNB_MODE = 'cucpup' ]]; then
 	    export MULTUS_CUUP_N3="true"
-	    export IP_GNB_N3="$SUBNET_N2N3.224"
-	    export CUUP_N3_IF_NAME="n3"
-	    export IP_NRUE="$SUBNET_N2N3.225"
-	    export IP_NRUE2="$SUBNET_N2N3.226"
-	    export IP_NRUE3="$SUBNET_N2N3.227"
+	    export IP_GNB_N3="${SUBNET_N2N3}.224"
+	    export IF_NAME_CUUP_N3="n3"
 	else
-	    export IP_GNB_N3="$IP_GNB_N2"
-	    export IP_NRUE="$SUBNET_N2N3.224"
-	    export IP_NRUE2="$SUBNET_N2N3.225"
-	    export IP_NRUE3="$SUBNET_N2N3.226"
+	    export IP_GNB_N3="${IP_GNB_N2}"
 	fi
-	export GNB_N3_IF_NAME="n2"
+	export IF_NAME_GNB_N3="n2"
 	export ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
 	#export ROUTES_GNB_N2="[{'dst': '172.21.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
 	#
@@ -318,47 +301,25 @@ else
         # RUN_MODE=gnb-only
 	# -- Local RAN and external CN
 	#
-        export SUBNET_N2N3="10.10.3" # "172.21.10"
-        export HOST_AMF="$SUBNET_N2N3.200" #${NODE_AMF_UPF%"-v30"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address # XXX "$SUBNET_N2N3.201"
-        #export HOST_AMF=${NODE_AMF_UPF}
-	#
-	# ** GNB specific part (also used for CU) **
+	# Following setting forcorrespnds to open5gs CN
+        export SUBNET_N2N3="10.10.3" 
+        export HOST_AMF="${SUBNET_N2N3}.200" #${NODE_AMF_UPF%"-v30"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address 
+	IF_NAME_RAN_N2N3="n3br" # host interface used for multus on N2/N3 
+	export NETMASK_N2N3="24"
 	#
 	export MULTUS_GNB_N2="false"
-	export IP_GNB_N2="$SUBNET_N2N3.205" # "$SUBNET_N2N3.223" 
-        # Set the route to reach AMF
-        export ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]"
-	export GNB_N2_IF_NAME="n3" # local pod network interface name for N2 (eth0 or n2 or n3)
+	export IP_GNB_N2="" 
+        export ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]" # Set route to reach AMF
+	export GNB_N2_IF_NAME="" # local pod network interface name for N2 (eth0 or n2 or n3)
 	#
 	export MULTUS_GNB_N3="true"
-	export IP_GNB_N3="$IP_GNB_N2" # "$SUBNET_N2N3.224"
-	export GNB_N3_IF_NAME="$GNB_N2_IF_NAME" # pod network interface name for N3 (eth0 or n2/n3)
-	export NETMASK_N2N3="24"
-        IF_NAME_RAN_N2N3="n3br" # host interface used for multus on N2/N3 
-	#
-	#if [[ $GNB_MODE = 'cucpup' ]]; then
-	#    export IP_GNB_N3="$SUBNET_N2N3.224"
-	#    export IP_NRUE="$SUBNET_N2N3.225"
-	#else
-	#    export IP_GNB_N3="$IP_GNB_N2"
-	#    export IP_NRUE="$SUBNET_N2N3.224"
-	#fi
-	#
-	# ** CU-CP specific part **
+	export IP_GNB_N3="${SUBNET_N2N3.205}"
 	#
 	export MULTUS_CUCP_N2="true"
-	export IP_CUCP_N2="$IP_GNB_N2"
-	export CUCP_N2_IF_NAME="n2"
-	#
-	# ** CU-UP specific part **
+	export IP_CUCP_N2="${SUBNET_N2N3.205}"
 	#
 	export MULTUS_CUUP_N3="true"
-	export IP_CUUP_N3="$SUBNET_N2N3.206"
-	export CUUP_N3_IF_NAME="n3"
-	#
-	# ** NRUE specific part **
-	#
-	export MULTUS_NRUE="false"
+	export IP_CUUP_N3="${SUBNET_N2N3.206}"
     fi
 fi
 
@@ -366,25 +327,25 @@ fi
 
 ############################### oai-cn5g chart parameters ########################
 #
-OAI5G_CHARTS="$PREFIX_DEMO/charts"
-OAI5G_CORE="$OAI5G_CHARTS/oai-5g-core"
-OAI5G_ADVANCE="$OAI5G_CORE/oai-5g-advance"
+OAI5G_CHARTS="${PREFIX_DEMO}/charts"
+OAI5G_CORE="${OAI5G_CHARTS}/oai-5g-core"
+OAI5G_ADVANCE="${OAI5G_CORE}/oai-5g-advance"
 
 export CN_DEFAULT_GW=""
 
 ################################ oai-gnb chart parameters ########################
-OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
+OAI5G_RAN="${OAI5G_CHARTS}/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 
 export RAN_TAG="2025.w52"
 
 # Default GNB REPO/TAG (can be overrided in rru/${rru}.env)
 export GNB_REPO="${R2LAB_REPO}/oai-gnb"
-export GNB_TAG="$RAN_TAG"
+export GNB_TAG="${RAN_TAG}"
 export GNB_PULL_POLICY="IfNotPresent"
 #
 export GNB_FHI72_REPO="${R2LAB_REPO}/oai-gnb-fhi72"
-export GNB_FHI72_TAG="$RAN_TAG"
+export GNB_FHI72_TAG="${RAN_TAG}"
 export GNB_FHI72_PULL_POLICY="IfNotPresent"
 
 ##########################################
@@ -397,75 +358,75 @@ export DU_TAG=${RAN_TAG}
 export DU_PULL_POLICY=${GNB_PULL_POLICY}
 #
 export DU_FHI72_REPO="${R2LAB_REPO}/oai-gnb-fhi72"
-export DU_FHI72_TAG="$DU_TAG"
-export DU_FHI72_PULL_POLICY="$DU_PULL_POLICY"
+export DU_FHI72_TAG="${DU_TAG}"
+export DU_FHI72_PULL_POLICY="${DU_PULL_POLICY}"
 #
 export MULTUS_DU_F1C="true"
 export IP_DU_F1C="172.21.6.90"
 export NETMASK_DU_F1C="22"
 export ROUTES_DU_F1C=""
-export IF_NAME_DU_F1C="$IF_NAME_F1"
+export IF_NAME_DU_F1C="${IF_NAME_F1}"
 #
 export MULTUS_DU_F1U="true"
 export IP_DU_F1U="172.21.16.90"
 export NETMASK_DU_F1U="22"
 export GW_DU_F1U=""
 export ROUTES_DU_F1U=""
-export IF_NAME_DU_F1U="$IF_NAME_F1"
+export IF_NAME_DU_F1U="${IF_NAME_F1}"
 #
 export MULTUS_DU_F1="true"
 export IP_DU_F1="172.21.16.100"
 export NETMASK_DU_F1="22"
 export GW_DU_F1=""
 export ROUTES_DU_F1=""
-export IF_NAME_DU_F1="$IF_NAME_F1"
+export IF_NAME_DU_F1="${IF_NAME_F1}"
 #
 export MULTUS_DU_E2="true"
 export IP_DU_E2="192.168.85.91"
 export NETMASK_DU_E2="24"
 export GW_DU_E2=""
 export ROUTES_DU_E2="" 
-export IF_NAME_DU_E2="$IF_NAME_E2"
+export IF_NAME_DU_E2="{$IF_NAME_E2}"
 #
 export QOS_DU="true"
-export NODE_DU="$NODE_GNB"
+export NODE_DU="${NODE_GNB}"
 #
 ########## CU specific part ##############
 export CU_REPO="${R2LAB_REPO}/oai-gnb" 
 export CU_TAG=${RAN_TAG}
-export CU_PULL_POLICY=${GNB_PULL_POLICY}
+export CU_PULL_POLICY="${GNB_PULL_POLICY}"
 #
 export MULTUS_CU_F1="true"
 export IP_CU_F1="172.21.16.92"
 export NETMASK_CU_F1="22"
 export GW_CU_F1="" 
 export ROUTES_CU_F1="" 
-export IF_NAME_CU_F1="$IF_NAME_F1"
+export IF_NAME_CU_F1="${IF_NAME_F1}"
 #
-export MULTUS_CU_N2=${MULTUS_CU_N2:=$MULTUS_GNB_N2}
-export IP_CU_N2=${IP_CU_N2:=$IP_GNB_N2}
-export NETMASK_CU_N2=${NETMASK_CU_N2:=$NETMASK_N2N3}
+export MULTUS_CU_N2=${MULTUS_CU_N2:=${MULTUS_GNB_N2}}
+export IP_CU_N2=${IP_CU_N2:=${IP_GNB_N2}}
+export NETMASK_CU_N2=${NETMASK_CU_N2:=${NETMASK_N2N3}}
 export GW_CU_N2=${GW_CU_N2:=""}
 export ROUTES_CU_N2=${ROUTES_CU_N2:=""}
-export IF_NAME_CU_N2=${IF_NAME_CU_N2:=$IF_NAME_RAN_N2N3}
+export IF_NAME_CU_N2=${IF_NAME_CU_N2:=${IF_NAME_RAN_N2N3}}
 #
-export MULTUS_CU_N3=${MULTUS_CU_N3:=$MULTUS_GNB_N3}
-export IP_CU_N3=${IP_CU_N3:=$IP_GNB_N3}
-export NETMASK_CU_N3=${NETMASK_CU_N3:=$NETMASK_N2N3}
+export MULTUS_CU_N3=${MULTUS_CU_N3:=${MULTUS_GNB_N3}}
+export IP_CU_N3=${IP_CU_N3:=${IP_GNB_N3}}
+export NETMASK_CU_N3=${NETMASK_CU_N3:=${NETMASK_N2N3}}
 export GW_CU_N3=${GW_CU_N3:=""}
 export ROUTES_CU_N3=${ROUTES_CU_N3:=""}
-export IF_NAME_CU_N3=${IF_NAME_CU_N3:=$IF_NAME_RAN_N2N3}
+export IF_NAME_CU_N3=${IF_NAME_CU_N3:=${IF_NAME_RAN_N2N3}}
 #
 export MULTUS_CU_E2="true"
 export IP_CU_E2="192.168.85.93"
 export NETMASK_CU_E2="24"
 export GW_CU_E2=""
 export ROUTES_CU_E2="" 
-export IF_NAME_CU_E2="$IF_NAME_E2"
+export IF_NAME_CU_E2="${IF_NAME_E2}"
 #
 export ADD_OPTIONS_CU="--log_config.global_log_options level,nocolor,time"
 export QOS_CU="true"
-export NODE_CU="$NODE_GNB" 
+export NODE_CU="${NODE_GNB}" 
 
 # NODE_CU is defined above and also the same for CUCP/CUUP
 #
@@ -479,85 +440,83 @@ export IP_CUCP_E1="192.168.18.12"
 export NETMASK_CUCP_E1="24"
 export GW_CUCP_E1=""
 export ROUTES_CUCP_E1=""
-export IF_NAME_CUCP_E1="$IF_NAME_E1"
+export IF_NAME_CUCP_E1="${IF_NAME_E1}"
 #
 export MULTUS_CUCP_E2="$FLEXRIC" # E2 only used if FLEXRIC is true
 export IP_CUCP_E2="192.168.85.93"
 export NETMASK_CUCP_E2="24"
 export GW_CUCP_E2=""
 export ROUTES_CUCP_E2="" 
-export IF_NAME_CUCP_E2="$IF_NAME_E2"
+export IF_NAME_CUCP_E2="${IF_NAME_E2}"
 #
-export MULTUS_CUCP_N2=${MULTUS_CUCP_N2:=$MULTUS_GNB_N2}
-export IP_CUCP_N2=${IP_CUCP_N2:=$IP_GNB_N2} 
-export NETMASK_CUCP_N2=${NETMASK_CUCP_N2:=$NETMASK_N2N3}
+export MULTUS_CUCP_N2=${MULTUS_CUCP_N2:=${MULTUS_GNB_N2}}
+export IP_CUCP_N2=${IP_CUCP_N2:=${IP_GNB_N2}}
+export NETMASK_CUCP_N2=${NETMASK_CUCP_N2:=${NETMASK_N2N3}}
 export GW_CUCP_N2=${GW_CUCP_N2:=""}
 export ROUTES_CUCP_N2=${ROUTES_CUCP_N2:=""}
-export IF_NAME_CUCP_N2=${IF_NAME_CUCP_N2:=$IF_NAME_RAN_N2N3}
-export CUCP_N2_IF_NAME=${CUCP_N2_IF_NAME:=$GNB_N2_IF_NAME}
+export IF_NAME_CUCP_N2=${IF_NAME_CUCP_N2:=${IF_NAME_RAN_N2N3}}
 #
 export MULTUS_CUCP_F1C="true"
 export IP_CUCP_F1C="172.21.16.92"
 export NETMASK_CUCP_F1C="22"
 export GW_CUCP_F1C=""
 export ROUTES_CUCP_F1C=""
-export IF_NAME_CUCP_F1C="$IF_NAME_F1"
+export IF_NAME_CUCP_F1C="${IF_NAME_F1}"
 #
 export ADD_OPTIONS_CUCP="--log_config.global_log_options level,nocolor,time"
 export NAME_CUCP="oai-cu-cp"
 export QOS_CUCP="true"
-export NODE_CUCP="$NODE_CU"
+export NODE_CUCP="${NODE_CU}"
 #
 ########## CU-UP specific part ##############
-export CUUP_REPO="$R2LAB_REPO/oai-nr-cuup"
-export CUUP_TAG=${RAN_TAG}
-export CUUP_PULL_POLICY=${GNB_PULL_POLICY}
+export CUUP_REPO="${R2LAB_REPO}/oai-nr-cuup"
+export CUUP_TAG="${RAN_TAG}"
+export CUUP_PULL_POLICY="${GNB_PULL_POLICY}"
 #
 export MULTUS_CUUP_E1="true"
 export IP_CUUP_E1="192.168.18.13"
 export NETMASK_CUUP_E1="24"
 export GW_CUUP_E1=""
 export ROUTES_CUUP_E1="" 
-export IF_NAME_CUUP_E1="$IF_NAME_E1"
+export IF_NAME_CUUP_E1="${IF_NAME_E1}"
 #
 export MULTUS_CUUP_E2="true"
 export IP_CUUP_E2="192.168.85.92"
 export NETMASK_CUUP_E2="24"
 export GW_CUUP_E2=""
 export ROUTES_CUUP_E2="" 
-export IF_NAME_CUUP_E2="$IF_NAME_E2"
+export IF_NAME_CUUP_E2="${IF_NAME_E2}"
 #
-export MULTUS_CUUP_N3=${MULTUS_CUUP_N3:=$MULTUS_GNB_N3}
-export IP_CUUP_N3=${IP_CUUP_N3:=$IP_GNB_N3}
-export NETMASK_CUUP_N3=${NETMASK_CUUP_N3:=$NETMASK_N2N3}
+export MULTUS_CUUP_N3=${MULTUS_CUUP_N3:=${MULTUS_GNB_N3}}
+export IP_CUUP_N3=${IP_CUUP_N3:=${IP_GNB_N3}}
+export NETMASK_CUUP_N3=${NETMASK_CUUP_N3:=${NETMASK_N2N3}}
 export GW_CUUP_N3=${GW_CUUP_N3:=""}
 export ROUTES_CUUP_N3=${ROUTES_CUUP_N3:=""}
-export IF_NAME_CUUP_N3=${IF_NAME_CUUP_N3:=$IF_NAME_RAN_N2N3}
-export CUUP_N3_IF_NAME=${CUUP_N3_IF_NAME:=$GNB_N2_IF_NAME}
+export IF_NAME_CUUP_N3=${IF_NAME_CUUP_N3:=${IF_NAME_RAN_N2N3}}
 #
 export MULTUS_CUUP_F1U="true"
 export IP_CUUP_F1U="172.21.16.93"
 export NETMASK_CUUP_F1U="22"
 export GW_CUUP_F1U="" # "172.21.19.254"
 export ROUTES_CUUP_F1U=""
-export IF_NAME_CUUP_F1U="$IF_NAME_F1"
+export IF_NAME_CUUP_F1U="${IF_NAME_F1}"
 #
 export ADD_OPTIONS_CUUP="--log_config.global_log_options level,nocolor,time"
-export HOST_CUCP="$IP_CUCP_E1" # "oai-cu-cp" 
+export HOST_CUCP="${IP_CUCP_E1}" # "oai-cu-cp" 
 export QOS_CUUP="true"
-export NODE_CUUP="$NODE_CU"
+export NODE_CUUP="${NODE_CU}"
 #
 if [[ $GNB_MODE = 'cucpup' ]]; then
-    export CU_HOST_FROM_DU="$IP_CUCP_F1C"
-    export CU_HOST_FROM_CUUP="$IP_CUCP_E1"
+    export CU_HOST_FROM_DU="${IP_CUCP_F1C}"
+    export CU_HOST_FROM_CUUP="${IP_CUCP_E1}"
 else
-    export CU_HOST_FROM_DU="$IP_CU_F1"
+    export CU_HOST_FROM_DU="${IP_CU_F1}"
 fi
 #
 ########## GNB Monolithic specific part ################
 #
-export NETMASK_GNB_N2="$NETMASK_N2N3"
-export NETMASK_GNB_N3="$NETMASK_N2N3"
+export NETMASK_GNB_N2="${NETMASK_N2N3}"
+export NETMASK_GNB_N3="${NETMASK_N2N3}"
 export NETMASK_GNB_RU="24"
 #
 export MULTUS_GNB_E2="true"
@@ -565,7 +524,7 @@ export IP_GNB_E2="192.168.85.94"
 export NETMASK_GNB_E2="24"
 export GW_GNB_E2=""
 export ROUTES_GNB_E2="" 
-export IF_NAME_GNB_E2="$IF_NAME_E2"
+export IF_NAME_GNB_E2="${IF_NAME_E2}"
 #
 export QOS_GNB="true"
 
@@ -574,11 +533,16 @@ export QOS_GNB="true"
 export NRUE_REPO="${R2LAB_REPO}/oai-nr-ue"
 #NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
 export NRUE_TAG="${RAN_TAG}"
+export MULTUS_NRUE="true"
+export NETMASK_NRUE="${NETMASK_N2N3}"
+export IF_NAME_NRUE="${IF_NAME_RAN_N2N3}"
+export IP_NRUE="${SUBNET_N2N3}.210"
+export IP_NRUE2="${SUBNET_N2N3}.211"
+export IP_NRUE3="${SUBNET_N2N3}.212"
 export ADD_OPTIONS_NRUE="--rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time" 
-export NETMASK_NRUE="$NETMASK_N2N3"
-export IF_NAME_NRUE="$IF_NAME_RAN_N2N3"
 export QOS_NRUE="false"
-export NODE_NRUE="$NODE_GNB"
+export NODE_NRUE="${NODE_GNB}"
+
 
 ########################### oai-flexric chart parameters #####################
 FLEXRIC_REPO="ghcr.io/ziyad-mabrouk/oai-flexric"
@@ -856,12 +820,12 @@ configure-oai-5g-advance() {
 
 configure-mysql() {
 
-    DIR_ORIG_CHART="$OAI5G_CORE/mysql/initialization"
-    DIR_PATCHED_CHART="$PREFIX_DEMO/oai5g-rru/patch-mysql"
+    DIR_ORIG_CHART="${OAI5G_CORE}/mysql/initialization"
+    DIR_PATCHED_CHART="${PREFIX_DEMO}/oai5g-rru/patch-mysql"
 
     echo "configure-mysql: mysql database already patched by configure-demo-oai.sh script, just copy it"
-    echo "cp $DIR_PATCHED_CHART/oai_db-basic.sql $DIR_ORIG_CHART/"
-    cp $DIR_PATCHED_CHART/oai_db-basic.sql $DIR_ORIG_CHART/
+    echo "cp ${DIR_PATCHED_CHART}/oai_db-basic.sql ${DIR_ORIG_CHART}/"
+    cp ${DIR_PATCHED_CHART}/oai_db-basic.sql ${DIR_ORIG_CHART}/
     # if SD NSSAI field is set to "NULL", replace it by "FFFFFF" in the mysql database
     sed -i 's/EMPTY/FFFFFF/g' $DIR_ORIG_CHART/oai_db-basic.sql
 }
@@ -871,7 +835,7 @@ configure-mysql() {
 
 
 load_rru_env() {
-    local file="$PREFIX_DEMO/oai5g-rru/rru/$1.env"
+    local file="${PREFIX_DEMO}/oai5g-rru/rru/$1.env"
     [[ -f "$file" ]] || return 1
     set -a
     source "$file"
@@ -949,10 +913,10 @@ render_nf_ifs() {
 configure-gnb() {
     echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $LOGS"
 
-    DIR_CHARTS="$PREFIX_DEMO/charts"
+    DIR_CHARTS="${PREFIX_DEMO}/charts"
     ORIG_GNB_TEMPLATES="${OAI5G_RAN}/oai-gnb/templates"
     ORIG_DU_TEMPLATES="${OAI5G_RAN}/oai-du/templates"
-    NEW_TEMPLATES="$PREFIX_DEMO/oai5g-rru/demo_charts/templates"
+    NEW_TEMPLATES="${PREFIX_DEMO}/oai5g-rru/demo_charts/templates"
 
     
     # First load RU specific parameters
@@ -976,10 +940,10 @@ configure-gnb() {
 	
 	# Inject multus interfaces
 	TMP_IFS="$(mktemp)"
-	render_nf_ifs "$nf" > "$TMP_IFS"
-	if [[ ! -s "$TMP_IFS" ]]; then
+	render_nf_ifs "$nf" > "${TMP_IFS}"
+	if [[ ! -s "${TMP_IFS}" ]]; then
 	    echo "ERROR: empty NF_IFS for $nf"
-	    rm -f "$TMP_IFS"
+	    rm -f "${TMP_IFS}"
 	    continue
 	fi
 	yq eval -i "
@@ -994,7 +958,7 @@ configure-gnb() {
     done
 
     # Update config.yaml charts
-    if [[ $GNB_MODE = 'monolithic' ]]; then
+    if [[ ${GNB_MODE} = 'monolithic' ]]; then
 	gnb_type="gnb"
 	if [[ "$RRU_TYPE" == "benetel" ]]; then
 	    nf="oai-gnb-fhi-72"
@@ -1003,16 +967,16 @@ configure-gnb() {
 	fi
     else
 	gnb_type="du"
-	if [[ "$RRU_TYPE" == "benetel" ]]; then
+	if [[ "${RRU_TYPE}" == "benetel" ]]; then
 	    nf="oai-du-fhi-72"
 	else
 	    nf="oai-du"
 	fi
     fi
-    CONFIG_RRU="$PREFIX_DEMO/oai5g-rru/rru/${gnb_type}-config-${RRU_TYPE}.yaml"
+    CONFIG_RRU="${PREFIX_DEMO}/oai5g-rru/rru/${gnb_type}-config-${RRU_TYPE}.yaml"
     CONFIG="${OAI5G_RAN}/${nf}/config.yaml"
     cp "$CONFIG" "${OAI5G_RAN}/${nf}/config.yaml.orig"
-    cp "$CONFIG_RRU" "$CONFIG"
+    cp "${CONFIG_RRU}" "$CONFIG"
     ##diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
 
     # Update deployment.yaml and nad.yaml templates
@@ -1022,9 +986,9 @@ configure-gnb() {
     sed -i 's/oai-cu.count/oai-du.count/g' "${ORIG_DU_TEMPLATES}/deployment.yaml"
 
     # Fix deployment charts in the case of AW2S RUs as Eurecom no more support AW2S...
-    if [[ "$RRU_TYPE" == "aw2s" ]]; then
+    if [[ "${RRU_TYPE}" == "aw2s" ]]; then
 	for nf in oai-gnb oai-du; do
-	    cp "$PREFIX_DEMO/oai5g-rru/rru/${nf}-deployment-aw2s.yaml" "${OAI5G_RAN}/${nf}/templates/deployment.yaml"
+	    cp "${PREFIX_DEMO}/oai5g-rru/rru/${nf}-deployment-aw2s.yaml" "${OAI5G_RAN}/${nf}/templates/deployment.yaml"
 	done
 	for nf in oai-cu oai-cu-cp oai-cu-up; do
 	    DEPLOYMENT="${OAI5G_RAN}/${nf}/templates/deployment.yaml"
@@ -1041,24 +1005,24 @@ configure-gnb() {
 
 
 configure-nr-ue() {
-    ORIG_VALUES="$OAI5G_RAN/oai-nr-ue/values.yaml"
+    ORIG_VALUES="${OAI5G_RAN}/oai-nr-ue/values.yaml"
     TMP_VALUES="$TMP/oai-nr-ue_values.yaml-orig"
     ORIG_TEMPLATES="${OAI5G_RAN}/oai-nr-ue/templates"
-    NEW_TEMPLATES="$PREFIX_DEMO/oai5g-rru/demo_charts/templates/oai-nr-ue"
+    NEW_TEMPLATES="${PREFIX_DEMO}/oai5g-rru/demo_charts/templates/oai-nr-ue"
 
-    cp "$ORIG_VALUES" "$TMP_VALUES"
+    cp "$ORIG_VALUES" "${TMP_VALUES}"
 
     # Insert the multus block BEFORE the config block
     # Keep indentation and comments intact
     awk -v multus="multus:
-  enabled: $MULTUS_NRUE
+  enabled: ${MULTUS_NRUE}
   interfaces:
     - name: \"net1\"
-      enabled: $MULTUS_NRUE
-      hostInterface: \"$IF_NAME_NRUE\"
+      enabled: ${MULTUS_NRUE}
+      hostInterface: \"${IF_NAME_NRUE}\"
       ipAdd: \"$IP_NRUE\"
-      netmask: \"$NETMASK_NRUE\"
-      defaultGateway: \"$DEFAULT_GW_NRUE\"
+      netmask: \"${NETMASK_NRUE}\"
+      defaultGateway: \"${DEFAULT_GW_NRUE}\"
       type: macvlan
       mode: \"bridge\"
   " '
@@ -1069,7 +1033,7 @@ configure-nr-ue() {
         }
         print
     }
-    ' "$ORIG_VALUES" > "$ORIG_VALUES.tmp" && mv "$ORIG_VALUES.tmp" "$ORIG_VALUES"
+    ' "${ORIG_VALUES}" > "${ORIG_VALUES}.tmp" && mv "${ORIG_VALUES}.tmp" "${ORIG_VALUES}"
 
     # Then update the variable fields
     yq eval -i '
@@ -1085,10 +1049,10 @@ configure-nr-ue() {
       .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
       .resources.define = (strenv(QOS_NRUE) | test("true")) |
       .nodeName         = strenv(NODE_NRUE)
-    ' "$ORIG_VALUES"
+    ' "${ORIG_VALUES}"
 
-    sed -i 's/0xEMPTY/16777215/g' "$ORIG_VALUES"
-    ##diff "$TMP_VALUES" "$ORIG_VALUES"
+    sed -i 's/0xEMPTY/16777215/g' "${ORIG_VALUES}"
+    ##diff "${TMP_VALUES}" "${ORIG_VALUES}"
 
     # Update deployment.yaml and nad.yaml templates
     cp -f "${NEW_TEMPLATES}/deployment.yaml" "${ORIG_TEMPLATES}"
@@ -1126,8 +1090,8 @@ configure-nr-ue2() {
       .resources.define = (strenv(QOS_NRUE) | test("true"))
     ' "$ORIG_VALUES"
 
-    sed -i 's/0xEMPTY/16777215/g' "$ORIG_VALUES"
-    ##cat "$ORIG_VALUES"
+    sed -i 's/0xEMPTY/16777215/g' "${ORIG_VALUES}"
+    ##cat "${ORIG_VALUES}"
 }
 
 #################################################################################
@@ -1158,10 +1122,10 @@ configure-nr-ue3() {
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
       .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
       .resources.define = (strenv(QOS_NRUE) | test("true"))
-    ' "$ORIG_VALUES"
+    ' "${ORIG_VALUES}"
 
-    sed -i 's/0xEMPTY/16777215/g' "$ORIG_VALUES"
-    ##cat "$ORIG_VALUES"
+    sed -i 's/0xEMPTY/16777215/g' "${ORIG_VALUES}"
+    ##cat "${ORIG_VALUES}"
 }
 
 
@@ -1169,21 +1133,21 @@ configure-nr-ue3() {
 
 configure-flexric() {
 
-    DIR="$OAI5G_RAN/oai-flexric"
+    DIR="${OAI5G_RAN}/oai-flexric"
     ORIG_CHART="$DIR"/values.yaml
     SED_FILE="$TMP/oai-flexric-values.sed"
-    echo "configure-flexric: $ORIG_CHART configuration"
-    cat > "$SED_FILE" <<EOF
+    echo "configure-flexric: ${ORIG_CHART} configuration"
+    cat > "${SED_FILE}" <<EOF
 s|@FLEXRIC_REPO@|$FLEXRIC_REPO|
 s|@FLEXRIC_TAG@|$FLEXRIC_TAG|
 s|@FLEXRIC_PULL_POLICY@|$FLEXRIC_PULL_POLICY|
 EOF
     cp "$ORIG_CHART" "$TMP"/oai-flexric_values.yaml-orig
     echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_FILE" < "$TMP"/oai-flexric_values.yaml-orig > "$ORIG_CHART"
+    sed -f "$SED_FILE" < "$TMP"/oai-flexric_values.yaml-orig > "${ORIG_CHART}"
     # if SD NSSAI field is set to "NULL", replace it by "16777215"
     sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
-    diff "$TMP"/oai-flexric_values.yaml-orig "$ORIG_CHART"
+    diff "$TMP"/oai-flexric_values.yaml-orig "${ORIG_CHART}"
 }
 
 
@@ -1191,8 +1155,8 @@ EOF
 
 configure-all() {
     echo "configure-all: Applying SophiaNode patches to OAI5G charts located on \"$PREFIX_DEMO/oai-cn5g-fed\""
-    echo -e "\t with oai-upf running on \"$NODE_AMF_UPF\""
-    echo -e "\t with oai-gnb running on \"$NODE_GNB\""
+    echo -e "\t with oai-upf running on \"${NODE_AMF_UPF}\""
+    echo -e "\t with oai-gnb running on \"${NODE_GNB}\""
     echo -e "\t with generate-logs: \"$LOGS\""
     echo -e "\t with generate-pcap: \"$PCAP\""
 
@@ -1223,8 +1187,8 @@ configure-all() {
 
 start-cn() {
     echo "Running start-cn() with namespace=$NS, NODE_AMF_UPF=$NODE_AMF_UPF"
-    echo "cd $OAI5G_@MODE@"
-    cd "$OAI5G_@MODE@" || { echo "Error: Failed to change directory"; exit 1; }
+    echo "cd ${OAI5G_@MODE@}"
+    cd "${OAI5G_@MODE@}" || { echo "Error: Failed to change directory"; exit 1; }
 
     echo "helm dependency update"
     if ! helm dependency update; then
@@ -1254,9 +1218,9 @@ start-cn() {
 
 start-flexric() {
 
-    echo "Running start-flexric() on namespace: $NS, NODE_GNB=$NODE_GNB"
-    echo "cd $OAI5G_RAN"
-    cd "$OAI5G_RAN"
+    echo "Running start-flexric() on namespace: $NS, NODE_GNB=${NODE_GNB}"
+    echo "cd ${OAI5G_RAN}"
+    cd "${OAI5G_RAN}"
 
     echo "helm -n $NS install oai-flexric oai-flexric/" 
     helm -n $NS install oai-flexric oai-flexric/
@@ -1269,17 +1233,17 @@ start-flexric() {
 
 
 start-gnb() {
-    echo "Running gNB on $NS namespace with GNB_MODE=$GNB_MODE, NODE_GNB=$NODE_GNB and rru=$RRU"
+    echo "Running gNB on $NS namespace with GNB_MODE=${GNB_MODE}, NODE_GNB=${NODE_GNB} and rru=$RRU"
 
-    echo "cd $OAI5G_RAN"
-    cd "$OAI5G_RAN"
+    echo "cd ${OAI5G_RAN}"
+    cd "${OAI5G_RAN}"
 
-    if [[ $GNB_MODE = 'monolithic' ]]; then
+    if [[ ${GNB_MODE} = 'monolithic' ]]; then
 	echo "helm -n $NS install oai-gnb oai-gnb/"
 	helm -n $NS install oai-gnb oai-gnb/
 	echo "Wait until the gNB pod is READY"
 	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-gnb
-    elif [[ $GNB_MODE = 'cudu' ]]; then
+    elif [[ ${GNB_MODE} = 'cudu' ]]; then
 	echo "helm -n $NS install oai-cu oai-cu/"
 	helm -n $NS install oai-cu oai-cu/
 
@@ -1289,7 +1253,7 @@ start-gnb() {
 	echo "helm install -n $NS oai-du oai-du/"
 	helm install -n $NS oai-du oai-du/
     else
-	# $GNB_MODE = 'cucpup'
+	# ${GNB_MODE} = 'cucpup'
 	echo "helm -n $NS install oai-cu-cp oai-cu-cp/"
 	helm -n $NS install oai-cu-cp oai-cu-cp/
 	echo "sleep 10s"; sleep 10
@@ -1309,15 +1273,15 @@ start-gnb() {
 
 start-nr-ue() {
 
-    echo "Running start-nr-ue() on namespace: $NS, NODE_GNB=$NODE_GNB"
-    echo "cd $OAI5G_RAN"
-    cd "$OAI5G_RAN"
+    echo "Running start-nr-ue() on namespace: $NS, NODE_GNB=${NODE_GNB}"
+    echo "cd ${OAI5G_RAN}"
+    cd "${OAI5G_RAN}"
 
     if [[ $MULTUS_NRUE == "true" ]]; then
-       GNB_IP="$IP_GNB_N3"
+       GNB_IP="${IP_GNB_N3}"
     else
 	echo "retrieve dynamically gNB/DU IP"
-	if [[ $GNB_MODE == 'monolithic' ]]; then
+	if [[ ${GNB_MODE} == 'monolithic' ]]; then
 	    GNB_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[*].status.podIP}")
 	else
 	    GNB_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
@@ -1337,15 +1301,15 @@ start-nr-ue() {
 
 start-nr-ue2() {
 
-    echo "Running start-nr-ue2() on namespace: $NS, NODE_GNB=$NODE_GNB"
-    echo "cd $OAI5G_RAN"
-    cd "$OAI5G_RAN"
+    echo "Running start-nr-ue2() on namespace: $NS, NODE_GNB=${NODE_GNB}"
+    echo "cd ${OAI5G_RAN}"
+    cd "${OAI5G_RAN}"
 
-    if [[ $MULTUS_NRUE == "true" ]]; then
-       GNB_IP="$IP_GNB_N3"
+    if [[ ${MULTUS_NRUE} == "true" ]]; then
+       GNB_IP="${IP_GNB_N3}"
     else
 	echo "retrieve dynamically gNB/DU IP"
-	if [[ $GNB_MODE == 'monolithic' ]]; then
+	if [[ ${GNB_MODE} == 'monolithic' ]]; then
 	    GNB_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[*].status.podIP}")
 	else
 	    GNB_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
@@ -1365,15 +1329,15 @@ start-nr-ue2() {
 
 start-nr-ue3() {
 
-    echo "Running start-nr-ue3() on namespace: $NS, NODE_GNB=$NODE_GNB"
-    echo "cd $OAI5G_RAN"
-    cd "$OAI5G_RAN"
+    echo "Running start-nr-ue3() on namespace: $NS, NODE_GNB=${NODE_GNB}"
+    echo "cd ${OAI5G_RAN}"
+    cd "${OAI5G_RAN}"
 
     if [[ $MULTUS_NRUE == "true" ]]; then
-       GNB_IP="$IP_GNB_N3"
+       GNB_IP="${IP_GNB_N3}"
     else
 	echo "retrieve dynamically gNB/DU IP"
-	if [[ $GNB_MODE == 'monolithic' ]]; then
+	if [[ ${GNB_MODE} == 'monolithic' ]]; then
 	    GNB_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[*].status.podIP}")
 	else
 	    GNB_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
@@ -1518,17 +1482,17 @@ stop-flexric(){
 }
 
 stop-gnb(){
-    if [[ $GNB_MODE = 'monolithic' ]]; then
+    if [[ ${GNB_MODE} = 'monolithic' ]]; then
 	echo "helm -n $NS uninstall oai-gnb"
 	helm -n $NS uninstall oai-gnb
     else
 	echo "helm -n $NS uninstall oai-du"
 	helm -n $NS uninstall oai-du
-	if [[ $GNB_MODE = 'cudu' ]]; then
+	if [[ ${GNB_MODE} = 'cudu' ]]; then
 	    echo "helm -n $NS uninstall oai-cu"
 	    helm -n $NS uninstall oai-cu
 	else
-	    # $GNB_MODE = 'cucpup'
+	    # ${GNB_MODE} = 'cucpup'
 	    echo "helm -n $NS uninstall oai-cu-up"
 	    helm -n $NS uninstall oai-cu-up
 	    echo "helm -n $NS uninstall oai-cu-cp"
@@ -1560,15 +1524,15 @@ stop() {
     if [[ "$LOGS" = "true" ]]; then
 	DATE=$(date +"%Y-%m-%dT%H.%M")
 	dir_stats=${PREFIX_STATS-"$TMP/oai5g-stats"}-"$DATE"
-	echo "First retrieve all pcap and logs files in $dir_stats and compressed it"
-	mkdir -p "$dir_stats"
-	echo "cleanup $dir_stats before including new logs/pcap files"
-	cd "$dir_stats"; rm -f *.pcap *.tgz *.logs *stats* *.conf
+	echo "First retrieve all pcap and logs files in ${dir_stats} and compressed it"
+	mkdir -p "${dir_stats}"
+	echo "cleanup ${dir_stats} before including new logs/pcap files"
+	cd "${dir_stats}"; rm -f *.pcap *.tgz *.logs *stats* *.conf
 	if [[ "$PCAP" = "true" ]]; then
-	    get-all-pcap "$dir_stats"
+	    get-all-pcap "${dir_stats}"
 	fi
-	get-all-logs "$dir_stats"
-	cd "$TMP"; dirname=$(basename "$dir_stats")
+	get-all-logs "${dir_stats}"
+	cd "$TMP"; dirname=$(basename "${dir_stats}")
 	echo tar cfz "$dirname".tgz "$dirname"
 	tar cfz "$dirname".tgz "$dirname"
     fi
@@ -1576,7 +1540,7 @@ stop() {
     res=$(helm -n $NS ls | wc -l)
     if test "$res" -gt 1; then
         echo "Remove all 5G OAI pods"
-	if [[ "$RUN_MODE" != "gnb-only" ]]; then
+	if [[ "${RUN_MODE}" != "gnb-only" ]]; then
 	    stop-cn
 	fi
 	if [[ $FLEXRIC = "true" ]]; then
@@ -1614,98 +1578,98 @@ get-all-logs() {
     DATE=$(date +"%Y-%m-%dT%H.%M.%S")
 
     echo "get-all-logs: saving charts"
-    tar -C "$PREFIX_DEMO"/oai-cn5g-fed -cf "$prefix"/charts.tar charts
+    tar -C "${PREFIX_DEMO}/oai-cn5g-fed" -cf "$prefix"/charts.tar charts
 
     echo "get-all-logs: saving demo-oai.sh script"
-    cp "$PREFIX_DEMO"/demo-oai.sh "$prefix"/
+    cp "${PREFIX_DEMO}"/demo-oai.sh "$prefix"/
 
-    if [[ -f "$PREFIX_DEMO"/prepare-demo-oai.sh ]]; then
+    if [[ -f "${PREFIX_DEMO}"/prepare-demo-oai.sh ]]; then
         echo "get-all-logs: saving prepare-demo-oai.sh script"
-    	cp "$PREFIX_DEMO"/prepare-demo-oai.sh "$prefix"/
+    	cp "${PREFIX_DEMO}/prepare-demo-oai.sh" "$prefix"/
     fi
 
     AMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
     AMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-amf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
-    echo -e "\t - Retrieving logs for oai-amf $AMF_POD_NAME running with IP $AMF_eth0_IP"
-    kubectl --namespace $NS -c amf logs "$AMF_POD_NAME" > "$prefix"/amf-"$DATE".logs
+    echo -e "\t - Retrieving logs for oai-amf ${AMF_POD_NAME} running with IP ${AMF_eth0_IP}"
+    kubectl --namespace $NS -c amf logs "${AMF_POD_NAME}" > "$prefix"/amf-"$DATE".logs
 
     AUSF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
     AUSF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-ausf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
-    echo -e "\t - Retrieving logs for oai-ausf $AUSF_POD_NAME running with IP $AUSF_eth0_IP"
-    kubectl --namespace $NS -c ausf logs "$AUSF_POD_NAME" > "$prefix"/ausf-"$DATE".logs
+    echo -e "\t - Retrieving logs for oai-ausf ${AUSF_POD_NAME} running with IP ${AUSF_eth0_IP}"
+    kubectl --namespace $NS -c ausf logs "${AUSF_POD_NAME}" > "$prefix"/ausf-"$DATE".logs
 
     NRF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
     NRF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-nrf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
-    echo -e "\t - Retrieving logs for oai-nrf $NRF_POD_NAME running with IP $NRF_eth0_IP"
-    kubectl --namespace $NS -c nrf logs "$NRF_POD_NAME" > "$prefix"/nrf-"$DATE".logs
+    echo -e "\t - Retrieving logs for oai-nrf ${NRF_POD_NAME} running with IP ${NRF_eth0_IP}"
+    kubectl --namespace $NS -c nrf logs "${NRF_POD_NAME}" > "$prefix"/nrf-"$DATE".logs
 
     SMF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
     SMF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-smf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
-    echo -e "\t - Retrieving logs for oai-smf $SMF_POD_NAME running with IP $SMF_eth0_IP"
-    kubectl --namespace $NS -c smf logs "$SMF_POD_NAME" > "$prefix"/smf-"$DATE".logs
+    echo -e "\t - Retrieving logs for oai-smf ${SMF_POD_NAME} running with IP ${SMF_eth0_IP}"
+    kubectl --namespace $NS -c smf logs "${SMF_POD_NAME}" > "$prefix"/smf-"$DATE".logs
 
     UPF_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
     UPF_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-upf,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
-    echo -e "\t - Retrieving logs for oai-upf $UPF_POD_NAME running with IP $UPF_eth0_IP"
-    kubectl --namespace $NS -c upf logs "$UPF_POD_NAME" > "$prefix"/upf-"$DATE".logs
+    echo -e "\t - Retrieving logs for oai-upf ${UPF_POD_NAME} running with IP ${UPF_eth0_IP}"
+    kubectl --namespace $NS -c upf logs "${UPF_POD_NAME}" > "$prefix"/upf-"$DATE".logs
 
     UDM_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
     UDM_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udm,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
-    echo -e "\t - Retrieving logs for oai-udm $UDM_POD_NAME running with IP $UDM_eth0_IP"
-    kubectl --namespace $NS -c udm logs "$UDM_POD_NAME" > "$prefix"/udm-"$DATE".logs
+    echo -e "\t - Retrieving logs for oai-udm ${UDM_POD_NAME} running with IP ${UDM_eth0_IP}"
+    kubectl --namespace $NS -c udm logs "${UDM_POD_NAME}" > "$prefix"/udm-"$DATE".logs
     
     UDR_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[0].metadata.name}")
     UDR_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-udr,app.kubernetes.io/instance=oai-5g-@mode@" -o jsonpath="{.items[*].status.podIP}")
-    echo -e "\t - Retrieving logs for oai-udr $UDR_POD_NAME running with IP $UDR_eth0_IP"
-    kubectl --namespace $NS -c udr logs "$UDR_POD_NAME" > "$prefix"/udr-"$DATE".logs
+    echo -e "\t - Retrieving logs for oai-udr ${UDR_POD_NAME} running with IP ${UDR_eth0_IP}"
+    kubectl --namespace $NS -c udr logs "${UDR_POD_NAME}" > "$prefix"/udr-"$DATE".logs
 
-    if [[ $GNB_MODE = 'monolithic' ]]; then
+    if [[ ${GNB_MODE} = 'monolithic' ]]; then
 	GNB_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-gnb,app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[0].metadata.name}")
 	GNB_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-gnb,app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[*].status.podIP}")
-	echo -e "\t - Retrieving logs for oai-gnb $GNB_POD_NAME running with IP $GNB_eth0_IP"
-	kubectl --namespace $NS -c gnb logs "$GNB_POD_NAME" > "$prefix"/gnb-"$DATE".logs
+	echo -e "\t - Retrieving logs for oai-gnb ${GNB_POD_NAME} running with IP ${GNB_eth0_IP}"
+	kubectl --namespace $NS -c gnb logs "${GNB_POD_NAME}" > "$prefix"/gnb-"$DATE".logs
 	echo "Retrieve gnb config from the pod"
 	kubectl -c gnb cp $NS/"GNB_POD_NAME":/tmp/gnb.conf "$prefix"/gnb.conf || true
 	echo "Retrieve nrL1_stats.log, nrMAC_stats.log and nrRRC_stats.log from gnb pod"
-	kubectl -c gnb cp $NS/"$GNB_POD_NAME":nrL1_stats.log "$prefix"/nrL1_stats.log"$DATE" || true
-	kubectl -c gnb cp $NS/"$GNB_POD_NAME":nrMAC_stats.log "$prefix"/nrMAC_stats.log"$DATE" || true
-	kubectl -c gnb cp $NS/"$GNB_POD_NAME":nrRRC_stats.log "$prefix"/nrRRC_stats.log"$DATE" || true
-    elif [[ $GNB_MODE = 'cudu' ]]; then
+	kubectl -c gnb cp $NS/"${GNB_POD_NAME}":nrL1_stats.log "$prefix"/nrL1_stats.log"$DATE" || true
+	kubectl -c gnb cp $NS/"${GNB_POD_NAME}":nrMAC_stats.log "$prefix"/nrMAC_stats.log"$DATE" || true
+	kubectl -c gnb cp $NS/"${GNB_POD_NAME}":nrRRC_stats.log "$prefix"/nrRRC_stats.log"$DATE" || true
+    elif [[ ${GNB_MODE} = 'cudu' ]]; then
 	CU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu" -o jsonpath="{.items[0].metadata.name}")
 	CU_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu" -o jsonpath="{.items[*].status.podIP}")
-	echo -e "\t - Retrieving logs for oai-cu $CU_POD_NAME running with IP $CU_eth0_IP"
-	kubectl --namespace $NS -c oai-cu logs "$CU_POD_NAME" > "$prefix"/cu-"$DATE".logs
+	echo -e "\t - Retrieving logs for oai-cu ${CU_POD_NAME} running with IP $CU_eth0_IP"
+	kubectl --namespace $NS -c oai-cu logs "${CU_POD_NAME}" > "$prefix"/cu-"$DATE".logs
 	DU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[0].metadata.name}")
-	kubectl -c gnbdu cp $NS/"$DU_POD_NAME":nrL1_stats.log "$prefix"/nrL1_stats.log"$DATE" || true
-	kubectl -c gnbdu cp $NS/"$DU_POD_NAME":nrMAC_stats.log "$prefix"/nrMAC_stats.log"$DATE" || true
-	kubectl -c oai-cu cp $NS/"$CU_POD_NAME":nrRRC_stats.log "$prefix"/nrRRC_stats.log"$DATE" || true
+	kubectl -c gnbdu cp $NS/"${DU_POD_NAME}":nrL1_stats.log "$prefix"/nrL1_stats.log"$DATE" || true
+	kubectl -c gnbdu cp $NS/"${DU_POD_NAME}":nrMAC_stats.log "$prefix"/nrMAC_stats.log"$DATE" || true
+	kubectl -c oai-cu cp $NS/"${CU_POD_NAME}":nrRRC_stats.log "$prefix"/nrRRC_stats.log"$DATE" || true
 	DU_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
-	echo -e "\t - Retrieving logs for oai-du $DU_POD_NAME running with IP $DU_eth0_IP"
-	kubectl --namespace $NS -c gnbdu logs "$DU_POD_NAME" > "$prefix"/du-"$DATE".logs
+	echo -e "\t - Retrieving logs for oai-du ${DU_POD_NAME} running with IP $DU_eth0_IP"
+	kubectl --namespace $NS -c gnbdu logs "${DU_POD_NAME}" > "$prefix"/du-"$DATE".logs
 	echo "Retrieve cu/du configs from the pods"
-	kubectl -c oai-cu cp $NS/"$CU_POD_NAME":/tmp/cu.conf "$prefix"/cu.conf || true
-	kubectl -c gnbdu cp $NS/"$DU_POD_NAME":/tmp/du.conf "$prefix"/du.conf || true
+	kubectl -c oai-cu cp $NS/"${CU_POD_NAME}":/tmp/cu.conf "$prefix"/cu.conf || true
+	kubectl -c gnbdu cp $NS/"${DU_POD_NAME}":/tmp/du.conf "$prefix"/du.conf || true
     else
-	# $GNB_MODE = 'cucpup'
+	# ${GNB_MODE} = 'cucpup'
 	CUCP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-cp" -o jsonpath="{.items[0].metadata.name}")
 	CUCP_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-cp" -o jsonpath="{.items[*].status.podIP}")
-	echo -e "\t - Retrieving logs for oaicucp $CUCP_POD_NAME running with IP $CUCP_eth0_IP"
-	kubectl --namespace $NS -c oaicucp logs "$CUCP_POD_NAME" > "$prefix"/cucp-"$DATE".logs
+	echo -e "\t - Retrieving logs for oaicucp ${CUCP_POD_NAME} running with IP $CUCP_eth0_IP"
+	kubectl --namespace $NS -c oaicucp logs "${CUCP_POD_NAME}" > "$prefix"/cucp-"$DATE".logs
 	CUUP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-up" -o jsonpath="{.items[0].metadata.name}")
 	CUUP_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-up" -o jsonpath="{.items[*].status.podIP}")
-	echo -e "\t - Retrieving logs for oaicuup $CUUP_POD_NAME running with IP $CUUP_eth0_IP"
-	kubectl --namespace $NS -c oaicuup logs "$CUUP_POD_NAME" > "$prefix"/cuup-"$DATE".logs
+	echo -e "\t - Retrieving logs for oaicuup ${CUUP_POD_NAME} running with IP $CUUP_eth0_IP"
+	kubectl --namespace $NS -c oaicuup logs "${CUUP_POD_NAME}" > "$prefix"/cuup-"$DATE".logs
 	DU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[0].metadata.name}")
-	kubectl -c gnbdu cp $NS/"$DU_POD_NAME":nrL1_stats.log "$prefix"/nrL1_stats.log"$DATE" || true
-	kubectl -c gnbdu cp $NS/"$DU_POD_NAME":nrMAC_stats.log "$prefix"/nrMAC_stats.log"$DATE" || true
-	kubectl -c oaicucp cp $NS/"$CUCP_POD_NAME":nrRRC_stats.log "$prefix"/nrRRC_stats.log"$DATE" || true
+	kubectl -c gnbdu cp $NS/"${DU_POD_NAME}":nrL1_stats.log "$prefix"/nrL1_stats.log"$DATE" || true
+	kubectl -c gnbdu cp $NS/"${DU_POD_NAME}":nrMAC_stats.log "$prefix"/nrMAC_stats.log"$DATE" || true
+	kubectl -c oaicucp cp $NS/"${CUCP_POD_NAME}":nrRRC_stats.log "$prefix"/nrRRC_stats.log"$DATE" || true
 	DU_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
-	echo -e "\t - Retrieving logs for oai-du $DU_POD_NAME running with IP $DU_eth0_IP"
-	kubectl --namespace $NS -c gnbdu logs "$DU_POD_NAME" > "$prefix"/du-"$DATE".logs
+	echo -e "\t - Retrieving logs for oai-du ${DU_POD_NAME} running with IP $DU_eth0_IP"
+	kubectl --namespace $NS -c gnbdu logs "${DU_POD_NAME}" > "$prefix"/du-"$DATE".logs
 	echo "Retrieve cucp/cuup/du configs from the pods"
-	kubectl -c oaicucp cp $NS/"$CUCP_POD_NAME":/tmp/cucp.conf "$prefix"/cucp.conf || true
-	kubectl -c oaicuup cp $NS/"$CUUP_POD_NAME":/tmp/cuup.conf "$prefix"/cuup.conf || true
-	kubectl -c gnbdu cp $NS/"$DU_POD_NAME":/tmp/du.conf "$prefix"/du.conf || true
+	kubectl -c oaicucp cp $NS/"${CUCP_POD_NAME}":/tmp/cucp.conf "$prefix"/cucp.conf || true
+	kubectl -c oaicuup cp $NS/"${CUUP_POD_NAME}":/tmp/cuup.conf "$prefix"/cuup.conf || true
+	kubectl -c gnbdu cp $NS/"${DU_POD_NAME}":/tmp/du.conf "$prefix"/du.conf || true
     fi
 
     if [[ "$RRU" = "rfsim" ]]; then
@@ -1739,40 +1703,40 @@ get-ran-pcap(){
 
     DATE=$(date +"%Y-%m-%dT%H.%M.%S")
 
-    if [[ $GNB_MODE = 'monolithic' ]]; then
+    if [[ ${GNB_MODE} = 'monolithic' ]]; then
 	GNB_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/name=oai-gnb,app.kubernetes.io/instance=oai-gnb" -o jsonpath="{.items[0].metadata.name}")
 	echo "Retrieve OAI5G gnb pcap file from the oai-gnb pod on ns $NS"
-	echo "kubectl -c tcpdump -n $NS exec -i $GNB_POD_NAME -- /bin/tar cfz gnb-pcap.tgz -C tmp pcap"
-	kubectl -c tcpdump -n $NS exec -i "$GNB_POD_NAME" -- /bin/tar cfz gnb-pcap.tgz -C tmp pcap || true
-	echo "kubectl -c tcpdump cp $NS/$GNB_POD_NAME:gnb-pcap.tgz $prefix/gnb-pcap-$DATE.tgz"
-	kubectl -c tcpdump cp $NS/"$GNB_POD_NAME":gnb-pcap.tgz "$prefix"/gnb-pcap-"$DATE".tgz || true
+	echo "kubectl -c tcpdump -n $NS exec -i ${GNB_POD_NAME} -- /bin/tar cfz gnb-pcap.tgz -C tmp pcap"
+	kubectl -c tcpdump -n $NS exec -i "${GNB_POD_NAME}" -- /bin/tar cfz gnb-pcap.tgz -C tmp pcap || true
+	echo "kubectl -c tcpdump cp $NS/${GNB_POD_NAME}:gnb-pcap.tgz $prefix/gnb-pcap-$DATE.tgz"
+	kubectl -c tcpdump cp $NS/"${GNB_POD_NAME}":gnb-pcap.tgz "$prefix"/gnb-pcap-"$DATE".tgz || true
     else
 	DU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[0].metadata.name}")
 	echo "Retrieve OAI5G du pcap file from the oai-du pod on ns $NS"
-	echo "kubectl -c tcpdump -n $NS exec -i $DU_POD_NAME -- /bin/tar cfz du-pcap.tgz -C tmp pcap"
-	kubectl -c tcpdump -n $NS exec -i "$DU_POD_NAME" -- /bin/tar cfz du-pcap.tgz -C tmp pcap || true
-	echo "kubectl -c tcpdump cp $NS/$DU_POD_NAME:du-pcap.tgz $prefix/du-pcap-$DATE.tgz"
-	kubectl -c tcpdump cp $NS/"$GNB_POD_NAME":du-pcap.tgz "$prefix"/du-pcap-"$DATE".tgz || true
-	if [[ $GNB_MODE = 'cudu' ]]; then
+	echo "kubectl -c tcpdump -n $NS exec -i ${DU_POD_NAME} -- /bin/tar cfz du-pcap.tgz -C tmp pcap"
+	kubectl -c tcpdump -n $NS exec -i "${DU_POD_NAME}" -- /bin/tar cfz du-pcap.tgz -C tmp pcap || true
+	echo "kubectl -c tcpdump cp $NS/${DU_POD_NAME}:du-pcap.tgz $prefix/du-pcap-$DATE.tgz"
+	kubectl -c tcpdump cp $NS/"${GNB_POD_NAME}":du-pcap.tgz "$prefix"/du-pcap-"$DATE".tgz || true
+	if [[ ${GNB_MODE} = 'cudu' ]]; then
 	    CU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu" -o jsonpath="{.items[0].metadata.name}")
 	    echo "Retrieve OAI5G cu pcap file from the oai-cu pod on ns $NS"
-	    echo "kubectl -c tcpdump -n $NS exec -i $CU_POD_NAME -- /bin/tar cfz cu-pcap.tgz -C tmp pcap"
-	    kubectl -c tcpdump -n $NS exec -i "$CU_POD_NAME" -- /bin/tar cfz cu-pcap.tgz -C tmp pcap || true
-	    echo "kubectl -c tcpdump cp $NS/$CU_POD_NAME:cu-pcap.tgz $prefix/cu-pcap-$DATE.tgz"
-	    kubectl -c tcpdump cp $NS/"$CU_POD_NAME":cu-pcap.tgz "$prefix"/cu-pcap-"$DATE".tgz || true
+	    echo "kubectl -c tcpdump -n $NS exec -i ${CU_POD_NAME} -- /bin/tar cfz cu-pcap.tgz -C tmp pcap"
+	    kubectl -c tcpdump -n $NS exec -i "${CU_POD_NAME}" -- /bin/tar cfz cu-pcap.tgz -C tmp pcap || true
+	    echo "kubectl -c tcpdump cp $NS/${CU_POD_NAME}:cu-pcap.tgz $prefix/cu-pcap-$DATE.tgz"
+	    kubectl -c tcpdump cp $NS/"${CU_POD_NAME}":cu-pcap.tgz "$prefix"/cu-pcap-"$DATE".tgz || true
 	else
 	    CUCP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-cp" -o jsonpath="{.items[0].metadata.name}")
 	    echo "Retrieve OAI5G cucp pcap file from the oai-cu-cp pod on ns $NS"
-	    echo "kubectl -c tcpdump -n $NS exec -i $CUCP_POD_NAME -- /bin/tar cfz cucp-pcap.tgz -C tmp pcap"
-	    kubectl -c tcpdump -n $NS exec -i "$CUCP_POD_NAME" -- /bin/tar cfz cucp-pcap.tgz -C tmp pcap || true
-	    echo "kubectl -c tcpdump cp $NS/$CUCP_POD_NAME:cucp-pcap.tgz $prefix/cucp-pcap-$DATE.tgz"
-	    kubectl -c tcpdump cp $NS/"$CUCP_POD_NAME":cucp-pcap.tgz "$prefix"/cucp-pcap-"$DATE".tgz || true
+	    echo "kubectl -c tcpdump -n $NS exec -i ${CUCP_POD_NAME} -- /bin/tar cfz cucp-pcap.tgz -C tmp pcap"
+	    kubectl -c tcpdump -n $NS exec -i "${CUCP_POD_NAME}" -- /bin/tar cfz cucp-pcap.tgz -C tmp pcap || true
+	    echo "kubectl -c tcpdump cp $NS/${CUCP_POD_NAME}:cucp-pcap.tgz $prefix/cucp-pcap-$DATE.tgz"
+	    kubectl -c tcpdump cp $NS/"${CUCP_POD_NAME}":cucp-pcap.tgz "$prefix"/cucp-pcap-"$DATE".tgz || true
 	    CUUP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-up" -o jsonpath="{.items[0].metadata.name}")
 	    echo "Retrieve OAI5G cuup pcap file from the oai-cu-up pod on ns $NS"
-	    echo "kubectl -c tcpdump -n $NS exec -i $CUUP_POD_NAME -- /bin/tar cfz cuup-pcap.tgz -C tmp pcap"
-	    kubectl -c tcpdump -n $NS exec -i "$CUUP_POD_NAME" -- /bin/tar cfz cuup-pcap.tgz -C tmp pcap || true
-	    echo "kubectl -c tcpdump cp $NS/$CUUP_POD_NAME:cuup-pcap.tgz $prefix/cuup-pcap-$DATE.tgz"
-	    kubectl -c tcpdump cp $NS/"$CUUP_POD_NAME":cuup-pcap.tgz "$prefix"/cuup-pcap-"$DATE".tgz || true
+	    echo "kubectl -c tcpdump -n $NS exec -i ${CUUP_POD_NAME} -- /bin/tar cfz cuup-pcap.tgz -C tmp pcap"
+	    kubectl -c tcpdump -n $NS exec -i "${CUUP_POD_NAME}" -- /bin/tar cfz cuup-pcap.tgz -C tmp pcap || true
+	    echo "kubectl -c tcpdump cp $NS/${CUUP_POD_NAME}:cuup-pcap.tgz $prefix/cuup-pcap-$DATE.tgz"
+	    kubectl -c tcpdump cp $NS/"${CUUP_POD_NAME}":cuup-pcap.tgz "$prefix"/cuup-pcap-"$DATE".tgz || true
 	fi
     fi
 }
