@@ -547,12 +547,12 @@ case "${GNB_MODE}" in
     'monolithic')
 	export SUBNET_NRUE="${SUBNET_N2N3}"
 	export NETMASK_NRUE="${NETMASK_N2N3}"
-	export IF_NAME_NRUE="{IF_NAME_RAN_N2N3}"
+	export IF_NAME_NRUE="${IF_NAME_RAN_N2N3}"
 	;;
     *)
 	export SUBNET_NRUE="${SUBNET_F1}"
 	export NETMASK_NRUE="${NETMASK_F1}"
-	export IF_NAME_NRUE="{IF_NAME_RAN_F1}"
+	export IF_NAME_NRUE="${IF_NAME_RAN_F1}"
 	;;
 esac
 export IP_NRUE="${SUBNET_NRUE}.210"
