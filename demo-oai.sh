@@ -219,7 +219,7 @@ if [[ $RUN_MODE = "full" ]]; then
 	export IP_GNB_N3="${SUBNET_N2N3}.204"
 	export IF_NAME_CUUP_N3="${IF_NAME_RAN_N2N3}"
     else
-	export IP_GNB_N3="${IP_GNB_N2}"
+	export IP_GNB_N3="${SUBNET_N2N3}.203"
     fi
 
 else
@@ -278,7 +278,7 @@ else
 	    export IP_GNB_N3="${SUBNET_N2N3}.224"
 	    export IF_NAME_CUUP_N3="n3"
 	else
-	    export IP_GNB_N3="${IP_GNB_N2}"
+	    export IP_GNB_N3="${SUBNET_N2N3}.223"
 	fi
 	export IF_NAME_GNB_N3="n2"
 	export ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
@@ -1296,8 +1296,15 @@ start-nr-ue() {
     echo "cd ${OAI5G_RAN}"
     cd "${OAI5G_RAN}"
 
-    if [[ $MULTUS_NRUE == "true" ]]; then
-       GNB_IP="${IP_GNB_N3}"
+    if [[ "${MULTUS_NRUE}" == "true" ]]; then
+	case "${GNB_MODE}" in
+	    'monolithic')
+		GNB_IP="${IP_GNB_N3}" ;;
+	    'cudu')
+		GNB_IP="${IP_DU_F1}" ;;
+	    'cucpdu')
+		GNB_IP="${IP_DU_F1U}" ;;
+	esac
     else
 	echo "retrieve dynamically gNB/DU IP"
 	if [[ ${GNB_MODE} == 'monolithic' ]]; then
@@ -1352,7 +1359,7 @@ start-nr-ue3() {
     echo "cd ${OAI5G_RAN}"
     cd "${OAI5G_RAN}"
 
-    if [[ $MULTUS_NRUE == "true" ]]; then
+    if [[ ${MULTUS_NRUE} == "true" ]]; then
        GNB_IP="${IP_GNB_N3}"
     else
 	echo "retrieve dynamically gNB/DU IP"
