@@ -936,15 +936,13 @@ configure-gnb() {
     ORIG_GNB_TEMPLATES="${OAI5G_RAN}/oai-gnb/templates"
     ORIG_DU_TEMPLATES="${OAI5G_RAN}/oai-du/templates"
     NEW_TEMPLATES="${PREFIX_DEMO}/oai5g-rru/demo_charts/templates"
-
-    
+  
     # First load RU specific parameters
     load_rru_env "$RRU" || {
 	echo "Unknown RRU: $RRU"
 	exit 1
     }
 
-  
     for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-du-fhi-72 oai-cu oai-cu-cp oai-cu-up; do
 	VALUES="${OAI5G_RAN}/${nf}/values.yaml"
 	    
@@ -1331,8 +1329,15 @@ start-nr-ue2() {
     echo "cd ${OAI5G_RAN}"
     cd "${OAI5G_RAN}"
 
-    if [[ ${MULTUS_NRUE} == "true" ]]; then
-       GNB_IP="${IP_GNB_N3}"
+    if [[ "${MULTUS_NRUE}" == "true" ]]; then
+	case "${GNB_MODE}" in
+	    'monolithic')
+		GNB_IP="${IP_GNB_N3}" ;;
+	    'cudu')
+		GNB_IP="${IP_DU_F1}" ;;
+	    'cucpdu')
+		GNB_IP="${IP_DU_F1U}" ;;
+	esac
     else
 	echo "retrieve dynamically gNB/DU IP"
 	if [[ ${GNB_MODE} == 'monolithic' ]]; then
@@ -1359,8 +1364,15 @@ start-nr-ue3() {
     echo "cd ${OAI5G_RAN}"
     cd "${OAI5G_RAN}"
 
-    if [[ ${MULTUS_NRUE} == "true" ]]; then
-       GNB_IP="${IP_GNB_N3}"
+    if [[ "${MULTUS_NRUE}" == "true" ]]; then
+	case "${GNB_MODE}" in
+	    'monolithic')
+		GNB_IP="${IP_GNB_N3}" ;;
+	    'cudu')
+		GNB_IP="${IP_DU_F1}" ;;
+	    'cucpdu')
+		GNB_IP="${IP_DU_F1U}" ;;
+	esac
     else
 	echo "retrieve dynamically gNB/DU IP"
 	if [[ ${GNB_MODE} == 'monolithic' ]]; then
