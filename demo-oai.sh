@@ -75,8 +75,8 @@ OAISA_REPO="docker.io/oaisoftwarealliance"
 
 # Interfaces names of VLANs in sopnode servers
 # Local network interface is defined in prepare-demo-oai.sh ("net-30" for sopnode-{l1|w1})
-IF_NAME_CORE_N2N3="@DEF_LOCAL_INTERFACE@" 
-IF_NAME_RAN_N2N3="@DEF_LOCAL_INTERFACE@" 
+IF_NAME_CORE_N2N3="@DEF_LOCAL_CORE_INTERFACE@" 
+IF_NAME_RAN_N2N3="@DEF_LOCAL_RAN_INTERFACE@" 
 IF_NAME_N4="@DEF_LOCAL_CORE_INTERFACE@" 
 IF_NAME_N6="@DEF_LOCAL_CORE_INTERFACE@" 
 IF_NAME_N9="@DEF_LOCAL_CORE_INTERFACE@" 
