@@ -798,16 +798,17 @@ configure-oai-5g-advance() {
     # ---- Diff config.yaml ----
     diff "$TMP/config.yaml-orig" "$config_file"
 
-    # Fix Chart.yaml and run helm dependency update
-    sed -i 's/version: v2.2.0.0/version: 2.2.0/g' "${OAI5G_ADVANCE}/Chart.yaml"
+    ## SHOULD NO MORE BE USEFUL WITH CORRECTED CHARTS
+    ### Fix Chart.yaml and run helm dependency update
+    ##sed -i 's/version: v2.2.0.0/version: 2.2.0/g' "${OAI5G_ADVANCE}/Chart.yaml"
 
-    # Fix n4 nad name to prevent creation of n4 nad twice for upf and smf
-    sed -i 's/name: {{ $.Release.Name }}-{{ .name }}/name: {{ $.Release.Name }}-{{ .name }}-upf/g' "${OAI5G_CORE}/oai-upf/templates/nad.yaml"
-    sed -i 's/"name": "{{ $.Release.Name }}-{{ .name }}",/"name": "{{ $.Release.Name }}-{{ .name }}-upf",/g' "${OAI5G_CORE}/oai-upf/templates/nad.yaml"
-    sed -i 's/"name": "{{ $.Release.Name }}-{{ .name }}",/"name": "{{ $.Release.Name }}-{{ .name }}-upf",/g' "${OAI5G_CORE}/oai-upf/templates/deployment.yaml"
-    sed -i 's/name: {{ $.Release.Name }}-{{ .name }}/name: {{ $.Release.Name }}-{{ .name }}-smf/g' "${OAI5G_CORE}/oai-smf/templates/nad.yaml"
-    sed -i 's/"name": "{{ $.Release.Name }}-{{ .name }}",/"name": "{{ $.Release.Name }}-{{ .name }}-smf",/g' "${OAI5G_CORE}/oai-smf/templates/nad.yaml"
-    sed -i 's/"name": "{{ $.Release.Name }}-{{ .name }}",/"name": "{{ $.Release.Name }}-{{ .name }}-smf",/g' "${OAI5G_CORE}/oai-smf/templates/deployment.yaml"
+    ### Fix n4 nad name to prevent creation of n4 nad twice for upf and smf
+    ##sed -i 's/name: {{ $.Release.Name }}-{{ .name }}/name: {{ $.Release.Name }}-{{ .name }}-upf/g' "${OAI5G_CORE}/oai-upf/templates/nad.yaml"
+    ##sed -i 's/"name": "{{ $.Release.Name }}-{{ .name }}",/"name": "{{ $.Release.Name }}-{{ .name }}-upf",/g' "${OAI5G_CORE}/oai-upf/templates/nad.yaml"
+    ##sed -i 's/"name": "{{ $.Release.Name }}-{{ .name }}",/"name": "{{ $.Release.Name }}-{{ .name }}-upf",/g' "${OAI5G_CORE}/oai-upf/templates/deployment.yaml"
+    ##sed -i 's/name: {{ $.Release.Name }}-{{ .name }}/name: {{ $.Release.Name }}-{{ .name }}-smf/g' "${OAI5G_CORE}/oai-smf/templates/nad.yaml"
+    ##sed -i 's/"name": "{{ $.Release.Name }}-{{ .name }}",/"name": "{{ $.Release.Name }}-{{ .name }}-smf",/g' "${OAI5G_CORE}/oai-smf/templates/nad.yaml"
+    ##sed -i 's/"name": "{{ $.Release.Name }}-{{ .name }}",/"name": "{{ $.Release.Name }}-{{ .name }}-smf",/g' "${OAI5G_CORE}/oai-smf/templates/deployment.yaml"
 
     # Run helm dependency update
     cd "${OAI5G_ADVANCE}"
