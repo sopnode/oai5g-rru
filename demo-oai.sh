@@ -1616,7 +1616,7 @@ get-all-logs() {
     DATE=$(date +"%Y-%m-%dT%H.%M.%S")
 
     echo "get-all-logs: saving charts"
-    tar -C "${PREFIX_DEMO}/oai-cn5g-fed" -cf "$prefix"/charts.tar charts
+    tar -C "${PREFIX_DEMO}" -cf "$prefix"/charts.tar charts
 
     echo "get-all-logs: saving demo-oai.sh script"
     cp "${PREFIX_DEMO}"/demo-oai.sh "$prefix"/
