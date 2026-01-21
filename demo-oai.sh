@@ -1300,7 +1300,7 @@ start-nr-ue() {
 		GNB_IP="${IP_GNB_N3}" ;;
 	    'cudu')
 		GNB_IP="${IP_DU_F1}" ;;
-	    'cucpdu')
+	    'cucpup')
 		GNB_IP="${IP_DU_F1U}" ;;
 	esac
     else
@@ -1335,7 +1335,7 @@ start-nr-ue2() {
 		GNB_IP="${IP_GNB_N3}" ;;
 	    'cudu')
 		GNB_IP="${IP_DU_F1}" ;;
-	    'cucpdu')
+	    'cucpup')
 		GNB_IP="${IP_DU_F1U}" ;;
 	esac
     else
@@ -1370,7 +1370,7 @@ start-nr-ue3() {
 		GNB_IP="${IP_GNB_N3}" ;;
 	    'cudu')
 		GNB_IP="${IP_DU_F1}" ;;
-	    'cucpdu')
+	    'cucpup')
 		GNB_IP="${IP_DU_F1U}" ;;
 	esac
     else
