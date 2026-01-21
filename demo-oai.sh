@@ -386,7 +386,7 @@ export IP_DU_E2="192.168.85.91"
 export NETMASK_DU_E2="24"
 export GW_DU_E2=""
 export ROUTES_DU_E2="" 
-export IF_NAME_DU_E2="{$IF_NAME_E2}"
+export IF_NAME_DU_E2="${IF_NAME_E2}"
 #
 export QOS_DU="true"
 export NODE_DU="${NODE_GNB}"
