@@ -552,7 +552,7 @@ case "${GNB_MODE}" in
     *)
 	export SUBNET_NRUE="${SUBNET_F1}"
 	export NETMASK_NRUE="${NETMASK_F1}"
-	export IF_NAME_NRUE="${IF_NAME_RAN_F1}"
+	export IF_NAME_NRUE="${IF_NAME_DU_F1}"
 	;;
 esac
 export IP_NRUE="${SUBNET_NRUE}.210"
