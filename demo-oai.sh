@@ -68,10 +68,10 @@ PREFIX_DEMO="@DEF_PREFIX_DEMO@" # Directory in which all scripts will be copied 
 #
 #################################################################################
 ##################################################################################
-TMP="/tmp/tmp.$USER"
+TMP="/tmp/tmp.$USER" # directory used to store logs and ither temp files
 mkdir -p "$TMP"
 PREFIX_STATS="$TMP/oai5g-stats"
-OAISA_REPO="docker.io/oaisoftwarealliance"
+OAISA_REPO="docker.io/oaisoftwarealliance" # currently unused
 
 # Interfaces names of VLANs in sopnode servers
 # Local network interface is defined in prepare-demo-oai.sh ("net-30" for sopnode-{l1|w1})
@@ -85,16 +85,6 @@ IF_NAME_E2="@DEF_LOCAL_RAN_INTERFACE@"
 IF_NAME_F1="@DEF_LOCAL_RAN_INTERFACE@"
 IF_NAME_SBI="@DEF_LOCAL_CORE_INTERFACE@"
 IF_NAME_TS="@DEF_LOCAL_CORE_INTERFACE@"
-
-IF_NAME_VLAN_N300_1="r2lab_usrp"
-IF_NAME_VLAN_N300_2="r2lab_usrp"
-IF_NAME_VLAN_N320_1="r2lab_usrp"
-IF_NAME_VLAN_N320_2="r2lab_usrp"
-IF_NAME_VLAN_JAGUAR="r2lab_aw2s"
-IF_NAME_VLAN_PANTHER="r2lab_aw2s"
-IF_NAME_VLAN_BENETEL1="r2lab_benetel"
-
-
 
 ############# Running-mode dependent parameters configuration ###############
 #
@@ -110,7 +100,7 @@ set_if_name() {
 }
 
 if [[ $RUN_MODE = "full" ]]; then
-    # Local RAN, Local CN
+    # CN and RAN pods enabled
     SUBNET_N2N3="192.168.3"
     SUBNET_N4="192.168.24"
     SUBNET_N6="192.168.22"
@@ -215,9 +205,9 @@ if [[ $RUN_MODE = "full" ]]; then
     export NETMASK_SMF_SBI="${NETMASK_SBI}"
     export GW_SMF_SBI=""
     #
-    export IP_DNS1="138.96.0.210"
-    export IP_DNS2="193.51.196.138"
-    # ran charts
+    export IP_DNS1="138.96.0.210" # unused TBD !
+    export IP_DNS2="193.51.196.138" # unused TBD !
+    # RAN charts
     export HOST_AMF="${IP_AMF_N2}"
     export MULTUS_GNB_N2="true"
     export IF_NAME_GNB_N2="${IF_NAME_RAN_N2N3}"
@@ -229,7 +219,7 @@ if [[ $RUN_MODE = "full" ]]; then
 	export IP_GNB_N3="${SUBNET_N2N3}.204"
 	export IF_NAME_CUUP_N3="${IF_NAME_RAN_N2N3}"
     else
-	export IP_GNB_N3="$IP_GNB_N2"
+	export IP_GNB_N3="${IP_GNB_N2}"
     fi
 
 else
@@ -293,33 +283,42 @@ else
 	export IF_NAME_GNB_N3="n2"
 	export ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
 	#export ROUTES_GNB_N2="[{'dst': '172.21.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
-	#
-	# ** NRUE specific part **
-	#
-	export MULTUS_NRUE="true"
     else
-        # RUN_MODE=gnb-only
-	# -- Local RAN and external CN
+        # ${RUN_MODE} == "gnb-only"
+	# only RAN pods are enabled
 	#
-	# Following setting forcorrespnds to open5gs CN
-        export SUBNET_N2N3="10.10.3" 
-        export HOST_AMF="${SUBNET_N2N3}.200" #${NODE_AMF_UPF%"-v30"} # open5gs-amf service is unknown, use $NODE_AMF_UPF to set up external IP address 
-	IF_NAME_RAN_N2N3="n3br" # host interface used for multus on N2/N3 
-	export NETMASK_N2N3="24"
-	#
-	export MULTUS_GNB_N2="false"
-	export IP_GNB_N2="" 
-        export ROUTES_GNB_N2="" # [{'dst': '172.22.10.0/24','gw': '10.0.20.1'}]" # Set route to reach AMF
-	export GNB_N2_IF_NAME="" # local pod network interface name for N2 (eth0 or n2 or n3)
-	#
-	export MULTUS_GNB_N3="true"
-	export IP_GNB_N3="${SUBNET_N2N3.205}"
-	#
-	export MULTUS_CUCP_N2="true"
-	export IP_CUCP_N2="${SUBNET_N2N3.205}"
-	#
-	export MULTUS_CUUP_N3="true"
-	export IP_CUUP_N3="${SUBNET_N2N3.206}"
+
+	if [[ "${NODE_AMF_UPF}" == "10.10.3.200" ]]; then
+	    # Scenario with Open5gs CN
+	    export SUBNET_N2N3="10.10.3"
+	    export IF_NAME_RAN_N2N3="n3br"
+	    export NETMASK_N2N3="24"
+	    export MULTUS_GNB_N2="false"
+	    export MULTUS_GNB_N3="true"
+	    export IF_NAME_GNB_N3="${IF_NAME_RAN_N2N3}"
+	    export IP_GNB_N3="${SUBNET_N2N3.205}"
+	    export MULTUS_CUCP_N2="true"
+	    export IP_CUCP_N2="${SUBNET_N2N3.205}"
+	    export MULTUS_CUUP_N3="true"
+	    export IP_CUUP_N3="${SUBNET_N2N3.206}"
+	else
+	    export SUBNET_N2N3="192.168.3"
+	    export IF_NAME_RAN_N2N3 # just export the default value
+	    export NETMASK_N2N3="24"
+	    export MULTUS_GNB_N2="true"
+	    export IF_NAME_GNB_N2="${IF_NAME_RAN_N2N3}"
+	    export IP_GNB_N2="${SUBNET_N2N3}.203"
+	    export MULTUS_GNB_N3="false"
+	    export IF_NAME_GNB_N3=""
+	    if [[ $GNB_MODE = 'cucpup' ]]; then
+		export MULTUS_CUUP_N3="true"
+		export IP_GNB_N3="${SUBNET_N2N3}.204"
+		export IF_NAME_CUUP_N3="${IF_NAME_RAN_N2N3}"
+	    else
+		export IP_GNB_N3="${SUBNET_N2N3}.203"
+	    fi
+	fi
+	export HOST_AMF="${SUBNET_N2N3}.200"  # Default AMF IP address
     fi
 fi
 
@@ -347,7 +346,18 @@ export GNB_PULL_POLICY="IfNotPresent"
 export GNB_FHI72_REPO="${R2LAB_REPO}/oai-gnb-fhi72"
 export GNB_FHI72_TAG="${RAN_TAG}"
 export GNB_FHI72_PULL_POLICY="IfNotPresent"
-
+#
+# F1/F1C/F1U/E1/E2 subnets/netmasks
+#
+SUBNET_E1="192.168.18"
+NETMASK_E1="24"
+SUBNET_E2="192.168.85"
+NETMASK_E2="24"
+SUBNET_F1="172.21.16"
+SUBNET_F1C="172.21.6"
+SUBNET_F1U="172.21.16"
+NETMASK_F1="24"
+#
 ##########################################
 # DU/CU SPLIT parameters
 ##########################################
@@ -362,28 +372,28 @@ export DU_FHI72_TAG="${DU_TAG}"
 export DU_FHI72_PULL_POLICY="${DU_PULL_POLICY}"
 #
 export MULTUS_DU_F1C="true"
-export IP_DU_F1C="172.21.6.90"
-export NETMASK_DU_F1C="22"
+export IP_DU_F1C="${SUBNET_F1C}.90"
+export NETMASK_DU_F1C="${NETMASK_F1}"
 export ROUTES_DU_F1C=""
 export IF_NAME_DU_F1C="${IF_NAME_F1}"
 #
 export MULTUS_DU_F1U="true"
-export IP_DU_F1U="172.21.16.90"
-export NETMASK_DU_F1U="22"
+export IP_DU_F1U="${SUBNET_F1U}.90"
+export NETMASK_DU_F1U="${NETMASK_F1}"
 export GW_DU_F1U=""
 export ROUTES_DU_F1U=""
 export IF_NAME_DU_F1U="${IF_NAME_F1}"
 #
 export MULTUS_DU_F1="true"
-export IP_DU_F1="172.21.16.100"
-export NETMASK_DU_F1="22"
+export IP_DU_F1="${SUBNET_F1}.100"
+export NETMASK_DU_F1="${NETMASK_F1}"
 export GW_DU_F1=""
 export ROUTES_DU_F1=""
 export IF_NAME_DU_F1="${IF_NAME_F1}"
 #
-export MULTUS_DU_E2="true"
-export IP_DU_E2="192.168.85.91"
-export NETMASK_DU_E2="24"
+export MULTUS_DU_E2="$FLEXRIC"
+export IP_DU_E2="${SUBNET_E2}.91"
+export NETMASK_DU_E2="${NETMASK_E2}"
 export GW_DU_E2=""
 export ROUTES_DU_E2="" 
 export IF_NAME_DU_E2="${IF_NAME_E2}"
@@ -397,8 +407,8 @@ export CU_TAG=${RAN_TAG}
 export CU_PULL_POLICY="${GNB_PULL_POLICY}"
 #
 export MULTUS_CU_F1="true"
-export IP_CU_F1="172.21.16.92"
-export NETMASK_CU_F1="22"
+export IP_CU_F1="${SUBNET_F1}.92"
+export NETMASK_CU_F1="${NETMASK_F1}"
 export GW_CU_F1="" 
 export ROUTES_CU_F1="" 
 export IF_NAME_CU_F1="${IF_NAME_F1}"
@@ -417,9 +427,9 @@ export GW_CU_N3=${GW_CU_N3:=""}
 export ROUTES_CU_N3=${ROUTES_CU_N3:=""}
 export IF_NAME_CU_N3=${IF_NAME_CU_N3:=${IF_NAME_RAN_N2N3}}
 #
-export MULTUS_CU_E2="true"
-export IP_CU_E2="192.168.85.93"
-export NETMASK_CU_E2="24"
+export MULTUS_CU_E2="$FLEXRIC"
+export IP_CU_E2="${SUBNET_E2}.93"
+export NETMASK_CU_E2="${NETMASK_E2}"
 export GW_CU_E2=""
 export ROUTES_CU_E2="" 
 export IF_NAME_CU_E2="${IF_NAME_E2}"
@@ -436,15 +446,15 @@ export CUCP_TAG=${RAN_TAG}
 export CUCP_PULL_POLICY=${GNB_PULL_POLICY}
 #
 export MULTUS_CUCP_E1="true"
-export IP_CUCP_E1="192.168.18.12"
-export NETMASK_CUCP_E1="24"
+export IP_CUCP_E1="${SUBNET_E1}.12"
+export NETMASK_CUCP_E1="${NETMASK_E1}"
 export GW_CUCP_E1=""
 export ROUTES_CUCP_E1=""
 export IF_NAME_CUCP_E1="${IF_NAME_E1}"
 #
 export MULTUS_CUCP_E2="$FLEXRIC" # E2 only used if FLEXRIC is true
-export IP_CUCP_E2="192.168.85.93"
-export NETMASK_CUCP_E2="24"
+export IP_CUCP_E2="${SUBNET_E2}.93"
+export NETMASK_CUCP_E2="${NETMASK_E2}"
 export GW_CUCP_E2=""
 export ROUTES_CUCP_E2="" 
 export IF_NAME_CUCP_E2="${IF_NAME_E2}"
@@ -457,8 +467,8 @@ export ROUTES_CUCP_N2=${ROUTES_CUCP_N2:=""}
 export IF_NAME_CUCP_N2=${IF_NAME_CUCP_N2:=${IF_NAME_RAN_N2N3}}
 #
 export MULTUS_CUCP_F1C="true"
-export IP_CUCP_F1C="172.21.16.92"
-export NETMASK_CUCP_F1C="22"
+export IP_CUCP_F1C="${SUBNET_F1C}.92"
+export NETMASK_CUCP_F1C="${NETMASK_F1}"
 export GW_CUCP_F1C=""
 export ROUTES_CUCP_F1C=""
 export IF_NAME_CUCP_F1C="${IF_NAME_F1}"
@@ -474,15 +484,15 @@ export CUUP_TAG="${RAN_TAG}"
 export CUUP_PULL_POLICY="${GNB_PULL_POLICY}"
 #
 export MULTUS_CUUP_E1="true"
-export IP_CUUP_E1="192.168.18.13"
-export NETMASK_CUUP_E1="24"
+export IP_CUUP_E1="${SUBNET_E1}.13"
+export NETMASK_CUUP_E1="${NETMASK_E1}"
 export GW_CUUP_E1=""
 export ROUTES_CUUP_E1="" 
 export IF_NAME_CUUP_E1="${IF_NAME_E1}"
 #
-export MULTUS_CUUP_E2="true"
-export IP_CUUP_E2="192.168.85.92"
-export NETMASK_CUUP_E2="24"
+export MULTUS_CUUP_E2="$FLEXRIC"
+export IP_CUUP_E2="${SUBNET_E2}.92"
+export NETMASK_CUUP_E2="${NETMASK_E2}"
 export GW_CUUP_E2=""
 export ROUTES_CUUP_E2="" 
 export IF_NAME_CUUP_E2="${IF_NAME_E2}"
@@ -495,8 +505,8 @@ export ROUTES_CUUP_N3=${ROUTES_CUUP_N3:=""}
 export IF_NAME_CUUP_N3=${IF_NAME_CUUP_N3:=${IF_NAME_RAN_N2N3}}
 #
 export MULTUS_CUUP_F1U="true"
-export IP_CUUP_F1U="172.21.16.93"
-export NETMASK_CUUP_F1U="22"
+export IP_CUUP_F1U="${SUBNET_F1U}.93"
+export NETMASK_CUUP_F1U="${NETMASK_F1}"
 export GW_CUUP_F1U="" # "172.21.19.254"
 export ROUTES_CUUP_F1U=""
 export IF_NAME_CUUP_F1U="${IF_NAME_F1}"
@@ -519,9 +529,9 @@ export NETMASK_GNB_N2="${NETMASK_N2N3}"
 export NETMASK_GNB_N3="${NETMASK_N2N3}"
 export NETMASK_GNB_RU="24"
 #
-export MULTUS_GNB_E2="true"
-export IP_GNB_E2="192.168.85.94"
-export NETMASK_GNB_E2="24"
+export MULTUS_GNB_E2="$FLEXRIC"
+export IP_GNB_E2="${SUBNET_E2}.94"
+export NETMASK_GNB_E2="${NETMASK_E2}"
 export GW_GNB_E2=""
 export ROUTES_GNB_E2="" 
 export IF_NAME_GNB_E2="${IF_NAME_E2}"
@@ -531,14 +541,23 @@ export QOS_GNB="true"
 
 ########################### oai-nr-ue rfsim chart parameters #####################
 export NRUE_REPO="${R2LAB_REPO}/oai-nr-ue"
-#NRUE_REPO="${OAISA_REPO}/oai-nr-ue"
 export NRUE_TAG="${RAN_TAG}"
 export MULTUS_NRUE="true"
-export NETMASK_NRUE="${NETMASK_N2N3}"
-export IF_NAME_NRUE="${IF_NAME_RAN_N2N3}"
-export IP_NRUE="${SUBNET_N2N3}.210"
-export IP_NRUE2="${SUBNET_N2N3}.211"
-export IP_NRUE3="${SUBNET_N2N3}.212"
+case "${GNB_MODE}" in
+    'monolithic')
+	export SUBNET_NRUE="${SUBNET_N2N3}"
+	export NETMASK_NRUE="${NETMASK_N2N3}"
+	export IF_NAME_NRUE="{IF_NAME_RAN_N2N3}"
+	;;
+    *)
+	export SUBNET_NRUE="${SUBNET_F1}"
+	export NETMASK_NRUE="${NETMASK_F1}"
+	export IF_NAME_NRUE="{IF_NAME_RAN_F1}"
+	;;
+esac
+export IP_NRUE="${SUBNET_NRUE}.210"
+export IP_NRUE2="${SUBNET_NRUE}.211"
+export IP_NRUE3="${SUBNET_NRUE}.212"
 export ADD_OPTIONS_NRUE="--rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time" 
 export QOS_NRUE="false"
 export NODE_NRUE="${NODE_GNB}"
@@ -798,7 +817,7 @@ configure-oai-5g-advance() {
     # ---- Diff config.yaml ----
     diff "$TMP/config.yaml-orig" "$config_file"
 
-    ## SHOULD NO MORE BE USEFUL WITH CORRECTED CHARTS
+    ## SHOULD NO MORE BE USEFUL WITH THE LATEST CORRECTED CHARTS
     ### Fix Chart.yaml and run helm dependency update
     ##sed -i 's/version: v2.2.0.0/version: 2.2.0/g' "${OAI5G_ADVANCE}/Chart.yaml"
 
@@ -914,7 +933,6 @@ render_nf_ifs() {
 configure-gnb() {
     echo "configure-gnb: gNB on node $NODE_GNB with RRU $RRU and logs is $LOGS"
 
-    DIR_CHARTS="${PREFIX_DEMO}/charts"
     ORIG_GNB_TEMPLATES="${OAI5G_RAN}/oai-gnb/templates"
     ORIG_DU_TEMPLATES="${OAI5G_RAN}/oai-du/templates"
     NEW_TEMPLATES="${PREFIX_DEMO}/oai5g-rru/demo_charts/templates"
