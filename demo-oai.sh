@@ -1007,7 +1007,8 @@ configure-gnb() {
 	for nf in oai-gnb oai-du; do
 	    cp "${PREFIX_DEMO}/oai5g-rru/rru/${nf}-deployment-aw2s.yaml" "${OAI5G_RAN}/${nf}/templates/deployment.yaml"
 	done
-	for nf in oai-cu oai-cu-cp oai-cu-up; do
+	# except for oai-cu-up
+	for nf in oai-cu oai-cu-cp; do
 	    DEPLOYMENT="${OAI5G_RAN}/${nf}/templates/deployment.yaml"
 	    sed -i 's|/opt/oai-gnb/etc|/opt/oai-gnb-aw2s/etc|' "$DEPLOYMENT"
 	done
