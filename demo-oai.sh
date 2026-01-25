@@ -883,7 +883,7 @@ apply-gnb-values-yq() {
 
     echo "Applying yq overlays from $yq_overlay_file to $values_file"
 
-    yq eval --style=double -i "$(cat "$yq_overlay_file")" "$values_file"
+    yq eval -i --style=double "$(cat "$yq_overlay_file")" "$values_file"
 
     # Update PLMN and NSSAI
     yq eval -i '
