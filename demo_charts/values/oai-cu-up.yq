@@ -10,5 +10,9 @@
 .config.ricHost              = strenv(HOST_FLEXRIC) |
 .config.tac                  = strenv(TAC) |
 
+.start.tcpdump               = (strenv(PCAP) == \"true\") |
+.includeTcpDumpContainer     = strenv(strenv(LOGS) == \"true\") |
+.persistent.sharedvolume     = (strenv(PCAP) == \"true\") |
+
 .resources.define            = (strenv(QOS_CUUP) == "true") |
 .nodeName                    = strenv(NODE_CUUP)

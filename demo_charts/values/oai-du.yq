@@ -6,12 +6,18 @@
 # Common gNB / NF config
 .config.useAdditionalOptions = strenv(ADD_OPTIONS_GNB) |
 .config.usrp                 = strenv(RRU_TYPE) |
+.config.duName               = strenv(DU_NAME) |
 .config.radio                = strenv(RRU_TYPE) |
 .config.cuHost               = strenv(CU_HOST_FROM_DU) |
 .config.enableE2             = (strenv(FLEXRIC) == "true") |
 .config.ricHost              = strenv(HOST_FLEXRIC) |
 .config.tac                  = strenv(TAC) |
 .config.ruIpAdd              = strenv(ADDR_RU) |
+.config.sdr_addrs            = strenv(SDR_ADDRS) |
+
+.start.tcpdump               = (strenv(PCAP) == \"true\") |
+.includeTcpDumpContainer     = strenv(strenv(LOGS) == \"true\") |
+.persistent.sharedvolume     = (strenv(PCAP) == \"true\") |
 
 .resources.define            = (strenv(QOS_DU) == "true") |
 .nodeName                    = strenv(NODE_DU)

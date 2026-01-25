@@ -358,6 +358,9 @@ SUBNET_F1C="172.21.6"
 SUBNET_F1U="172.21.16"
 NETMASK_F1="24"
 #
+export GNB_NAME="oai-gnb-${RRU}"
+export DU_NAME="oai-du-${RRU}"
+#
 ##########################################
 # DU/CU SPLIT parameters
 ##########################################
