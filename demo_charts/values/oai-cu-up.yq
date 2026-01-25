@@ -11,7 +11,7 @@
 .config.tac                  = strenv(TAC) |
 
 .start.tcpdump               = (strenv(PCAP) == "true") |
-.includeTcpDumpContainer     = strenv(strenv(LOGS) == "true") |
+.includeTcpDumpContainer     = (strenv(LOGS) == "true") |
 .persistent.sharedvolume     = (strenv(PCAP) == "true") |
 
 .resources.define            = (strenv(QOS_CUUP) == "true") |
