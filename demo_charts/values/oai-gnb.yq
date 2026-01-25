@@ -15,9 +15,9 @@
 .config.ruIpAdd              = strenv(ADDR_RU) |
 .config.sdr_addrs            = strenv(SDR_ADDRS) |
 
-.start.tcpdump               = (strenv(PCAP) == \"true\") |
-.includeTcpDumpContainer     = strenv(strenv(LOGS) == \"true\") |
-.persistent.sharedvolume     = (strenv(PCAP) == \"true\") |
+.start.tcpdump               = (strenv(PCAP) == "true") |
+.includeTcpDumpContainer     = strenv(strenv(LOGS) == "true") |
+.persistent.sharedvolume     = (strenv(PCAP) == "true") |
 
 .resources.define            = (strenv(QOS_GNB) == "true") |
 .nodeName                    = strenv(NODE_GNB)
