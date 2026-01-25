@@ -13,7 +13,7 @@
 .config.ricHost              = strenv(HOST_FLEXRIC) |
 .config.tac                  = strenv(TAC) |
 .config.ruIpAdd              = strenv(ADDR_RU) |
-.config.sdr_addrs            = ""+strenv(SDR_ADDRS) |
+.config.sdr_addrs            = strenv(SDR_ADDRS) |
 
 .start.tcpdump               = (strenv(PCAP) == "true") |
 .includeTcpDumpContainer     = (strenv(LOGS) == "true") |
