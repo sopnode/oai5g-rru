@@ -12,7 +12,7 @@ HOST_AMF_UPF="sopnode-w1"
 HOST_GNB="sopnode-w1"
 
 # k8s namespace
-NS="open5gs"
+NS="oai-ci"
 
 # Repo/Branch/TAG for code
 REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
@@ -22,13 +22,13 @@ REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/orchestration/charts.git"
 TAG_OAI_CN5G_FED="main"
 
 # CN mode
-CN_MODE="advance"
-#CN_MODE="basic"
+#CN_MODE="advance"
+CN_MODE="basic"
 
 # oai5g-rru running mode 
-#RUN_MODE="full"
+RUN_MODE="full"
 #RUN_MODE="gnb-upf"
-RUN_MODE="gnb-only"
+#RUN_MODE="gnb-only"
 
 # RAN options
 #RRU="jaguar"
