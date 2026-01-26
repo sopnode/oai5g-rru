@@ -1081,7 +1081,7 @@ configure-nr-ue2() {
     yq eval -i '
       .nfimage.repository = strenv(NRUE_REPO) |
       .nfimage.version = strenv(NRUE_TAG) |
-      .multus.ipadd    = strenv(IP_NRUE2) |
+      .multus.interfaces[0].ipAdd    = strenv(IP_NRUE2) |
       .config.fullImsi = strenv(RFSIM_IMSI_UE2) |
       .config.fullKey  = strenv(FULL_KEY) |
       .config.opc      = strenv(OPC) |
@@ -1115,7 +1115,7 @@ configure-nr-ue3() {
     yq eval -i '
       .nfimage.repository = strenv(NRUE_REPO) |
       .nfimage.version = strenv(NRUE_TAG) |
-      .multus.ipadd    = strenv(IP_NRUE3) |
+      .multus.interfaces[0].ipAdd    = strenv(IP_NRUE3) |
       .config.fullImsi = strenv(RFSIM_IMSI_UE3) |
       .config.fullKey  = strenv(FULL_KEY) |
       .config.opc      = strenv(OPC) |
