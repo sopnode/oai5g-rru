@@ -103,7 +103,7 @@ if [[ $RUN_MODE = "full" ]]; then
     # CN and RAN pods enabled
     SUBNET_N2N3="192.168.3"
     SUBNET_N4="192.168.24"
-    SUBNET_N6="192.168.22"
+    SUBNET_N6="192.168.3"
     SUBNET_N9="192.168.23"
     SUBNET_SBI="172.21.8"
     SUBNET_TS="172.21.6"
@@ -160,7 +160,8 @@ if [[ $RUN_MODE = "full" ]]; then
     export MULTUS_UPF_N6="true"
     export IF_NAME_UPF_N6="${IF_NAME_N6}"
     export NAME_UPF_N6=$(set_if_name "${MULTUS_UPF_N6}" "eth0" "n6")
-    export IP_UPF_N6="${SUBNET_N6}.2"
+    export IP_UPF_N6="${SUBNET_N6}.199"
+    export GW_UPF_N6="${SUBNET_N6}.251" # for sopnode-w1
     export NETMASK_UPF_N6="${NETMASK_N6}"
     ## upf n9 IF
     export MULTUS_UPF_N9="false"
