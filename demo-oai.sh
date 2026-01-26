@@ -328,7 +328,7 @@ fi
 #
 OAI5G_CHARTS="${PREFIX_DEMO}/charts"
 OAI5G_CORE="${OAI5G_CHARTS}/oai-5g-core"
-OAI5G_ADVANCE="${OAI5G_CORE}/oai-5g-advance"
+OAI5G_@MODE@="${OAI5G_CORE}/oai-5g-@mode@"
 
 export CN_DEFAULT_GW=""
 
@@ -579,10 +579,10 @@ export HOST_FLEXRIC="oai-flexric"
 #                       OAI-CN charts configuration
 #################################################################################
 
-configure-oai-5g-advance() {
+configure-oai-5g-@mode@() {
 
-    values_file="${OAI5G_ADVANCE}/values.yaml"
-    config_file="${OAI5G_ADVANCE}/config.yaml"
+    values_file="${OAI5G_@MODE@}/values.yaml"
+    config_file="${OAI5G_@MODE@}/config.yaml"
 
     echo "======================="
 
@@ -820,20 +820,8 @@ configure-oai-5g-advance() {
     # ---- Diff config.yaml ----
     diff "$TMP/config.yaml-orig" "$config_file"
 
-    ## SHOULD NO MORE BE USEFUL WITH THE LATEST CORRECTED CHARTS
-    ### Fix Chart.yaml and run helm dependency update
-    ##sed -i 's/version: v2.2.0.0/version: 2.2.0/g' "${OAI5G_ADVANCE}/Chart.yaml"
-
-    ### Fix n4 nad name to prevent creation of n4 nad twice for upf and smf
-    ##sed -i 's/name: {{ $.Release.Name }}-{{ .name }}/name: {{ $.Release.Name }}-{{ .name }}-upf/g' "${OAI5G_CORE}/oai-upf/templates/nad.yaml"
-    ##sed -i 's/"name": "{{ $.Release.Name }}-{{ .name }}",/"name": "{{ $.Release.Name }}-{{ .name }}-upf",/g' "${OAI5G_CORE}/oai-upf/templates/nad.yaml"
-    ##sed -i 's/"name": "{{ $.Release.Name }}-{{ .name }}",/"name": "{{ $.Release.Name }}-{{ .name }}-upf",/g' "${OAI5G_CORE}/oai-upf/templates/deployment.yaml"
-    ##sed -i 's/name: {{ $.Release.Name }}-{{ .name }}/name: {{ $.Release.Name }}-{{ .name }}-smf/g' "${OAI5G_CORE}/oai-smf/templates/nad.yaml"
-    ##sed -i 's/"name": "{{ $.Release.Name }}-{{ .name }}",/"name": "{{ $.Release.Name }}-{{ .name }}-smf",/g' "${OAI5G_CORE}/oai-smf/templates/nad.yaml"
-    ##sed -i 's/"name": "{{ $.Release.Name }}-{{ .name }}",/"name": "{{ $.Release.Name }}-{{ .name }}-smf",/g' "${OAI5G_CORE}/oai-smf/templates/deployment.yaml"
-
     # Run helm dependency update
-    cd "${OAI5G_ADVANCE}"
+    cd "${OAI5G_@MODE@}"
     echo "run helm dependency update"
     helm dependency update
 }
@@ -998,12 +986,6 @@ configure-gnb() {
     cp "$CONFIG" "${OAI5G_RAN}/${nf}/config.yaml.orig"
     cp "${CONFIG_RRU}" "$CONFIG"
     ##diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
-
-    ## Update deployment.yaml and nad.yaml templates
-    #cp -f "${NEW_TEMPLATES}/oai-gnb/nad.yaml" "${ORIG_GNB_TEMPLATES}"
-    #cp -f "${NEW_TEMPLATES}/oai-du/nad.yaml" "${ORIG_DU_TEMPLATES}"
-    # fix also this typo in the du deployment template 
-    #sed -i 's/oai-cu.count/oai-du.count/g' "${ORIG_DU_TEMPLATES}/deployment.yaml"
 
     # Fix deployment charts in the case of AW2S RUs as Eurecom no more support AW2S...
     if [[ "${RRU_TYPE}" == "aw2s" ]]; then
