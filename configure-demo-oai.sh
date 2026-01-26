@@ -74,7 +74,7 @@ else
       "0000000013:1"
       "0000000014:1"
       "${RFSIM_IMSI:5}:1"
-      "${RFSIM_IMSI_UE2:5}:1"
+      "${RFSIM_IMSI_UE2:5}:2"
       "${RFSIM_IMSI_UE3:5}:1"
     )
 fi

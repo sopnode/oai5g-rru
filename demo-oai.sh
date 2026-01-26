@@ -1119,7 +1119,7 @@ configure-nr-ue3() {
       .config.fullImsi = strenv(RFSIM_IMSI_UE3) |
       .config.fullKey  = strenv(FULL_KEY) |
       .config.opc      = strenv(OPC) |
-      .config.dnn      = strenv(DNN1) |
+      .config.dnn      = strenv(DNN0) |
       .config.sst      = strenv(SLICE2_SST) |
       .config.sd       = ("0x" + strenv(SLICE2_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
