@@ -1120,8 +1120,8 @@ configure-nr-ue3() {
       .config.fullKey  = strenv(FULL_KEY) |
       .config.opc      = strenv(OPC) |
       .config.dnn      = strenv(DNN0) |
-      .config.sst      = strenv(SLICE2_SST) |
-      .config.sd       = ("0x" + strenv(SLICE2_SD)) |
+      .config.sst      = strenv(SLICE1_SST) |
+      .config.sd       = ("0x" + strenv(SLICE1_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
       .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
       .resources.define = (strenv(QOS_NRUE) | test("true"))
