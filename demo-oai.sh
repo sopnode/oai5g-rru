@@ -205,8 +205,8 @@ if [[ $RUN_MODE = "full" ]]; then
     export NETMASK_SMF_SBI="${NETMASK_SBI}"
     export GW_SMF_SBI=""
     #
-    export IP_DNS1="138.96.0.210" # unused TBD !
-    export IP_DNS2="193.51.196.138" # unused TBD !
+    export IP_DNS1="138.96.0.210"
+    export IP_DNS2="8.8.8.8"
     # RAN charts
     export HOST_AMF="${IP_AMF_N2}"
     export MULTUS_GNB_N2="true"
@@ -790,8 +790,10 @@ configure-oai-5g-@mode@() {
       .amf.plmn_support_list[0].tac = strenv(TAC)
     " "$config_file"
 
-    # SMF DNN + QoS
+    # SMF DNS + DNN + QoS
     yq -i "
+      .smf.ue_dns.primary_ipv4 = strenv(IP_DNS1) |
+      .smf.ue_dns.secondary_ipv4 = strenv(IP_DNS2) |
       .smf.smf_info.sNssaiSmfInfoList[0].dnnSmfInfoList[0].dnn = strenv(DNN0) |
       .smf.smf_info.sNssaiSmfInfoList[1].dnnSmfInfoList[0].dnn = strenv(DNN1) |
       .smf.local_subscription_infos[0].dnn = strenv(DNN0) |
