@@ -5,13 +5,16 @@ if [ -f /etc/oai/5g-env.sh ]; then
     source /etc/oai/5g-env.sh
 else
     echo "/etc/oai/5g-env.sh not found, using following default parameters:"
+    
     MCC="001" 
     MNC="01" 
     TAC="1" 
 
-    # DNN0 and DNN1 must be initialized in scripts demo-oai.py or in prepare-demo-oai.sh scripts 
-    DNN0_PDU_TYPE="IPV4" # XXX "IPV4" or "IPV4V6" 
-    DNN1_PDU_TYPE="IPV4" # XXX "IPV4" or "IPV4V6"
+    # DNN0 and DNN1 can be updated in demo-oai.py or in prepare-demo-oai.sh scripts
+    DNN0="internet"
+    DNN1="streaming"
+    DNN0_PDU_TYPE="IPV4" # e.g., "IPV4" or "IPV4V6" 
+    DNN1_PDU_TYPE="IPV4" # e.g., "IPV4" or "IPV4V6"
 
     # NSSAI (SST,SD) Configuration
     #
@@ -83,9 +86,10 @@ fi
 GNB_ID="0xe020"
 START_IP=11
 
-##########################################################################################
 TMP="/tmp/tmp.$USER"
 mkdir -p "$TMP"
+
+##########################################################################################
 
 function update() {
     NS=$1; shift
@@ -93,17 +97,17 @@ function update() {
     NODE_GNB=$1; shift
     RRU=$1; shift 
     RUN_MODE=$1; shift # in ["full", "gnb-only", "gnb-upf"]
-    LOGS=$1; shift # boolean in [true, false]
-    PCAP=$1; shift # boolean in [true, false]
-    MONITORING=$1; shift # boolean in [true, false]
-    FLEXRIC=$1; shift # boolean
-    LOCAL_CORE_INTERFACE=$1; shift
-    LOCAL_RAN_INTERFACE=$1; shift
-    PREFIX_DEMO=$1; shift
-    CN_MODE=$1; shift
-    GNB_MODE=$1; shift
-    DNN0=$1; shift
-    DNN1=$1; shift
+    LOGS=$1; shift # boolean
+    PCAP=$1; shift # boolean 
+    MONITORING=$1; shift # boolean 
+    FLEXRIC=$1; shift # boolean 
+    LOCAL_CORE_INTERFACE=$1; shift # network interface for multus in core node
+    LOCAL_RAN_INTERFACE=$1; shift # network interface for multus in ran node
+    PREFIX_DEMO=$1; shift # main directory, will include prepare-demo-oai.sh script
+    CN_MODE=$1; shift # in ["basic", "advance"]
+    GNB_MODE=$1; shift # in ["monolithic", "cudu", "cucpup"]
+    [[ -n "$1" ]] && DNN0="$1" && shift # possibly update DNN0
+    [[ -n "$1" ]] && DNN1="$1" && shift # possibly update DNN1
     REGCRED_NAME=$1; shift
     REGCRED_PWD=$1; shift
     REGCRED_EMAIL=$1; shift
