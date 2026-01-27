@@ -1,62 +1,69 @@
 #!/bin/bash
 #
-# This script aims to test the oai5g-rru demo script directly on a sopnode server
+# This script aims to deploy the oai5g-rru demo script directly on a sopnode server
 # see https://github.com/sopnode/oai5g-rru/tree/develop-r2lab
 #
 
-# server used for following OAI5G functions
-# use HOST_AMF_UPF parameter to set up external AMF IP address when using RUN_MODE="gnb-only"
+# Server name where AMF/UPF are deployed
+#  -- or external AMF IP address when using RUN_MODE="gnb-only"
+#  -- in case of external open5gs, set it to the AMF address: "10.10.3.200"
 HOST_AMF_UPF="sopnode-w1" 
-#HOST_AMF_UPF="10.10.3.200" # AMF IP used with open5gs
 
+# Server name where RAN pods are deployed
 HOST_GNB="sopnode-w1"
 
 # k8s namespace
 NS="oai-ci"
 
-# Repo/Branch/TAG for code
+# Repo/tag for oai5g-rru scripts
 REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
 TAG_OAI5G_RRU="v2.2.0-r2lab"
 
-REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/oai/orchestration/charts.git"
-TAG_OAI_CN5G_FED="main"
+# Repo/tag for OAI charts
+REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/turletti/charts.git"
+TAG_OAI_CN5G_FED="correction-v1.0.0-r2lab"
 
-# CN mode
-#CN_MODE="advance"
+# CORE node mode in ["basic", "advance"]
 CN_MODE="basic"
+#CN_MODE="advance"
 
-# oai5g-rru running mode 
+# run mode in ["full", "gnb-upf", "gnb-only"]
 RUN_MODE="full"
 #RUN_MODE="gnb-upf"
 #RUN_MODE="gnb-only"
 
-# RAN options
+# RRU device in ["benetel1", "benetel2", "jaguar", "panther", "n300", "n320", "b210", "rfsim"]
 #RRU="jaguar"
 #RRU="panther"
 RRU="rfsim"
 #RRU="b210"
 #RRU="n300"
 #RRU="n320"
+
+# Type of RAN deployment in ["monolithic", "cudu", "cucpup"]
 #GNB_MODE="cudu"
 #GNB_MODE="cucpup"
 GNB_MODE="monolithic"
 
 # DNNs 
-DNN0="internet"
-DNN1="streaming" 
+DNN0="" # default DNN0 is "internet"
+DNN1="" # default DNN1 is "streaming" 
 
 # logs configuration
-# logs and pcap are automatically retrieved when running demo-oai.sh stop in /tmp/tmp.root/oai5g-stats.tgz
-# you should manually erase /tmp/tmp.root/oai5g-stats directory before running another scenario to prevent retrieving old logs/pcaps
+#   -- logs and pcap are automatically retrieved when running demo-oai.sh stop
+#      in /tmp/tmp.root/oai5g-stats.tgz
 LOGS="false"
 PCAP="false"
 MONITORING="false"
 FLEXRIC="false"
 
-LOCAL_CORE_INTERFACE="net-30" # "net-30" is used to possibly reach R2lab k8s workers from sopnode-{l1|w1}
-LOCAL_RAN_INTERFACE="net-30"  # "net-30" is used to possibly reach R2lab k8s workers from sopnode-{l1|w1}
+# Network interface name by multus to deploy CORE pods
+LOCAL_CORE_INTERFACE="net-30" 
 
-# identity used to git pull
+# Network interface name by multus to deploy RAN pods
+LOCAL_RAN_INTERFACE="net-30" 
+
+# github identity used to git pull
 RC_NAME="r2labuser"
 RC_PWD="r2labuser-pwd"
 RC_MAIL="r2labuser@turletti.com"
@@ -64,7 +71,7 @@ RC_MAIL="r2labuser@turletti.com"
 DIR="$(pwd)"
 COMMAND=$(basename "$0")
 
-function git_pull(){
+git_pull(){
 
     echo "Step 1: clean up previous oai5g-rru and oai-cn5g-fed.git local directories if any"
     cd "$DIR" || exit
@@ -83,7 +90,7 @@ function git_pull(){
 }
 
 
-function configure_all_scripts(){
+configure_all_scripts(){
     echo "Step 1: use parameters from configure-demo-oai.sh to configure demo-oai.sh script"
     echo "./configure-demo-oai.sh update $NS $HOST_AMF_UPF $HOST_GNB $RRU $RUN_MODE $LOGS $PCAP $MONITORING $FLEXRIC $LOCAL_CORE_INTERFACE $LOCAL_RAN_INTERFACE $DIR $CN_MODE $GNB_MODE $DNN0 $DNN1 $RC_NAME $RC_PWD $RC_MAIL"
     ./configure-demo-oai.sh update "$NS" "$HOST_AMF_UPF" "$HOST_GNB" "$RRU" "$RUN_MODE" "$LOGS" "$PCAP" "$MONITORING" "$FLEXRIC" "$LOCAL_CORE_INTERFACE" "$LOCAL_RAN_INTERFACE" "$DIR" "$CN_MODE" "$GNB_MODE" "$DNN0" "$DNN1" "$RC_NAME" "$RC_PWD" "$RC_MAIL"
@@ -93,7 +100,7 @@ function configure_all_scripts(){
     echo "OAI5G charts are now configured for your scenario, you can use the start.sh script to launch your scenario."
 }
 
-function usage() {
+usage() {
     echo "$COMMAND: Invalid option"
     echo "USAGE: $COMMAND [-B OAI_BRANCH] [-R RRU] -a|-p|-c"
     echo "$COMMAND -B: select the oai5g-rru tag or branch to pull, default is develop-r2lab."
@@ -103,6 +110,8 @@ function usage() {
     echo "$COMMAND -c: configure the OAI5G charts for the target scenario, configure must only be run after a fresh pull, i.e., 2 consecutive configure will fail."
     exit 1
 }
+
+# main starts here
 
 while getopts "apcB:R:" opt; do
   case "$opt" in
