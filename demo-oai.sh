@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 
 usage() {
     echo "USAGE:"
@@ -296,11 +296,11 @@ else
 	    export MULTUS_GNB_N2="false"
 	    export MULTUS_GNB_N3="true"
 	    export IF_NAME_GNB_N3="${IF_NAME_RAN_N2N3}"
-	    export IP_GNB_N3="${SUBNET_N2N3.205}"
+	    export IP_GNB_N3="${SUBNET_N2N3}.205"
 	    export MULTUS_CUCP_N2="true"
-	    export IP_CUCP_N2="${SUBNET_N2N3.205}"
+	    export IP_CUCP_N2="${SUBNET_N2N3}.205"
 	    export MULTUS_CUUP_N3="true"
-	    export IP_CUUP_N3="${SUBNET_N2N3.206}"
+	    export IP_CUUP_N3="${SUBNET_N2N3}.206"
 	else
 	    export SUBNET_N2N3="192.168.3"
 	    export IF_NAME_RAN_N2N3 # just export the default value
