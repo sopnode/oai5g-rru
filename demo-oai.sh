@@ -1244,33 +1244,46 @@ start-gnb() {
     cd "${OAI5G_RAN}"
 
     if [[ ${GNB_MODE} = 'monolithic' ]]; then
-	echo "helm -n $NS install oai-gnb oai-gnb/"
-	helm -n $NS install oai-gnb oai-gnb/
+	if [[ "$RRU_TYPE" == "benetel" ]]; then
+	    RAN_DIR="oai-gnb-fhi-72/"
+	else
+	    RAN_DIR="oai-gnb/"
+	fi
+	echo "helm -n $NS install oai-gnb ${RAN_DIR}"
+	helm -n $NS install oai-gnb ${RAN_DIR}
 	echo "Wait until the gNB pod is READY"
 	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-gnb
-    elif [[ ${GNB_MODE} = 'cudu' ]]; then
-	echo "helm -n $NS install oai-cu oai-cu/"
-	helm -n $NS install oai-cu oai-cu/
-
-	echo "sleep 5s"; sleep 5
-	echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu"
-	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu
-	echo "helm install -n $NS oai-du oai-du/"
-	helm install -n $NS oai-du oai-du/
     else
-	# ${GNB_MODE} = 'cucpup'
-	echo "helm -n $NS install oai-cu-cp oai-cu-cp/"
-	helm -n $NS install oai-cu-cp oai-cu-cp/
-	echo "sleep 10s"; sleep 10
-	echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp"
-	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp
-	echo "helm -n $NS install oai-cu-up oai-cu-up/"
-	helm -n $NS install oai-cu-up oai-cu-up/
-	echo "sleep 5s"; sleep 5
-	echo "kubectl -n $NS wait pod --for=condition=Ready  -l app.kubernetes.io/instance=oai-cu-up"
-	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-up
-	echo "helm install -n $NS oai-du oai-du/"
-	helm install -n $NS oai-du oai-du/
+	# cudu or cucpup split mode
+	if [[ "$RRU_TYPE" == "benetel" ]]; then
+	    RAN_DIR="oai-du-fhi-72/"
+	else
+	    RAN_DIR="oai-du/"
+	fi
+	if [[ ${GNB_MODE} = 'cudu' ]]; then
+	    echo "helm -n $NS install oai-cu oai-cu/"
+	    helm -n $NS install oai-cu oai-cu/
+
+	    echo "sleep 5s"; sleep 5
+	    echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu"
+	    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu
+	    echo "helm install -n $NS oai-du ${RAN_DIR}"
+	    helm install -n $NS oai-du "${RAN_DIR}"
+	else
+	    # ${GNB_MODE} = 'cucpup'
+	    echo "helm -n $NS install oai-cu-cp oai-cu-cp/"
+	    helm -n $NS install oai-cu-cp oai-cu-cp/
+	    echo "sleep 10s"; sleep 10
+	    echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp"
+	    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp
+	    echo "helm -n $NS install oai-cu-up oai-cu-up/"
+	    helm -n $NS install oai-cu-up oai-cu-up/
+	    echo "sleep 5s"; sleep 5
+	    echo "kubectl -n $NS wait pod --for=condition=Ready  -l app.kubernetes.io/instance=oai-cu-up"
+	    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-up
+	    echo "helm install -n $NS oai-du ${RAN_DIR}"
+	    helm install -n $NS oai-du "${RAN_DIR}"
+	fi
     fi
 }
 
