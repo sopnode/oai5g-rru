@@ -136,11 +136,12 @@ fhi_72:
   dpdk_devices: ["0000:c1:11.0", "0000:c1:11.1"]
   system_core: 0
   io_core: 1
-  dpdk_mem_size: 0
-  dpdk_iova_mode: "VA"
   worker_cores: [2]
+  dpdk_mem_size: 0
+  du_addr: ["00:11:22:33:44:67", "00:11:22:33:44:66"]
   ru_addr: ["70:b3:d5:e1:5b:81", "70:b3:d5:e1:5b:81"]
   mtu: 9600
+  file_prefix: "fhi_72"
   fh_config:
     - T1a_cp_dl: [419, 470]
       T1a_cp_ul: [285, 336]
