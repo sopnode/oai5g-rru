@@ -46,8 +46,8 @@ RRU="rfsim"
 GNB_MODE="monolithic"
 
 # DNNs 
-DNN0="" # default DNN0 is "internet"
-DNN1="" # default DNN1 is "streaming" 
+DNN0="internet"
+DNN1="streaming"
 
 # logs configuration
 #   -- logs and pcap are automatically retrieved when running demo-oai.sh stop
