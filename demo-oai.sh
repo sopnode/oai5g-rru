@@ -347,6 +347,23 @@ export GNB_FHI72_REPO="${R2LAB_REPO}/oai-gnb-fhi72"
 export GNB_FHI72_TAG="${RAN_TAG}"
 export GNB_FHI72_PULL_POLICY="IfNotPresent"
 #
+# Compute RRU_TYPE
+#
+case "$RRU" in 
+    "benetel1"|"benetel2")
+	RRU_TYPE="benetel" ;;
+    "jaguar"|"panther")
+	RRU_TYPE="aw2s" ;;
+    "n300"|"n320")
+	RRU_TYPE="n3xx" ;;
+    "b210")
+	RRU_TYPE="b2xx" ;;
+    "rfsim")
+	RRU_TYPE="rfsim" ;;
+    *)
+	RRU_TYPE="UNKNOWN" ;;
+esac
+#
 # F1/F1C/F1U/E1/E2 subnets/netmasks
 #
 SUBNET_E1="192.168.18"
@@ -994,7 +1011,7 @@ configure-gnb() {
 	for nf in oai-gnb oai-du; do
 	    cp "${PREFIX_DEMO}/oai5g-rru/rru/${nf}-deployment-aw2s.yaml" "${OAI5G_RAN}/${nf}/templates/deployment.yaml"
 	done
-	# except for oai-cu-up
+	# exception for oai-cu-up, regular oai-gnb image is used
 	for nf in oai-cu oai-cu-cp; do
 	    DEPLOYMENT="${OAI5G_RAN}/${nf}/templates/deployment.yaml"
 	    sed -i 's|/opt/oai-gnb/etc|/opt/oai-gnb-aw2s/etc|' "$DEPLOYMENT"
