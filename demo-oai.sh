@@ -301,6 +301,7 @@ else
 	    export IP_CUCP_N2="${SUBNET_N2N3}.205"
 	    export MULTUS_CUUP_N3="true"
 	    export IP_CUUP_N3="${SUBNET_N2N3}.206"
+	    export HOST_AMF="${SUBNET_N2N3}.201"  # Open5GS AMF IP address
 	else
 	    export SUBNET_N2N3="192.168.3"
 	    export IF_NAME_RAN_N2N3 # just export the default value
@@ -317,8 +318,9 @@ else
 	    else
 		export IP_GNB_N3="${SUBNET_N2N3}.203"
 	    fi
+	    export HOST_AMF="${SUBNET_N2N3}.201"  # OAI AMF IP address
 	fi
-	export HOST_AMF="${SUBNET_N2N3}.200"  # Default AMF IP address
+	
     fi
 fi
 
