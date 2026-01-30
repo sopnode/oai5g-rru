@@ -1319,7 +1319,7 @@ start-nr-ue() {
 	    'monolithic')
 		GNB_IP="${IP_GNB_N3}" ;;
 	    'cudu')
-		GNB_IP="${IP_DU_F1U}" ;;
+		GNB_IP="${IP_DU_F1}" ;;
 	    'cucpup')
 		GNB_IP="${IP_DU_F1U}" ;;
 	esac
@@ -1354,7 +1354,7 @@ start-nr-ue2() {
 	    'monolithic')
 		GNB_IP="${IP_GNB_N3}" ;;
 	    'cudu')
-		GNB_IP="${IP_DU_F1U}" ;;
+		GNB_IP="${IP_DU_F1}" ;;
 	    'cucpup')
 		GNB_IP="${IP_DU_F1U}" ;;
 	esac
@@ -1389,7 +1389,7 @@ start-nr-ue3() {
 	    'monolithic')
 		GNB_IP="${IP_GNB_N3}" ;;
 	    'cudu')
-		GNB_IP="${IP_DU_F1U}" ;;
+		GNB_IP="${IP_DU_F1}" ;;
 	    'cucpup')
 		GNB_IP="${IP_DU_F1U}" ;;
 	esac
