@@ -574,8 +574,10 @@ export NETMASK_FLEXRIC_E2="${NETMASK_E2}"
 export ROUTES_FLEXRIC_E2=""
 export QOS_FLEXRIC="true"
 export NODE_FLEXRIC="${NODE_GNB}"
-
-
+#
+# for all gnb/du/cu charts
+#
+HOST_FLEXRIC="oai-flexric"
 
 
 ########################### oai-nr-ue rfsim chart parameters #####################
