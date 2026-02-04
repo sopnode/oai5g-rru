@@ -568,6 +568,7 @@ export FLEXRIC_TAG="test"
 #export FLEXRIC_TAG="latest"
 export FLEXRIC_PULL_POLICY="Always"
 #
+export IF_NAME_FLEXRIC_E2="${IF_NAME_E2}"
 export IP_FLEXRIC_E2="${SUBNET_E2}.90"
 export ROUTES_FLEXRIC_E2=""
 export QOS_FLEXRIC="true"
@@ -1173,7 +1174,7 @@ configure-flexric() {
       .nfimage.version                    = strenv(FLEXRIC_TAG) |
       .nfimage.pullPolicy                 = strenv(FLEXRIC_PULL_POLICY) |
       .multus.enabled                     = strenv(FLEXRIC | == \"true\") |
-      .multus.interfaces[0].hostInterface = strenv(IF_NAME_E2) |
+      .multus.interfaces[0].hostInterface = strenv(IF_NAME_FLEXRIC_E2) |
       .multus.interfaces[0].ipAdd         = strenv(IP_FLEXRIC_E2) |
       .multus.interfaces[0].netmask       = strenv(NETMASK_E2) |
       .multus.interfaces[0].defaultRoute  = strenv(ROUTES_FLEXRIC_E2) |
