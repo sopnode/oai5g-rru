@@ -1269,6 +1269,11 @@ start-flexric() {
 
 
 start-gnb() {
+
+    if [[ $FLEXRIC = "true" ]]; then
+	start-flexric
+    fi
+
     echo "Running gNB on $NS namespace with GNB_MODE=${GNB_MODE}, NODE_GNB=${NODE_GNB} and rru=$RRU"
 
     echo "cd ${OAI5G_RAN}"
@@ -1514,16 +1519,14 @@ EOF
 	start-cn 
     fi
     
-    if [[ $FLEXRIC = "true" ]]; then
-	start-flexric
-    fi
-
-    echo "sleep 20s before running RAN pods"; sleep 20
+    echo "sleep 15s before running RAN pods"; sleep 15
     start-gnb 
 
     if [[ "$RRU" == "rfsim" ]]; then
-	echo "sleep 5s before starting nr-ue and nr-ue2"; sleep 5
+	echo "sleep 5s before starting nr-ues"
+	sleep 5
 	start-nr-ue
+	sleep 5
 	start-nr-ue2
     fi
 
@@ -1552,6 +1555,11 @@ stop-flexric(){
 }
 
 stop-gnb(){
+
+    if [[ $FLEXRIC = "true" ]]; then
+	stop-flexric
+    fi
+
     if [[ ${GNB_MODE} = 'monolithic' ]]; then
 	echo "helm -n $NS uninstall oai-gnb"
 	helm -n $NS uninstall oai-gnb
