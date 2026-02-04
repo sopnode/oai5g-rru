@@ -625,7 +625,7 @@ configure-oai-5g-@mode@() {
     #####################################
     
     # ---- GLOBAL ----
-    yq -i '.global.IP_NRF = strenv(NFS_NRF_HOST)' "$values_file"
+    yq -i '.global.IP_NRF = strenv(NFS_NRF_HOST)' "${values_file}"
 
     # ---- NETWORK FUNCTIONS ----
     NF_NAMES=(oai-nrf oai-amf oai-smf oai-upf oai-udm oai-udr oai-ausf oai-lmf oai-traffic-server)
@@ -635,8 +635,8 @@ configure-oai-5g-@mode@() {
 
         # ---- nodeName ----
 	# Form the name of the variable you want to reference
-	export NODE_NAME=$(eval echo \"\${NODE_$NF_UPPER}\")
-	export ENABLED=$(eval echo \"\${ENABLED_$NF_UPPER}\")
+	export NODE_NAME=$(eval echo \"\$NODE_$NF_UPPER\")
+	export ENABLED=$(eval echo \"\$ENABLED_$NF_UPPER\")
 
 	# Proceed with your yq command
 	yq -i ".${nf}.nodeName = strenv(NODE_NAME)" "${values_file}"
@@ -766,7 +766,7 @@ configure-oai-5g-@mode@() {
     #####################################
 
     # NF interfaces
-    yq -i "
+    yq -i '
       .nfs.amf.sbi.interface_name = strenv(NAME_AMF_SBI)|
       .nfs.amf.n2.interface_name  = strenv(NAME_AMF_N2) |
       .nfs.smf.sbi.interface_name = strenv(NAME_SMF_SBI)|
@@ -776,7 +776,7 @@ configure-oai-5g-@mode@() {
       .nfs.upf.n4.interface_name  = strenv(NAME_UPF_N4) |
       .nfs.upf.n6.interface_name  = strenv(NAME_UPF_N6) |
       .nfs.upf.n9.interface_name  = strenv(NAME_UPF_N9)
-    " "${config_file}"
+    ' "${config_file}"
     
     
     # SNSSAI slices
@@ -904,7 +904,7 @@ apply-gnb-values-yq() {
     )
   }
 ]
-' "$values_file"
+' "${values_file}"
     
     # Validate new values.yaml configuration
     yq eval '.' "${values_file}" >/dev/null || {
