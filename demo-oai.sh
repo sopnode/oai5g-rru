@@ -561,6 +561,21 @@ export IF_NAME_GNB_E2="${IF_NAME_E2}"
 export QOS_GNB="true"
 
 
+########################### oai-flexric chart parameters #####################
+export FLEXRIC_REPO="ghcr.io/ziyad-mabrouk/oai-flexric"
+#export FLEXRIC_REPO="oaisoftwarealliance/oai-flexric"
+export FLEXRIC_TAG="test"
+#export FLEXRIC_TAG="latest"
+export FLEXRIC_PULL_POLICY="Always"
+#
+export IP_FLEXRIC_E2="${SUBNET_E2}.90"
+export ROUTES_FLEXRIC_E2=""
+export QOS_FLEXRIC="true"
+export NODE_FLEXRIC="${NODE_GNB}"
+
+
+
+
 ########################### oai-nr-ue rfsim chart parameters #####################
 export NRUE_REPO="${R2LAB_REPO}/oai-nr-ue"
 export NRUE_TAG="${RAN_TAG}"
@@ -584,14 +599,6 @@ export ADD_OPTIONS_NRUE="--rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -
 export QOS_NRUE="false"
 export NODE_NRUE="${NODE_GNB}"
 
-
-########################### oai-flexric chart parameters #####################
-FLEXRIC_REPO="ghcr.io/ziyad-mabrouk/oai-flexric"
-#FLEXRIC_REPO="oaisoftwarealliance/oai-flexric"
-export FLEXRIC_TAG="test"
-#FLEXRIC_TAG="latest"
-export FLEXRIC_PULL_POLICY="Always"
-export HOST_FLEXRIC="oai-flexric"
 
 
 #################################################################################
@@ -1157,21 +1164,26 @@ configure-nr-ue3() {
 
 configure-flexric() {
 
-    DIR="${OAI5G_RAN}/oai-flexric"
-    ORIG_CHART="$DIR"/values.yaml
-    SED_FILE="$TMP/oai-flexric-values.sed"
-    echo "configure-flexric: ${ORIG_CHART} configuration"
-    cat > "${SED_FILE}" <<EOF
-s|@FLEXRIC_REPO@|$FLEXRIC_REPO|
-s|@FLEXRIC_TAG@|$FLEXRIC_TAG|
-s|@FLEXRIC_PULL_POLICY@|$FLEXRIC_PULL_POLICY|
-EOF
-    cp "$ORIG_CHART" "$TMP"/oai-flexric_values.yaml-orig
-    echo "(Over)writing $DIR/values.yaml"
-    sed -f "$SED_FILE" < "$TMP"/oai-flexric_values.yaml-orig > "${ORIG_CHART}"
-    # if SD NSSAI field is set to "NULL", replace it by "16777215"
-    sed -i 's/0xEMPTY/16777215/g' "$ORIG_CHART"
-    diff "$TMP"/oai-flexric_values.yaml-orig "${ORIG_CHART}"
+    ORIG_VALUES="${OAI5G_RAN}/oai-flexric/values.yaml"
+    TMP_VALUES="$TMP/oai-flexric_values.yaml-orig"
+
+    cp "$ORIG_VALUES" "${TMP_VALUES}"
+    yq eval -i '
+      .nfimage.repository                 = strenv(FLEXRIC_REPO) |
+      .nfimage.version                    = strenv(FLEXRIC_TAG) |
+      .nfimage.pullPolicy                 = strenv(FLEXRIC_PULL_POLICY) |
+      .multus.enabled                     = strenv(FLEXRIC | test("true")) |
+      .multus.interfaces[0].hostInterface = strenv(IF_NAME_E2) |
+      .multus.interfaces[0].ipAdd         = strenv(IP_FLEXRIC_E2) |
+      .multus.interfaces[0].netmask       = strenv(NETMASK_E2) |
+      .multus.interfaces[0].defaultRoute  = strenv(ROUTES_FLEXRIC_E2) |
+      .start.tcpdump                      = (strenv(PCAP)| test("true")) |
+      .includeTcpDumpContainer            = (strenv(LOGS) | test("true")) |
+      .resources.define                   = (strenv(QOS_FLEXRIC) | test("true")) |
+      .nodeName                           = strenv(NODE_FLEXRIC)
+    ' "${ORIG_VALUES}"
+
+    diff "${TMP_VALUES}" "${ORIG_VALUES}"
 }
 
 
