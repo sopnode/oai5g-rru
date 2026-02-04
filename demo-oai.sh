@@ -577,7 +577,7 @@ export NODE_FLEXRIC="${NODE_GNB}"
 #
 # for all gnb/du/cu charts
 #
-export HOST_FLEXRIC="oai-flexric"
+export HOST_FLEXRIC="${IP_FLEXRIC_E2}"
 
 
 ########################### oai-nr-ue rfsim chart parameters #####################
