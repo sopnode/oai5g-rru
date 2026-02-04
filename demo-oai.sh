@@ -1168,20 +1168,20 @@ configure-flexric() {
     TMP_VALUES="$TMP/oai-flexric_values.yaml-orig"
 
     cp "$ORIG_VALUES" "${TMP_VALUES}"
-    yq eval -i '
+    yq eval -i "
       .nfimage.repository                 = strenv(FLEXRIC_REPO) |
       .nfimage.version                    = strenv(FLEXRIC_TAG) |
       .nfimage.pullPolicy                 = strenv(FLEXRIC_PULL_POLICY) |
-      .multus.enabled                     = strenv(FLEXRIC | == "true") |
+      .multus.enabled                     = strenv(FLEXRIC | == \"true\") |
       .multus.interfaces[0].hostInterface = strenv(IF_NAME_E2) |
       .multus.interfaces[0].ipAdd         = strenv(IP_FLEXRIC_E2) |
       .multus.interfaces[0].netmask       = strenv(NETMASK_E2) |
       .multus.interfaces[0].defaultRoute  = strenv(ROUTES_FLEXRIC_E2) |
-      .start.tcpdump                      = (strenv(PCAP) == "true") |
-      .includeTcpDumpContainer            = (strenv(LOGS) == "true") |
-      .resources.define                   = (strenv(QOS_FLEXRIC) == "true") |
+      .start.tcpdump                      = (strenv(PCAP) == \"true\") |
+      .includeTcpDumpContainer            = (strenv(LOGS) == \"true\") |
+      .resources.define                   = (strenv(QOS_FLEXRIC) == \"true\") |
       .nodeName                           = strenv(NODE_FLEXRIC)
-    ' "${ORIG_VALUES}"
+    " "${ORIG_VALUES}"
 
     diff "${TMP_VALUES}" "${ORIG_VALUES}"
 }
