@@ -570,6 +570,7 @@ export FLEXRIC_PULL_POLICY="Always"
 #
 export IF_NAME_FLEXRIC_E2="${IF_NAME_E2}"
 export IP_FLEXRIC_E2="${SUBNET_E2}.90"
+export NETMASK_FLEXRIC_E2="${NETMASK_E2}"
 export ROUTES_FLEXRIC_E2=""
 export QOS_FLEXRIC="true"
 export NODE_FLEXRIC="${NODE_GNB}"
@@ -614,8 +615,8 @@ configure-oai-5g-@mode@() {
     echo "======================="
 
     # ---- Backup ----
-    cp "$values_file" "$TMP/values.yaml-orig"
-    cp "$config_file" "$TMP/config.yaml-orig"
+    cp "${values_file}" "$TMP/values.yaml-orig"
+    cp "${config_file}" "$TMP/config.yaml-orig"
 
     #####################################
     # ---- values.yaml CONFIGURATION ----
@@ -636,7 +637,7 @@ configure-oai-5g-@mode@() {
 	export ENABLED=$(eval echo \"\${ENABLED_$NF_UPPER}\")
 
 	# Proceed with your yq command
-	yq -i ".${nf}.nodeName = strenv(NODE_NAME)" "$values_file"
+	yq -i ".${nf}.nodeName = strenv(NODE_NAME)" "${values_file}"
 
         # ---- start / tcpdump / sharedvolume ----
         yq -i '
@@ -644,92 +645,81 @@ configure-oai-5g-@mode@() {
           .${nf}.start.tcpdump           = (strenv(PCAP) == "true") |
           .${nf}.includeTcpDumpContainer = (strenv(LOGS) == "true") |
           .${nf}.persistent.sharedvolume = (strenv(PCAP) == "true")
-        ' "$values_file"
+        ' "${values_file}"
 
         # ---- Multus interfaces ----
         case "$nf" in
             oai-amf)
                 yq -i '
-                  .${nf}.multus.enabled               = (strenv(MULTUS_AMF) == "true") |
-                  .${nf}.multus.interfaces[0].hostInterface = \
-		  strenv(IF_NAME_AMF_N2) |
-                  .${nf}.multus.interfaces[0].ipAdd   = strenv(IP_AMF_N2) |
-                  .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_AMF_N2) |
-                  .${nf}.multus.interfaces[0].routes  = strenv(ROUTES_AMF_N2) |
-                  .${nf}.multus.interfaces[0].defaultRoute = \
-		  strenv(DEF_ROUTE_AMF_N2) |
-                  .${nf}.multus.interfaces[0].enabled = (strenv(MULTUS_AMF_N2) == "true") |
-                  .${nf}.multus.interfaces[0].type    = "macvlan"
-                ' "$values_file"
-                yq -i "
-                  .${nf}.multus.interfaces[1].hostInterface = \
-		  strenv(IF_NAME_AMF_SBI) |
-                  .${nf}.multus.interfaces[1].ipAdd   = strenv(IP_AMF_SBI) |
-                  .${nf}.multus.interfaces[1].netmask = strenv(NETMASK_AMF_SBI) |
-                  .${nf}.multus.interfaces[1].gateway = strenv(GW_AMF_SBI) |
-                  .${nf}.multus.interfaces[1].enabled = \
-		  (strenv(MULTUS_AMF_SBI) == \"true\") |
-                  .${nf}.multus.interfaces[1].type = \"macvlan\"
-                " "$values_file"
+                  .${nf}.multus.enabled                     = (strenv(MULTUS_AMF) == "true") |
+                  .${nf}.multus.interfaces[0].hostInterface = strenv(IF_NAME_AMF_N2) |
+                  .${nf}.multus.interfaces[0].ipAdd         = strenv(IP_AMF_N2) |
+                  .${nf}.multus.interfaces[0].netmask       = strenv(NETMASK_AMF_N2) |
+                  .${nf}.multus.interfaces[0].routes        = strenv(ROUTES_AMF_N2) |
+                  .${nf}.multus.interfaces[0].defaultRoute  = strenv(DEF_ROUTE_AMF_N2) |
+                  .${nf}.multus.interfaces[0].enabled       = (strenv(MULTUS_AMF_N2) == "true") |
+                  .${nf}.multus.interfaces[0].type          = "macvlan"
+                ' "${values_file}"
+                yq -i '
+                  .${nf}.multus.interfaces[1].hostInterface = strenv(IF_NAME_AMF_SBI) |
+                  .${nf}.multus.interfaces[1].ipAdd         = strenv(IP_AMF_SBI) |
+                  .${nf}.multus.interfaces[1].netmask       = strenv(NETMASK_AMF_SBI) |
+                  .${nf}.multus.interfaces[1].gateway       = strenv(GW_AMF_SBI) |
+                  .${nf}.multus.interfaces[1].enabled       = (strenv(MULTUS_AMF_SBI) == "true") |
+                  .${nf}.multus.interfaces[1].type          = "macvlan"
+                ' "${values_file}"
                 ;;
             oai-upf)
-                yq -i "
-                  .${nf}.multus.enabled = (strenv(MULTUS_UPF) == \"true\") |
-                  .${nf}.multus.interfaces[0].hostInterface = \
-		  strenv(IF_NAME_UPF_N3) |
-                  .${nf}.multus.interfaces[0].ipAdd   = strenv(IP_UPF_N3) |
-                  .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_UPF_N3) |
-                  .${nf}.multus.interfaces[0].gateway = strenv(GW_UPF_N3) |
-                  .${nf}.multus.interfaces[0].routes  = strenv(ROUTES_UPF_N3) |
-                  .${nf}.multus.interfaces[0].defaultRoute = \
-		  strenv(DEF_ROUTE_UPF_N3) |
-                  .${nf}.multus.interfaces[0].enabled = \
-                  (strenv(MULTUS_UPF_N3) == \"true\") |
-                  .${nf}.multus.interfaces[0].type = \"macvlan\"
-                " "$values_file"
-                yq -i "
-                  .${nf}.multus.interfaces[1].hostInterface = \
-		  strenv(IF_NAME_UPF_N4) |
-                  .${nf}.multus.interfaces[1].ipAdd   = strenv(IP_UPF_N4) |
-                  .${nf}.multus.interfaces[1].netmask = strenv(NETMASK_UPF_N4) |
-                  .${nf}.multus.interfaces[1].gateway = strenv(GW_UPF_N4) |
-                  .${nf}.multus.interfaces[1].routes  = strenv(ROUTES_UPF_N4) |
-                  .${nf}.multus.interfaces[1].enabled = \
-                  (strenv(MULTUS_UPF_N4) == \"true\") |
-                  .${nf}.multus.interfaces[1].type    = \"macvlan\"
-                " "$values_file"
-                yq -i "
-                  .${nf}.multus.interfaces[2].hostInterface = \
-		  strenv(IF_NAME_UPF_N6) |
-                  .${nf}.multus.interfaces[2].ipAdd   = strenv(IP_UPF_N6) |
-                  .${nf}.multus.interfaces[2].netmask = strenv(NETMASK_UPF_N6) |
-                  .${nf}.multus.interfaces[2].gateway = strenv(GW_UPF_N6) |
-                  .${nf}.multus.interfaces[2].routes  = strenv(ROUTES_UPF_N6) |
-                  .${nf}.multus.interfaces[2].enabled = \
-                  (strenv(MULTUS_UPF_N6) == \"true\") |
-                  .${nf}.multus.interfaces[2].type = \"macvlan\"
-                " "$values_file"
+                yq -i '
+                  .${nf}.multus.enabled                     = (strenv(MULTUS_UPF) == "true") |
+                  .${nf}.multus.interfaces[0].hostInterface = strenv(IF_NAME_UPF_N3) |
+                  .${nf}.multus.interfaces[0].ipAdd         = strenv(IP_UPF_N3) |
+                  .${nf}.multus.interfaces[0].netmask       = strenv(NETMASK_UPF_N3) |
+                  .${nf}.multus.interfaces[0].gateway       = strenv(GW_UPF_N3) |
+                  .${nf}.multus.interfaces[0].routes        = strenv(ROUTES_UPF_N3) |
+                  .${nf}.multus.interfaces[0].defaultRoute  = strenv(DEF_ROUTE_UPF_N3) |
+                  .${nf}.multus.interfaces[0].enabled       = (strenv(MULTUS_UPF_N3) == "true") |
+                  .${nf}.multus.interfaces[0].type          = "macvlan"
+                '  "${values_file}"
+                yq -i '
+                  .${nf}.multus.interfaces[1].hostInterface = strenv(IF_NAME_UPF_N4) |
+                  .${nf}.multus.interfaces[1].ipAdd         = strenv(IP_UPF_N4) |
+                  .${nf}.multus.interfaces[1].netmask       = strenv(NETMASK_UPF_N4) |
+                  .${nf}.multus.interfaces[1].gateway       = strenv(GW_UPF_N4) |
+                  .${nf}.multus.interfaces[1].routes        = strenv(ROUTES_UPF_N4) |
+                  .${nf}.multus.interfaces[1].enabled       = (strenv(MULTUS_UPF_N4) == "true") |
+                  .${nf}.multus.interfaces[1].type          = "macvlan"
+                ' "${values_file}"
+                yq -i '
+                  .${nf}.multus.interfaces[2].hostInterface = strenv(IF_NAME_UPF_N6) |
+                  .${nf}.multus.interfaces[2].ipAdd         = strenv(IP_UPF_N6) |
+                  .${nf}.multus.interfaces[2].netmask       = strenv(NETMASK_UPF_N6) |
+                  .${nf}.multus.interfaces[2].gateway       = strenv(GW_UPF_N6) |
+                  .${nf}.multus.interfaces[2].routes        = strenv(ROUTES_UPF_N6) |
+                  .${nf}.multus.interfaces[2].enabled       = (strenv(MULTUS_UPF_N6) == "true") |
+                  .${nf}.multus.interfaces[2].type          = "macvlan"
+                ' "${values_file}"
                 yq -i '
                   .${nf}.multus.interfaces[3].hostInterface = strenv(IF_NAME_UPF_N9) |
-                  .${nf}.multus.interfaces[3].ipAdd   = strenv(IP_UPF_N9) |
-                  .${nf}.multus.interfaces[3].netmask = strenv(NETMASK_UPF_N9) |
-                  .${nf}.multus.interfaces[3].gateway = strenv(GW_UPF_N9) |
-                  .${nf}.multus.interfaces[3].routes  = strenv(ROUTES_UPF_N9) |
-                  .${nf}.multus.interfaces[3].enabled = (strenv(MULTUS_UPF_N9) == "true") |
-                  .${nf}.multus.interfaces[3].type = "macvlan"
+                  .${nf}.multus.interfaces[3].ipAdd         = strenv(IP_UPF_N9) |
+                  .${nf}.multus.interfaces[3].netmask       = strenv(NETMASK_UPF_N9) |
+                  .${nf}.multus.interfaces[3].gateway       = strenv(GW_UPF_N9) |
+                  .${nf}.multus.interfaces[3].routes        = strenv(ROUTES_UPF_N9) |
+                  .${nf}.multus.interfaces[3].enabled       = (strenv(MULTUS_UPF_N9) == "true") |
+                  .${nf}.multus.interfaces[3].type          = "macvlan"
                 ' "${values_file}"
                 yq -i '
                   .${nf}.multus.interfaces[4].hostInterface = strenv(IF_NAME_UPF_SBI) |
-                  .${nf}.multus.interfaces[4].ipAdd   = strenv(IP_UPF_SBI) |
-                  .${nf}.multus.interfaces[4].netmask = strenv(NETMASK_UPF_SBI) |
-                  .${nf}.multus.interfaces[4].gateway = strenv(GW_UPF_SBI) |
-                  .${nf}.multus.interfaces[4].enabled = (strenv(MULTUS_UPF_SBI) == "true") |
-                  .${nf}.multus.interfaces[4].type = "macvlan"
+                  .${nf}.multus.interfaces[4].ipAdd         = strenv(IP_UPF_SBI) |
+                  .${nf}.multus.interfaces[4].netmask       = strenv(NETMASK_UPF_SBI) |
+                  .${nf}.multus.interfaces[4].gateway       = strenv(GW_UPF_SBI) |
+                  .${nf}.multus.interfaces[4].enabled       = (strenv(MULTUS_UPF_SBI) == "true") |
+                  .${nf}.multus.interfaces[4].type          = "macvlan"
                 ' "${values_file}"
                 ;;
             oai-traffic-server)
                 yq -i '
-                  .${nf}.multus.enabled = (strenv(MULTUS_TS) == "true") |
+                  .${nf}.multus.enabled                     = (strenv(MULTUS_TS) == "true") |
                   .${nf}.multus.interfaces[0].hostInterface = strenv(IF_NAME_TS) |
                   .${nf}.multus.interfaces[0].ipAdd         = strenv(IP_TS) |
                   .${nf}.multus.interfaces[0].netmask       = strenv(NETMASK_TS) |
@@ -740,22 +730,22 @@ configure-oai-5g-@mode@() {
                 ;;
             oai-smf)
                 yq -i '
-                  .${nf}.multus.enabled               = (strenv(MULTUS_SMF) == "true") |
+                  .${nf}.multus.enabled                     = (strenv(MULTUS_SMF) == "true") |
                   .${nf}.multus.interfaces[0].hostInterface = strenv(IF_NAME_SMF_N4) |
-                  .${nf}.multus.interfaces[0].ipAdd   = strenv(IP_SMF_N4) |
-                  .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_SMF_N4) |
+                  .${nf}.multus.interfaces[0].ipAdd         = strenv(IP_SMF_N4) |
+                  .${nf}.multus.interfaces[0].netmask       = strenv(NETMASK_SMF_N4) |
                   .${nf}.multus.interfaces[0].defaultRoute  = strenv(DEF_ROUTE_SMF_N4) |
-                  .${nf}.multus.interfaces[0].routes  = strenv(ROUTES_SMF_N4) |
-                  .${nf}.multus.interfaces[0].enabled = (strenv(MULTUS_SMF_N4) == "true") |
-                  .${nf}.multus.interfaces[0].type    = "macvlan"
+                  .${nf}.multus.interfaces[0].routes        = strenv(ROUTES_SMF_N4) |
+                  .${nf}.multus.interfaces[0].enabled       = (strenv(MULTUS_SMF_N4) == "true") |
+                  .${nf}.multus.interfaces[0].type          = "macvlan"
                 ' "${values_file}"
                 yq -i '
                   .${nf}.multus.interfaces[1].hostInterface = strenv(IF_NAME_SMF_SBI) |
-                  .${nf}.multus.interfaces[1].ipAdd   = strenv(IP_SMF_SBI) |
-                  .${nf}.multus.interfaces[1].netmask = strenv(NETMASK_SMF_SBI) |
-                  .${nf}.multus.interfaces[1].gateway = strenv(GW_SMF_SBI) |
-                  .${nf}.multus.interfaces[1].enabled = (strenv(MULTUS_SMF_SBI) == "true") |
-                  .${nf}.multus.interfaces[1].type    = "macvlan"
+                  .${nf}.multus.interfaces[1].ipAdd         = strenv(IP_SMF_SBI) |
+                  .${nf}.multus.interfaces[1].netmask       = strenv(NETMASK_SMF_SBI) |
+                  .${nf}.multus.interfaces[1].gateway       = strenv(GW_SMF_SBI) |
+                  .${nf}.multus.interfaces[1].enabled       = (strenv(MULTUS_SMF_SBI) == "true") |
+                  .${nf}.multus.interfaces[1].type          = "macvlan"
                 ' "${values_file}"
                 ;;
         esac
@@ -1166,7 +1156,7 @@ configure-flexric() {
       .multus.enabled                     = (strenv(FLEXRIC) == "true") |
       .multus.interfaces[0].hostInterface = strenv(IF_NAME_FLEXRIC_E2) |
       .multus.interfaces[0].ipAdd         = strenv(IP_FLEXRIC_E2) |
-      .multus.interfaces[0].netmask       = strenv(NETMASK_E2) |
+      .multus.interfaces[0].netmask       = strenv(NETMASK_FLEXRIC_E2) |
       .multus.interfaces[0].defaultRoute  = strenv(ROUTES_FLEXRIC_E2) |
       .start.tcpdump                      = (strenv(PCAP) == "true") |
       .includeTcpDumpContainer            = (strenv(LOGS) == "true") |
