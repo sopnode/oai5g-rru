@@ -950,7 +950,7 @@ configure-gnb() {
 	cp "$VALUES" "${OAI5G_RAN}/${nf}/values.yaml.orig"
 	    
 	# First remove multus interfaces
-	yq eval -i 'del(.multus.interfaces)' "$VALUES"
+	yq eval -i "del(.multus.interfaces)" "$VALUES"
 	
 	# Inject multus interfaces
 	TMP_IFS="$(mktemp)"
@@ -960,10 +960,10 @@ configure-gnb() {
 	    rm -f "${TMP_IFS}"
 	    continue
 	fi
-	yq eval -i '
+	yq eval -i "
           .multus.enabled = true |
-          .multus.interfaces = load("$TMP_IFS")
-        ' "$VALUES"
+          .multus.interfaces = load(\"$TMP_IFS\")
+        " "$VALUES"
 	rm -f "$TMP_IFS"
 	
 	# Update remaining parameters
@@ -1045,7 +1045,7 @@ configure-nr-ue() {
     ' "${ORIG_VALUES}" > "${ORIG_VALUES}.tmp" && mv "${ORIG_VALUES}.tmp" "${ORIG_VALUES}"
 
     # Then update the variable fields
-    yq eval -i '
+    yq eval -i "
       .nfimage.repository          = strenv(NRUE_REPO) |
       .nfimage.version             = strenv(NRUE_TAG) |
       .config.fullImsi             = strenv(RFSIM_IMSI) |
@@ -1053,12 +1053,12 @@ configure-nr-ue() {
       .config.opc                  = strenv(OPC) |
       .config.dnn                  = strenv(DNN0) |
       .config.sst                  = strenv(SLICE1_SST) |
-      .config.sd                   = ("0x" + strenv(SLICE1_SD)) |
+      .config.sd                   = (\"0x\" + strenv(SLICE1_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
-      .includeTcpDumpContainer     = (strenv(LOGS) == "true") |
-      .resources.define            = (strenv(QOS_NRUE) == "true") |
+      .includeTcpDumpContainer     = (strenv(LOGS) == \"true\") |
+      .resources.define            = (strenv(QOS_NRUE) == \"true\") |
       .nodeName                    = strenv(NODE_NRUE)
-    ' "${ORIG_VALUES}"
+    " "${ORIG_VALUES}"
 
     # Handle the particular case of sd == "EMPTY"
     sed -i 's/0xEMPTY/16777215/g' "${ORIG_VALUES}"
@@ -1085,7 +1085,7 @@ configure-nr-ue2() {
     sed -i 's/oai-nr-ue2\/etc/oai-nr-ue\/etc/g' "$DIR/templates/deployment.yaml"
     
     # Then update the variable fields
-    yq eval -i '
+    yq eval -i "
       .nfimage.repository          = strenv(NRUE_REPO) |
       .nfimage.version             = strenv(NRUE_TAG) |
       .multus.interfaces[0].ipAdd  = strenv(IP_NRUE2) |
@@ -1094,11 +1094,11 @@ configure-nr-ue2() {
       .config.opc                  = strenv(OPC) |
       .config.dnn                  = strenv(DNN1) |
       .config.sst                  = strenv(SLICE2_SST) |
-      .config.sd                   = ("0x" + strenv(SLICE2_SD)) |
+      .config.sd                   = (\"0x\" + strenv(SLICE2_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
-      .includeTcpDumpContainer     = (strenv(LOGS) == "true") |
-      .resources.define            = (strenv(QOS_NRUE) == "true")
-    ' "$ORIG_VALUES"
+      .includeTcpDumpContainer     = (strenv(LOGS) == \"true\") |
+      .resources.define            = (strenv(QOS_NRUE) == \"true\")
+    " "${ORIG_VALUES}"
 
     # Handle the particular case of sd == "EMPTY"
     sed -i 's/0xEMPTY/16777215/g' "${ORIG_VALUES}"
@@ -1120,7 +1120,7 @@ configure-nr-ue3() {
     sed -i 's/oai-nr-ue3\/etc/oai-nr-ue\/etc/g' "$DIR/templates/deployment.yaml"
     
     # Then update the variable fields
-    yq eval -i '
+    yq eval -i "
       .nfimage.repository          = strenv(NRUE_REPO) |
       .nfimage.version             = strenv(NRUE_TAG) |
       .multus.interfaces[0].ipAdd  = strenv(IP_NRUE3) |
@@ -1129,11 +1129,11 @@ configure-nr-ue3() {
       .config.opc                  = strenv(OPC) |
       .config.dnn                  = strenv(DNN0) |
       .config.sst                  = strenv(SLICE1_SST) |
-      .config.sd                   = ("0x" + strenv(SLICE1_SD)) |
+      .config.sd                   = (\"0x\" + strenv(SLICE1_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
-      .includeTcpDumpContainer     = (strenv(LOGS) == "true") |
-      .resources.define            = (strenv(QOS_NRUE) == "true")
-    ' "${ORIG_VALUES}"
+      .includeTcpDumpContainer     = (strenv(LOGS) == \"true\") |
+      .resources.define            = (strenv(QOS_NRUE) == \"true\")
+    " "${ORIG_VALUES}"
 
     # Handle the particular case of sd == "EMPTY"
     sed -i 's/0xEMPTY/16777215/g' "${ORIG_VALUES}"
@@ -1149,20 +1149,20 @@ configure-flexric() {
     TMP_VALUES="$TMP/oai-flexric_values.yaml-orig"
 
     cp "$ORIG_VALUES" "${TMP_VALUES}"
-    yq eval -i '
+    yq eval -i "
       .nfimage.repository                 = strenv(FLEXRIC_REPO) |
       .nfimage.version                    = strenv(FLEXRIC_TAG) |
       .nfimage.pullPolicy                 = strenv(FLEXRIC_PULL_POLICY) |
-      .multus.enabled                     = (strenv(FLEXRIC) == "true") |
+      .multus.enabled                     = (strenv(FLEXRIC) == \"true\") |
       .multus.interfaces[0].hostInterface = strenv(IF_NAME_FLEXRIC_E2) |
       .multus.interfaces[0].ipAdd         = strenv(IP_FLEXRIC_E2) |
       .multus.interfaces[0].netmask       = strenv(NETMASK_FLEXRIC_E2) |
       .multus.interfaces[0].defaultRoute  = strenv(ROUTES_FLEXRIC_E2) |
-      .start.tcpdump                      = (strenv(PCAP) == "true") |
-      .includeTcpDumpContainer            = (strenv(LOGS) == "true") |
-      .resources.define                   = (strenv(QOS_FLEXRIC) == "true") |
+      .start.tcpdump                      = (strenv(PCAP) == \"true\") |
+      .includeTcpDumpContainer            = (strenv(LOGS) == \"true\") |
+      .resources.define                   = (strenv(QOS_FLEXRIC) == \"true\") |
       .nodeName                           = strenv(NODE_FLEXRIC)
-    ' "${ORIG_VALUES}"
+    " "${ORIG_VALUES}"
 
     ##diff "${TMP_VALUES}" "${ORIG_VALUES}"
 }
