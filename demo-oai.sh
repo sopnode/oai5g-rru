@@ -639,33 +639,32 @@ configure-oai-5g-@mode@() {
 	yq -i ".${nf}.nodeName = strenv(NODE_NAME)" "$values_file"
 
         # ---- start / tcpdump / sharedvolume ----
-        yq -i "
-          .${nf}.enabled = (strenv(ENABLED) == \"true\") |
-          .${nf}.start.tcpdump = (strenv(PCAP) == \"true\") |
-          .${nf}.includeTcpDumpContainer = (strenv(LOGS) == \"true\") |
-          .${nf}.persistent.sharedvolume = (strenv(PCAP) == \"true\")
-        " "$values_file"
+        yq -i '
+          .${nf}.enabled                 = (strenv(ENABLED) == "true") |
+          .${nf}.start.tcpdump           = (strenv(PCAP) == "true") |
+          .${nf}.includeTcpDumpContainer = (strenv(LOGS) == "true") |
+          .${nf}.persistent.sharedvolume = (strenv(PCAP) == "true")
+        ' "$values_file"
 
         # ---- Multus interfaces ----
         case "$nf" in
             oai-amf)
-                yq -i "
-                  .${nf}.multus.enabled = (strenv(MULTUS_AMF) == \"true\") |
+                yq -i '
+                  .${nf}.multus.enabled               = (strenv(MULTUS_AMF) == "true") |
                   .${nf}.multus.interfaces[0].hostInterface = \
 		  strenv(IF_NAME_AMF_N2) |
-                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_AMF_N2) |
+                  .${nf}.multus.interfaces[0].ipAdd   = strenv(IP_AMF_N2) |
                   .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_AMF_N2) |
-                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_AMF_N2) |
+                  .${nf}.multus.interfaces[0].routes  = strenv(ROUTES_AMF_N2) |
                   .${nf}.multus.interfaces[0].defaultRoute = \
 		  strenv(DEF_ROUTE_AMF_N2) |
-                  .${nf}.multus.interfaces[0].enabled = \
-		  (strenv(MULTUS_AMF_N2) == \"true\") |
-                  .${nf}.multus.interfaces[0].type = \"macvlan\"
-                " "$values_file"
+                  .${nf}.multus.interfaces[0].enabled = (strenv(MULTUS_AMF_N2) == "true") |
+                  .${nf}.multus.interfaces[0].type    = "macvlan"
+                ' "$values_file"
                 yq -i "
                   .${nf}.multus.interfaces[1].hostInterface = \
 		  strenv(IF_NAME_AMF_SBI) |
-                  .${nf}.multus.interfaces[1].ipAdd = strenv(IP_AMF_SBI) |
+                  .${nf}.multus.interfaces[1].ipAdd   = strenv(IP_AMF_SBI) |
                   .${nf}.multus.interfaces[1].netmask = strenv(NETMASK_AMF_SBI) |
                   .${nf}.multus.interfaces[1].gateway = strenv(GW_AMF_SBI) |
                   .${nf}.multus.interfaces[1].enabled = \
@@ -678,10 +677,10 @@ configure-oai-5g-@mode@() {
                   .${nf}.multus.enabled = (strenv(MULTUS_UPF) == \"true\") |
                   .${nf}.multus.interfaces[0].hostInterface = \
 		  strenv(IF_NAME_UPF_N3) |
-                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_UPF_N3) |
+                  .${nf}.multus.interfaces[0].ipAdd   = strenv(IP_UPF_N3) |
                   .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_UPF_N3) |
                   .${nf}.multus.interfaces[0].gateway = strenv(GW_UPF_N3) |
-                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_UPF_N3) |
+                  .${nf}.multus.interfaces[0].routes  = strenv(ROUTES_UPF_N3) |
                   .${nf}.multus.interfaces[0].defaultRoute = \
 		  strenv(DEF_ROUTE_UPF_N3) |
                   .${nf}.multus.interfaces[0].enabled = \
@@ -691,96 +690,84 @@ configure-oai-5g-@mode@() {
                 yq -i "
                   .${nf}.multus.interfaces[1].hostInterface = \
 		  strenv(IF_NAME_UPF_N4) |
-                  .${nf}.multus.interfaces[1].ipAdd = strenv(IP_UPF_N4) |
+                  .${nf}.multus.interfaces[1].ipAdd   = strenv(IP_UPF_N4) |
                   .${nf}.multus.interfaces[1].netmask = strenv(NETMASK_UPF_N4) |
                   .${nf}.multus.interfaces[1].gateway = strenv(GW_UPF_N4) |
-                  .${nf}.multus.interfaces[1].routes = strenv(ROUTES_UPF_N4) |
+                  .${nf}.multus.interfaces[1].routes  = strenv(ROUTES_UPF_N4) |
                   .${nf}.multus.interfaces[1].enabled = \
                   (strenv(MULTUS_UPF_N4) == \"true\") |
-                  .${nf}.multus.interfaces[1].type = \"macvlan\"
+                  .${nf}.multus.interfaces[1].type    = \"macvlan\"
                 " "$values_file"
                 yq -i "
                   .${nf}.multus.interfaces[2].hostInterface = \
 		  strenv(IF_NAME_UPF_N6) |
-                  .${nf}.multus.interfaces[2].ipAdd = strenv(IP_UPF_N6) |
+                  .${nf}.multus.interfaces[2].ipAdd   = strenv(IP_UPF_N6) |
                   .${nf}.multus.interfaces[2].netmask = strenv(NETMASK_UPF_N6) |
                   .${nf}.multus.interfaces[2].gateway = strenv(GW_UPF_N6) |
-                  .${nf}.multus.interfaces[2].routes = strenv(ROUTES_UPF_N6) |
+                  .${nf}.multus.interfaces[2].routes  = strenv(ROUTES_UPF_N6) |
                   .${nf}.multus.interfaces[2].enabled = \
                   (strenv(MULTUS_UPF_N6) == \"true\") |
                   .${nf}.multus.interfaces[2].type = \"macvlan\"
                 " "$values_file"
-                yq -i "
-                  .${nf}.multus.interfaces[3].hostInterface = \
-		  strenv(IF_NAME_UPF_N9) |
-                  .${nf}.multus.interfaces[3].ipAdd = strenv(IP_UPF_N9) |
+                yq -i '
+                  .${nf}.multus.interfaces[3].hostInterface = strenv(IF_NAME_UPF_N9) |
+                  .${nf}.multus.interfaces[3].ipAdd   = strenv(IP_UPF_N9) |
                   .${nf}.multus.interfaces[3].netmask = strenv(NETMASK_UPF_N9) |
                   .${nf}.multus.interfaces[3].gateway = strenv(GW_UPF_N9) |
-                  .${nf}.multus.interfaces[3].routes = strenv(ROUTES_UPF_N9) |
-                  .${nf}.multus.interfaces[3].enabled = \
-                  (strenv(MULTUS_UPF_N9) == \"true\") |
-                  .${nf}.multus.interfaces[3].type = \"macvlan\"
-                " "$values_file"
-                yq -i "
-                  .${nf}.multus.interfaces[4].hostInterface = \
-		  strenv(IF_NAME_UPF_SBI) |
-                  .${nf}.multus.interfaces[4].ipAdd = strenv(IP_UPF_SBI) |
+                  .${nf}.multus.interfaces[3].routes  = strenv(ROUTES_UPF_N9) |
+                  .${nf}.multus.interfaces[3].enabled = (strenv(MULTUS_UPF_N9) == "true") |
+                  .${nf}.multus.interfaces[3].type = "macvlan"
+                ' "${values_file}"
+                yq -i '
+                  .${nf}.multus.interfaces[4].hostInterface = strenv(IF_NAME_UPF_SBI) |
+                  .${nf}.multus.interfaces[4].ipAdd   = strenv(IP_UPF_SBI) |
                   .${nf}.multus.interfaces[4].netmask = strenv(NETMASK_UPF_SBI) |
                   .${nf}.multus.interfaces[4].gateway = strenv(GW_UPF_SBI) |
-                  .${nf}.multus.interfaces[4].enabled = \
-		  (strenv(MULTUS_UPF_SBI) == \"true\") |
-                  .${nf}.multus.interfaces[4].type = \"macvlan\"
-                " "$values_file"
+                  .${nf}.multus.interfaces[4].enabled = (strenv(MULTUS_UPF_SBI) == "true") |
+                  .${nf}.multus.interfaces[4].type = "macvlan"
+                ' "${values_file}"
                 ;;
             oai-traffic-server)
-                yq -i "
-                  .${nf}.multus.enabled = (strenv(MULTUS_TS) == \"true\") |
-                  .${nf}.multus.interfaces[0].hostInterface = \
-		  strenv(IF_NAME_TS) |
-                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_TS) |
-                  .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_TS) |
-                  .${nf}.multus.interfaces[0].defaultRoute = \
-                  strenv(DEF_ROUTE_TS) |
-                  .${nf}.multus.interfaces[0].enabled = \
-                  (strenv(MULTUS_TS) == \"true\") |
-                  .${nf}.multus.interfaces[0].type = \"macvlan\"
-                " "$values_file"
+                yq -i '
+                  .${nf}.multus.enabled = (strenv(MULTUS_TS) == "true") |
+                  .${nf}.multus.interfaces[0].hostInterface = strenv(IF_NAME_TS) |
+                  .${nf}.multus.interfaces[0].ipAdd         = strenv(IP_TS) |
+                  .${nf}.multus.interfaces[0].netmask       = strenv(NETMASK_TS) |
+                  .${nf}.multus.interfaces[0].defaultRoute  = strenv(DEF_ROUTE_TS) |
+                  .${nf}.multus.interfaces[0].enabled       = (strenv(MULTUS_TS) == "true") |
+                  .${nf}.multus.interfaces[0].type          = "macvlan"
+                ' "${values_file}"
                 ;;
             oai-smf)
-                yq -i "
-                  .${nf}.multus.enabled = (strenv(MULTUS_SMF) == \"true\") |
-                  .${nf}.multus.interfaces[0].hostInterface = \
-		  strenv(IF_NAME_SMF_N4) |
-                  .${nf}.multus.interfaces[0].ipAdd = strenv(IP_SMF_N4) |
+                yq -i '
+                  .${nf}.multus.enabled               = (strenv(MULTUS_SMF) == "true") |
+                  .${nf}.multus.interfaces[0].hostInterface = strenv(IF_NAME_SMF_N4) |
+                  .${nf}.multus.interfaces[0].ipAdd   = strenv(IP_SMF_N4) |
                   .${nf}.multus.interfaces[0].netmask = strenv(NETMASK_SMF_N4) |
-                  .${nf}.multus.interfaces[0].defaultRoute = \
-                  strenv(DEF_ROUTE_SMF_N4) |
-                  .${nf}.multus.interfaces[0].routes = strenv(ROUTES_SMF_N4) |
-                  .${nf}.multus.interfaces[0].enabled = \
-                  (strenv(MULTUS_SMF_N4) == \"true\") |
-                  .${nf}.multus.interfaces[0].type = \"macvlan\"
-                " "$values_file"
-                yq -i "
-                  .${nf}.multus.interfaces[1].hostInterface = \
-		  strenv(IF_NAME_SMF_SBI) |
-                  .${nf}.multus.interfaces[1].ipAdd = strenv(IP_SMF_SBI) |
+                  .${nf}.multus.interfaces[0].defaultRoute  = strenv(DEF_ROUTE_SMF_N4) |
+                  .${nf}.multus.interfaces[0].routes  = strenv(ROUTES_SMF_N4) |
+                  .${nf}.multus.interfaces[0].enabled = (strenv(MULTUS_SMF_N4) == "true") |
+                  .${nf}.multus.interfaces[0].type    = "macvlan"
+                ' "${values_file}"
+                yq -i '
+                  .${nf}.multus.interfaces[1].hostInterface = strenv(IF_NAME_SMF_SBI) |
+                  .${nf}.multus.interfaces[1].ipAdd   = strenv(IP_SMF_SBI) |
                   .${nf}.multus.interfaces[1].netmask = strenv(NETMASK_SMF_SBI) |
                   .${nf}.multus.interfaces[1].gateway = strenv(GW_SMF_SBI) |
-                  .${nf}.multus.interfaces[1].enabled = \
-		  (strenv(MULTUS_SMF_SBI) == \"true\") |
-                  .${nf}.multus.interfaces[1].type = \"macvlan\"
-                " "$values_file"
+                  .${nf}.multus.interfaces[1].enabled = (strenv(MULTUS_SMF_SBI) == "true") |
+                  .${nf}.multus.interfaces[1].type    = "macvlan"
+                ' "${values_file}"
                 ;;
         esac
 
         # ---- DEBUG AFTER NF ----
         #echo "==== DEBUG $nf ===="
-        #yq e ".${nf}" "$values_file"
+        #yq e ".${nf}" "${values_file}"
         #echo "==================="
     done
 
     # ---- Diff values.yaml ----
-    diff "$TMP/values.yaml-orig" "$values_file"
+    diff "$TMP/values.yaml-orig" "${values_file}"
 
     #####################################
     # ---- config.yaml CONFIGURATION ----
@@ -788,66 +775,66 @@ configure-oai-5g-@mode@() {
 
     # NF interfaces
     yq -i "
-      .nfs.amf.sbi.interface_name = strenv(NAME_AMF_SBI) |
-      .nfs.amf.n2.interface_name = strenv(NAME_AMF_N2) |
-      .nfs.smf.sbi.interface_name = strenv(NAME_SMF_SBI) |
-      .nfs.smf.n4.interface_name = strenv(NAME_SMF_N4) |
-      .nfs.upf.sbi.interface_name = strenv(NAME_UPF_SBI) |
-      .nfs.upf.n3.interface_name = strenv(NAME_UPF_N3) |
-      .nfs.upf.n4.interface_name = strenv(NAME_UPF_N4) |
-      .nfs.upf.n6.interface_name = strenv(NAME_UPF_N6) |
-      .nfs.upf.n9.interface_name = strenv(NAME_UPF_N9)
-    " "$config_file"
+      .nfs.amf.sbi.interface_name = strenv(NAME_AMF_SBI)|
+      .nfs.amf.n2.interface_name  = strenv(NAME_AMF_N2) |
+      .nfs.smf.sbi.interface_name = strenv(NAME_SMF_SBI)|
+      .nfs.smf.n4.interface_name  = strenv(NAME_SMF_N4) |
+      .nfs.upf.sbi.interface_name = strenv(NAME_UPF_SBI)|
+      .nfs.upf.n3.interface_name  = strenv(NAME_UPF_N3) |
+      .nfs.upf.n4.interface_name  = strenv(NAME_UPF_N4) |
+      .nfs.upf.n6.interface_name  = strenv(NAME_UPF_N6) |
+      .nfs.upf.n9.interface_name  = strenv(NAME_UPF_N9)
+    " "${config_file}"
     
     
     # SNSSAI slices
-    yq -i "
+    yq -i '
       .snssais[0].sst = strenv(SLICE1_SST) |
-      .snssais[0].sd = strenv(SLICE1_SD) |
+      .snssais[0].sd  = strenv(SLICE1_SD)  |
       .snssais[1].sst = strenv(SLICE2_SST) |
-      .snssais[1].sd = strenv(SLICE2_SD)
-    " "$config_file"
+      .snssais[1].sd  = strenv(SLICE2_SD)
+    ' "${config_file}"
 
     # AMF PLMN / TAC
-    yq -i "
+    yq -i '
       .amf.served_guami_list[0].mcc = strenv(MCC) |
       .amf.served_guami_list[0].mnc = strenv(MNC) |
       .amf.plmn_support_list[0].mcc = strenv(MCC) |
       .amf.plmn_support_list[0].mnc = strenv(MNC) |
       .amf.plmn_support_list[0].tac = strenv(TAC)
-    " "$config_file"
+    ' "${config_file}"
 
     # SMF DNS + DNN + QoS
-    yq -i "
-      .smf.ue_dns.primary_ipv4 = strenv(IP_DNS1) |
-      .smf.ue_dns.secondary_ipv4 = strenv(IP_DNS2) |
+    yq -i '
+      .smf.ue_dns.primary_ipv4                                 = strenv(IP_DNS1) |
+      .smf.ue_dns.secondary_ipv4                               = strenv(IP_DNS2) |
       .smf.smf_info.sNssaiSmfInfoList[0].dnnSmfInfoList[0].dnn = strenv(DNN0) |
       .smf.smf_info.sNssaiSmfInfoList[1].dnnSmfInfoList[0].dnn = strenv(DNN1) |
-      .smf.local_subscription_infos[0].dnn = strenv(DNN0) |
+      .smf.local_subscription_infos[0].dnn                     = strenv(DNN0) |
       .smf.local_subscription_infos[0].qos_profile.5qi = strenv(SLICE1_5QI) |
       .smf.local_subscription_infos[0].qos_profile.session_ambr_ul = strenv(SLICE1_UPLINK) |
       .smf.local_subscription_infos[0].qos_profile.session_ambr_dl = strenv(SLICE1_DOWNLINK) |
-      .smf.local_subscription_infos[1].dnn = strenv(DNN1) |
-      .smf.local_subscription_infos[1].qos_profile.5qi = strenv(SLICE2_5QI) |
+      .smf.local_subscription_infos[1].dnn                     = strenv(DNN1) |
+      .smf.local_subscription_infos[1].qos_profile.5qi         = strenv(SLICE2_5QI) |
       .smf.local_subscription_infos[1].qos_profile.session_ambr_ul = strenv(SLICE2_UPLINK) |
       .smf.local_subscription_infos[1].qos_profile.session_ambr_dl = strenv(SLICE2_DOWNLINK)
-    " "$config_file"
+    ' "${config_file}"
 
     # UPF DNN + SNAT and DNNs
-    yq -i "
+    yq -i '
       .upf.upf_info.sNssaiUpfInfoList[0].dnnUpfInfoList[0].dnn = strenv(DNN0) |
       .upf.upf_info.sNssaiUpfInfoList[1].dnnUpfInfoList[0].dnn = strenv(DNN1) |
-      .upf.support_features.enable_snat = strenv(ENABLE_SNAT) |
-      .dnns[0].dnn = strenv(DNN0) |
-      .dnns[0].pdu_session_type = strenv(DNN0_PDU_TYPE) |
-      .dnns[1].dnn = strenv(DNN1) |
-      .dnns[1].pdu_session_type = strenv(DNN1_PDU_TYPE) 
-    " "$config_file"
+      .upf.support_features.enable_snat                        = strenv(ENABLE_SNAT) |
+      .dnns[0].dnn                                             = strenv(DNN0) |
+      .dnns[0].pdu_session_type                                = strenv(DNN0_PDU_TYPE) |
+      .dnns[1].dnn                                             = strenv(DNN1) |
+      .dnns[1].pdu_session_type                                = strenv(DNN1_PDU_TYPE) 
+   ' "${config_file}"
 
     # if SD NSSAI field is set to "NULL", erase the sd line
-    awk '!/EMPTY/' "$OAI5G_@MODE@"/config.yaml > /tmp/temp && mv /tmp/temp "$config_file"
+    awk '!/EMPTY/' "$OAI5G_@MODE@"/config.yaml > /tmp/temp && mv /tmp/temp "${config_file}"
     # ---- Diff config.yaml ----
-    diff "$TMP/config.yaml-orig" "$config_file"
+    diff "$TMP/config.yaml-orig" "${config_file}"
 
     # Run helm dependency update
     cd "${OAI5G_@MODE@}"
@@ -863,11 +850,11 @@ configure-mysql() {
     DIR_ORIG_CHART="${OAI5G_CORE}/mysql/initialization"
     DIR_PATCHED_CHART="${PREFIX_DEMO}/oai5g-rru/patch-mysql"
 
-    echo "configure-mysql: mysql database already patched by configure-demo-oai.sh script, just copy it"
+    echo "configure-mysql: mysql database already configured by configure-demo-oai.sh script, just copy it"
     echo "cp ${DIR_PATCHED_CHART}/oai_db-basic.sql ${DIR_ORIG_CHART}/"
     cp ${DIR_PATCHED_CHART}/oai_db-basic.sql ${DIR_ORIG_CHART}/
     # if SD NSSAI field is set to "NULL", replace it by "FFFFFF" in the mysql database
-    sed -i 's/EMPTY/FFFFFF/g' $DIR_ORIG_CHART/oai_db-basic.sql
+    sed -i 's/EMPTY/FFFFFF/g' "${DIR_ORIG_CHART}/oai_db-basic.sql"
 }
 
 #################################################################################
@@ -888,24 +875,24 @@ apply-gnb-values-yq() {
     values_file="$1"
     yq_overlay_file="$2"
 
-    [ -f "$values_file" ] || {
-        echo "ERROR: values file not found: $values_file"
+    [ -f "${values_file}" ] || {
+        echo "ERROR: values file not found: ${values_file}"
         exit 1
     }
 
-    [ -f "$yq_overlay_file" ] || {
-        echo "ERROR: yq overlay file not found: $yq_overlay_file"
+    [ -f "${yq_overlay_file}" ] || {
+        echo "ERROR: yq overlay file not found: ${yq_overlay_file}"
         exit 1
     }
 
-    echo "Applying yq overlays from $yq_overlay_file to $values_file"
+    echo "Applying yq overlays from $yq_overlay_file to ${values_file}"
 
-    yq eval -i "$(cat "$yq_overlay_file")" "$values_file"
+    yq eval -i "$(cat "${yq_overlay_file}")" "${values_file}"
 
     # Update PLMN and NSSAI
     yq eval -i '
-.config.plmn_list[0].mcc = strenv(MCC) |
-.config.plmn_list[0].mnc = strenv(MNC) |
+.config.plmn_list[0].mcc        = strenv(MCC) |
+.config.plmn_list[0].mnc        = strenv(MNC) |
 .config.plmn_list[0].snssaiList =
 [
   {
@@ -928,11 +915,11 @@ apply-gnb-values-yq() {
 ' "$values_file"
     
     # Validate new values.yaml configuration
-    yq eval '.' "$values_file" >/dev/null || {
-        echo "ERROR: generated YAML is invalid: $values_file"
+    yq eval '.' "${values_file}" >/dev/null || {
+        echo "ERROR: generated YAML is invalid: ${values_file}"
         exit 1
     }
-    echo "OK: $values_file updated successfully"
+    echo "OK: ${values_file} updated successfully"
 }
 
 
@@ -1069,26 +1056,27 @@ configure-nr-ue() {
 
     # Then update the variable fields
     yq eval -i '
-      .nfimage.repository = strenv(NRUE_REPO) |
-      .nfimage.version = strenv(NRUE_TAG) |
-      .config.fullImsi = strenv(RFSIM_IMSI) |
-      .config.fullKey  = strenv(FULL_KEY) |
-      .config.opc      = strenv(OPC) |
-      .config.dnn      = strenv(DNN0) |
-      .config.sst      = strenv(SLICE1_SST) |
-      .config.sd       = ("0x" + strenv(SLICE1_SD)) |
+      .nfimage.repository          = strenv(NRUE_REPO) |
+      .nfimage.version             = strenv(NRUE_TAG) |
+      .config.fullImsi             = strenv(RFSIM_IMSI) |
+      .config.fullKey              = strenv(FULL_KEY) |
+      .config.opc                  = strenv(OPC) |
+      .config.dnn                  = strenv(DNN0) |
+      .config.sst                  = strenv(SLICE1_SST) |
+      .config.sd                   = ("0x" + strenv(SLICE1_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
-      .includeTcpDumpContainer = (strenv(LOGS) == "true") |
-      .resources.define = (strenv(QOS_NRUE) == "true") |
-      .nodeName         = strenv(NODE_NRUE)
+      .includeTcpDumpContainer     = (strenv(LOGS) == "true") |
+      .resources.define            = (strenv(QOS_NRUE) == "true") |
+      .nodeName                    = strenv(NODE_NRUE)
     ' "${ORIG_VALUES}"
 
+    # Handle the particular case of sd == "EMPTY"
     sed -i 's/0xEMPTY/16777215/g' "${ORIG_VALUES}"
-    ##diff "${TMP_VALUES}" "${ORIG_VALUES}"
 
-    # Update deployment.yaml and nad.yaml templates
+    # Update deployment.yaml and nad.yaml templates to enable multus in nrue
     cp -f "${NEW_TEMPLATES}/deployment.yaml" "${ORIG_TEMPLATES}"
     cp -f "${NEW_TEMPLATES}/nad.yaml" "${ORIG_TEMPLATES}"
+    ##diff "${TMP_VALUES}" "${ORIG_VALUES}"
 }
 
 
@@ -1108,20 +1096,21 @@ configure-nr-ue2() {
     
     # Then update the variable fields
     yq eval -i '
-      .nfimage.repository = strenv(NRUE_REPO) |
-      .nfimage.version = strenv(NRUE_TAG) |
-      .multus.interfaces[0].ipAdd    = strenv(IP_NRUE2) |
-      .config.fullImsi = strenv(RFSIM_IMSI_UE2) |
-      .config.fullKey  = strenv(FULL_KEY) |
-      .config.opc      = strenv(OPC) |
-      .config.dnn      = strenv(DNN1) |
-      .config.sst      = strenv(SLICE2_SST) |
-      .config.sd       = ("0x" + strenv(SLICE2_SD)) |
+      .nfimage.repository          = strenv(NRUE_REPO) |
+      .nfimage.version             = strenv(NRUE_TAG) |
+      .multus.interfaces[0].ipAdd  = strenv(IP_NRUE2) |
+      .config.fullImsi             = strenv(RFSIM_IMSI_UE2) |
+      .config.fullKey              = strenv(FULL_KEY) |
+      .config.opc                  = strenv(OPC) |
+      .config.dnn                  = strenv(DNN1) |
+      .config.sst                  = strenv(SLICE2_SST) |
+      .config.sd                   = ("0x" + strenv(SLICE2_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
-      .includeTcpDumpContainer = (strenv(LOGS) == "true") |
-      .resources.define = (strenv(QOS_NRUE) == "true")
+      .includeTcpDumpContainer     = (strenv(LOGS) == "true") |
+      .resources.define            = (strenv(QOS_NRUE) == "true")
     ' "$ORIG_VALUES"
 
+    # Handle the particular case of sd == "EMPTY"
     sed -i 's/0xEMPTY/16777215/g' "${ORIG_VALUES}"
     ##cat "${ORIG_VALUES}"
 }
@@ -1142,20 +1131,21 @@ configure-nr-ue3() {
     
     # Then update the variable fields
     yq eval -i '
-      .nfimage.repository = strenv(NRUE_REPO) |
-      .nfimage.version = strenv(NRUE_TAG) |
-      .multus.interfaces[0].ipAdd    = strenv(IP_NRUE3) |
-      .config.fullImsi = strenv(RFSIM_IMSI_UE3) |
-      .config.fullKey  = strenv(FULL_KEY) |
-      .config.opc      = strenv(OPC) |
-      .config.dnn      = strenv(DNN0) |
-      .config.sst      = strenv(SLICE1_SST) |
-      .config.sd       = ("0x" + strenv(SLICE1_SD)) |
+      .nfimage.repository          = strenv(NRUE_REPO) |
+      .nfimage.version             = strenv(NRUE_TAG) |
+      .multus.interfaces[0].ipAdd  = strenv(IP_NRUE3) |
+      .config.fullImsi             = strenv(RFSIM_IMSI_UE3) |
+      .config.fullKey              = strenv(FULL_KEY) |
+      .config.opc                  = strenv(OPC) |
+      .config.dnn                  = strenv(DNN0) |
+      .config.sst                  = strenv(SLICE1_SST) |
+      .config.sd                   = ("0x" + strenv(SLICE1_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
-      .includeTcpDumpContainer = (strenv(LOGS) == "true") |
-      .resources.define = (strenv(QOS_NRUE) == "true")
+      .includeTcpDumpContainer     = (strenv(LOGS) == "true") |
+      .resources.define            = (strenv(QOS_NRUE) == "true")
     ' "${ORIG_VALUES}"
 
+    # Handle the particular case of sd == "EMPTY"
     sed -i 's/0xEMPTY/16777215/g' "${ORIG_VALUES}"
     ##cat "${ORIG_VALUES}"
 }
@@ -1169,22 +1159,22 @@ configure-flexric() {
     TMP_VALUES="$TMP/oai-flexric_values.yaml-orig"
 
     cp "$ORIG_VALUES" "${TMP_VALUES}"
-    yq eval -i "
+    yq eval -i '
       .nfimage.repository                 = strenv(FLEXRIC_REPO) |
       .nfimage.version                    = strenv(FLEXRIC_TAG) |
       .nfimage.pullPolicy                 = strenv(FLEXRIC_PULL_POLICY) |
-      .multus.enabled                     = strenv(FLEXRIC | == \"true\") |
+      .multus.enabled                     = (strenv(FLEXRIC) == "true") |
       .multus.interfaces[0].hostInterface = strenv(IF_NAME_FLEXRIC_E2) |
       .multus.interfaces[0].ipAdd         = strenv(IP_FLEXRIC_E2) |
       .multus.interfaces[0].netmask       = strenv(NETMASK_E2) |
       .multus.interfaces[0].defaultRoute  = strenv(ROUTES_FLEXRIC_E2) |
-      .start.tcpdump                      = (strenv(PCAP) == \"true\") |
-      .includeTcpDumpContainer            = (strenv(LOGS) == \"true\") |
-      .resources.define                   = (strenv(QOS_FLEXRIC) == \"true\") |
+      .start.tcpdump                      = (strenv(PCAP) == "true") |
+      .includeTcpDumpContainer            = (strenv(LOGS) == "true") |
+      .resources.define                   = (strenv(QOS_FLEXRIC) == "true") |
       .nodeName                           = strenv(NODE_FLEXRIC)
-    " "${ORIG_VALUES}"
+    ' "${ORIG_VALUES}"
 
-    diff "${TMP_VALUES}" "${ORIG_VALUES}"
+    ##diff "${TMP_VALUES}" "${ORIG_VALUES}"
 }
 
 
