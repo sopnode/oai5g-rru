@@ -1077,8 +1077,8 @@ configure-nr-ue() {
       .config.sst      = strenv(SLICE1_SST) |
       .config.sd       = ("0x" + strenv(SLICE1_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
-      .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
-      .resources.define = (strenv(QOS_NRUE) | test("true")) |
+      .includeTcpDumpContainer = (strenv(LOGS) == "true") |
+      .resources.define = (strenv(QOS_NRUE) == "true") |
       .nodeName         = strenv(NODE_NRUE)
     ' "${ORIG_VALUES}"
 
@@ -1117,8 +1117,8 @@ configure-nr-ue2() {
       .config.sst      = strenv(SLICE2_SST) |
       .config.sd       = ("0x" + strenv(SLICE2_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
-      .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
-      .resources.define = (strenv(QOS_NRUE) | test("true"))
+      .includeTcpDumpContainer = (strenv(LOGS) == "true") |
+      .resources.define = (strenv(QOS_NRUE) == "true")
     ' "$ORIG_VALUES"
 
     sed -i 's/0xEMPTY/16777215/g' "${ORIG_VALUES}"
@@ -1151,8 +1151,8 @@ configure-nr-ue3() {
       .config.sst      = strenv(SLICE1_SST) |
       .config.sd       = ("0x" + strenv(SLICE1_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
-      .includeTcpDumpContainer = (strenv(LOGS) | test("true")) |
-      .resources.define = (strenv(QOS_NRUE) | test("true"))
+      .includeTcpDumpContainer = (strenv(LOGS) == "true") |
+      .resources.define = (strenv(QOS_NRUE) == "true")
     ' "${ORIG_VALUES}"
 
     sed -i 's/0xEMPTY/16777215/g' "${ORIG_VALUES}"
@@ -1172,14 +1172,14 @@ configure-flexric() {
       .nfimage.repository                 = strenv(FLEXRIC_REPO) |
       .nfimage.version                    = strenv(FLEXRIC_TAG) |
       .nfimage.pullPolicy                 = strenv(FLEXRIC_PULL_POLICY) |
-      .multus.enabled                     = strenv(FLEXRIC | test("true")) |
+      .multus.enabled                     = strenv(FLEXRIC | == "true") |
       .multus.interfaces[0].hostInterface = strenv(IF_NAME_E2) |
       .multus.interfaces[0].ipAdd         = strenv(IP_FLEXRIC_E2) |
       .multus.interfaces[0].netmask       = strenv(NETMASK_E2) |
       .multus.interfaces[0].defaultRoute  = strenv(ROUTES_FLEXRIC_E2) |
-      .start.tcpdump                      = (strenv(PCAP)| test("true")) |
-      .includeTcpDumpContainer            = (strenv(LOGS) | test("true")) |
-      .resources.define                   = (strenv(QOS_FLEXRIC) | test("true")) |
+      .start.tcpdump                      = (strenv(PCAP) == "true") |
+      .includeTcpDumpContainer            = (strenv(LOGS) == "true") |
+      .resources.define                   = (strenv(QOS_FLEXRIC) == "true") |
       .nodeName                           = strenv(NODE_FLEXRIC)
     ' "${ORIG_VALUES}"
 
@@ -1213,8 +1213,8 @@ configure-all() {
     configure-flexric
     if [[ "$RRU" = "rfsim" ]]; then
 	configure-nr-ue
-    configure-nr-ue2
-    configure-nr-ue3
+	configure-nr-ue2
+	configure-nr-ue3
     fi
 }
 
