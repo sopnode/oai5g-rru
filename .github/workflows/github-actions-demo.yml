@@ -36,7 +36,7 @@ jobs:
           chmod a+x $OAI5G/prepare-demo-oai.sh
           echo "configure oai5g-rru demo, branch $BRANCH for RRU=jaguar"
           $OAI5G/prepare-demo-oai.sh -a -B $BRANCH -R jaguar
-	  echo "Sleep 60s to ensure RUs are operational"; sleep 60
+          echo "Sleep 60s to ensure RUs are operational"; sleep 60
           echo "Run the oai5g-rru demo with jaguar RRU"
           $OAI5G/demo-oai.sh start
           echo "Sleep 10s"; sleep 10
