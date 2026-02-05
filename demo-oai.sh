@@ -60,7 +60,7 @@ export GNB_ID="@DEF_GNB_ID@"
 ################SST0="@DEF_SST0@"
 export FULL_KEY="@DEF_FULL_KEY@"
 export OPC="@DEF_OPC@"
-export RFSIM_IMSI="@DEF_RFSIM_IMSI@"
+export RFSIM_IMSI_UE="@DEF_RFSIM_IMSI_UE@"
 export RFSIM_IMSI_UE2="@DEF_RFSIM_IMSI_UE2@"
 export RFSIM_IMSI_UE3="@DEF_RFSIM_IMSI_UE3@"
 #
@@ -1048,7 +1048,7 @@ configure-nr-ue() {
     yq eval -i "
       .nfimage.repository          = strenv(NRUE_REPO) |
       .nfimage.version             = strenv(NRUE_TAG) |
-      .config.fullImsi             = strenv(RFSIM_IMSI) |
+      .config.fullImsi             = strenv(RFSIM_IMSI_UE) |
       .config.fullKey              = strenv(FULL_KEY) |
       .config.opc                  = strenv(OPC) |
       .config.dnn                  = strenv(DNN0) |
