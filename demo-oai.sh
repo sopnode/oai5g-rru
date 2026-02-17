@@ -221,6 +221,7 @@ if [[ $RUN_MODE = "full" ]]; then
     else
 	export IP_GNB_N3="${SUBNET_N2N3}.203"
     fi
+    export TYPE_GNB_N3="macvlan"
 
 else
     # Local RAN, External MYSQL/UDR/UDM/AUSF/AMF/SMF/UPF
@@ -280,13 +281,14 @@ else
 	else
 	    export IP_GNB_N3="${SUBNET_N2N3}.223"
 	fi
+	export TYPE_GNB_N3="macvlan"
 	export IF_NAME_GNB_N3="n2"
 	export ROUTES_GNB_N2="" # Set the route for gNB to reach AMF (N2) and UPF (N3)
 	#export ROUTES_GNB_N2="[{'dst': '172.21.0.0/16','gw': '192.168.128.129'},{'dst': '192.168.128.0/24','gw': '192.168.128.129'}]"
     else
         # ${RUN_MODE} == "gnb-only"
 	# only RAN pods are enabled
-	#
+	# if [[ "${RUN_MODE}" == "gnb-only" &&  "${IF_NAME_RAN_N2N3}" == "n3br" ]]; then
 
 	if [[ "${NODE_AMF_UPF}" == "10.10.3.200" ]]; then
 	    # Scenario with Open5gs CN
@@ -297,6 +299,7 @@ else
 	    export MULTUS_GNB_N3="true"
 	    export IF_NAME_GNB_N3="${IF_NAME_RAN_N2N3}"
 	    export IP_GNB_N3="${SUBNET_N2N3}.205"
+	    export TYPE_GNB_N3="ovs"
 	    export MULTUS_CUCP_N2="true"
 	    export IP_CUCP_N2="${SUBNET_N2N3}.205"
 	    export MULTUS_CUUP_N3="true"
@@ -311,6 +314,7 @@ else
 	    export IP_GNB_N2="${SUBNET_N2N3}.203"
 	    export MULTUS_GNB_N3="false"
 	    export IF_NAME_GNB_N3=""
+	    export TYPE_GNB_N3="macvlan"
 	    if [[ $GNB_MODE = 'cucpup' ]]; then
 		export MULTUS_CUUP_N3="true"
 		export IP_GNB_N3="${SUBNET_N2N3}.204"
