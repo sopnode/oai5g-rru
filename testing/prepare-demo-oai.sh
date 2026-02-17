@@ -21,7 +21,7 @@ TAG_OAI5G_RRU="main"
 
 # Repo/tag for OAI charts
 REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/turletti/charts.git"
-TAG_OAI_CN5G_FED="correction-v1.0.0-r2lab"
+TAG_OAI_CN5G_FED="main"
 
 # CORE node mode in ["basic", "advance"]
 CN_MODE="basic"
