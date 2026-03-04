@@ -19,7 +19,7 @@ gNBs:
     pusch_AntennaPorts: 4
     do_CSIRS: 1
     do_SRS: 0
-    sib1_tda: 15
+    #sib1_tda: 15 # removed (SA)
 
     servingCellConfigCommon:
       - physCellId: 0
@@ -72,7 +72,7 @@ gNBs:
         nrofDownlinkSymbols: 10 # 6
         nrofUplinkSlots: 1
         nrofUplinkSymbols: 2 # 4
-        ssPBCH_BlockPower: 3 # -10
+        ssPBCH_BlockPower: -15 # 3 (SA)
 
     SCTP:
       SCTP_INSTREAMS: 2
@@ -90,8 +90,8 @@ MACRLCs:
   - num_cc: 1
     tr_s_preference: "local_L1"
     tr_n_preference: "local_RRC"
-    pusch_TargetSNRx10: 180
-    pucch_TargetSNRx10: 220
+    pusch_TargetSNRx10: 100 # 180 (SA)
+    pucch_TargetSNRx10: 200 # 220 (SA)
     dl_bler_target_upper: 0.35
     dl_bler_target_lower: 0.15
     ul_bler_target_upper: 0.35
@@ -103,7 +103,7 @@ L1s:
   - num_cc: 1
     tr_n_preference: "local_mac"
     prach_dtx_threshold: 170 # was 100, 170 to prevent ghost UE msg3
-    pucch0_dtx_threshold: 80
+    pucch0_dtx_threshold: 90 # 80 (SA)
     pusch_dtx_threshold: 10
     max_ldpc_iterations: 15
     tx_amp_backoff_dB: 12 # 15 # needs to match O-RU configuration
@@ -158,7 +158,7 @@ fhi_72:
     - T1a_cp_dl: [419, 470]
       T1a_cp_ul: [285, 336]
       T1a_up: [294, 345]
-      Ta4: [50, 331] # [0, 200]
+      Ta4: [0, 200] # [50, 331] put back old param (SA)
       ru_config:
         iq_width: 9
         iq_width_prach: 9
