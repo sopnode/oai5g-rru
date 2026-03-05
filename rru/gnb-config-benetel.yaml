@@ -23,9 +23,9 @@ gNBs:
 
     servingCellConfigCommon:
       - physCellId: 0
-        absoluteFrequencySSB: 623328
+        absoluteFrequencySSB: 630048 # (before 623328)
         dl_frequencyBand: 78
-        dl_absoluteFrequencyPointA: 620058
+        dl_absoluteFrequencyPointA: 626772 # (before 620058)
         dl_offstToCarrier: 0
         dl_subcarrierSpacing: 1
         dl_carrierBandwidth: 273
@@ -90,8 +90,8 @@ MACRLCs:
   - num_cc: 1
     tr_s_preference: "local_L1"
     tr_n_preference: "local_RRC"
-    pusch_TargetSNRx10: 200 # (RK) # was 100 (SA)
-    pucch_TargetSNRx10: 200 # 220 (SA)
+    pusch_TargetSNRx10: 250
+    pucch_TargetSNRx10: 220
     dl_bler_target_upper: 0.35
     dl_bler_target_lower: 0.15
     ul_bler_target_upper: 0.35
