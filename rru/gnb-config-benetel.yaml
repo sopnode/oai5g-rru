@@ -90,7 +90,7 @@ MACRLCs:
   - num_cc: 1
     tr_s_preference: "local_L1"
     tr_n_preference: "local_RRC"
-    pusch_TargetSNRx10: 100 # 180 (SA)
+    pusch_TargetSNRx10: 200 # (RK) # was 100 (SA)
     pucch_TargetSNRx10: 200 # 220 (SA)
     dl_bler_target_upper: 0.35
     dl_bler_target_lower: 0.15
