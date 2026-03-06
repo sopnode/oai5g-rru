@@ -69,9 +69,9 @@ gNBs:
         referenceSubcarrierSpacing: 1
         dl_UL_TransmissionPeriodicity: 5
         nrofDownlinkSlots: 3
-        nrofDownlinkSymbols: 10 # 6
+        nrofDownlinkSymbols: 6
         nrofUplinkSlots: 1
-        nrofUplinkSymbols: 2 # 4
+        nrofUplinkSymbols: 4
         ssPBCH_BlockPower: -15 # 3 (SA)
 
     SCTP:
@@ -90,7 +90,7 @@ MACRLCs:
   - num_cc: 1
     tr_s_preference: "local_L1"
     tr_n_preference: "local_RRC"
-    pusch_TargetSNRx10: 250
+    pusch_TargetSNRx10: 230
     pucch_TargetSNRx10: 220
     dl_bler_target_upper: 0.35
     dl_bler_target_lower: 0.15
