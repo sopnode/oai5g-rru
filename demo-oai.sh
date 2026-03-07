@@ -305,6 +305,21 @@ else
 	    export MULTUS_CUUP_N3="true"
 	    export IP_CUUP_N3="${SUBNET_N2N3}.206"
 	    export HOST_AMF="${SUBNET_N2N3}.200"  # Open5GS AMF IP address
+        elif [[ "${NODE_AMF_UPF}" == "10.100.50.249" ]]; then
+	    # Scenario with free5gc CN
+	    export SUBNET_N2N3="10.100.50"
+	    export IF_NAME_RAN_N2N3="n3br"
+	    export NETMASK_N2N3="24"
+	    export MULTUS_GNB_N2="false"
+	    export MULTUS_GNB_N3="true"
+	    export IF_NAME_GNB_N3="${IF_NAME_RAN_N2N3}"
+	    export IP_GNB_N3="${SUBNET_N2N3}.205"
+	    export TYPE_GNB_N3="ovs"
+	    export MULTUS_CUCP_N2="true"
+	    export IP_CUCP_N2="${SUBNET_N2N3}.205"
+	    export MULTUS_CUUP_N3="true"
+	    export IP_CUUP_N3="${SUBNET_N2N3}.206"
+	    export HOST_AMF="${SUBNET_N2N3}.249"  # free5gc AMF IP address
 	else
 	    export SUBNET_N2N3="192.168.3"
 	    export IF_NAME_RAN_N2N3 # just export the default value
