@@ -7,7 +7,7 @@
 # Server name where AMF/UPF are deployed
 #  -- or external AMF IP address when using RUN_MODE="gnb-only"
 #  -- in case of external open5gs core, set it to the AMF address:
-#     e.g., "10.10.3.200" for open5gs and "10.100.50.249" for free5gc
+#     e.g., "10.10.3.200" for open5gs and "10.100.50.234" for free5gc
 #
 HOST_AMF_UPF="sopnode-w1" 
 
