@@ -309,7 +309,7 @@ else
 	    # Scenario with free5gc CN
 	    export SUBNET_N2N3="10.100.50"
 	    export IF_NAME_RAN_N2N3="n3br"
-	    export NETMASK_N2N3="29"
+	    export NETMASK_N2N3="24"
 	    export MULTUS_GNB_N2="false"
 	    export MULTUS_GNB_N3="true"
 	    export IF_NAME_GNB_N3="${IF_NAME_RAN_N2N3}"
