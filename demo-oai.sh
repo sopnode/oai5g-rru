@@ -1321,6 +1321,31 @@ start-gnb() {
 	    helm install -n $NS oai-du "${RAN_DIR}"
 	fi
     fi
+    if [[ "$MONITORING" == "true" ]]; then
+        echo "Monitoring enabled. Configuring metrics inside pod..."
+
+        POD_NAME=$(kubectl -n $NS get pods -l app.kubernetes.io/instance=oai-gnb -o jsonpath="{.items[0].metadata.name}")
+
+        echo "Target pod: $POD_NAME"
+
+        if [[ "$RRU_TYPE" == "aw2s" ]]; then
+            GNB_PATH="/opt/oai-gnb-aw2s"
+        else
+            GNB_PATH="/opt/oai-gnb"
+        fi
+
+        kubectl -n $NS exec -it $POD_NAME -- /bin/bash -c "
+            mkdir -p /shared-logs;
+            touch /shared-logs/nrMAC_stats.log;
+            touch /shared-logs/nrL1_stats.log;
+            touch /shared-logs/nrRRC_stats.log;
+            ln -sf /shared-logs/nrMAC_stats.log ${GNB_PATH}/nrMAC_stats.log;
+            ln -sf /shared-logs/nrL1_stats.log ${GNB_PATH}/nrL1_stats.log;
+            ln -sf /shared-logs/nrRRC_stats.log ${GNB_PATH}/nrRRC_stats.log;
+        "
+        
+        echo "Monitoring setup completed."
+    fi
 }
 
 #################################################################################
