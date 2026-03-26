@@ -1339,9 +1339,9 @@ start-gnb() {
             touch /shared-logs/nrMAC_stats.log;
             touch /shared-logs/nrL1_stats.log;
             touch /shared-logs/nrRRC_stats.log;
-            ln -sf /shared-logs/nrMAC_stats.log ${GNB_PATH}/nrMAC_stats.log;
-            ln -sf /shared-logs/nrL1_stats.log ${GNB_PATH}/nrL1_stats.log;
-            ln -sf /shared-logs/nrRRC_stats.log ${GNB_PATH}/nrRRC_stats.log;
+            ln -s ${GNB_PATH}/nrMAC_stats.log /shared-logs/nrMAC_stats.log;
+            ln -s ${GNB_PATH}/nrL1_stats.log /shared-logs/nrL1_stats.log;
+            ln -s ${GNB_PATH}/nrRRC_stats.log /shared-logs/nrRRC_stats.log;
         "
         
         echo "Monitoring setup completed."
