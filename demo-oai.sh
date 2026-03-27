@@ -1335,13 +1335,9 @@ start-gnb() {
         fi
 
         kubectl -n $NS exec -it $POD_NAME -- /bin/bash -c "
-            mkdir -p /shared-logs;
-            touch /shared-logs/nrMAC_stats.log;
-            touch /shared-logs/nrL1_stats.log;
-            touch /shared-logs/nrRRC_stats.log;
-            ln -s ${GNB_PATH}/nrMAC_stats.log /shared-logs/nrMAC_stats.log;
-            ln -s ${GNB_PATH}/nrL1_stats.log /shared-logs/nrL1_stats.log;
-            ln -s ${GNB_PATH}/nrRRC_stats.log /shared-logs/nrRRC_stats.log;
+            ln -sf ${GNB_PATH}/nrMAC_stats.log /shared-logs/nrMAC_stats.log;
+            ln -sf ${GNB_PATH}/nrL1_stats.log /shared-logs/nrL1_stats.log;
+            ln -sf ${GNB_PATH}/nrRRC_stats.log /shared-logs/nrRRC_stats.log;
         "
         
         echo "Monitoring setup completed."
