@@ -1334,11 +1334,12 @@ start-gnb() {
             GNB_PATH="/opt/oai-gnb"
         fi
 
-        kubectl -n $NS exec -it $POD_NAME -- /bin/bash -c "
-            ln -sf ${GNB_PATH}/nrMAC_stats.log /shared-logs/nrMAC_stats.log;
-            ln -sf ${GNB_PATH}/nrL1_stats.log /shared-logs/nrL1_stats.log;
-            ln -sf ${GNB_PATH}/nrRRC_stats.log /shared-logs/nrRRC_stats.log;
-        "
+        kubectl -n $NS exec $POD_NAME -c gnb -- /bin/bash -c "
+        nohup /bin/bash -c 'while true; do 
+            \cp $GNB_PATH/nrL1_stats.log /shared-logs/nrL1_stats.log 2>/dev/null;
+            \cp $GNB_PATH/nrMAC_stats.log /shared-logs/nrMAC_stats.log 2>/dev/null;
+            \cp $GNB_PATH/nrRRC_stats.log /shared-logs/nrRRC_stats.log 2>/dev/null;
+        done' >/dev/null 2>&1 &"
         
         echo "Monitoring setup completed."
     fi
