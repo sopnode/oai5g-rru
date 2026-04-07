@@ -17,6 +17,7 @@
 
 .start.tcpdump               = (strenv(PCAP) == "true") |
 .includeTcpDumpContainer     = (strenv(LOGS) == "true") |
+.includeMetricsParser        = (strenv(MONITORING) == "true") |
 .persistent.sharedvolume     = (strenv(PCAP) == "true") |
 
 .resources.define            = (strenv(QOS_DU) == "true") |
