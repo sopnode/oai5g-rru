@@ -214,6 +214,10 @@ spec:
             - name: usrp
               mountPath: /dev/bus/usb/
           {{- end }}
+          {{- if .Values.includeMetricsParser }}
+            - name: gnb-log-volume
+              mountPath: /shared-logs
+          {{- end}}
           env:
           - name: TZ
             value: {{ .Values.config.timeZone }}
@@ -282,6 +286,25 @@ spec:
           {{- end }}
         {{- end }}
 
+        {{- if .Values.includeMetricsParser }}
+        - name: metrics-parser
+          image: "{{ .Values.metricsParserImage.repository }}:{{ .Values.metricsParserImage.version }}"
+          imagePullPolicy: {{ .Values.metricsParserImage.pullPolicy }}
+          ports:
+            - containerPort: 9090
+              name: metrics
+          volumeMounts:
+          - name: gnb-log-volume
+            mountPath: /oai-gnb-logs
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 50m
+              memory: 50Mi
+        {{- end }}
+
       volumes:
         - name: configuration
           configMap:
@@ -292,4 +315,8 @@ spec:
         - name: usrp
           hostPath:
             path: /dev/bus/usb/
+        {{- end }}
+        {{- if .Values.includeMetricsParser }} 
+        - name: gnb-log-volume
+          emptyDir: {}
         {{- end }}
