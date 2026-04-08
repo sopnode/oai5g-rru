@@ -1295,7 +1295,7 @@ setup_stats_monitor() {
     kubectl -n "$namespace" exec "$pod_name" -- /bin/bash -c "
     nohup /bin/bash -c 'while true; do 
         $copy_cmds
-        sleep 1;
+        sleep 0.1;
     done' >/dev/null 2>&1 &"
 }
 
@@ -1337,6 +1337,7 @@ start-gnb() {
 	    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu
 	    echo "helm install -n $NS oai-du ${RAN_DIR}"
 	    helm install -n $NS oai-du "${RAN_DIR}"
+        kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-du
 	else
 	    # ${GNB_MODE} = 'cucpup'
 	    echo "helm -n $NS install oai-cu-cp oai-cu-cp/"
@@ -1351,6 +1352,7 @@ start-gnb() {
 	    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-up
 	    echo "helm install -n $NS oai-du ${RAN_DIR}"
 	    helm install -n $NS oai-du "${RAN_DIR}"
+        kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-du
 	fi
     fi
     if [[ "$MONITORING" == "true" ]]; then
