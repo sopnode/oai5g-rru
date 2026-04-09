@@ -35,7 +35,7 @@ RUN_MODE="@DEF_RUN_MODE@" # in ['full', 'gnb-only', 'gnb-upf']
 GNB_MODE="@DEF_GNB_MODE@" # in ['monolithic', 'cudu', 'cucpup']
 export LOGS="@DEF_LOGS@" # boolean, true if logs are retrieved on pods
 export PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
-MONITORING="@DEF_MONITORING@" # boolean, true if prometheus metrics parser is generated on oai-gnb pod (monolithic)
+export MONITORING="@DEF_MONITORING@" # boolean, true if prometheus metrics parser is generated on oai-gnb pod (monolithic)
 export FLEXRIC="@DEF_FLEXRIC@" # boolean, true if flexRIC is included
 #
 export MCC="@DEF_MCC@"
@@ -1268,6 +1268,38 @@ start-flexric() {
 #################################################################################
 
 
+# Helper function to start the background copy process inside a pod
+setup_stats_monitor() {
+    local pod_label=$1
+    local files=$2
+    local namespace=$3
+    local gnb_path=$4
+
+    # Get the pod name based on the instance label
+    local pod_name=$(kubectl -n "$namespace" get pods -l "app.kubernetes.io/instance=$pod_label" -o jsonpath="{.items[0].metadata.name}" 2>/dev/null)
+    
+    if [[ -z "$pod_name" ]]; then
+        echo "Error: Could not find pod for $pod_label"
+        return 1
+    fi
+
+    echo "Configuring monitoring for $pod_name ($pod_label)..."
+
+    # Construct the copy command for the specified files
+    local copy_cmds=""
+    for f in $files; do
+        copy_cmds+="\cp $gnb_path/$f /shared-logs/$f 2>/dev/null; "
+    done
+
+    # Execute the background loop inside the pod
+    kubectl -n "$namespace" exec "$pod_name" -- /bin/bash -c "
+    nohup /bin/bash -c 'while true; do 
+        $copy_cmds
+        sleep 0.1;
+    done' >/dev/null 2>&1 &"
+}
+
+
 start-gnb() {
 
     if [[ $FLEXRIC = "true" ]]; then
@@ -1305,6 +1337,7 @@ start-gnb() {
 	    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu
 	    echo "helm install -n $NS oai-du ${RAN_DIR}"
 	    helm install -n $NS oai-du "${RAN_DIR}"
+        kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-du
 	else
 	    # ${GNB_MODE} = 'cucpup'
 	    echo "helm -n $NS install oai-cu-cp oai-cu-cp/"
@@ -1319,7 +1352,28 @@ start-gnb() {
 	    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-up
 	    echo "helm install -n $NS oai-du ${RAN_DIR}"
 	    helm install -n $NS oai-du "${RAN_DIR}"
+        kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-du
 	fi
+    fi
+    if [[ "$MONITORING" == "true" ]]; then
+        echo "Monitoring enabled. Configuring log files copying logic..."
+
+        GNB_PATH=$([[ "$RRU_TYPE" == "aw2s" ]] && echo "/opt/oai-gnb-aw2s" || echo "/opt/oai-gnb")
+        
+        case ${GNB_MODE} in
+            "monolithic")
+                setup_stats_monitor "oai-gnb" "nrL1_stats.log nrMAC_stats.log nrRRC_stats.log" "$NS" "$GNB_PATH"
+                ;;
+            "cudu")
+                setup_stats_monitor "oai-du" "nrL1_stats.log nrMAC_stats.log" "$NS" "$GNB_PATH"
+                setup_stats_monitor "oai-cu" "nrRRC_stats.log" "$NS" "$GNB_PATH"
+                ;;
+            "cucpup")
+                setup_stats_monitor "oai-du" "nrL1_stats.log nrMAC_stats.log" "$NS" "$GNB_PATH"
+                setup_stats_monitor "oai-cu-cp" "nrRRC_stats.log" "$NS" "$GNB_PATH"
+                ;;
+        esac
+        echo "Monitoring setup completed."
     fi
 }
 

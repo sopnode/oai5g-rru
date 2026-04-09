@@ -13,5 +13,7 @@
 .config.ruCPlaneMacAdd       = strenv(MAC_RU) |
 .config.ruUPlaneMacAdd       = strenv(MAC_RU) |
 
+.includeMetricsParser        = (strenv(MONITORING) == "true") |
+
 .resources.define            = (strenv(QOS_GNB) == "true") |
 .nodeName                    = strenv(NODE_GNB)
