@@ -1600,8 +1600,12 @@ run-ping() {
 #################################################################################
 
 stop-cn(){
-    echo "helm --namespace=$NS uninstall oai-5g-@mode@"
-    helm --namespace=$NS uninstall oai-5g-@mode@ 
+    for mode in basic advance; do
+        if helm status "oai-5g-$mode" -n "$NS" >/dev/null 2>&1; then
+            echo "Uninstalling oai-5g-$mode"
+            helm uninstall "oai-5g-$mode" -n "$NS"
+	fi
+    done
 }
 
 stop-flexric(){
