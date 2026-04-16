@@ -12,6 +12,7 @@ usage() {
     echo "            start-nr-ue2 |"
     echo "            start-nr-ue3 |"
     echo "            stop-cn |"
+    echo "            stop-ran |"
     echo "            stop-flexric |"
     echo "            stop-gnb |"
     echo "            stop-nr-ue |"
@@ -1650,6 +1651,18 @@ stop-nr-ue3(){
     helm -n $NS uninstall oai-nr-ue3
 }
 
+stop-ran(){
+    echo "Uninstall any OAI RAN deployment if any"
+
+    releases=(oai-flexric oai-gnb oai-du oai-cu oai-cu-up oai-cu-cp oai-nr-ue oai-nr-ue2 oai-nr-ue3)
+
+    for release in "${releases[@]}"; do
+	if helm status "$release" -n "$NS" >/dev/null 2>&1; then
+	    helm uninstall "$release" -n "$NS"
+	fi
+    done
+}
+
 stop() {
     echo "Running stop() on $NS namespace, logs=$LOGS"
 
@@ -1892,7 +1905,7 @@ if test $# -lt 1; then
     usage
 else
     case $1 in
-	start|stop|configure-all|start-cn|start-flexric|start-gnb|start-nr-ue|start-nr-ue2|start-nr-ue3|stop-cn|stop-flexric|stop-gnb|stop-nr-ue|stop-nr-ue2|stop-nr-ue3|run-ping)
+	start|stop|configure-all|start-cn|start-flexric|start-gnb|start-nr-ue|start-nr-ue2|start-nr-ue3|stop-cn|stop-ran|stop-flexric|stop-gnb|stop-nr-ue|stop-nr-ue2|stop-nr-ue3|run-ping)
 	    echo "$0: running $1"
 	    "$1"
 	;;
