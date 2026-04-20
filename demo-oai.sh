@@ -87,6 +87,8 @@ IF_NAME_F1="@DEF_LOCAL_RAN_INTERFACE@"
 IF_NAME_SBI="@DEF_LOCAL_CORE_INTERFACE@"
 IF_NAME_TS="@DEF_LOCAL_CORE_INTERFACE@"
 
+NAD_TYPE_N2N3=${NAD_TYPE_N2N3:="macvlan"}
+
 ############# Running-mode dependent parameters configuration ###############
 #
 set_if_name() {
@@ -134,6 +136,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export NETMASK_AMF_N2="${NETMASK_N2N3}"
     export ROUTES_AMF_N2=""
     export DEF_ROUTE_AMF_N2=""
+    export TYPE_AMF_N2="${NAD_TYPE_N2N3}"
     ## amf sbi IF
     export MULTUS_AMF_SBI="false"
     export IF_NAME_AMF_SBI="${IF_NAME_SBI}"
@@ -151,6 +154,7 @@ if [[ $RUN_MODE = "full" ]]; then
     export IP_UPF_N3="${SUBNET_N2N3}.202"
     export NETMASK_UPF_N3="${NETMASK_N2N3}"
     export DEF_ROUTE_UPF_N3=""
+    export TYPE_UPF_N3="${NAD_TYPE_N2N3}"
     ## upf n4 IF
     export MULTUS_UPF_N4="false"
     export IF_NAME_UPF_N4="${IF_NAME_N4}"
@@ -680,7 +684,7 @@ configure-oai-5g-@mode@() {
                   .${nf}.multus.interfaces[0].routes        = strenv(ROUTES_AMF_N2) |
                   .${nf}.multus.interfaces[0].defaultRoute  = strenv(DEF_ROUTE_AMF_N2) |
                   .${nf}.multus.interfaces[0].enabled       = (strenv(MULTUS_AMF_N2) == \"true\") |
-                  .${nf}.multus.interfaces[0].type          = \"macvlan\"
+                  .${nf}.multus.interfaces[0].type          = strenv(TYPE_AMF_N2)
                 " "${values_file}"
                 yq -i "
                   .${nf}.multus.interfaces[1].hostInterface = strenv(IF_NAME_AMF_SBI) |
@@ -701,7 +705,7 @@ configure-oai-5g-@mode@() {
                   .${nf}.multus.interfaces[0].routes        = strenv(ROUTES_UPF_N3) |
                   .${nf}.multus.interfaces[0].defaultRoute  = strenv(DEF_ROUTE_UPF_N3) |
                   .${nf}.multus.interfaces[0].enabled       = (strenv(MULTUS_UPF_N3) == \"true\") |
-                  .${nf}.multus.interfaces[0].type          = \"macvlan\"
+                  .${nf}.multus.interfaces[0].type          = strenv(TYPE_UPF_N3)
                 "  "${values_file}"
                 yq -i "
                   .${nf}.multus.interfaces[1].hostInterface = strenv(IF_NAME_UPF_N4) |
