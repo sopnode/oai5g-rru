@@ -25,7 +25,7 @@
   netmask: "${NETMASK_CU_N3}"
   defaultRoute: "${GW_CU_N3}"
   routes: "${ROUTES_CU_N3}"
-  type: macvlan
+  type: "${TYPE_GNB_N3}"
   mode: "bridge"
 
 - name: "e2"

@@ -5,7 +5,7 @@
   netmask: "${NETMASK_CUUP_N3}"
   defaultRoute: "${GW_CUUP_N3}"
   routes: "${ROUTES_CUUP_N3}"
-  type: macvlan
+  type: "${TYPE_GNB_N3}"
   mode: "bridge"
 
 - name: "f1u"
