@@ -35,6 +35,8 @@ RUN_MODE="full"
 #RUN_MODE="gnb-only"
 
 # RRU device in ["benetel1", "benetel2", "jaguar", "panther", "n300", "n320", "b210", "rfsim"]
+#RRU="benetel1"
+#RRU="benetel2"
 #RRU="jaguar"
 #RRU="panther"
 RRU="rfsim"
@@ -60,15 +62,20 @@ MONITORING="false"
 FLEXRIC="false"
 
 # Network interface name by multus to deploy CORE pods
-LOCAL_CORE_INTERFACE="net-30" 
+LOCAL_CORE_INTERFACE="net-30" # e.g., n3br for ovs
 
 # Network interface name by multus to deploy RAN pods
-LOCAL_RAN_INTERFACE="net-30" 
+LOCAL_RAN_INTERFACE="net-30" # e.g., n3br for ovs
 
 # github identity used to git pull
 RC_NAME="r2labuser"
 RC_PWD="r2labuser-pwd"
 RC_MAIL="r2labuser@turletti.com"
+
+# TYPE of NAD used for N2 and N3 interfaces.
+# By default, do not export it if macvlan is used. Only useful to change N2/N3 NAD to ovs type.
+#export NAD_TYPE_N2N3="ovs" # if not exported, default value is "macvlan"
+
 
 DIR="$(pwd)"
 COMMAND=$(basename "$0")
