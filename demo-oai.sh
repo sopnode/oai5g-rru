@@ -320,7 +320,7 @@ OAI5G_RAN="$OAI5G_CHARTS/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 #
 #RAN_TAG="2024.w48"
-RAN_TAG="2025.w34" # starting from w29 includes "Initial support for RedCap" feature in gNB
+RAN_TAG="2026.w16"
 GNB_NAME="gNB-r2lab"
 
 # DU/CU SPLIT parameters
