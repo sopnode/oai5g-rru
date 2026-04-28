@@ -357,6 +357,7 @@ OAI5G_CORE="${OAI5G_CHARTS}/oai-5g-core"
 OAI5G_@MODE@="${OAI5G_CORE}/oai-5g-@mode@"
 
 export CN_DEFAULT_GW=""
+export CN_TAG="v2.2.1"
 
 ################################ oai-gnb chart parameters ########################
 OAI5G_RAN="${OAI5G_CHARTS}/oai-5g-ran"
@@ -662,8 +663,11 @@ configure-oai-5g-@mode@() {
 	export NODE_NAME=$(eval echo \"\$NODE_$NF_UPPER\")
 	export ENABLED=$(eval echo \"\$ENABLED_$NF_UPPER\")
 
-	# Proceed with your yq command
+	# Set NODE_NAME for each OAI CN NF
 	yq -i ".${nf}.nodeName = strenv(NODE_NAME)" "${values_file}"
+
+	# Set OAI repo version for each OAI CN NF
+	yq -i ".${nf}.nfimage.version = strenv(CN_TAG)" "${values_file}"
 
         # ---- start / tcpdump / sharedvolume ----
         yq -i "
