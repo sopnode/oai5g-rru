@@ -67,6 +67,37 @@ spec:
       nodeName: {{ .Values.nodeName }}
       {{- end }}
       initContainers:
+
+      # ---------------------------------------------------------------
+      # CORRECTION 1: init-gnb-workdir
+      # Copies the full content of /opt/oai-gnb-aw2s (bin/, etc/, libs)
+      # from the image into the gnb-workdir emptyDir volume, so that
+      # mounting gnb-workdir on /opt/oai-gnb-aw2s in the gnb container
+      # does not shadow the image binaries and libraries.
+      # This container MUST run FIRST, before config-patcher, so that
+      # gnb-workdir/etc/ exists and is ready to receive the patched config.
+      # Note: the WORKDIR for this chart is /opt/oai-gnb-aw2s, not
+      # /opt/oai-gnb as in oai-gnb and oai-du.
+      # ---------------------------------------------------------------
+      {{- if .Values.includeMetricsParser }}
+        - name: init-gnb-workdir
+          image: "{{ .Values.nfimage.repository }}:{{ .Values.nfimage.version }}"
+          imagePullPolicy: {{ .Values.nfimage.pullPolicy }}
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - |
+              echo "Populating gnb-workdir from image..."
+              cp -a /opt/oai-gnb-aw2s/. /opt-gnb-workdir/
+              echo "Done:"
+              ls /opt-gnb-workdir/
+          volumeMounts:
+            - name: gnb-workdir
+              mountPath: /opt-gnb-workdir
+          resources:
+            requests: { cpu: "10m", memory: "100Mi" }
+            limits:   { cpu: "100m", memory: "200Mi" }
+      {{- end }}
+
       {{- if .Values.config.enableE2 }}
         - name: wait-for-ric
           image: docker.io/oaisoftwarealliance/oai-tcpdump-init:alpine-3.20
@@ -89,6 +120,7 @@ spec:
             requests: { cpu: "1m", memory: "50Mi" }
             limits:   { cpu: "1m", memory: "50Mi" }
       {{- end }}{{- end }}
+
         - name: config-patcher
           image: docker.io/mikefarah/yq:4.47.2
           command: [ "sh", "-c" ]
@@ -184,13 +216,65 @@ spec:
               value: |
               {{ toYaml .Values.config.plmn_list | nindent 16 }}
           volumeMounts:
-            - name: shared-data
-              mountPath: /tmp/config_patch
             - name: configuration
               mountPath: /tmp/config
+            # CORRECTION 2: config-patcher output path.
+            # When includeMetricsParser=true, gnb-workdir is mounted on
+            # /opt/oai-gnb-aw2s in the gnb container. The patched gnb.yaml
+            # must land directly inside gnb-workdir at the etc/ subPath so
+            # the gnb container finds it at /opt/oai-gnb-aw2s/etc/gnb.yaml.
+            # When includeMetricsParser=false, shared-data is used as before,
+            # mounted on /opt/oai-gnb-aw2s/etc in the gnb container.
+            {{- if .Values.includeMetricsParser }}
+            - name: gnb-workdir
+              mountPath: /tmp/config_patch
+              subPath: etc
+            {{- else }}
+            - name: shared-data
+              mountPath: /tmp/config_patch
+            {{- end }}
           resources:
             requests: { cpu: "1m", memory: "50Mi" }
             limits:   { cpu: "1m", memory: "50Mi" }
+
+      # ---------------------------------------------------------------
+      # CORRECTION 3: setup-log-symlinks
+      # Creates symlinks in gnb-workdir pointing to gnb-log-volume for
+      # each stats file. The gNB writes through its usual paths
+      # (WORKDIR /opt/oai-gnb-aw2s) → writes land in gnb-log-volume
+      # → metrics-parser reads directly from that same volume.
+      # Zero copy, zero contention.
+      # Must run AFTER init-gnb-workdir (gnb-workdir must be populated)
+      # and AFTER config-patcher (etc/gnb.yaml must already be in place).
+      # ---------------------------------------------------------------
+      {{- if .Values.includeMetricsParser }}
+        - name: setup-log-symlinks
+          image: docker.io/oaisoftwarealliance/oai-tcpdump-init:alpine-3.20
+          imagePullPolicy: IfNotPresent
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - |
+              set -e
+              echo "Creating stat-file symlinks in gnb-workdir -> gnb-log-volume..."
+              for f in nrMAC_stats.log nrL1_stats.log nrRRC_stats.log; do
+                touch /shared-logs/$f
+                ln -sf /shared-logs/$f /opt-gnb-workdir/$f
+                echo "  /opt-gnb-workdir/$f -> /shared-logs/$f"
+              done
+              echo "Symlinks done:"
+              ls -la /opt-gnb-workdir/*.log
+              echo "Config check:"
+              ls -la /opt-gnb-workdir/etc/
+          volumeMounts:
+            - name: gnb-log-volume
+              mountPath: /shared-logs
+            - name: gnb-workdir
+              mountPath: /opt-gnb-workdir
+          resources:
+            requests: { cpu: "1m", memory: "10Mi" }
+            limits:   { cpu: "1m", memory: "10Mi" }
+      {{- end }}
+
       containers:
         - name: gnb
           image: "{{ .Values.nfimage.repository }}:{{ .Values.nfimage.version }}"
@@ -201,20 +285,32 @@ spec:
           hostIPC: true
           {{- end }}
           volumeMounts:
-            - name: shared-data
-              mountPath: /opt/oai-gnb-aw2s/etc
-          {{- if eq .Values.config.radio "b2xx" }}
-            - name: radio
-              mountPath: /dev/bus/usb/
-          {{- end }}
-          {{- if eq .Values.config.radio "vrtsim" }}
-            - name: shared-data
-              mountPath: /tmp
-          {{- end }}
-          {{- if .Values.includeMetricsParser }}
+            {{- if .Values.includeMetricsParser }}
+            # gnb-workdir is pre-populated with the full image content by
+            # init-gnb-workdir, has the patched gnb.yaml in etc/ written by
+            # config-patcher (via subPath: etc), and contains symlinks to
+            # gnb-log-volume for each stats file created by setup-log-symlinks.
+            # Mounting it on /opt/oai-gnb-aw2s gives the gNB its full
+            # environment while routing stats writes to gnb-log-volume
+            # transparently, with zero periodic copy.
+            - name: gnb-workdir
+              mountPath: /opt/oai-gnb-aw2s
             - name: gnb-log-volume
               mountPath: /shared-logs
-          {{- end}}
+            {{- else }}
+            # Original behaviour when metrics-parser is disabled:
+            # shared-data carries the patched gnb.yaml from config-patcher.
+            - name: shared-data
+              mountPath: /opt/oai-gnb-aw2s/etc
+            {{- end }}
+            {{- if eq .Values.config.radio "b2xx" }}
+            - name: radio
+              mountPath: /dev/bus/usb/
+            {{- end }}
+            {{- if eq .Values.config.radio "vrtsim" }}
+            - name: shared-data
+              mountPath: /tmp
+            {{- end }}
           env:
           - name: TZ
             value: {{ .Values.config.timeZone | quote }}
@@ -291,8 +387,11 @@ spec:
             - containerPort: 9090
               name: metrics
           volumeMounts:
-          - name: gnb-log-volume
-            mountPath: /oai-gnb-logs
+            # The metrics-parser reads directly from gnb-log-volume.
+            # Stats files arrive there via the gNB symlinks.
+            # No periodic copy → no contention.
+            - name: gnb-log-volume
+              mountPath: /oai-gnb-logs
           resources:
             limits:
               cpu: 100m
@@ -318,7 +417,15 @@ spec:
           persistentVolumeClaim:
             claimName: shared-pvc
         {{- end }}
-        {{- if .Values.includeMetricsParser }} 
+        {{- if .Values.includeMetricsParser }}
+        # gnb-log-volume: volume shared between gnb and metrics-parser.
+        # The gNB writes to it via symlinks; metrics-parser reads directly.
         - name: gnb-log-volume
+          emptyDir: {}
+        # gnb-workdir: clone of the image WORKDIR /opt/oai-gnb-aw2s,
+        # pre-populated by init-gnb-workdir, config-patched by config-patcher
+        # (via subPath: etc), and containing the symlinks to gnb-log-volume
+        # created by setup-log-symlinks.
+        - name: gnb-workdir
           emptyDir: {}
         {{- end }}
