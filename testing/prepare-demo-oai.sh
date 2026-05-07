@@ -19,7 +19,7 @@ NS="oai-ci"
 
 # Repo/tag for oai5g-rru scripts
 REPO_OAI5G_RRU="https://github.com/sopnode/oai5g-rru.git"
-TAG_OAI5G_RRU="main"
+TAG_OAI5G_RRU="2026.w18"
 
 # Repo/tag for OAI charts
 REPO_OAI_CN5G_FED="https://gitlab.eurecom.fr/turletti/charts.git"
