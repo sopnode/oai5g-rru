@@ -17,11 +17,6 @@ gNBs:
     nr_cellid: 12345678
     do_CSIRS: 1
     do_SRS: 1
-    pdsch_AntennaPorts_N1: 2
-    pdsch_AntennaPorts_N2: 1
-    pdsch_AntennaPorts_XP: 2
-    pusch_AntennaPorts: 2
-    maxMIMO_layers: 2
     ##### Physical parameters:
     min_rxtxtime: 6
     servingCellConfigCommon:
@@ -151,8 +146,8 @@ L1s:
     # pucch0_dtx_threshold = 150
 RUs:
   - local_rf: yes
-    nb_tx: 2
-    nb_rx: 2
+    nb_tx: 1
+    nb_rx: 1
     att_tx: 0
     att_rx: 0
     bands: [78]
