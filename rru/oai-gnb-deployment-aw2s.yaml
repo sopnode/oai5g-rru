@@ -330,15 +330,15 @@ spec:
           {{- end }}
           {{- if eq .Values.config.radio "b2xx" }}
             - name: USE_B2XX
-              value: true
+              value: "true"
           {{- end }}
           {{- if eq .Values.config.radio "x3xx" }}
             - name: USE_X3XX
-              value: true
+              value: "true"
           {{- end }}
           {{- if eq .Values.config.radio "n3xx" }}
             - name: USE_N3XX
-              value: true
+              value: "true"
           {{- end }}
           {{- if .Values.resources.define }}
           resources:
@@ -359,12 +359,6 @@ spec:
           {{- if not .Values.start.gnb }}
           command: [ "/bin/sleep", "infinity" ]
           {{- end }}
-          env:
-            - name: TZ
-              value: {{ .Values.config.timeZone | quote }}
-            - name: USE_ADDITIONAL_OPTIONS
-              value: {{ .Values.config.useAdditionalOptions | quote }}
-
         {{- if .Values.includeTcpDumpContainer }}
         - name: tcpdump
           image: "{{ .Values.tcpdumpimage.repository }}:{{ .Values.tcpdumpimage.version }}"
