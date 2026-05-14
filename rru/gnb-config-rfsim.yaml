@@ -19,7 +19,7 @@ gNBs:
     do_SRS: 1
     pdsch_AntennaPorts_N1: 2
     pdsch_AntennaPorts_N2: 1
-    pdsch_AntennaPorts_XP: 2
+    pdsch_AntennaPorts_XP: 1
     pusch_AntennaPorts: 2
     maxMIMO_layers: 2
     ##### Physical parameters:
