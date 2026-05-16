@@ -162,7 +162,12 @@ RUs:
     sf_extension: 0
     sdr_addrs: serial=XXXXXXX
 rfsimulator:
-  serveraddr: server
+  -
+    serveraddr: server
+    serverport: 4043
+    options: ["chanmod"]
+    modelname: AWGN
+    IQfile: /tmp/rfsimulator.iqs
 security:
   # preferred ciphering algorithms
   # the first one of the list that an UE supports in chosen
