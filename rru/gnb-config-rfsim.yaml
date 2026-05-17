@@ -166,26 +166,26 @@ rfsimulator:
     serveraddr: server
     serverport: 4043
     options: ["chanmod"]
-    modelname: EPA
+    modelname: AWGN
     IQfile: /tmp/rfsimulator.iqs
 channelmod:
   max_chan: 10
   modellist: modellist_rfsimu_1
   modellist_rfsimu_1:
     - model_name: rfsimu_channel_enB0
-      type: EPA
+      type: AWGN
       ploss_dB: 0
       noise_power_dB: -10
-      forgetfact: 0.5
+      forgetfact: 0.0
       offset: 0
-      ds_tdl: 0.1
+      ds_tdl: 0
     - model_name: rfsimu_channel_ue0
-      type: EPA
+      type: AWGN
       ploss_dB: 0
       noise_power_dB: -10
-      forgetfact: 0.5
+      forgetfact: 0.0
       offset: 0
-      ds_tdl: 0.1
+      ds_tdl: 0
 security:
   # preferred ciphering algorithms
   # the first one of the list that an UE supports in chosen
