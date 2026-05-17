@@ -173,19 +173,19 @@ channelmod:
   modellist: modellist_rfsimu_1
   modellist_rfsimu_1:
     - model_name: rfsimu_channel_enB0
-      type: TDL_A
+      type: Raileigh1
       ploss_dB: 0
       noise_power_dB: -10
-      forgetfact: 0
+      forgetfact: 0.5
       offset: 0
-      ds_tdl: 0.1
+      ds_tdl: 0
     - model_name: rfsimu_channel_ue0
-      type: TD_LA
+      type: Raileigh1
       ploss_dB: 0
       noise_power_dB: -10
-      forgetfact: 0
+      forgetfact: 0.5
       offset: 0
-      ds_tdl: 0.1
+      ds_tdl: 0
 security:
   # preferred ciphering algorithms
   # the first one of the list that an UE supports in chosen
