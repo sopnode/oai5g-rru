@@ -1,4 +1,4 @@
-#!/bin/bash
+s#!/bin/bash
 
 usage() {
     echo "USAGE:"
@@ -445,7 +445,7 @@ export GW_DU_E2=""
 export ROUTES_DU_E2="" 
 export IF_NAME_DU_E2="${IF_NAME_E2}"
 #
-export QOS_DU="true"
+export QOS_DU="false"
 export NODE_DU="${NODE_GNB}"
 #
 ########## CU specific part ##############
@@ -583,7 +583,7 @@ export GW_GNB_E2=""
 export ROUTES_GNB_E2="" 
 export IF_NAME_GNB_E2="${IF_NAME_E2}"
 #
-export QOS_GNB="true"
+export QOS_GNB="false"
 
 
 ########################### oai-flexric chart parameters #####################
