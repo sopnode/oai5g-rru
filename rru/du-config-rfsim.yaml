@@ -20,6 +20,13 @@ gNBs:
           - sst: 1
             sd: 0xffffff
     nr_cellid: 12345678
+    do_CSIRS: 1
+    do_SRS: 1
+    pdsch_AntennaPorts_N1: 2
+    pdsch_AntennaPorts_N2: 1
+    pdsch_AntennaPorts_XP: 1
+    pusch_AntennaPorts: 2
+    maxMIMO_layers: 2
 
     #////////// Physical parameters:
     min_rxtxtime: 6
@@ -166,7 +173,30 @@ RUs:
     clock_src: "internal"
 
 rfsimulator:
-  serveraddr: server
+  -
+    serveraddr: server
+    serverport: 4043
+    options: ["chanmod"]
+    modelname: AWGN
+    IQfile: /tmp/rfsimulator.iqs
+channelmod:
+  max_chan: 10
+  modellist: modellist_rfsimu_1
+  modellist_rfsimu_1:
+    - model_name: rfsimu_channel_enB0
+      type: AWGN
+      ploss_dB: 0
+      noise_power_dB: -10
+      forgetfact: 0.0
+      offset: 0
+      ds_tdl: 0
+    - model_name: rfsimu_channel_ue0
+      type: AWGN
+      ploss_dB: 0
+      noise_power_dB: -10
+      forgetfact: 0.0
+      offset: 0
+      ds_tdl: 0
 
 log_config:
   global_log_level: "info"

@@ -309,6 +309,10 @@ spec:
             - name: shared-data
               mountPath: /opt/oai-gnb-aw2s/etc
             {{- end }}
+            {{- if .Values.csi.enabled }}
+            - name: csi-output
+              mountPath: /data/csi
+            {{- end }}
             {{- if eq .Values.config.usrp "b2xx" }}
             - name: usrp
               mountPath: /dev/bus/usb/
@@ -320,6 +324,12 @@ spec:
             value: {{ .Values.config.useAdditionalOptions }}
           - name: OAI_GDBSTACKS
             value: "{{ .Values.config.gdbstack }}"
+          {{- if .Values.csi.enabled }}
+          - name: CSI_LOGGING_ENABLED
+            value: "1"
+          - name: CSI_OUTPUT_DIR
+            value: "/data/csi"
+          {{- end }}
           {{- if eq .Values.config.usrp "b2xx" }}
             - name: USE_B2XX
               value: true
@@ -409,6 +419,12 @@ spec:
             name: {{ .Chart.Name }}-configmap
         - name: shared-data
           emptyDir: {}
+        {{- if .Values.csi.enabled }}
+        - name: csi-output
+          hostPath:
+            path: /data/csi
+            type: DirectoryOrCreate
+        {{- end }}
         {{- if eq .Values.config.usrp "b2xx" }}
         - name: usrp
           hostPath:
