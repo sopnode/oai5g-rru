@@ -121,6 +121,8 @@ function update() {
     MONITORING="${MONITORING,,}"
     FLEXRIC="${FLEXRIC,,}"
 
+    echo "@@@@@@@@@@@@@@@@@@@@ CSI=$CSI"
+
     # if node is a sopnode-w or sopnode-l1, add the "-v30" suffix
     if [[ "$NODE_AMF_UPF" == "sopnode-l1" || "$NODE_AMF_UPF" == "sopnode-w1" ]]; then
 	NODE_AMF_UPF="${NODE_AMF_UPF}-v30"
