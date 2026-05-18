@@ -1,4 +1,4 @@
-s#!/bin/bash
+#!/bin/bash
 
 usage() {
     echo "USAGE:"
