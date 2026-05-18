@@ -61,6 +61,9 @@ PCAP="false"
 MONITORING="false"
 FLEXRIC="false"
 
+# CSI ENABLED flag, use export to set it.
+export CSI="true"
+
 # Network interface name by multus to deploy CORE pods
 LOCAL_CORE_INTERFACE="net-30" # e.g., n3br for ovs
 

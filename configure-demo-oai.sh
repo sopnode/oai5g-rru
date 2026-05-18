@@ -121,7 +121,7 @@ function update() {
     MONITORING="${MONITORING,,}"
     FLEXRIC="${FLEXRIC,,}"
 
-    echo "@@@@@@@@@@@@@@@@@@@@ CSI=$CSI"
+    CSI=${CSI:="false"}
 
     # if node is a sopnode-w or sopnode-l1, add the "-v30" suffix
     if [[ "$NODE_AMF_UPF" == "sopnode-l1" || "$NODE_AMF_UPF" == "sopnode-w1" ]]; then
@@ -151,6 +151,7 @@ s|@DEF_LOGS@|$LOGS|
 s|@DEF_PCAP@|$PCAP|
 s|@DEF_MONITORING@|$MONITORING|
 s|@DEF_FLEXRIC@|$FLEXRIC|
+s|@DEF_CSI@|$CSI|
 s|@DEF_LOCAL_CORE_INTERFACE@|$LOCAL_CORE_INTERFACE|
 s|@DEF_LOCAL_RAN_INTERFACE@|$LOCAL_RAN_INTERFACE|
 s|@DEF_MCC@|${MCC}|g

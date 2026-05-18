@@ -39,6 +39,8 @@ export PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
 export MONITORING="@DEF_MONITORING@" # boolean, true if prometheus metrics parser is generated on oai-gnb pod (monolithic)
 export FLEXRIC="@DEF_FLEXRIC@" # boolean, true if flexRIC is included
 #
+export CSI="@DEF_CSI@"
+#
 export MCC="@DEF_MCC@"
 export MNC="@DEF_MNC@"
 export TAC="@DEF_TAC@"
