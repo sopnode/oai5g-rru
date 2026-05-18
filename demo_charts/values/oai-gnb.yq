@@ -16,7 +16,7 @@
 .config.sdr_addrs            = strenv(SDR_ADDRS) |
 
 # CSI ENABLED flag
-.csi.enabled                 = strenv(CSI) == "true") |
+.csi.enabled                 = (strenv(CSI) == "true") |
 
 .start.tcpdump               = (strenv(PCAP) == "true") |
 .includeTcpDumpContainer     = (strenv(LOGS) == "true") |
