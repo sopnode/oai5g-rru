@@ -16,7 +16,12 @@
 .config.sdr_addrs            = strenv(SDR_ADDRS) |
 
 # CSI ENABLED flag
-.csi.enabled                 = (strenv(CSI) == "true") |
+.csi.enabled                 = (strenv(CSI_ENABLED) == "true") |
+.csi.granularity             = strenv(CSI_GRANULARITY) |
+.csi.antenna_selection       = strenv(CSI_ANTENNA_SELECTION) |
+.csi.port_selection          = strenv(CSI_PORT_SELECTION) |
+.csi.subcarrier_sampling     = strenv(CSI_SUBCARRIER_SAMPLING) |
+.csi.output_dir              = strenv(CSI_OUTPUT_DIR) |
 
 .start.tcpdump               = (strenv(PCAP) == "true") |
 .includeTcpDumpContainer     = (strenv(LOGS) == "true") |
