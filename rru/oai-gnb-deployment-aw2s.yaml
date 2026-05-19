@@ -305,7 +305,7 @@ spec:
             {{- end }}
             {{- if .Values.csi.enabled }}
             - name: csi-output
-              mountPath: /data/csi
+              mountPath: {{ .Values.csi.output_dir }}
             {{- end }}
             {{- if eq .Values.config.radio "b2xx" }}
             - name: radio
@@ -326,8 +326,16 @@ spec:
           - name: CSI_LOGGING_ENABLED
             value: "1"
           - name: CSI_OUTPUT_DIR
-            value: "/data/csi"
-          {{- end }}
+            value: "{{ .Values.csi.output_dir }}"
+          - name: CSI_GRANULARITY
+            value: "{{ .Values.csi.granularity }}"
+          - name: CSI_ANTENNA_SELECTION
+            value: "{{ .Values.csi.antenna_selection }}"
+          - name: CSI_PORT_SELECTION
+            value: "{{ .Values.csi.port_selection }}"
+          - name: CSI_SUBCARRIER_SAMPLING
+            value: "{{ .Values.csi.subcarrier_sampling }}"
+           {{- end }}
           {{- if eq .Values.config.radio "b2xx" }}
             - name: USE_B2XX
               value: "true"
@@ -414,7 +422,7 @@ spec:
         {{- if .Values.csi.enabled }}
         - name: csi-output
           hostPath:
-            path: /data/csi
+            path: {{ .Values.csi.output_dir }}
             type: DirectoryOrCreate
         {{- end }}
         {{- if eq .Values.config.radio "b2xx" }}

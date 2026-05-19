@@ -39,7 +39,12 @@ export PCAP="@DEF_PCAP@" # boolean, true if pcap are generated on pods
 export MONITORING="@DEF_MONITORING@" # boolean, true if prometheus metrics parser is generated on oai-gnb pod (monolithic)
 export FLEXRIC="@DEF_FLEXRIC@" # boolean, true if flexRIC is included
 #
-export CSI="@DEF_CSI@"
+export CSI_ENABLED="@DEF_CSI_ENABLED@"
+export CSI_OUTPUT_DIR="@DEF_CSI_OUTPUT_DIR@"
+export CSI_GRANULARITY="@DEF_CSI_GRANULARITY@"
+export CSI_ANTENNA_SELECTION="@DEF_CSI_ANTENNA_SELECTION@"
+export CSI_PORT_SELECTION="@DEF_CSI_PORT_SELECTION@"
+export CSI_SUBCARRIER_SAMPLING="@DEF_CSI_SUBCARRIER_SAMPLING@"
 #
 export MCC="@DEF_MCC@"
 export MNC="@DEF_MNC@"
@@ -627,7 +632,7 @@ export IP_NRUE="${SUBNET_NRUE}.210"
 export IP_NRUE2="${SUBNET_NRUE}.211"
 export IP_NRUE3="${SUBNET_NRUE}.212"
 export ADD_OPTIONS_NRUE="--rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time"
-if [[ "$CSI" == "true" ]]; then
+if [[ "$CSI_ENABLED" == "true" ]]; then
     # if CSI logging is enabled, use the following option to trigger CSI estimation at the gNB
     ADD_OPTIONS_NRUE+=" --ue-nb-ant-tx 2"
 fi

@@ -61,8 +61,13 @@ PCAP="false"
 MONITORING="false"
 FLEXRIC="false"
 
-# CSI ENABLED flag, use export to set it.
-export CSI="true"
+# CSI parameters, use export to configure them.
+export CSI_ENABLED="true"
+export CSI_OUTPUT_DIR="/data/csi"
+export CSI_GRANULARITY="rb" # "rb" (per-RB) or "subcarrier" (per-subcarrier)
+export CSI_ANTENNA_SELECTION="all" # "all" or "0,1,2,3"
+export CSI_PORT_SELECTION="all" # "all" or "0,1"
+export CSI_SUBCARRIER_SAMPLING="1" # 1=all, 2=every-2nd, 3=every-3rd, 6, 12
 
 # Network interface name by multus to deploy CORE pods
 LOCAL_CORE_INTERFACE="net-30" # e.g., n3br for ovs

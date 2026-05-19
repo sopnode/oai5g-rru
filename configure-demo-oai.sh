@@ -122,7 +122,12 @@ function update() {
     FLEXRIC="${FLEXRIC,,}"
 
     # Handle differently CSI ENABLED parameter set using export
-    CSI=${CSI:="false"}
+    CSI_ENABLED=${CSI_ENABLED:="false"}
+    CSI_OUTPUT_DIR=${CSI_OUTPUT_DIR:="/data/csi"}
+    CSI_GRANULARITY=${CSI_GRANULARITY:="rb"}
+    CSI_ANTENNA_SELECTION=${CSI_ANTENNA_SELECTION:="all"}
+    CSI_PORT_SELECTION=${CSI_PORT_SELECTION:="all"}
+    CSI_SUBCARRIER_SAMPLING=${CSI_SUBCARRIER_SAMPLING:="1"}
 
     # if node is a sopnode-w or sopnode-l1, add the "-v30" suffix
     if [[ "$NODE_AMF_UPF" == "sopnode-l1" || "$NODE_AMF_UPF" == "sopnode-w1" ]]; then
