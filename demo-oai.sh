@@ -363,7 +363,7 @@ export CN_TAG="v2.2.1"
 OAI5G_RAN="${OAI5G_CHARTS}/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 
-export RAN_TAG=
+export RAN_TAG=2026.w20
 
 # Default GNB REPO/TAG (can be overrided in rru/${rru}.env)
 export GNB_REPO="${R2LAB_REPO}/oai-gnb"
