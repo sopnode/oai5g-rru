@@ -445,7 +445,7 @@ export GW_DU_E2=""
 export ROUTES_DU_E2="" 
 export IF_NAME_DU_E2="${IF_NAME_E2}"
 #
-export QOS_DU="true"
+export QOS_DU="false"
 export NODE_DU="${NODE_GNB}"
 #
 ########## CU specific part ##############
@@ -482,7 +482,7 @@ export ROUTES_CU_E2=""
 export IF_NAME_CU_E2="${IF_NAME_E2}"
 #
 export ADD_OPTIONS_CU="--log_config.global_log_options level,nocolor,time"
-export QOS_CU="true"
+export QOS_CU="false"
 export NODE_CU="${NODE_GNB}" 
 
 # NODE_CU is defined above and also the same for CUCP/CUUP
@@ -522,7 +522,7 @@ export IF_NAME_CUCP_F1C="${IF_NAME_F1}"
 #
 export ADD_OPTIONS_CUCP="--log_config.global_log_options level,nocolor,time"
 export NAME_CUCP="oai-cu-cp"
-export QOS_CUCP="true"
+export QOS_CUCP="false"
 export NODE_CUCP="${NODE_CU}"
 #
 ########## CU-UP specific part ##############
@@ -560,7 +560,7 @@ export IF_NAME_CUUP_F1U="${IF_NAME_F1}"
 #
 export ADD_OPTIONS_CUUP="--log_config.global_log_options level,nocolor,time"
 export HOST_CUCP="${IP_CUCP_E1}" # "oai-cu-cp" 
-export QOS_CUUP="true"
+export QOS_CUUP="false"
 export NODE_CUUP="${NODE_CU}"
 #
 if [[ $GNB_MODE = 'cucpup' ]]; then
@@ -583,7 +583,7 @@ export GW_GNB_E2=""
 export ROUTES_GNB_E2="" 
 export IF_NAME_GNB_E2="${IF_NAME_E2}"
 #
-export QOS_GNB="true"
+export QOS_GNB="false"
 
 
 ########################### oai-flexric chart parameters #####################
@@ -597,7 +597,7 @@ export IF_NAME_FLEXRIC_E2="${IF_NAME_E2}"
 export IP_FLEXRIC_E2="${SUBNET_E2}.90"
 export NETMASK_FLEXRIC_E2="${NETMASK_E2}"
 export ROUTES_FLEXRIC_E2=""
-export QOS_FLEXRIC="true"
+export QOS_FLEXRIC="false"
 export NODE_FLEXRIC="${NODE_GNB}"
 #
 # for all gnb/du/cu charts
