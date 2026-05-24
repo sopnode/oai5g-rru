@@ -337,6 +337,8 @@ spec:
             value: "{{ .Values.csi.port_selection }}"
           - name: CSI_SUBCARRIER_SAMPLING
             value: "{{ .Values.csi.subcarrier_sampling }}"
+          - name: CSI_FLUSH_CORE
+            value: "{{ .Values.csi.flush_core }}"
           {{- end }}
           {{- if eq .Values.config.usrp "b2xx" }}
             - name: USE_B2XX
