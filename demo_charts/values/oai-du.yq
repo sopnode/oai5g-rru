@@ -22,6 +22,7 @@
 .csi.port_selection          = strenv(CSI_PORT_SELECTION) |
 .csi.subcarrier_sampling     = strenv(CSI_SUBCARRIER_SAMPLING) |
 .csi.output_dir              = strenv(CSI_OUTPUT_DIR) |
+.csi.flush_core              = strenv(CSI_FLUSH_CORE) |
 
 .start.tcpdump               = (strenv(PCAP) == "true") |
 .includeTcpDumpContainer     = (strenv(LOGS) == "true") |
