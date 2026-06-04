@@ -371,7 +371,7 @@ export CN_TAG="v2.2.1"
 OAI5G_RAN="${OAI5G_CHARTS}/oai-5g-ran"
 R2LAB_REPO="docker.io/r2labuser"
 
-export RAN_TAG="2026.w11" # "2025.w52"
+export RAN_TAG="2026.w22" # "2025.w52"
 
 # Default GNB REPO/TAG (can be overrided in rru/${rru}.env)
 export GNB_REPO="${R2LAB_REPO}/oai-gnb"
@@ -1376,26 +1376,6 @@ start-gnb() {
         kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-du
 	fi
     fi
-#    if [[ "$MONITORING" == "true" ]]; then
-#        echo "Monitoring enabled. Configuring log files copying logic..."
-#
-#        GNB_PATH=$([[ "$RRU_TYPE" == "aw2s" ]] && echo "/opt/oai-gnb-aw2s" || echo "/opt/oai-gnb")
-#        
-#        case ${GNB_MODE} in
-#            "monolithic")
-#                setup_stats_monitor "oai-gnb" "nrL1_stats.log nrMAC_stats.log nrRRC_stats.log" "$NS" "$GNB_PATH"
-#                ;;
-#            "cudu")
-#                setup_stats_monitor "oai-du" "nrL1_stats.log nrMAC_stats.log" "$NS" "$GNB_PATH"
-#                setup_stats_monitor "oai-cu" "nrRRC_stats.log" "$NS" "$GNB_PATH"
-#                ;;
-#            "cucpup")
-#                setup_stats_monitor "oai-du" "nrL1_stats.log nrMAC_stats.log" "$NS" "$GNB_PATH"
-#                setup_stats_monitor "oai-cu-cp" "nrRRC_stats.log" "$NS" "$GNB_PATH"
-#                ;;
-#        esac
-#        echo "Monitoring setup completed."
-#    fi
 }
 
 #################################################################################
