@@ -15,9 +15,9 @@ gNBs:
     nr_cellid: 1
 
     pdsch_AntennaPorts_XP: 2
-    pusch_AntennaPorts: 1 # with 2, instabilities appear
+    pusch_AntennaPorts: 1 # with 2, instabilities appear if do_SRS
     do_CSIRS: 1
-    do_SRS: 1 # force SRS to enable CSI logging
+    do_SRS: periodic # force SRS to enable CSI logging (none,periodic,aperiodic)
 
     pdcch_ConfigSIB1:
       - controlResourceSetZero: 11
@@ -96,6 +96,8 @@ MACRLCs:
     pusch_TargetSNRx10: 290 # was 200. with 29dB, TPC forces UE to increase Tx power to reach 29dB, as 256QAM requires 28-30dB (for PUSCH)
     pucch_TargetSNRx10: 200 # (for PUCCH)
     ulsch_max_frame_inactivity: 0
+    ul_bler_target_upper: 0.02
+    ul_bler_target_lower: 0.005
 
 L1s:
   - num_cc: 1
