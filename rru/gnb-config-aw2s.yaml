@@ -15,9 +15,9 @@ gNBs:
     nr_cellid: 1
 
     pdsch_AntennaPorts_XP: 2
-    pusch_AntennaPorts: 2
+    pusch_AntennaPorts: 1 # with 2, instabilities appear
     do_CSIRS: 1
-    do_SRS: 1
+    do_SRS: 1 # force SRS to enable CSI logging
 
     pdcch_ConfigSIB1:
       - controlResourceSetZero: 11
@@ -96,6 +96,7 @@ MACRLCs:
     pusch_TargetSNRx10: 200
     pucch_TargetSNRx10: 200
     ulsch_max_frame_inactivity: 0
+    ul_max_mcs: 16 # added option to check if this improves the UL link (BER/HARQ observed without)
 
 L1s:
   - num_cc: 1
