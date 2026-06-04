@@ -60,10 +60,10 @@ gNBs:
         msg1_SubcarrierSpacing: 1
         restrictedSetConfig: 0
         msg3_DeltaPreamble: 1
-        p0_NominalWithGrant: -96
+        p0_NominalWithGrant: -76 # was -96. Force UE to transmit with 20dB more power to increase SNR UL (17 ->30 dB)
         pucchGroupHopping: 0
         hoppingId: 40
-        p0_nominal: -96
+        p0_nominal: -90 # was -96. Same change than above for PRACH/PUCCH, more moderate here to prevent inter-UE interference
         ssb_PositionsInBurst_PR: 2 
         ssb_PositionsInBurst_Bitmap: 0x1
         ssb_periodicityServingCell: 2
@@ -93,10 +93,9 @@ MACRLCs:
   - num_cc: 1
     tr_s_preference: "local_L1"
     tr_n_preference: "local_RRC"
-    pusch_TargetSNRx10: 200
-    pucch_TargetSNRx10: 200
+    pusch_TargetSNRx10: 290 # was 200. with 29dB, TPC forces UE to increase Tx power to reach 29dB, as 256QAM requires 28-30dB (for PUSCH)
+    pucch_TargetSNRx10: 200 # (for PUCCH)
     ulsch_max_frame_inactivity: 0
-    ul_max_mcs: 16 # added option to check if this improves the UL link (BER/HARQ observed without)
 
 L1s:
   - num_cc: 1
