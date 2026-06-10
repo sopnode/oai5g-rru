@@ -15,7 +15,7 @@ gNBs:
     nr_cellid: 1
 
     min_rxtxtime: 5
-    do_SRS: 0
+    do_SRS: none
     force_256qam_off: 1    
     pdsch_AntennaPorts_N1: 1
     pdsch_AntennaPorts_XP: 1
