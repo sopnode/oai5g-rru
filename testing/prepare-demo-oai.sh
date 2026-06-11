@@ -62,7 +62,7 @@ MONITORING="false"
 FLEXRIC="false"
 
 # CSI parameters, use export to configure them.
-export CSI_ENABLED="true"
+export CSI_ENABLED="false"
 export CSI_OUTPUT_DIR="/data/csi"
 export CSI_GRANULARITY="rb" # "rb" (per-RB) or "subcarrier" (per-subcarrier)
 export CSI_ANTENNA_SELECTION="all" # "all" or "0,1,2,3"
