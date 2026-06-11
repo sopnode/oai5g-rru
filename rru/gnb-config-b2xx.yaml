@@ -15,7 +15,7 @@ gNBs:
     nr_cellid: 1
 
     do_CSIRS: 1
-    do_SRS: 1
+    do_SRS: periodic
 
     servingCellConfigCommon:
       - physCellId: 0

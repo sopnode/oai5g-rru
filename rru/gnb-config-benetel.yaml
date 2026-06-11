@@ -18,7 +18,7 @@ gNBs:
     #maxMIMO_layers: 2 # 4-layers when line commented
     pusch_AntennaPorts: 4
     do_CSIRS: 1
-    do_SRS: 0
+    do_SRS: none
     #sib1_tda: 15 # removed (SA)
 
     servingCellConfigCommon:
