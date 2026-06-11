@@ -1043,6 +1043,7 @@ configure-gnb() {
     # Force do_SRS parameter to periodic if CSI_ENABLED
     if [[ "$CSI_ENABLED" == "true" ]]; then
 	yq eval -i '.gNBs[0].do_SRS = "periodic"' "$CONFIG_RRU"
+	diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
     fi
     cp "${CONFIG_RRU}" "$CONFIG"
     ##diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
