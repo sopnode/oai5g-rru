@@ -980,6 +980,16 @@ configure-gnb() {
 	exit 1
     }
 
+    # Add -csi suffix on GNB/DU repo names when CSI_ENABLED
+    if [[ "$CSI_ENABLED" == "true" ]]; then
+        for var in GNB_REPO DU_REPO; do
+            val="${!var}"
+            if [[ "$val" != *-csi ]]; then
+                printf -v "$var" '%s-csi' "$val"
+            fi
+        done
+    fi
+    
     for nf in oai-gnb oai-gnb-fhi-72 oai-du oai-du-fhi-72 oai-cu oai-cu-cp oai-cu-up; do
 	VALUES="${OAI5G_RAN}/${nf}/values.yaml"
 	    
