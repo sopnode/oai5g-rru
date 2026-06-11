@@ -18,7 +18,7 @@ gNBs:
     pdsch_AntennaPorts_XP: 2
     pusch_AntennaPorts: 2
     do_CSIRS: 1
-    do_SRS: 1
+    do_SRS: none # use periodic to enable CSI logging (none,periodic,aperiodic)
 
     pdcch_ConfigSIB1:
       - controlResourceSetZero: 11

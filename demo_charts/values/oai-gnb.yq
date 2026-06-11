@@ -29,5 +29,5 @@
 .includeMetricsParser        = (strenv(MONITORING) == "true") |
 .persistent.sharedvolume     = (strenv(PCAP) == "true") |
 
-.resources.define            = (strenv(QOS_GNB) == "true") |
+.resources.define            = (strenv(QOS_GNB) == "false") |
 .nodeName                    = strenv(NODE_GNB)

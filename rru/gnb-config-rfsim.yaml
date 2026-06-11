@@ -16,7 +16,7 @@ gNBs:
             sd: 0xffffff
     nr_cellid: 12345678
     do_CSIRS: 1
-    do_SRS: 1
+    do_SRS: none # use periodic to enable CSI logging (none,periodic,aperiodic)
     pdsch_AntennaPorts_N1: 2
     pdsch_AntennaPorts_N2: 1
     pdsch_AntennaPorts_XP: 1

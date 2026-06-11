@@ -16,7 +16,8 @@ gNBs:
     nr_cellid: 1
 
     do_CSIRS: 1
-    do_SRS: 1
+    do_SRS: periodic # use periodic to enable CSI logging (none,periodic,aperiodic)
+    # default do_SRS for b2xx was periodic before adding CSI logging functionality
 
     servingCellConfigCommon:
       - physCellId: 0

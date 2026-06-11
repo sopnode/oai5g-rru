@@ -17,7 +17,7 @@ gNBs:
     pdsch_AntennaPorts_XP: 2
     pusch_AntennaPorts: 1 # with 2, instabilities appear if do_SRS
     do_CSIRS: 1
-    do_SRS: periodic # force SRS to enable CSI logging (none,periodic,aperiodic)
+    do_SRS: none # use periodic to enable CSI logging (none,periodic,aperiodic)
 
     pdcch_ConfigSIB1:
       - controlResourceSetZero: 11
