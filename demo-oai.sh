@@ -1111,6 +1111,7 @@ configure-nr-ue() {
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
       .includeTcpDumpContainer     = (strenv(LOGS) == \"true\") |
       .resources.define            = (strenv(QOS_NRUE) == \"true\") |
+      .csi.enabled                 = (strenv(CSI_ENABLED) == \"true\") |
       .nodeName                    = strenv(NODE_NRUE)
     " "${ORIG_VALUES}"
 
@@ -1150,6 +1151,7 @@ configure-nr-ue2() {
       .config.sst                  = strenv(SLICE2_SST) |
       .config.sd                   = (\"0x\" + strenv(SLICE2_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
+      .csi.enabled                 = (strenv(CSI_ENABLED) == \"true\") |
       .includeTcpDumpContainer     = (strenv(LOGS) == \"true\") |
       .resources.define            = (strenv(QOS_NRUE) == \"true\")
     " "${ORIG_VALUES}"
@@ -1185,6 +1187,7 @@ configure-nr-ue3() {
       .config.sst                  = strenv(SLICE1_SST) |
       .config.sd                   = (\"0x\" + strenv(SLICE1_SD)) |
       .config.useAdditionalOptions = strenv(ADD_OPTIONS_NRUE) |
+      .csi.enabled                 = (strenv(CSI_ENABLED) == \"true\") |
       .includeTcpDumpContainer     = (strenv(LOGS) == \"true\") |
       .resources.define            = (strenv(QOS_NRUE) == \"true\")
     " "${ORIG_VALUES}"
