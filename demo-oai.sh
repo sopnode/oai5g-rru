@@ -632,11 +632,8 @@ esac
 export IP_NRUE="${SUBNET_NRUE}.210"
 export IP_NRUE2="${SUBNET_NRUE}.211"
 export IP_NRUE3="${SUBNET_NRUE}.212"
-export ADD_OPTIONS_NRUE="--rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --log_config.global_log_options level,nocolor,time"
-if [[ "$CSI_ENABLED" == "true" ]]; then
-    # if CSI logging is enabled, use the following option to trigger CSI estimation at the gNB
-    ADD_OPTIONS_NRUE+=" --ue-nb-ant-tx 2"
-fi
+export ADD_OPTIONS_NRUE="--rfsim -C 3619200000 -r 106 --numerology 1 --ssb 516 -E  --ue-nb-ant-tx 2 --log_config.global_log_options level,nocolor,time"
+# use the same rfsim conf with 2 antennas with or without CSI_ENABLED
 export QOS_NRUE="false"
 export NODE_NRUE="${NODE_GNB}"
 
