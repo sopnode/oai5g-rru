@@ -1037,12 +1037,10 @@ configure-gnb() {
     CONFIG_RRU="${PREFIX_DEMO}/oai5g-rru/rru/${gnb_type}-config-${RRU_TYPE}.yaml"
     CONFIG="${OAI5G_RAN}/${nf}/config.yaml"
     cp "$CONFIG" "${OAI5G_RAN}/${nf}/config.yaml.orig"
-    # Force do_SRS parameter to periodic if CSI_ENABLED
-    echo "** bef"
+    # Force do_SRS parameter to periodic and do_CSIRS to 1 if CSI_ENABLED
     if [[ "$CSI_ENABLED" == "true" ]]; then
-    echo "** aft CONFIG_RRU=${CONFIG_RRU}"
+	yq eval -i '.gNBs[0].do_CSIRS = 1' "${CONFIG_RRU}"
 	yq eval -i '.gNBs[0].do_SRS = "periodic"' "${CONFIG_RRU}"
-	diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
     fi
     cp "${CONFIG_RRU}" "$CONFIG"
     ##diff -u <(yq eval -P '.' ${OAI5G_RAN}/${nf}/config.yaml.orig) <(yq eval -P '.' ${CONFIG})
