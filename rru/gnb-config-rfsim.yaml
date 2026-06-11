@@ -160,7 +160,7 @@ RUs:
     max_rxgain: 75
     eNB_instances: [0]
     sf_extension: 0
-    sdr_addrs: serial=XXXXXXX
+
 rfsimulator:
   -
     serveraddr: server
@@ -213,6 +213,7 @@ security:
   # what 'ciphering_algorithms' configures; same thing for 'drb_integrity'
   drb_ciphering: yes
   drb_integrity: no
+
 log_config:
   global_log_level: info
   hw_log_level: info

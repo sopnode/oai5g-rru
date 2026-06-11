@@ -2,13 +2,13 @@
 Active_gNBs: 
 - du-rfsim
 # Asn1_verbosity, choice in: none, info, annoying
-Asn1_verbosity: "none"
+Asn1_verbosity: none
 gNBs:
   - #////////// Identification parameters:
     gNB_ID: 0xe00
     gNB_DU_ID: 0xe00
 
-    gNB_name: "du-rfsim"
+    gNB_name: du-rfsim
 
     # Tracking area code, 0x0000 and 0xfffe are reserved values
     tracking_area_code: 1
@@ -144,10 +144,10 @@ gNBs:
 
 MACRLCs:
   - num_cc: 1
-    tr_s_preference: "local_L1"
-    tr_n_preference: "f1"
-    local_n_address: "192.168.71.171"
-    remote_n_address: "192.168.71.150"
+    tr_s_preference: local_L1
+    tr_n_preference: f1
+    local_n_address: 192.168.71.171
+    remote_n_address: 192.168.71.150
     local_n_portd: 2153
     remote_n_portd: 2153
     pusch_TargetSNRx10: 200
@@ -155,22 +155,22 @@ MACRLCs:
 
 L1s:
   - num_cc: 1
-    tr_n_preference: "local_mac"
+    tr_n_preference: local_mac
     prach_dtx_threshold: 200
-    pucch0_dtx_threshold: 150
-    ofdm_offset_divisor: 8 # set this to UINT_MAX for offset 0
+    # pucch0_dtx_threshold: 150
+    # ofdm_offset_divisor: 8 # set this to UINT_MAX for offset 0
 
 RUs:
-  - local_rf: "yes"
-    nb_tx: 1
-    nb_rx: 1
+  - local_rf: yes
+    nb_tx: 2
+    nb_rx: 2
     att_tx: 0
     att_rx: 0
     bands: [78]
     max_pdschReferenceSignalPower: -27
-    max_rxgain: 114
+    max_rxgain: 75
     eNB_instances: [0]
-    clock_src: "internal"
+    sf_extension: 0
 
 rfsimulator:
   -
@@ -213,10 +213,13 @@ channelmod:
       ds_tdl: 0
       
 log_config:
-  global_log_level: "info"
-  hw_log_level: "info"
-  phy_log_level: "info"
-  mac_log_level: "info"
-  rlc_log_level: "info"
-  f1ap_log_level: "info"
+  global_log_level: info
+  hw_log_level: info
+  phy_log_level: info
+  mac_log_level: info
+  rlc_log_level: info
+  pdcp_log_level: info
+  rrc_log_level: info
+  ngap_log_level: debug  
+  f1ap_log_level: debug
 
