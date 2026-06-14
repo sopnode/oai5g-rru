@@ -1774,7 +1774,7 @@ get-all-logs() {
 	DU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[0].metadata.name}")
 	kubectl -c du cp $NS/"${DU_POD_NAME}":/shared-logs/nrL1_stats.log "$prefix"/nrL1_stats.log"$DATE" || true
 	kubectl -c du cp $NS/"${DU_POD_NAME}":/shared-logs/nrMAC_stats.log "$prefix"/nrMAC_stats.log"$DATE" || true
-	kubectl -c cu cp $NS/"${CU_POD_NAME}":/shared-logs/nrRRC_stats.log "$prefix"/nrRRC_stats.log"$DATE" || true
+	kubectl -c cu cp $NS/"${CU_POD_NAME}":nrRRC_stats.log "$prefix"/nrRRC_stats.log"$DATE" || true
 	DU_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
 	echo -e "\t - Retrieving logs for oai-du ${DU_POD_NAME} running with IP $DU_eth0_IP"
 	kubectl --namespace $NS -c du logs "${DU_POD_NAME}" > "$prefix"/du-"$DATE".logs
