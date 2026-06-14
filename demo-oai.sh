@@ -1799,9 +1799,9 @@ get-all-logs() {
 	echo -e "\t - Retrieving logs for oai-du ${DU_POD_NAME} running with IP $DU_eth0_IP"
 	kubectl --namespace $NS -c du logs "${DU_POD_NAME}" > "$prefix"/du-"$DATE".logs
 	echo "Retrieve cucp/cuup/du configs from the pods"
-	kubectl -c oaicucp cp $NS/"${CUCP_POD_NAME}":/tmp/cucp.conf "$prefix"/cucp.conf || true
-	kubectl -c oaicuup cp $NS/"${CUUP_POD_NAME}":/tmp/cuup.conf "$prefix"/cuup.conf || true
-	kubectl -c du cp $NS/"${DU_POD_NAME}":/tmp/du.conf "$prefix"/du.conf || true
+	kubectl -c oaicucp cp $NS/"${CUCP_POD_NAME}":/opt/oai-gnb/etc/gnb.yaml "$prefix"/cucp.yaml || true
+	kubectl -c oaicuup cp $NS/"${CUUP_POD_NAME}":/opt/oai-gnb/etc/gnb.yaml "$prefix"/cuup.yaml || true
+	kubectl -c du cp $NS/"${DU_POD_NAME}":/opt/oai-gnb/etc/gnb.yaml "$prefix"/du.yaml || true
     fi
 
     if [[ "$RRU" = "rfsim" ]]; then
