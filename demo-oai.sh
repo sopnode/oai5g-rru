@@ -1786,21 +1786,21 @@ get-all-logs() {
 	CUCP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-cp" -o jsonpath="{.items[0].metadata.name}")
 	CUCP_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-cp" -o jsonpath="{.items[*].status.podIP}")
 	echo -e "\t - Retrieving logs for oaicucp ${CUCP_POD_NAME} running with IP $CUCP_eth0_IP"
-	kubectl --namespace $NS -c cucp logs "${CUCP_POD_NAME}" > "$prefix"/cucp-"$DATE".logs
+	kubectl --namespace $NS -c oaicucp logs "${CUCP_POD_NAME}" > "$prefix"/cucp-"$DATE".logs
 	CUUP_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-up" -o jsonpath="{.items[0].metadata.name}")
 	CUUP_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-cu-up" -o jsonpath="{.items[*].status.podIP}")
 	echo -e "\t - Retrieving logs for oaicuup ${CUUP_POD_NAME} running with IP $CUUP_eth0_IP"
-	kubectl --namespace $NS -c cuup logs "${CUUP_POD_NAME}" > "$prefix"/cuup-"$DATE".logs
+	kubectl --namespace $NS -c oaicuup logs "${CUUP_POD_NAME}" > "$prefix"/cuup-"$DATE".logs
 	DU_POD_NAME=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[0].metadata.name}")
 	kubectl -c du cp $NS/"${DU_POD_NAME}":/shared-logs/nrL1_stats.log "$prefix"/nrL1_stats.log"$DATE" || true
 	kubectl -c du cp $NS/"${DU_POD_NAME}":/shared-logs/nrMAC_stats.log "$prefix"/nrMAC_stats.log"$DATE" || true
-	kubectl -c cucp cp $NS/"${CUCP_POD_NAME}":nrRRC_stats.log "$prefix"/nrRRC_stats.log"$DATE" || true
+	kubectl -c oaicucp cp $NS/"${CUCP_POD_NAME}":nrRRC_stats.log "$prefix"/nrRRC_stats.log"$DATE" || true
 	DU_eth0_IP=$(kubectl get pods --namespace $NS -l "app.kubernetes.io/instance=oai-du" -o jsonpath="{.items[*].status.podIP}")
 	echo -e "\t - Retrieving logs for oai-du ${DU_POD_NAME} running with IP $DU_eth0_IP"
 	kubectl --namespace $NS -c du logs "${DU_POD_NAME}" > "$prefix"/du-"$DATE".logs
 	echo "Retrieve cucp/cuup/du configs from the pods"
-	kubectl -c cucp cp $NS/"${CUCP_POD_NAME}":/tmp/cucp.conf "$prefix"/cucp.conf || true
-	kubectl -c cuup cp $NS/"${CUUP_POD_NAME}":/tmp/cuup.conf "$prefix"/cuup.conf || true
+	kubectl -c oaicucp cp $NS/"${CUCP_POD_NAME}":/tmp/cucp.conf "$prefix"/cucp.conf || true
+	kubectl -c oaicuup cp $NS/"${CUUP_POD_NAME}":/tmp/cuup.conf "$prefix"/cuup.conf || true
 	kubectl -c du cp $NS/"${DU_POD_NAME}":/tmp/du.conf "$prefix"/du.conf || true
     fi
 
