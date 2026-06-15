@@ -66,7 +66,6 @@ export SLICE2_UPLINK="@DEF_SLICE2_UPLINK@"
 export SLICE2_DOWNLINK="@DEF_SLICE2_DOWNLINK@"
 export GNB_ID="@DEF_GNB_ID@"
 #
-################SST0="@DEF_SST0@"
 export FULL_KEY="@DEF_FULL_KEY@"
 export OPC="@DEF_OPC@"
 export RFSIM_IMSI_UE="@DEF_RFSIM_IMSI_UE@"
@@ -77,10 +76,15 @@ PREFIX_DEMO="@DEF_PREFIX_DEMO@" # Directory in which all scripts will be copied 
 #
 #################################################################################
 ##################################################################################
-TMP="/tmp/tmp.$USER" # directory used to store logs and ither temp files
+TMP="/tmp/tmp.$USER" # directory used to store logs and other temp files
 mkdir -p "$TMP"
 PREFIX_STATS="$TMP/oai5g-stats"
 OAISA_REPO="docker.io/oaisoftwarealliance" # currently unused
+#
+## METRIC PARSER REPO
+export METRIC_PARSER_REPO="ghcr.io/ziyad-mabrouk/oai-gnb-metrics-parser"
+export METRIC_PARSER_VERSION="2026.w22"
+#
 
 # Interfaces names of VLANs in sopnode servers
 # Local network interface is defined in prepare-demo-oai.sh ("net-30" for sopnode-{l1|w1})
@@ -918,8 +922,11 @@ apply-gnb-values-yq() {
 
     yq eval -i "$(cat "$yq_overlay_file")" "${values_file}"
 
-    # Update PLMN and NSSAI
+    # Update metricsParserImage, PLMN and NSSAI
     yq eval -i '
+.metricsParserImage.repository  = strenv(METRIC_PARSER_REPO) |
+.metricsParserImage.version     = strenv(METRIC_PARSER_VERSION) |
+
 .config.plmn_list[0].mcc        = strenv(MCC) |
 .config.plmn_list[0].mnc        = strenv(MNC) |
 .config.plmn_list[0].snssaiList =
