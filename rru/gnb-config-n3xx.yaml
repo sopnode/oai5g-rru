@@ -44,7 +44,7 @@ gNBs:
         ul_subcarrierSpacing: 1
         ul_carrierBandwidth: 106
         pMax: 20
-        initialULBWPlocationAndBandwidth: 28875
+        initialULBWPlocationAndBandwidth: 13750
         initialULBWPsubcarrierSpacing: 1
 
         prach_ConfigurationIndex: 98
@@ -89,10 +89,11 @@ gNBs:
       ul_bwp1_locationAndBandwidth: 28875
       ul_bwp1_subcarrierSpacing: 1
       firstActiveUplinkBWP-Id: 1
-    RedCap:
-      cellBarredRedCap1Rx_r17: 1
-      cellBarredRedCap2Rx_r17: 1
-      intraFreqReselectionRedCap_r17: 0
+# openairinterface5g yaml parser broken for Redcap for TYPE_INT8 params, to fix
+#    RedCap:
+#      cellBarredRedCap1Rx_r17: 1
+#      cellBarredRedCap2Rx_r17: 1
+#      intraFreqReselectionRedCap_r17: 0
     TIMERS:
       t300: 1000
       t301: 1000
