@@ -1,9 +1,10 @@
-# gnb.sa.band78.133prb.aw2s.ddsuu.50MHz.conf
+# du.sa.band78.133prb.aw2s.ddsuu.50MHz.conf
 Active_gNBs: ["gNB-OAI"]
 Asn1_verbosity: "none"
 
 gNBs:
   - gNB_ID: 0xe00
+    gNB_DU_ID: 0xe00
     gNB_name: "gNB-OAI"
     tracking_area_code: 1
     plmn_list:
@@ -15,7 +16,7 @@ gNBs:
     nr_cellid: 1
 
     pdsch_AntennaPorts_XP: 2
-    pusch_AntennaPorts: 2 # with 2, instabilities appear if do_SRS
+    pusch_AntennaPorts: 2
     do_CSIRS: 1
     do_SRS: none # use periodic to enable CSI logging (none,periodic,aperiodic)
 
@@ -31,7 +32,7 @@ gNBs:
         dl_offstToCarrier: 0
         dl_subcarrierSpacing: 1
         dl_carrierBandwidth: 133
-        initialDLBWPlocationAndBandwidth: 13750
+        initialDLBWPlocationAndBandwidth: 36300
         initialDLBWPsubcarrierSpacing: 1
         initialDLBWPcontrolResourceSetZero: 11
         initialDLBWPsearchSpaceZero: 0
@@ -41,7 +42,7 @@ gNBs:
         ul_subcarrierSpacing: 1
         ul_carrierBandwidth: 133
         pMax: 20
-        initialULBWPlocationAndBandwidth: 13750
+        initialULBWPlocationAndBandwidth: 36300
         initialULBWPsubcarrierSpacing: 1
 
         prach_ConfigurationIndex: 98
@@ -60,10 +61,10 @@ gNBs:
         msg1_SubcarrierSpacing: 1
         restrictedSetConfig: 0
         msg3_DeltaPreamble: 1
-        p0_NominalWithGrant: -76 # was -96. Force UE to transmit with 20dB more power to increase SNR UL (17 ->30 dB)
+        p0_NominalWithGrant: -96
         pucchGroupHopping: 0
         hoppingId: 40
-        p0_nominal: -90 # was -96. Same change than above for PRACH/PUCCH, more moderate here to prevent inter-UE interference
+        p0_nominal: -96
         ssb_PositionsInBurst_PR: 2 
         ssb_PositionsInBurst_Bitmap: 0x1
         ssb_periodicityServingCell: 2
@@ -77,51 +78,23 @@ gNBs:
         nrofUplinkSymbols: 4
         ssPBCH_BlockPower: -10
 
-    servingCellConfigDedicated:
-      dl_bwp-Id_1: 1
-      dl_bwp1_locationAndBandwidth: 36300
-      dl_bwp1_subcarrierSpacing: 1
-      firstActiveDownlinkBWP-Id: 1
-      defaultDownlinkBWP-Id: 1
-      ul_bwp-Id_1: 1
-      ul_bwp1_locationAndBandwidth: 36300
-      ul_bwp1_subcarrierSpacing: 1
-      firstActiveUplinkBWP-Id: 1
-# openairinterface5g yaml parser broken for Redcap for TYPE_INT8 params, to fix
-#    RedCap:
-#      cellBarredRedCap1Rx_r17: 1
-#      cellBarredRedCap2Rx_r17: 1
-#      intraFreqReselectionRedCap_r17: 0
-    TIMERS:
-      t300: 1000
-      t301: 1000
-      t310: 1000
-      n310: 1
-      t311: 30000
-      n311: 1
-      t319: 1000
-
     SCTP:
       SCTP_INSTREAMS: 2
       SCTP_OUTSTREAMS: 2
 
-    amf_ip_address:
-      - ipv4: "172.21.6.5"
-
-    NETWORK_INTERFACES:
-      GNB_IPV4_ADDRESS_FOR_NG_AMF: "172.21.16.51"
-      GNB_IPV4_ADDRESS_FOR_NGU: "172.21.16.51"
-      GNB_PORT_FOR_S1U: 2152
-
 MACRLCs:
   - num_cc: 1
     tr_s_preference: "local_L1"
-    tr_n_preference: "local_RRC"
-    pusch_TargetSNRx10: 290 # was 200. with 29dB, TPC forces UE to increase Tx power to reach 29dB, as 256QAM requires 28-30dB (for PUSCH)
-    pucch_TargetSNRx10: 200 # (for PUCCH)
+    tr_n_preference: "f1"
+    local_n_address: ""
+    remote_n_address: ""
+    local_n_portc: 500
+    local_n_portd: 2153
+    remote_n_portc: 501
+    remote_n_portd: 2153
+    pusch_TargetSNRx10: 200
+    pucch_TargetSNRx10: 200
     ulsch_max_frame_inactivity: 0
-    ul_bler_target_upper: 0.02
-    ul_bler_target_lower: 0.005
 
 L1s:
   - num_cc: 1
@@ -146,20 +119,14 @@ RUs:
     nb_rx: 2
     att_tx: 17
     att_rx: 0
-    bands: [78]
     eNB_instances: [0]
+    bands: [78]
     num_tp_cores: 4
     rxfh_core_id: 20
     txfh_core_id: 22
     tp_cores: [24,26,28,30]
     nr_flag: 1
     sl_ahead: 5
-
-security:
-  ciphering_algorithms: ["nea0"]
-  integrity_algorithms: ["nia2", "nia0"]
-  drb_ciphering: "yes"
-  drb_integrity: "no"
 
 log_config:
   global_log_level: "info"
