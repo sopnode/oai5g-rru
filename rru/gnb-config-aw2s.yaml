@@ -70,8 +70,8 @@ gNBs:
         dmrs_TypeA_Position: 0
         subcarrierSpacing: 1
         referenceSubcarrierSpacing: 1
-        dl_UL_TransmissionPeriodicity: 5
-        nrofDownlinkSlots: 2
+        dl_UL_TransmissionPeriodicity: 6 # was 5
+        nrofDownlinkSlots: 7 # was 2
         nrofDownlinkSymbols: 6
         nrofUplinkSlots: 2
         nrofUplinkSymbols: 4
@@ -79,12 +79,12 @@ gNBs:
 
     servingCellConfigDedicated:
       dl_bwp-Id_1: 1
-      dl_bwp1_locationAndBandwidth: 36300
+      dl_bwp1_locationAndBandwidth: 28875 # 106 PRB
       dl_bwp1_subcarrierSpacing: 1
       firstActiveDownlinkBWP-Id: 1
       defaultDownlinkBWP-Id: 1
       ul_bwp-Id_1: 1
-      ul_bwp1_locationAndBandwidth: 36300
+      ul_bwp1_locationAndBandwidth: 28875 # 106 PRB
       ul_bwp1_subcarrierSpacing: 1
       firstActiveUplinkBWP-Id: 1
 # openairinterface5g yaml parser broken for Redcap for TYPE_INT8 params, to fix
