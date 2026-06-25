@@ -14,9 +14,9 @@ gNBs:
           - sst: 1
     nr_cellid: 1
 
-    pdsch_AntennaPorts_XP: 2
-    pusch_AntennaPorts: 2 # with 2, instabilities appear if do_SRS
-    do_CSIRS: 1
+    pdsch_AntennaPorts_XP: 1
+    pusch_AntennaPorts: 1 # with 2, instabilities appear if do_SRS
+    do_CSIRS: 0
     do_SRS: none # use periodic to enable CSI logging (none,periodic,aperiodic)
 
     pdcch_ConfigSIB1:
@@ -60,7 +60,7 @@ gNBs:
         msg1_SubcarrierSpacing: 1
         restrictedSetConfig: 0
         msg3_DeltaPreamble: 1
-        p0_NominalWithGrant: -76 # was -96. Force UE to transmit with 20dB more power to increase SNR UL (17 ->30 dB)
+        p0_NominalWithGrant: -82 # was -96. Force UE to transmit with 14dB more power to increase SNR UL (17 ->30 dB)
         pucchGroupHopping: 0
         hoppingId: 40
         p0_nominal: -90 # was -96. Same change than above for PRACH/PUCCH, more moderate here to prevent inter-UE interference
@@ -117,7 +117,7 @@ MACRLCs:
   - num_cc: 1
     tr_s_preference: "local_L1"
     tr_n_preference: "local_RRC"
-    pusch_TargetSNRx10: 290 # was 200. with 29dB, TPC forces UE to increase Tx power to reach 29dB, as 256QAM requires 28-30dB (for PUSCH)
+    pusch_TargetSNRx10: 250 # was 200. with 29dB, TPC forces UE to increase Tx power to reach 29dB, as 256QAM requires 28-30dB (for PUSCH)
     pucch_TargetSNRx10: 200 # (for PUCCH)
     ulsch_max_frame_inactivity: 0
     ul_bler_target_upper: 0.02
@@ -142,8 +142,8 @@ RUs:
     remote_portd: 52183
     local_rf: "no"
     tr_preference: "udp_ecpri_if5"
-    nb_tx: 2
-    nb_rx: 2
+    nb_tx: 1
+    nb_rx: 1
     att_tx: 17
     att_rx: 0
     bands: [78]
