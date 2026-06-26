@@ -23,13 +23,13 @@ gNBs:
       - physCellId: 0
         absoluteFrequencySSB: 641280
         dl_frequencyBand: 78
-        dl_absoluteFrequencyPointA: 640752
+        dl_absoluteFrequencyPointA: 640008
         dl_offstToCarrier: 0
         dl_subcarrierSpacing: 1
         dl_carrierBandwidth: 106
-        initialDLBWPlocationAndBandwidth: 13750
+        initialDLBWPlocationAndBandwidth: 28875
         initialDLBWPsubcarrierSpacing: 1
-        initialDLBWPcontrolResourceSetZero: 10
+        initialDLBWPcontrolResourceSetZero: 12
         initialDLBWPsearchSpaceZero: 0
 
         ul_frequencyBand: 78
@@ -37,7 +37,7 @@ gNBs:
         ul_subcarrierSpacing: 1
         ul_carrierBandwidth: 106
         pMax: 20
-        initialULBWPlocationAndBandwidth: 13750
+        initialULBWPlocationAndBandwidth: 28875
         initialULBWPsubcarrierSpacing: 1
 
         prach_ConfigurationIndex: 98
@@ -72,30 +72,6 @@ gNBs:
         nrofUplinkSlots: 2
         nrofUplinkSymbols: 4
         ssPBCH_BlockPower: -25
-
-    servingCellConfigDedicated:
-      dl_bwp-Id_1: 1
-      dl_bwp1_locationAndBandwidth: 28875
-      dl_bwp1_subcarrierSpacing: 1
-      firstActiveDownlinkBWP-Id: 1
-      defaultDownlinkBWP-Id: 1
-      ul_bwp-Id_1: 1
-      ul_bwp1_locationAndBandwidth: 28875
-      ul_bwp1_subcarrierSpacing: 1
-      firstActiveUplinkBWP-Id: 1
-# openairinterface5g yaml parser broken for Redcap for TYPE_INT8 params, to fix
-#    RedCap:
-#      cellBarredRedCap1Rx_r17: 1
-#      cellBarredRedCap2Rx_r17: 1
-#      intraFreqReselectionRedCap_r17: 0
-    TIMERS:
-      t300: 1000
-      t301: 1000
-      t310: 1000
-      n310: 1
-      t311: 30000
-      n311: 1
-      t319: 1000
 
     SCTP:
       SCTP_INSTREAMS: 2

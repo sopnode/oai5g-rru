@@ -16,7 +16,7 @@ gNBs:
 
     min_rxtxtime: 5
     do_CSIRS: 1 # added for CSI so that gNB sends CSI-RS and UEs measure DL
-    do_SRS: periodic # use periodic to enable CSI logging (none,periodic,aperiodic)
+    do_SRS: none # use periodic to enable CSI logging (none,periodic,aperiodic)
     force_256qam_off: 1    
     pdsch_AntennaPorts_N1: 1
     pdsch_AntennaPorts_XP: 1
@@ -28,15 +28,15 @@ gNBs:
 
     servingCellConfigCommon:
       - physCellId: 0
-        absoluteFrequencySSB: 641280
+        absoluteFrequencySSB: 634080
         dl_frequencyBand: 78
-        dl_absoluteFrequencyPointA: 640752
+        dl_absoluteFrequencyPointA: 632808
         dl_offstToCarrier: 0
         dl_subcarrierSpacing: 1
         dl_carrierBandwidth: 106
-        initialDLBWPlocationAndBandwidth: 13750
+        initialDLBWPlocationAndBandwidth: 28875
         initialDLBWPsubcarrierSpacing: 1
-        initialDLBWPcontrolResourceSetZero: 10
+        initialDLBWPcontrolResourceSetZero: 12
         initialDLBWPsearchSpaceZero: 0
 
         ul_frequencyBand: 78
@@ -44,18 +44,18 @@ gNBs:
         ul_subcarrierSpacing: 1
         ul_carrierBandwidth: 106
         pMax: 20
-        initialULBWPlocationAndBandwidth: 13750
+        initialULBWPlocationAndBandwidth: 28875
         initialULBWPsubcarrierSpacing: 1
 
         prach_ConfigurationIndex: 98
         prach_msg1_FDM: 0
         prach_msg1_FrequencyStart: 0
-        zeroCorrelationZoneConfig: 13
+        zeroCorrelationZoneConfig: 12
         preambleReceivedTargetPower: -96
         preambleTransMax: 6
         powerRampingStep: 1
-        ssb_perRACH_OccasionAndCB_PreamblesPerSSB_PR: 4
-        ssb_perRACH_OccasionAndCB_PreamblesPerSSB: 14
+        ssb_perRACH_OccasionAndCB_PreamblesPerSSB_PR: 3
+        ssb_perRACH_OccasionAndCB_PreamblesPerSSB: 15
         ra_ContentionResolutionTimer: 7
         rsrp_ThresholdSSB: 19
         prach_RootSequenceIndex_PR: 2
@@ -78,31 +78,6 @@ gNBs:
         nrofUplinkSlots: 2
         nrofUplinkSymbols: 4
         ssPBCH_BlockPower: -25
-
-    servingCellConfigDedicated:
-      dl_bwp-Id_1: 1
-      dl_bwp1_locationAndBandwidth: 28875
-      dl_bwp1_subcarrierSpacing: 1
-      firstActiveDownlinkBWP-Id: 1
-      defaultDownlinkBWP-Id: 1
-      ul_bwp-Id_1: 1
-      ul_bwp1_locationAndBandwidth: 28875
-      ul_bwp1_subcarrierSpacing: 1
-      firstActiveUplinkBWP-Id: 1
-# openairinterface5g yaml parser broken for Redcap for TYPE_INT8 params, to fix
-#    RedCap:
-#      cellBarredRedCap1Rx_r17: 1
-#      cellBarredRedCap2Rx_r17: 1
-#      intraFreqReselectionRedCap_r17: 0
-    TIMERS:
-      t300: 1000
-      t301: 1000
-      t310: 1000
-      n310: 1
-      t311: 30000
-      n311: 1
-      t319: 1000
-
 
     SCTP:
       SCTP_INSTREAMS: 2
