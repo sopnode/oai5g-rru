@@ -47,6 +47,8 @@ export CSI_PORT_SELECTION="@DEF_CSI_PORT_SELECTION@"
 export CSI_SUBCARRIER_SAMPLING="@DEF_CSI_SUBCARRIER_SAMPLING@"
 export CSI_FLUSH_CORE="@DEF_CSI_FLUSH_CORE@"
 #
+export REDCAP="@DEF_REDCAP@" # boolean, true if REDCAP UEs are used
+#
 export MCC="@DEF_MCC@"
 export MNC="@DEF_MNC@"
 export TAC="@DEF_TAC@"
@@ -1026,7 +1028,7 @@ configure-gnb() {
     done
 
     # Update config.yaml charts
-    if [[ ${GNB_MODE} = 'monolithic' ]]; then
+    if [[ ${GNB_MODE} == 'monolithic' ]]; then
 	gnb_type="gnb"
 	if [[ "$RRU_TYPE" == "benetel" ]]; then
 	    nf="oai-gnb-fhi-72"
@@ -1041,7 +1043,17 @@ configure-gnb() {
 	    nf="oai-du"
 	fi
     fi
-    CONFIG_RRU="${PREFIX_DEMO}/oai5g-rru/rru/${gnb_type}-config-${RRU_TYPE}.yaml"
+    if [[ "${RRU_TYPE}" == "rfsim" || "${RRU_TYPE}" == "benetel1" || "${RRU_TYPE}" == "benetel2" ]]
+       if [[ "${REDCAP}" == "true" ]]; then
+	   echo "Enforcing REDCAP boolean to false for ${RRU_TYPE} scenario"
+	   REDCAP="false"
+       fi
+    fi
+    if [[ "${REDCAP}" == "true" ]]; then
+	CONFIG_RRU="${PREFIX_DEMO}/oai5g-rru/rru/${gnb_type}-config-${RRU_TYPE}-redcap.yaml"
+    else
+	CONFIG_RRU="${PREFIX_DEMO}/oai5g-rru/rru/${gnb_type}-config-${RRU_TYPE}.yaml"
+    fi
     CONFIG="${OAI5G_RAN}/${nf}/config.yaml"
     cp "$CONFIG" "${OAI5G_RAN}/${nf}/config.yaml.orig"
     # Force do_SRS parameter to periodic and do_CSIRS to 1 if CSI_ENABLED

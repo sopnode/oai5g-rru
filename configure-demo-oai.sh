@@ -128,7 +128,9 @@ function update() {
     MONITORING="${MONITORING,,}"
     FLEXRIC="${FLEXRIC,,}"
 
-    # Handle differently CSI ENABLED parameter set using export
+    # Handle differently CSI ENABLED set of parameters and REDCAP boolean using export
+    REDCAP=${REDCAP:="false"}
+    #
     CSI_ENABLED=${CSI_ENABLED:="false"}
     CSI_OUTPUT_DIR=${CSI_OUTPUT_DIR:="/data/csi"}
     CSI_GRANULARITY=${CSI_GRANULARITY:="rb"}
@@ -165,6 +167,7 @@ s|@DEF_LOGS@|$LOGS|
 s|@DEF_PCAP@|$PCAP|
 s|@DEF_MONITORING@|$MONITORING|
 s|@DEF_FLEXRIC@|$FLEXRIC|
+s|@DEF_REDCAP@|$REDCAP|
 s|@DEF_CSI_ENABLED@|$CSI_ENABLED|
 s|@DEF_CSI_OUTPUT_DIR@|$CSI_OUTPUT_DIR|
 s|@DEF_CSI_GRANULARITY@|$CSI_GRANULARITY|
