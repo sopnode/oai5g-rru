@@ -1043,7 +1043,7 @@ configure-gnb() {
 	    nf="oai-du"
 	fi
     fi
-    if [[ "${RRU_TYPE}" == "rfsim" || "${RRU_TYPE}" == "benetel1" || "${RRU_TYPE}" == "benetel2" ]]
+    if [[ "${RRU_TYPE}" == "rfsim" || "${RRU_TYPE}" == "benetel1" || "${RRU_TYPE}" == "benetel2" ]]; then
        if [[ "${REDCAP}" == "true" ]]; then
 	   echo "Enforcing REDCAP boolean to false for ${RRU_TYPE} scenario"
 	   REDCAP="false"
