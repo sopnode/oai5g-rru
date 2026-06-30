@@ -64,7 +64,7 @@ else
     # Dynamic mapping for UEs → slice index (1 for SLICE1 or 2 for SLICE2)
 
     UE_SLICE_MAP=(
-      "0000000001:2"
+      "0000000001:1"
       "0000000002:1"
       "0000000003:1"
       "0000000004:1"
