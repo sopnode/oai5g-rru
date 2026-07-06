@@ -74,12 +74,12 @@ gNBs:
 
     servingCellConfigDedicated:
       dl_bwp-Id_1: 1
-      dl_bwp1_locationAndBandwidth: # 51 PRB (was 28875 = 106 PRB)
+      dl_bwp1_locationAndBandwidth: 13750 # 51 PRB (was 28875 = 106 PRB)
       dl_bwp1_subcarrierSpacing: 1
       firstActiveDownlinkBWP-Id: 1
       defaultDownlinkBWP-Id: 1
       ul_bwp-Id_1: 1
-      ul_bwp1_locationAndBandwidth: # 51 PRB (was 28875 = 106 PRB)
+      ul_bwp1_locationAndBandwidth: 13750 # 51 PRB (was 28875 = 106 PRB)
       ul_bwp1_subcarrierSpacing: 1
       firstActiveUplinkBWP-Id: 1
 
