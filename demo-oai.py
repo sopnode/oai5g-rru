@@ -34,14 +34,10 @@ from r2lab import r2lab_hostname, ListOfChoices, ListOfChoicesNullReset, find_lo
 ##########################################################################################
 #    Configure here OAI5G_RRU and OAI_CN5G_FED repo and tag
 OAI5G_RRU_REPO = 'https://github.com/sopnode/oai5g-rru.git'
-OAI5G_RRU_TAG = 'main' # XXX
-#OAI5G_RRU_TAG = 'v2.1.0-1.0-1.2'
+OAI5G_RRU_TAG = 'main'
 OAI_CN5G_FED_REPO = 'https://gitlab.eurecom.fr/turletti/charts.git'
 #OAI_CN5G_FED_REPO = 'https://gitlab.eurecom.fr/oai/cn5g/oai-cn5g-fed.git'
 OAI_CN5G_FED_TAG = 'main'
-#OAI_CN5G_FED_TAG = 'correction-v1.0.0-r2lab'
-#OAI_CN5G_FED_TAG = 'develop-r2lab' # XXX
-#OAI_CN5G_FED_TAG = 'v2.1.0-1.2'
 ##########################################################################################
 
 default_master = 'sopnode-w1'
@@ -83,8 +79,8 @@ default_regcred_email = 'r2labuser@turletti.com'
 
 default_run_mode = 'full'
 default_gnb_mode = 'monolithic'
-default_dnn0 = 'oai.ipv4'
-default_dnn1 = 'none'
+default_dnn0 = 'internet'
+default_dnn1 = 'streaming'
 
 
 def run(*, mode, gateway, slicename, master, namespace, logs,
