@@ -1343,7 +1343,7 @@ start-gnb() {
 	echo "helm -n $NS install oai-gnb ${RAN_DIR}"
 	helm -n $NS install oai-gnb ${RAN_DIR}
 	echo "Wait until the gNB pod is READY"
-	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-gnb
+	kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-gnb --timeout=60s
     else
 	# cudu or cucpup split mode
 	if [[ "$RRU_TYPE" == "benetel" ]]; then
@@ -1356,8 +1356,8 @@ start-gnb() {
 	    helm -n $NS install oai-cu oai-cu/
 
 	    echo "sleep 5s"; sleep 5
-	    echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu"
-	    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu
+	    echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu --timeout=60s"
+	    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu --timeout=60s
 	    echo "helm install -n $NS oai-du ${RAN_DIR}"
 	    helm install -n $NS oai-du "${RAN_DIR}"
         kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-du
@@ -1366,16 +1366,16 @@ start-gnb() {
 	    echo "helm -n $NS install oai-cu-cp oai-cu-cp/"
 	    helm -n $NS install oai-cu-cp oai-cu-cp/
 	    echo "sleep 10s"; sleep 10
-	    echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp"
-	    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp
+	    echo "kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp --timeout=60s"
+	    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-cp --timeout=60s
 	    echo "helm -n $NS install oai-cu-up oai-cu-up/"
 	    helm -n $NS install oai-cu-up oai-cu-up/
 	    echo "sleep 5s"; sleep 5
-	    echo "kubectl -n $NS wait pod --for=condition=Ready  -l app.kubernetes.io/instance=oai-cu-up"
-	    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-up
+	    echo "kubectl -n $NS wait pod --for=condition=Ready  -l app.kubernetes.io/instance=oai-cu-up --timeout=60s"
+	    kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-cu-up --timeout=60s
 	    echo "helm install -n $NS oai-du ${RAN_DIR}"
 	    helm install -n $NS oai-du "${RAN_DIR}"
-        kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-du
+        kubectl -n $NS wait pod --for=condition=Ready -l app.kubernetes.io/instance=oai-du --timeout=60s
 	fi
     fi
 }
