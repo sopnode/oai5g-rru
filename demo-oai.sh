@@ -85,7 +85,7 @@ OAISA_REPO="docker.io/oaisoftwarealliance" # currently unused
 #
 ## METRIC PARSER REPO
 export METRIC_PARSER_REPO="ghcr.io/ziyad-mabrouk/oai-gnb-metrics-parser"
-export METRIC_PARSER_VERSION="2026.w22"
+export METRIC_PARSER_VERSION="2026.w38"
 #
 
 # Interfaces names of VLANs in sopnode servers
