@@ -102,7 +102,7 @@ MACRLCs:
 L1s:
   - num_cc: 1
     tr_n_preference: "local_mac"
-    prach_dtx_threshold: 100 # was 100, 170 to prevent ghost UE msg3
+    prach_dtx_threshold: 140 # was 100, 170 to prevent ghost UE msg3
     pucch0_dtx_threshold: 90 # 80 (SA)
     pusch_dtx_threshold: 10
     max_ldpc_iterations: 15
