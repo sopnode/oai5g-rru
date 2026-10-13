@@ -92,6 +92,8 @@ MACRLCs:
     tr_n_preference: "local_RRC"
     pusch_TargetSNRx10: 220
     pucch_TargetSNRx10: 220
+    pusch_RSSI_Threshold: -150
+    pucch_RSSI_Threshold: -150
     dl_bler_target_upper: 0.35
     dl_bler_target_lower: 0.15
     ul_bler_target_upper: 0.35
@@ -134,7 +136,7 @@ security:
   drb_integrity: "no"
 
 log_config:
-  global_log_level: "info"
+  global_log_level: ["level", "nocolor", "wall_clock"]
   hw_log_level: "info"
   phy_log_level: "info"
   mac_log_level: "info"
