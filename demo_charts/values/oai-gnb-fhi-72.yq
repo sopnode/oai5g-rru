@@ -13,6 +13,16 @@
 .config.ruCPlaneMacAdd       = strenv(MAC_RU) |
 .config.ruUPlaneMacAdd       = strenv(MAC_RU) |
 
+# CSI ENABLED flag
+.csi.enabled                 = (strenv(CSI_ENABLED) == "true") |
+.csi.granularity             = strenv(CSI_GRANULARITY) |
+.csi.antenna_selection       = strenv(CSI_ANTENNA_SELECTION) |
+.csi.port_selection          = strenv(CSI_PORT_SELECTION) |
+.csi.subcarrier_sampling     = strenv(CSI_SUBCARRIER_SAMPLING) |
+.csi.output_dir              = strenv(CSI_OUTPUT_DIR) |
+# The fhi-72 charts pin the flush thread on the last CPU of the gNB cpuset (static CPU manager: CSI_FLUSH_CORE)
+.csi.flush_core              = "auto" |
+
 .includeMetricsParser        = (strenv(MONITORING) == "true") |
 
 .resources.define            = (strenv(QOS_GNB) == "true") |

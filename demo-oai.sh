@@ -988,7 +988,7 @@ configure-gnb() {
 
     # Add -csi suffix on GNB/DU repo names when CSI_ENABLED
     if [[ "$CSI_ENABLED" == "true" ]]; then
-        for var in GNB_REPO DU_REPO; do
+        for var in GNB_REPO DU_REPO GNB_FHI72_REPO DU_FHI72_REPO; do
             val="${!var}"
             if [[ "$val" != *-csi ]]; then
                 printf -v "$var" '%s-csi' "$val"
