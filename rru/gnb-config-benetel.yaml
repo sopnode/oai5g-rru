@@ -98,8 +98,9 @@ MACRLCs:
     dl_bler_target_lower: 0.15
     ul_bler_target_upper: 0.35
     ul_bler_target_lower: 0.15
-    pusch_FailureThres: 1000
+    pusch_FailureThres: 500 # was 1000
     ul_max_mcs: 28
+    stats_max_ue: 32 # default is 8. Enable Frame.Slot logs for large number of UEs in presence of zombies
 
 L1s:
   - num_cc: 1
