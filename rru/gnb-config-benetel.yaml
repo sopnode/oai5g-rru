@@ -90,7 +90,7 @@ MACRLCs:
   - num_cc: 1
     tr_s_preference: "local_L1"
     tr_n_preference: "local_RRC"
-    pusch_TargetSNRx10: 220
+    pusch_TargetSNRx10: 150 # was 220: with 220, wideband UL (252 PRB) saturated RX chains 0/1 of benetel2 (I0 = 90 dB = full scale, UE lost); to validate with benetel1
     pucch_TargetSNRx10: 220
     pusch_RSSI_Threshold: -150
     pucch_RSSI_Threshold: -150
