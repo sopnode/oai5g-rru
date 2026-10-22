@@ -91,6 +91,15 @@ else
     )
 fi
 
+# Optional IMS DNN (added to slice-1 UEs). Can be overridden in /etc/oai/5g-env.sh
+IMS_ENABLED=${IMS_ENABLED:="true"}
+IMS_DNN=${IMS_DNN:="ims"}
+IMS_PDU_TYPE=${IMS_PDU_TYPE:="IPV4V6"}   # must match the ims DNN type declared in SMF config
+IMS_5QI=${IMS_5QI:="5"}                  # 5QI 5 = IMS signalling
+IMS_ARP_PRIORITY_LEVEL=${IMS_ARP_PRIORITY_LEVEL:="1"}
+IMS_UPLINK=${IMS_UPLINK:="100Mbps"}
+IMS_DOWNLINK=${IMS_DOWNLINK:="200Mbps"}
+
 # IP suffix is incremented by 1 for each UE, starting from $START_IP
 GNB_ID="0xe020"
 START_IP=11
@@ -297,10 +306,16 @@ INSERT INTO \`AuthenticationSubscription\` (\`ueid\`, \`authenticationMethod\`, 
 ('${IMSI}', '5G_AKA', '${DEF_FULL_KEY}', '${DEF_FULL_KEY}', '{\"sqn\": \"000000000020\", \"sqnScheme\": \"NON_TIME_BASED\", \"lastIndexes\": {\"ausf\": 0}}', '8000', 'milenage', '${DEF_OPC}', NULL, NULL, NULL, NULL, '${IMSI}');
 EOF
 
+        # Optional IMS DNN, only for slice 1 (where SMF/UPF declare the ims DNN)
+        IMS_CFG=""
+        if [[ "${IMS_ENABLED,,}" == "true" && "$SLICE" == "1" ]]; then
+            IMS_CFG=",\\\"${IMS_DNN}\\\":{\\\"pduSessionTypes\\\":{ \\\"defaultSessionType\\\": \\\"${IMS_PDU_TYPE}\\\"},\\\"sscModes\\\": {\\\"defaultSscMode\\\": \\\"SSC_MODE_1\\\"},\\\"5gQosProfile\\\": {\\\"5qi\\\": ${IMS_5QI},\\\"arp\\\":{\\\"priorityLevel\\\": ${IMS_ARP_PRIORITY_LEVEL},\\\"preemptCap\\\": \\\"NOT_PREEMPT\\\",\\\"preemptVuln\\\":\\\"PREEMPTABLE\\\"},\\\"priorityLevel\\\":1},\\\"sessionAmbr\\\":{\\\"uplink\\\":\\\"${IMS_UPLINK}\\\", \\\"downlink\\\":\\\"${IMS_DOWNLINK}\\\"}}"
+        fi
+
         # SessionManagementSubscriptionData
         cat >> "$SMSD_DB" <<EOF
 INSERT INTO \`SessionManagementSubscriptionData\` (\`ueid\`, \`servingPlmnid\`, \`singleNssai\`, \`dnnConfigurations\`) VALUES
-('${IMSI}', '${DEF_MCC}${DEF_MNC}', '{\"sst\": ${SST}, \"sd\": \"${SD}\"}','{\"${DNN}\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"${DNN_PDU_TYPE}\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": ${QOS_5QI},\"arp\":{\"priorityLevel\": ${ARP_PRIORITY_LEVEL},\"preemptCap\": \"${ARP_PREEMPT_CAP}\",\"preemptVuln\":\"${ARP_PREEMPT_VULN}\"},\"priorityLevel\":${PRIORITY_LEVEL}},\"sessionAmbr\":{\"uplink\":\"${UPLINK}\", \"downlink\":\"${DOWNLINK}\"},\"staticIpAddress\":[{\"ipv4Addr\": \"${IPADDR}\"}]}}');
+('${IMSI}', '${DEF_MCC}${DEF_MNC}', '{\"sst\": ${SST}, \"sd\": \"${SD}\"}','{\"${DNN}\":{\"pduSessionTypes\":{ \"defaultSessionType\": \"${DNN_PDU_TYPE}\"},\"sscModes\": {\"defaultSscMode\": \"SSC_MODE_1\"},\"5gQosProfile\": {\"5qi\": ${QOS_5QI},\"arp\":{\"priorityLevel\": ${ARP_PRIORITY_LEVEL},\"preemptCap\": \"${ARP_PREEMPT_CAP}\",\"preemptVuln\":\"${ARP_PREEMPT_VULN}\"},\"priorityLevel\":${PRIORITY_LEVEL}},\"sessionAmbr\":{\"uplink\":\"${UPLINK}\", \"downlink\":\"${DOWNLINK}\"},\"staticIpAddress\":[{\"ipv4Addr\": \"${IPADDR}\"}]}${IMS_CFG}}');
 EOF
     done
 
