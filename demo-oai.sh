@@ -371,7 +371,7 @@ OAI5G_CORE="${OAI5G_CHARTS}/oai-5g-core"
 OAI5G_@MODE@="${OAI5G_CORE}/oai-5g-@mode@"
 
 export CN_DEFAULT_GW=""
-export CN_TAG="v2.2.1"
+export CN_TAG="v2.2.2"
 
 ################################ oai-gnb chart parameters ########################
 OAI5G_RAN="${OAI5G_CHARTS}/oai-5g-ran"
